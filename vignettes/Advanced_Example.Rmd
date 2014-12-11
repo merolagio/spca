@@ -1,0 +1,196 @@
+---
+title: "Advanced Example"
+author: "Giovanni Merola"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    fig_caption: yes    
+bibliography: spca.bibtex    
+vignette: >  
+  %\VignetteIndexEntry{Advanced Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+******
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+  comment = "#>",
+  error = FALSE,
+  tidy = TRUE,
+  collapse = TRUE)
+options(width=100)
+```
+<!-- read_chunk('Chunks_baseball_1986_avgs.R') -->
+## Example on the baseball data
+ 
+```{r ldspca, echo=TRUE, eval=TRUE}
+library(spca)
+```
+
+```{r vrsn, echo=FALSE, eval=TRUE, comment=""}
+cat(paste("loaded spca version:", packageVersion("spca")))
+```
+
+###The data
+The `bsbl_avg` contains 16 carrer and 1986 season statistics on Major League Baseball players.
+```{r data}
+data(bsbl_avg)
+data(bsbl_labels)
+print(bsbl_labels, right = FALSE)
+```
+
+The heatmap of the correlation shows a block structure defined by offensive and defensive play in career and in season. However the offensive play statistics are also correlated  across blocks.
+
+```{r heatmap, fig.width = 6, fig.height = 4}
+library(ggplot2)
+library(reshape2)
+q = qplot(x=Var1, y=Var2, xlab = "", ylab = "", las = 2,
+      data=melt(bsbl_avg[,16:1]), fill=value, geom="tile") +
+      scale_fill_gradient2(limits=c(-1, 1))
+q + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  ```
+
+###  Principal Component Analysis
+PCA can be computed with the `pca` function. This is a simple eigendecomposition and produces an *spca* object. It can also generate the screeplot and prrint Kaiser rule, which are useful for determining the number of components to include in the model.
+```{r pca, cache = FALSE, fig.show='hold'}
+bc.pca = pca(bsbl_avg, scree = T, kai = T)
+#
+#<__ names in object -->
+names(bc.pca)
+```
+
+```{r plotpca, fig.show = "hold"}
+#<__ plot the first four loadings
+plot(bc.pca, cols = 4, plotvex = FALSE, plotload = TRUE, 
+     variables = TRUE, rotlab = 45, size = 0.75,  mfrow = 1, mfcol = 1)
+```
+
+As expexcted, there are a few larger ones and other smaller ones. 
+
+The plot of only the contributions larger than with absolute value > 4% is shown below.
+```{r pca-trimmout, fig.show = "hold"}
+plot(bc.pca, cols = 4, thresh = 0.04, plotvex = FALSE, plotload = TRUE, 
+     variables = TRUE, rotlab = 45, size = 0.75, mfrow = 1, mfcol = 1)
+```
+
+The first component is more or less an average without defensive play and years in career.\cr 
+The others are different contrasts.
+
+Following the literature, instead of interpreting the threshold loadings we compute the sparse ones.
+
+###  Choosing the cardinality
+
+In order to choose the cardinality of the sparse loadings, the traces of the elimination can be inspected using the function `choosecard`. Computing the solutions requires choosing the cardinality at each step. This is usually done interactively. We thunk that the best choice is cardinality *(3, 3, 4)*. However, for this script, we ran the selection automatically only for the first component by setting *interact = 3*.  The solution would have been computed using the BE elimination. Alternatively, the the BB algorithm could have been used. This may take a long time for larger matrices.
+
+In the call below we require to print the traces of the trimming for the last six cardinalities the sparse contributions and their statistics. We also plot the statistics for all cardinalities, fewer could be plotted with `cardstoplot`. The *Cardinality Plots* show for each cardinality, in clockwise order: 
+
+* Minaimal contribution (*Min contr*) versus the cardinality;
+* Percentage of cumulative variance of the PCs explained (*PRCVE*) versus the cardinality;
+* Percentage of cumulated variance explained (*PCVE*) versus *Min Contr*;
+* Entropy vs cardinality.
+
+For brevity we show only the first trace, but we chose cardinalities 3, 3 and 4 .We choose the first cardinality as 3 in order to avoid being greedy. Cardinality 4 for the first component could have been chosen.
+
+```{r choosecard, echo = TRUE, tidy = FALSE, fig.show='hold'}
+##<__ print and plot the trace of trimming for each component using card 3, 3 and 4 
+bc.cc = choosecard(bsbl_avg, unc = FALSE, prntrace = TRUE, cardstoprint = 6, mfrow = 1, mfcol = 1, 
+                   interact = c(3))
+```
+
+The command below computes the BE solution as if we had chosen the cardinalities interactively.
+```{r docc, echo = TRUE, tidy = TRUE}
+##<__ print and plot the trace of trimming for each component using card 3, 3 and 4 
+bc.cc = spcabe(bsbl_avg, nd = 3, unc = FALSE, mincard = c(3, 3, 4), msg = FALSE)
+```
+
+The solutions can be printed n different ways, as shown below.
+
+### Print the sparse solutions
+`choosecard` produces a proper **spca** object, in this case obtained with the BE algorithm, which is 
+printed below
+
+````{r look cc}
+#<__ print summaries of cc
+summary(bc.cc)
+##<__ print the contributions__
+bc.cc
+```
+The first table shows that the LS SPCA solutions explain about 97% of the variance explained by PCs. The smallest contribution is above 18% for all components.
+
+From the second table it can be seen that the first component regards offensive play, about 50% season and 50% career performances. The other component are different contrasts of the different dimensions.
+
+Since we chose to compute correlated components, the correlations among them are shown below and they are negligeable.
+```{r check cor cc}
+
+##<__ check the correlation among the components
+round(bc.cc$cor, 2)
+```
+### Plot the sparse solutions
+
+The results can be also inspected visually, as shown below. 
+
+```{r plot cc}
+```
+The sparse contributions can also be plotted against the contributions of the corresponding PCs, as follows.
+```{r plot cc pc, echo = TRUE, tidy = TRUE, fig.keep="all", show="hold"}
+##<== Percentage contributions of the the LS SPCA(BE)(3, 4, 4)  
+##<== and Cumulative variance explained by  LS SPCA(BE) compared with PCA
+plot(bc.cc, plotload = TRUE, methodname = "BE", variablesnames = TRUE, addlabels = TRUE,
+        rotlabels = 0, size = 0.75)
+
+##----plot cc pc, echo = TRUE, tidy = TRUE, fig.keep="all", fig.show="hold", fig.cap = "Sparse vs PC contr.", fig.align="center")----
+#
+##<== Percentage contributions of the the LS SPCA(BE)(3, 4, 4)  
+##<== and Cumulative variance explained by  LS SPCA(BE) compared with PCA
+plot(bc.cc, plotv = TRUE, plotloadvsPC = TRUE, pcs = bc.pca, variablesnames = TRUE, 
+     addlabels = TRUE, rotlabels = 0, size = 0.75)
+```
+These plots show how the PCs' contributions relate to the sparse ones. The solid line across the plots marks the equality for the PCs' contributions.
+
+### BE solutions with minimal variance explained
+
+Instead of using choosecard, the BE solutions can be computed to have a certain characteristic, for example explain a given amount of the variance explained by the PCs.
+
+```{r bbvpv, fig.show = 'hold'}
+bc.be95 = spcabe(bsbl_avg, nd = 3, threshvaronPC = 0.95)
+#
+summary(bc.be95)
+bc.be95
+
+compare(bc.cc, bc.be95, plotload = TRUE, meth = c("CC", "BE95"), short = FALSE )
+```
+Note: the legend and the labels are distorted because of the nonscalability of png images used for these HTML vignettes.
+
+### BB solutions
+The sparse solutions can be computed by the Branch-and-bound algorithm proposed by @fra. The function `spcabb`. The BB solutions with the same cardinality as the BE found above are shown below.
+```{r bb}
+bc.bb = spcabb(bsbl_avg, card = c(3, 3, 4), unc = FALSE)
+summary(bc.bb)
+
+compare(bc.cc, bc.bb, plotload = TRUE, meth = c("CC", "BB"), short = FALSE )
+```
+
+### Sparse solutions of subsets of variables
+Components made up of only subsets of variables can be easily computed with the argument *startind*. In the following example we compute three components, one fomed by offensive season play, the second formed by offensive career play and the last by defensive season play.
+```{r subind, echo = TRUE, tidy = TRUE }
+indos = 1: 6
+indoc = 7: 13
+indds = 14: 16
+bc.sub = spcabe(bsbl_avg, nd = 3, threshvaronPC = 0.85, startind = list(indoc, indos, indds), unc = FALSE)
+
+summary(bc.sub)
+
+bc.sub
+```
+The BB solutions of the same cardinality are the same.
+
+### Trimming more than one contribution at the time
+When the number of variables is large also the BE algorithm can take a long time. In this case the process can be sped up by setting the argument *trim > 1*. In the example below we trim three loadings at the time. This he exmple below shows how the trimming is reverted to one at the time when the number of loadings left to trim is less than three. This last feature is controlled by the argument *reducetrim*, which is *TRUE* by default.
+
+```{r redtrim}
+bc.bet = spcabe(bsbl_avg, nd = 3, mincard = c(2, 2, 2), trim = 3, unc = F)
+```

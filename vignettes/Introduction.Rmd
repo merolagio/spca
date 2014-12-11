@@ -1,0 +1,192 @@
+---
+title: "Introduction to the spca package"
+author: "Giovanni Merola<br>
+RMIT International University Vietnam<br>
+email: lsspca@gmail.com<br>
+bug reports: https://github.com/merolagio/spca----pre-release/issues/new"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  rmarkdown::html_document:
+    toc: true
+    theme: united
+    highlight: haddock
+    fig_caption: true
+bibliography: spca.bibtex    
+vignette: >
+  %\VignetteIndexEntry{Introduction to spca}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+
+
+---
+
+```{r, echo = FALSE, message = FALSE}
+library(spca)
+library(formatR)
+library(knitr)
+knitr::opts_chunk$set(
+  comment = "#>",
+  error = FALSE,
+  tidy = FALSE)
+options(width=120)
+```
+
+### Foreword 
+Unfortunately, creating package vignettes in LaTex using Rmarkdown is virtually impossible. I spent several days trying to figure out **how to make my (flawless) LaTex vignettes accepted by CRAN**. I have finally given in and I had to spend **a lot of time figuring out knitr, rmarkdown, markdown, pandoc and yaml, instead of debugging the package**. Rmarkdown and knitr seem to be still immature products with limitations, bugs, inconsistencies and poor documentation available. 
+So, the quality of these vignettes is not what I would have liked. On the positive side, I can now send cool emails with markdown :-)
+
+### Intro
+`spca` is an R package for running Sparse Principal Component Analysis. It implements the **LS SPCA** approach that computes the Least Squares estimates of sparse PCs (@mer). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
+
+The implementation is completely in `R`, so it can only be run on *small* datasets (the limit depends on the hardware used, we were able to solve problems with about 1000 variables in minutes). The package is self contained as it only depends on the library `MASS` which is part of the basic distribution of R. 
+
+Details about LS SPCA and the methodology impmented in the package can be found in ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")) and in the forthcoming peer reviewed paper. 
+
+### A little math
+Principal Component Analysis was developed by @pea to attain the components that minimised the LS criterion when approximating the data matrix. If $X$ is a matrix with *n* rows of observations on *p* variables, the PCs are defined by the loadings $a_j$ as $t_j = X a_j$. The matrix of $d<p$ PCs, $T = XA$, is derived as the regressors that minimise the Residual Sum of Squares. By the principle of the Extra Sum of Squares the components can be constrained to be uncorrelated without loss of optimality. Therefore the PCA problem is obtained by solving: 
+$$
+A = \text{arg}\min ||X - TP'||^2 = \text{arg}\max\frac{A'SSA}{A'SA} = \text{arg}\max \sum_{1}^d \frac{a_j'SSa_j}{a_j'Sa_j}\\
+\text{subject to}\ a_j'Sa_k = 0,\ j\neq k,
+$$
+where $S$ is the covariance matrix of the $x$ variables. The terms in the last summation are the *variance explained* by each component. The solutions are proportional to the eigenvectors of $S$ corresponding to the eigenvalues taken in nonicreasing order. It is well known that the eigenvectors are mutually uncorrelated.
+
+@hot gives the PCs' loadings as the eigenvectors of $S$ with unit Euclidean norm. Using this normalisation the maximisation of the variance explained by each component simplifies to
+$$
+A =  \text{arg}\max \sum_{1}^d {a_j'Sa_j}\\
+\text{subject to}\ a_j'Sa_k = \delta_{jk},
+$$
+where $\delta_{jk} = 1$ if $j=k$ and  $\delta_{jk} = 0$ otherwise.
+
+Because of its simplicity, Hotelling's derivation has been adopted for popularizing PCA among pratictioners. This choice was unfortunate because the original objective of minimising the LS criterion has been somewhat forgotten. This is confirmed, for example, by the fact that the Technometrics' chief editor, Dr Qiu, and another associated editor rejected the LS SPCA paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc :-D** (on top of other blatantly wrong and biased objections). Other than in Person's original paper, the LS derivation is given in several books and papers cited in my paper ( *e.g.* @ten and @ize08).  
+
+When cardinality constraints, the so called $L_0$ *norm* constraints, are imposed on the original PCA problem the loadings are no longer eigenvectors of $S$. Therefore, Hotelling's simplification is no longer equivalent to the variance explained. Therefore, by the Cauchy-Schwartz inequality:
+$$
+\frac{a_j'SSa_j}{a_j'Sa_j} \geq \frac{a_j'Sa_j}{a_j'a_j}
+$$
+for any square matrix *S*, with equality if and only if the vectors $a_j$ are eigenvectors of $S$.
+
+Previous SPCA methods apply cardinality constraints to Hotelling's definition, hence not optimising the variance explained. Instead, in LS SPCA the loadings are derived by applying cardinality constraints to Pearson's LS optimisation.
+
+The uncorrelated LS SPCA solutions are derived from constrained Reduced Rank Regression (see @ize, for the unconstrained solutions). The uncorrelatedness constraints limit the amount of variance explained by the solutions and require that the loadings have cardinality not smaller than their rank. Even though uncorrelated components are easier to interpret, in some cases uncorrelated ones can be useful. Therefore, we also provide correlated sparse loadings that approximately minimise the LS criterion.
+
+### Optimisation Models
+Finding the optimal indices for an *spca* solution is an intractable NP-hard problem.  
+
+Therefore, we find the solutions through two greedy algorithms: Branch-and-Bound (**BB**) and Backward Elimination (**BE**).
+
+* **BB** searches for the solutions that sequentially maximise the variance explained under the constraints. The solutions may not be a global maximum when more than one component is computed. The BB algorithm is a modification of @fra's (thanks!).
+
+* **BE** has the goal of attaining larger contributions while minimising the LS criterium. It sequentially eliminates the smallest contributions (in absolute value) from a non-sparse solution. 
+
+* The  **BE** solutions will generally explain less variance than the **BB** ones. However, the **BE** algorithm is much faster and the solutions, usually, have larger loadings. The algorithm is illustrated in more details in the *BE Algorithm* Vignette.
+
+The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca")`
+
+### Use of the package
+
+**SPCA aims to obtain interpretable solutions**
+
+Interpretability is not univocally defined. Hence, for a problem there exist a number of competing solutions. In Factor Analysis literature there is plenty of discussion about the  definition of *interpretable* and *simple* solution (as qualities and mathematical functions). 
+
+* *Simplicity* can be defined by different measures, being linked to sparseness, parsimony, variance explained and size of the loadings. 
+
+* *interpretability* is also linked to which of the variables are included in the solution  and is not measurable.
+    * it usually requires expert knowledge.
+    
+Therefore, for a given problem there usually exist several competing *simple* and *interpretable* solutions. 
+
+`spca` **is implemented as an exploratory data analysis tool** 
+
+The cardinality of the components can be chosen interactively after inspecting trace and plots of solutions of different cardinality.
+
+Furthermore, the solutions can be automatically computed so as to:
+
+* be uncorrelated with the others or not.
+* have a minimal cardinality. 
+* reproduce a given proportion of the variance explained by the full PCs. 
+* have only contributions larger than a given threshold.
+
+`spca` can be helpful also in a confirmatory stage of the analysis, in fact
+* the components can be constrained to be made up of only a subset of the variables.
+
+### Functions
+The workhorse of the package is the function `spca`, which computes the optimal solutions for a given set of indices.
+
+It is called simply with a list of indices and the the flags for correlated or uncorrelated components (one for each component, if necessary)
+```{r spca,   comment = "", echo = FALSE}
+usage(spca)
+```
+
+The functions `spcabb` and `spcabe` implement the **BB** and **BE** searches, respectively.
+
+```{r spcabb, comment = "", echo = FALSE}
+usage(spcabb)
+```
+
+```{r spcabe, comment = "", echo = FALSE}
+usage(spcabe)
+```
+
+With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and the utilities. In the `vignettes(spca)` you will find a more complete example and details on the methods. These are available also in the *Manual* and a more complete example is given in the *Advanced Example* vignette.
+
+### Methods
+
+The package contains methods for plotting, printing and comparing spca solutions. These are:
+
+- `choosecard`: interactive method for choosing the cardinality. It plots and prints statistics for comparing solutions of different cardinality.
+
+- `print`: shows a formatted matrix of sparse loadings or *contributions* of a solution. Contributions are loadings expressed as percentages, while the loadings are scaled to unit sum of squares.
+
+- `showload`: prints only the non-zero sparse loadings. This is useful when the number of variables is large.
+
+- `summary`: shows formatted summary statistics of a solution
+
+- `plot`: plots the cumulative variance explained by the sparse solutions versus that explained by the PCs, which is their upper bound. It can also plot the contributions in different ways.
+
+- `compare`: plots and prints comparison of two or more *spca* objects.
+
+### Minimal Example
+The naming of the arguments in R is not simple, mainly because different syntaxes have been used over the years. I tried to give meaningful names starting differently so that R's useful feature of partial matching the arguments can be exploited. In the following wxample I sometime use partial arguments names.
+
+```{r ex, fig.width = 3.5, fig.height = 3.5, fig.cap ="screeplot", fig.align= "center"}
+library(spca)
+cat(paste("loaded spca version:", packageVersion("spca")))
+data(bsbl)
+
+#- ordinary PCA
+bpca = pca(bsbl, screeplot = TRUE, kaiser.print = TRUE)
+```
+
+```{r ex second}
+#- sparse PCA with minimal contribution 25%
+bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
+
+#- summary output
+summary(bbe1)
+#-# Explaining over 96% of the PCs' variance with 2, 3, 3 and 1 variables.
+
+#- print percentage contributions
+bbe1
+#-# Simple combinations of offensive play in career and season are most important. Defensive play in season appears only in 3rd component.
+
+#- The contributions can be printed one by one using the descriptive names in `bsbl_label`
+data(bsbl_labels, package = "spca")
+head(bsbl_labels)
+showload(bbe1, variablesnames = bsbl_labels[,2])
+#- plot solution
+plot(bbe1, plotloadvsPC = TRUE, pc = bpca, mfr = 2, mfc = 2, 
+               variablesnames = as.character(bsbl_labels[,2]))
+#-# Explaining the variance pretty closely to PCA with much fewer variables.
+
+#
+```
+
+### Future releases
+This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bug reports or contributions.
+
+For now most of the plots are produced with the basic plotting functions. In a later release I will produce them with \code{ggplt2} (requires learning the package better).
+
+The code is implemented in R, so it will not work for large datasets. 
+I have in mind to develop C routines at least for the matrix algebra. Anybody willing to help, please, let me know. 
+
+# References

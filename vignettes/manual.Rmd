@@ -1,0 +1,1877 @@
+---
+title: "spca package help file"
+author: "Giovanni Merola"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Manual}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+<div id="TOC">
+<ul>
+<li><a href="#spca-package">spca-package</a></li>
+<li><a href="#anthrop">anthrop</a></li>
+<li><a href="#bsbl">bsbl</a></li>
+<li><a href="#bsbl_avg">bsbl_avg</a></li>
+<li><a href="#bsbl_labels">bsbl_labels</a></li>
+<li><a href="#choosecard">choosecard</a></li>
+<li><a href="#compare.spca">compare.spca</a></li>
+<li><a href="#is.spca">is.spca</a></li>
+<li><a href="#pca">pca</a></li>
+<li><a href="#plot.spca">plot.spca</a></li>
+<li><a href="#print.spca">print.spca</a></li>
+<li><a href="#showload">showload</a></li>
+<li><a href="#spca">spca</a></li>
+<li><a href="#spcabb">spcabb</a></li>
+<li><a href="#spcabe">spcabe</a></li>
+<li><a href="#summary.spca">summary.spca</a></li>
+</ul>
+</div>
+
+<h3 id="spca-package" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;box-shadow: 2.5px 2.5px 1.25px #888888;">spca-package</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for spca-package"><tr><td>spca-package</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Utilities for computing Sparse Principal Components with the LS SPCA method.</h2>
+
+<h3>Description</h3>
+
+<p>Sparse principal components have few loadings different from zero.  The
+functions in this package compute the sparse components with the method LS
+SPCA. These solutions attain the Least Squares approximation to the data
+using a correlation (or covariance) matrix.<br> <br> The solutions are
+obtained either through a Branch-and-Bound search (<code>spcabb</code>) or
+a more efficient iterative backward Elimination Algorithm
+(<code>spcabe</code>). <br><br> If the indices of the sparse loadings are
+known, the LS SPCA solutions can be computed with <code>spca</code><br><br>
+The output is an object of class spca. The minimal spca object contains the
+following elements: </p>
+
+<table summary="Rd table">
+<tr>
+ <td align="left"> loadings</td><td align="left"> A matrix with the loadings
+scaled to unit <i>L_2</i> norm in the columns.</td>
+</tr>
+<tr>
+ <td align="left"> vexp</td><td align="left"> A vector with the
+% variance explained by each component.</td>
+</tr>
+<tr>
+ <td align="left"> vexpv</td><td align="left"> A vector with the %
+variance explained by each principal component.</td>
+</tr>
+<tr>
+ <td align="left"> ind</td><td align="left"> A list of the indices
+of the sparse loadings.</td>
+</tr>
+
+</table>
+<p> The following methods
+are available </p>
+
+<table summary="Rd table">
+<tr>
+ <td align="left"> <code>print.spca</code></td><td align="left"> Prints the nonzero
+loadings</td>
+</tr>
+<tr>
+ <td align="left"> <code>plot.spca</code></td><td align="left"> Plots the variance explained and the
+nonzero loadings</td>
+</tr>
+<tr>
+ <td align="left"> <code>summary.spca</code></td><td align="left"> Prints summary statistics
+of the solutions</td>
+</tr>
+<tr>
+ <td align="left"> <code>showload</code></td><td align="left"> shows and plots the spca
+loadings. Not implemented as an spca method.</td>
+</tr>
+<tr>
+ <td align="left"> <code>compare.spca</code></td><td align="left">
+Compares different spca objects, giving summaries and plots. Not implemented
+as an spca method. </td>
+</tr>
+
+</table>
+
+
+
+<h3>References</h3>
+
+<p>Giovanni M. Merola. 2014. <EM>Least Squares Sparse Principal
+Component Analysis: a Backward Elimination approach to attain large
+loadings.</EM> To appear on Austr.&amp;NZ Jou. Stats. Giovanni M. Merola.<br><br>
+Giovanni M. Merola. 2014. <EM>Sparse Principal Component Analysis: a
+Least Squares approximation approach.</EM>  <a href="http://arxiv.org/abs/1406.1381">http://arxiv.org/abs/1406.1381</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>spcabb</code> and <code>spcabe</code> for usage examples.
+</p>
+
+
+</div>
+
+
+<h3 id="anthrop" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">anthrop</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for anthrop"><tr><td>anthrop</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Anthropometric measures of criminals</h2>
+
+<h3>Description</h3>
+
+<p>This dataset was used for the first application of PCA. It consists of the
+correlation matrix of seven measures of physical characteristics of a random
+sample of British criminals. This dataset was used for the first PCA application (by hand!).
+Useful for testing.
+</p>
+
+
+<h3>Format</h3>
+
+<p>A 7 by 7 correlation matrix.
+</p>
+
+<dl>
+<dt><code>Head Length</code></dt><dd></dd>
+<dt><code>Head Breadth</code></dt><dd></dd>
+<dt><code>Face Breadth</code></dt><dd></dd>
+<dt><code>Finger</code></dt><dd></dd>
+<dt><code>Cubit</code></dt><dd></dd>
+<dt><code>Foot</code></dt><dd></dd>
+<dt><code>Height</code></dt><dd></dd>
+</dl>
+
+
+<h3>References</h3>
+
+<p>Macdonell, W. (1902). Criminal Anthropometry and the
+Identification of Criminals. <EM>Biometrika</EM>, 1(2):177-227.
+</p>
+
+
+</div>
+
+<h3 id="bsbl" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">bsbl</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for bsbl"><tr><td>bsbl</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Baseball hitters career and 1986 season total statistics</h2>
+
+<h3>Description</h3>
+
+<p>Correlation matrix of 16 statistics of major league hitters some of the
+overall career and others relative to the 1986 season. Available at StatLib.
+The matrix has a block structure, defined by season offensive play, career
+offensive play and season defensive play.
+</p>
+
+
+<h3>Format</h3>
+
+<p>A <EM>16</EM> by <EM>16</EM> correlation matrix.
+</p>
+
+<dl>
+<dt><code>TAB_86</code></dt><dd><p>times at bat in 1986</p>
+</dd>
+<dt><code>HIT_86</code></dt><dd><p>hits in 1986</p>
+</dd>
+<dt><code>HR_86</code></dt><dd><p>home runs in 1986</p>
+</dd>
+<dt><code>RUN_86</code></dt><dd><p>runs in 1986</p>
+</dd>
+<dt><code>RB_86</code></dt><dd><p>runs batted-in in 1986</p>
+</dd>
+<dt><code>WAL_86</code></dt><dd><p>walks in 1986</p>
+</dd>
+<dt><code>YC</code></dt><dd><p>years in the major leagues</p>
+</dd>
+<dt><code>TAB</code></dt><dd><p>times at bat during his career</p>
+</dd>
+<dt><code>HIT</code></dt><dd><p>hits during his career</p>
+</dd>
+<dt><code>HR</code></dt><dd><p>home runs during his career</p>
+</dd>
+<dt><code>RUN</code></dt><dd><p>runs during his career</p>
+</dd>
+<dt><code>RUNB</code></dt><dd><p>runs batted-in during his career</p>
+</dd>
+<dt><code>WAL</code></dt><dd><p>walks during his career</p>
+</dd>
+<dt><code>PO_86</code></dt><dd><p>put outs in 1986</p>
+</dd>
+<dt><code>ASS_86</code></dt><dd><p>assists in 1986</p>
+</dd>
+<dt><code>ERR_86</code></dt><dd><p>errors in 1986</p>
+</dd>
+</dl>
+
+
+<h3>Source</h3>
+
+<p><a href="http://lib.stat.cmu.edu/datasets/baseball.data">http://lib.stat.cmu.edu/datasets/baseball.data</a>
+</p>
+
+
+</div>
+
+<h3 id="bsbl_avg" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">bsbl_avg</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for bsbl_avg"><tr><td>bsbl_avg</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Baseball hitters career and 1986 season average statistics</h2>
+
+<h3>Description</h3>
+
+<p>Same data as above after averaging the career totals with the years in career. <br>
+The matrix no longer has a block structure.
+</p>
+
+
+<h3>Format</h3>
+
+<p>A <EM>16</EM> by <EM>16</EM> correlation matrix. See 
+ <code>bsbl</code> for variables names.
+</p>
+
+
+<h3>Source</h3>
+
+<p><a href="http://lib.stat.cmu.edu/datasets/baseball.data">http://lib.stat.cmu.edu/datasets/baseball.data</a>
+</p>
+
+
+</div>
+
+
+<h3 id="bsbl_labels" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">bsbl_labels</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for bsbl_labels"><tr><td>bsbl_labels</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Baseball hitters statistics labels reference table</h2>
+
+<h3>Description</h3>
+
+<p>This data frame provides descriptive labels for the variables in the
+bsbl datasets matching the short ones used.
+</p>
+
+
+<h3>Format</h3>
+
+<p>A <EM>16</EM> by <EM>16</EM> correlation matrix.</p>
+
+
+<h3>Source</h3>
+
+<p><a href="http://lib.stat.cmu.edu/datasets/baseball.data">http://lib.stat.cmu.edu/datasets/baseball.data</a>
+</p>
+
+
+</div>
+
+
+<h3 id="choosecard" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">choosecard</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for choosecard"><tr><td>choosecard</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Function for choosing the cardinality of the sparse components</h2>
+
+<h3>Description</h3>
+
+<p>Interactive function that produces and plots various statistics relative to
+different cardinalities of the sparse components.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+choosecard(S, method = c("BE", "BB"), perc = TRUE, unc = TRUE, trim = 1,
+  reducetrim = TRUE, prntrace = FALSE, cardstoprint, interact = TRUE,
+  rtntrace = TRUE, doplot = TRUE, plotminload = TRUE,
+  plotcvexp = c("rel", "abs", FALSE), plotlovsvexp = TRUE,
+  plotentropy = TRUE, plotfarcomeni = FALSE, mfrowplot = 2,
+  mfcolplot = 2, cardstoplot, ce = 1)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>S</code></td>
+<td>
+<p>A correlation (or covariance) matrix.</p>
+</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+<p>String. Method used to produce solutions, either BE or BB.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: should the loading be scaled as percentages?</p>
+</td></tr>
+<tr valign="top"><td><code>unc</code></td>
+<td>
+<p>Logical vector. If TRUE the corresponding component is computed
+uncorrelated, otherwise correlated. Can be shorter than nd. See details for
+spcabe.</p>
+</td></tr>
+<tr valign="top"><td><code>trim</code></td>
+<td>
+<p>Number of loadings to trim at each iteration.  See details for
+spcabe</p>
+</td></tr>
+<tr valign="top"><td><code>reducetrim</code></td>
+<td>
+<p>Logical. If TRUE and trim &gt; 1 when are left less than trim
++ mincard[j] loadings, trim is reduced to 1 for these last loadings.</p>
+</td></tr>
+<tr valign="top"><td><code>prntrace</code></td>
+<td>
+<p>Logical: should the trace of the trimming be printed?</p>
+</td></tr>
+<tr valign="top"><td><code>cardstoprint</code></td>
+<td>
+<p>Integer: number of cardinalities to print with the
+trace. If missing all, otherwise only the last <EM>cardstoprint</EM> solutions
+will be printed.</p>
+</td></tr>
+<tr valign="top"><td><code>interact</code></td>
+<td>
+<p>Hybrid: if TRUE the cardinalities chosen must be entered
+intearctively.  If a vector of cardinalities is passed the plots and tracies
+are produced.</p>
+</td></tr>
+<tr valign="top"><td><code>rtntrace</code></td>
+<td>
+<p>Logical: should the trace of the trimming be returned?</p>
+</td></tr>
+<tr valign="top"><td><code>doplot</code></td>
+<td>
+<p>Logical: should the any plotting be done</p>
+</td></tr>
+<tr valign="top"><td><code>plotminload</code></td>
+<td>
+<p>Logical: should the minimum loading (or contribution if
+perc = TRUE) for each cardinality be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>plotcvexp</code></td>
+<td>
+<p>string: if set =<EM>abs</EM> the percentage variance
+explained for each cardinality is plotted. If set =<EM>rel</EM> the percentage
+cumulative variance explained relative to that explained by the same number
+of PCs is plotted against the cardinality. If set =FALSE (or anything else)
+none is plotted.</p>
+</td></tr>
+<tr valign="top"><td><code>plotlovsvexp</code></td>
+<td>
+<p>Logical: should the variance explained for each
+cardinality be plotted against the minimal loadings?</p>
+</td></tr>
+<tr valign="top"><td><code>plotentropy</code></td>
+<td>
+<p>Logical: should the entropy of the loadings be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>plotfarcomeni</code></td>
+<td>
+<p>Logical: should the sparsity index proposed by
+farcomeni be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>mfrowplot,mfcolplot</code></td>
+<td>
+<p>Integers. The number of rows and columns on which
+display the plots</p>
+</td></tr>
+<tr valign="top"><td><code>cardstoplot</code></td>
+<td>
+<p>Integer: number of cardinalities to plot. If missing all
+are plotted</p>
+</td></tr>
+<tr valign="top"><td><code>ce</code></td>
+<td>
+<p>Real &gt; 0. The expansion factor for the plots labels.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function is interactive produces plots relative to the different
+cardinalities of a component and then asks which cardinality is preferred
+and computes the next. The process can be stopped by entering adding a
+decimal value to cardinality of the last component desired. By default the
+solutions are computed with the BE algorithm (<code>spcabe</code>).
+<EM>prntrace=TRUE</EM> prints the trace of the last <EM>cardstoprint</EM>
+trimmings, with the variables orderd in elimination order during cardinality
+selection.  The order may not be univocal when using the BB algorithm.
+<EM>rtntrace</EM> returns the full trace for all dimensions.  The default
+settings produce 4 plots. Farcomeni's index is computed as <i>vexp(c_j) -
+\frac{\log(c_j)\bar&sigma;^2}{j+1}</i>, where <i>c_j</i> is the cardinality
+and <i>\bar&sigma;^2</i> is the average variance (=1 for correlation
+matrices). The values of farcomeni's Index and entropy are not returned if
+their plot is not required.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If rtntrace = TRUE a list of matrices of full traces is retuned.
+</p>
+
+
+<h3>Note</h3>
+
+<p>The plots are not very customisable. Personalised plots can be easily
+produced from the spca object.
+</p>
+
+
+<h3>References</h3>
+
+<p>Giovanni M. Merola. 2014.  Least Squares Sparse Principal
+Component Analysis: a backward elimination approach to attain large
+loadings. To appear in Australian and New Zealand Journal of Statistics.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>spcabe</code>, <code>spcabb</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre class="r">
+## Not run: 
+data(bsbl)
+## run choosecard in non interactive mode
+ba &lt;- choosecard(bsbl, prntrace = TRUE, cardstoprint = 6, doplot = FALSE, interact = c(3, 3, 4))
+
+# to run in interactive mode replace the interact and doplot arguments with TRUE
+# (or remove them from the call altogether).
+
+## End(Not run)
+</pre>
+
+
+</div>
+
+
+<h3 id="compare.spca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">compare.spca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for compare.spca"><tr><td>compare.spca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Compares two or more spca solutions</h2>
+
+<h3>Description</h3>
+
+<p>Compares two or more spca solutions by printing the loadings and the summary
+statistics next to each other. It can plot the cumulative variances
+explained together with those of PCA and the loadings for each component.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+## S3 method for class 'spca'
+compare(smpc, compareto, nd, methodsnames, perc = TRUE,
+  plotvar = TRUE, plotload = FALSE, labelload = TRUE,
+  sizelabelsload = 0.85, poslabeload = 3, prnload = TRUE,
+  shortnamescomp = TRUE, rtn = FALSE, prn = TRUE, only.nonzero = TRUE,
+  bnw = FALSE, mfrowload = 1, mfcolload = 1, sizelegend = 0.85, ...)
+
+compare(smpc, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>smpc</code></td>
+<td>
+<p>An spca object</p>
+</td></tr>
+<tr valign="top"><td><code>compareto</code></td>
+<td>
+<p>A list of spca objects with which smpc is to be compared. Can be givenas
+single object</p>
+</td></tr>
+<tr valign="top"><td><code>nd</code></td>
+<td>
+<p>Number of dimensions to compare. If not specified set to the
+minimum number of loadings in the objects.</p>
+</td></tr>
+<tr valign="top"><td><code>methodsnames</code></td>
+<td>
+<p>Names for each object included. If not specified, labels are
+created as Met1, Met2, etc.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: should the loadings be standardised to unit <i>L_1</i>
+norm (and printed as percentage contributions).</p>
+</td></tr>
+<tr valign="top"><td><code>plotvar</code></td>
+<td>
+<p>Logical: should the cumulative variances be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>plotload</code></td>
+<td>
+<p>Logical or integer (&gt;0): should the loadings be plotted and
+how many?</p>
+</td></tr>
+<tr valign="top"><td><code>labelload</code></td>
+<td>
+<p>Logical: write variables names loading plots?</p>
+</td></tr>
+<tr valign="top"><td><code>sizelabelsload</code></td>
+<td>
+<p>Real: expansion coefficient for loading plot label.
+See <EM>cex</EM> in <code>par</code>,</p>
+</td></tr>
+<tr valign="top"><td><code>poslabeload</code></td>
+<td>
+<p>integer: position of the labels of the laodings.
+1 = bottom, 2 = left, 3 = top (default), 4 = right.</p>
+</td></tr>
+<tr valign="top"><td><code>prnload</code></td>
+<td>
+<p>Logical or Integer (&gt;0): should the loadings be printed and
+how many?</p>
+</td></tr>
+<tr valign="top"><td><code>shortnamescomp</code></td>
+<td>
+<p>Logical: should the loadings be printed with short names
+(Cx.y) or long ones (Cx.methodsnames)?</p>
+</td></tr>
+<tr valign="top"><td><code>rtn</code></td>
+<td>
+<p>Logical: should the text table of loadings and the matrix of
+summaries be returneded?</p>
+</td></tr>
+<tr valign="top"><td><code>prn</code></td>
+<td>
+<p>Logical: should anything be printed? Takes priority on prnload.</p>
+</td></tr>
+<tr valign="top"><td><code>only.nonzero</code></td>
+<td>
+<p>Logical: should only nonzero contributions be printed?</p>
+</td></tr>
+<tr valign="top"><td><code>bnw</code></td>
+<td>
+<p>Logical: should plots be in blck and white?</p>
+</td></tr>
+<tr valign="top"><td><code>mfrowload</code></td>
+<td>
+<p>Number of loadings plots per row.</p>
+</td></tr>
+<tr valign="top"><td><code>mfcolload</code></td>
+<td>
+<p>Number of loadings plots per column.</p>
+</td></tr>
+<tr valign="top"><td><code>sizelegend</code></td>
+<td>
+<p>Magnification of the legend labels, see <EM>cex</EM> in
+<code>par</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>additional arguments for generic compare. Disabled, additional arguments will
+generate an error.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>For the meaning of each summary statistic see <code>summary.spca</code>.  Plotvar
+plots <EM>nd</EM> values. if <EM>plotload</EM> or <EM>prnload</EM> are integer,
+that number of loaidngs will be processed. However, <EM>nd</EM>
+loadings are always returned if <EM>rtn=TRUE</EM>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If rtn = TRUE, it returns a formatted text table with the loadings
+and a matrix with the summaries.
+</p>
+<p><code>NULL</code>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Examples in <code>spcabb</code> and <code>spcabe</code>.
+</p>
+
+
+</div>
+
+
+<h3 id="is.spca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">is.spca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for is.spca"><tr><td>is.spca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Verifies if an object is of class spca</h2>
+
+<h3>Description</h3>
+
+<p>Verifies if an object is of class spca
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+is.spca(x)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Any object suspected of being of class spca.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Logical: TRUE if object is of class spca, FALSE otherwise.
+</p>
+
+
+</div>
+
+<h3 id="pca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">pca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for pca"><tr><td>pca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Computes principal components solutions</h2>
+
+<h3>Description</h3>
+
+<p>Computes PCA components loadings.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+pca(S, nd, only.values = FALSE, screeplot = FALSE, kaiser.print = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>S</code></td>
+<td>
+<p>A correlation or covariance matrix.</p>
+</td></tr>
+<tr valign="top"><td><code>nd</code></td>
+<td>
+<p>Integer: number of loadings to retain. If missing all loadings are
+retained.</p>
+</td></tr>
+<tr valign="top"><td><code>only.values</code></td>
+<td>
+<p>Logical: should only the eigenvalues be computed?</p>
+</td></tr>
+<tr valign="top"><td><code>screeplot</code></td>
+<td>
+<p>Logical: should the screeplot be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>kaiser.print</code></td>
+<td>
+<p>Logical: should the kaiser rule be computed, printed and
+returned?.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><EM>nd</EM> is just the number of components retained from the full eigen
+decomposition, doesn't speed up the function. <EM>only.values</EM> does not
+compute the loadings and is more efficient. Kaiser rule determines the
+number of components as the number of eigenvalues larger than one. It should
+be used only for correlation matrices, if called on a covariance matrix a
+warning is generated.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <EM>spca</EM> is returned, which contains:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>loadings</code></td>
+<td>
+<p>The matrix of loadings (if only.values = TRUE it is equal to
+NULL).</p>
+</td></tr> <tr valign="top"><td><code>vexpv</code></td>
+<td>
+<p>a vector of variances explained by each PC</p>
+</td></tr>
+<tr valign="top"><td><code>vexp</code></td>
+<td>
+<p>a vector of variances explained by each PC</p>
+</td></tr> <tr valign="top"><td><code>cvexp</code></td>
+<td>
+<p>a
+vector of cumulative variances explained by the PCs</p>
+</td></tr></table>
+<p> In addition, if
+<code>kaiser.print = TRUE</code>: </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>kaiser</code></td>
+<td>
+<p>The number of eigenvalues larger
+than one.</p>
+</td></tr>
+</table>
+
+
+<h3>See Also</h3>
+
+<p>See also <code>print.spca, summary.spca</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre class="r">
+## Not run: 
+	 data(anthrop, package = "spca")
+	 # computes 4 PCs loadings plotting the screeplot and printing the kaiser rule
+	 mypca &lt;- pca(anthrop, nd = 4, screeplot = TRUE, kaiser.print = TRUE)
+	 ## print loadings
+	 mypca
+	 summary(mypca)
+ 
+## End(Not run)
+</pre>
+
+
+</div>
+
+
+<h3 id="plot.spca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">plot.spca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for plot.spca"><tr><td>plot.spca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plots loadings and variance explained for an spca object</h2>
+
+<h3>Description</h3>
+
+<p>Plots coefficients and variance explained for spca solutions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+## S3 method for class 'spca'
+plot(x, cols, plotvexp = TRUE, methodname = FALSE,
+  plotload = FALSE, thresh = 0.001, perc = TRUE, variablesnames = FALSE,
+  onlynonzero = TRUE, plotloadvsPC = FALSE, pcs = NULL,
+  addlabels = TRUE, mfrowload = 1, mfcolload = 1, bnw = FALSE,
+  rotlabels = 0, sizelabels = 1, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>An spca object.</p>
+</td></tr>
+<tr valign="top"><td><code>cols</code></td>
+<td>
+<p>The number of components to be plotted. Default all.  If an
+iteger is passed, it is set to 1:cols.</p>
+</td></tr>
+<tr valign="top"><td><code>plotvexp</code></td>
+<td>
+<p>Logical: should the cumulative variance explained be
+plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>methodname</code></td>
+<td>
+<p>Name of the method. If FALSE set to LS SPCA</p>
+</td></tr>
+<tr valign="top"><td><code>plotload</code></td>
+<td>
+<p>Logical: should the loadings be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>thresh</code></td>
+<td>
+<p>Real: value below this are considered zero and not plotted. It
+<EM>thresh</EM>&gt; 0.001 it is effective regardless of the value of <EM>onlynonzero</EM>.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: should the loading be scaled as percentages?</p>
+</td></tr>
+<tr valign="top"><td><code>variablesnames</code></td>
+<td>
+<p>names of the variables to use in plot of loadings.  If FALSE,
+names are set to V1, V2,... If TRUE the rownames of the matrix of loadings
+are used.</p>
+</td></tr>
+<tr valign="top"><td><code>onlynonzero</code></td>
+<td>
+<p>Logical: should only the non-zero loadings be plotted?</p>
+</td></tr>
+<tr valign="top"><td><code>plotloadvsPC</code></td>
+<td>
+<p>Logical: if TRUE the sparse loadings are plotted versus
+the corresponding PCA ones.</p>
+</td></tr>
+<tr valign="top"><td><code>pcs</code></td>
+<td>
+<p>An spca object containing the PCA loadings, typically obtained
+with the function pca.</p>
+</td></tr>
+<tr valign="top"><td><code>addlabels</code></td>
+<td>
+<p>Hybrid: if TRUE the nonzero loadings in the plotloadvsPC
+and plotload plots are labelled with short names V1, V2,..., if equal to
+&quot;orig&quot; the original variables names are used as labels, if FALSE no labels
+are added.</p>
+</td></tr>
+<tr valign="top"><td><code>mfrowload</code></td>
+<td>
+<p>Number of loadings plots per row.</p>
+</td></tr>
+<tr valign="top"><td><code>mfcolload</code></td>
+<td>
+<p>Number of loadings plots per column.</p>
+</td></tr>
+<tr valign="top"><td><code>bnw</code></td>
+<td>
+<p>Logical: should the plots be in black and white?</p>
+</td></tr>
+<tr valign="top"><td><code>rotlabels</code></td>
+<td>
+<p>Angle for the rotation of the labels, see <EM>srt</EM> in <code>par</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>sizelabels</code></td>
+<td>
+<p>Magnification of the labels, see <EM>cex</EM> in <code>par</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additonal arguments for generic plot. Disabled, additional arguments will
+generate an error.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The cumulative variance explained is always plotted together with that
+explained by the PCs.  The loadings are plotted as barplots. For large
+matrices it is reccommended to set onlynonzero = TRUE and variablesnames = F. The
+plots of the sparse loadings versus the PC's ones are marked with the line
+of equality of the PCs ones.
+</p>
+
+
+<h3>Value</h3>
+
+<p>None
+</p>
+
+
+<h3>Note</h3>
+
+<p>The value of <EM>thresh</EM> must be chosen according to the value of <EM>perc</EM>.<br>
+The &quot;dots&quot; are disabled so that only exact (or partial) prescribed arguments
+can be entered.<br>
+The plots are not very customisable. Personalised plots can be easily
+produced from the spca object.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Examples in <code>spcabe</code> and <code>spcabb</code>. For plotting two or
+more spca solutions together see <code>compare</code>.
+</p>
+
+
+</div>
+
+
+<h3 id="print.spca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">print.spca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for print.spca"><tr><td>print.spca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Prints the sparse loadings from an spca object</h2>
+
+<h3>Description</h3>
+
+<p>Prints sparse loadings omitting the zero ones and giving the cumulative
+variance explained.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+## S3 method for class 'spca'
+print(x, cols, only.nonzero = TRUE, perc = TRUE,
+  digits = 3, thresh = 0.001, rtn = FALSE, namescomp = NULL, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>An spca object.</p>
+</td></tr>
+<tr valign="top"><td><code>cols</code></td>
+<td>
+<p>A vector indicating which components should be printed. Default
+all. If an iteger is passed, it is set to 1:cols.</p>
+</td></tr>
+<tr valign="top"><td><code>only.nonzero</code></td>
+<td>
+<p>Logical: if = TRUE only the nonzero loadings are printed.
+otherwise all loadings are printed.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: should the loadings be standardised to unit <i>L_1</i>
+norm (and printed as percentage contributions)?</p>
+</td></tr>
+<tr valign="top"><td><code>digits</code></td>
+<td>
+<p>Integer: number of decimal figures.</p>
+</td></tr>
+<tr valign="top"><td><code>thresh</code></td>
+<td>
+<p>Value below which loadings are considered zero and not
+printed.</p>
+</td></tr>
+<tr valign="top"><td><code>rtn</code></td>
+<td>
+<p>Logical: should the formatted (text) table be returned?</p>
+</td></tr>
+<tr valign="top"><td><code>namescomp</code></td>
+<td>
+<p>A vector of names for the components. If NULL assigned as
+&quot;Comp j&quot;</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additonal arguments for generic print, additional arguments will
+generate an error.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>If rtn = TRUE, it returns a text table formatted as specified by the
+arguments.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This is a wrapper for the main function in which the &quot;dots&quot; are disabled
+so that only exact (or partial) prescribed arguments can be entered.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Examples in spcabb and spcabe.
+</p>
+
+
+</div>
+
+
+<h3 id="showload" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">showload</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for showload"><tr><td>showload</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Shows the sparse loadings</h2>
+
+<h3>Description</h3>
+
+<p>Shows the non-zero loadings separately for each component.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+showload(smpc, cols, perc = TRUE, digits = 3, variablesnames = FALSE,
+  thresh = 0.001, rtn = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>smpc</code></td>
+<td>
+<p>A list of spca objects, typically from spcabe and spcabb.  It
+can also be a simple matrix of loadings.</p>
+</td></tr>
+<tr valign="top"><td><code>cols</code></td>
+<td>
+<p>A vector containg the indices of the loadings to be shown.  Can
+be a single value. if missing all loadings are shown: If an integer is
+passed, only that dimension will be returned.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: should the loodings be standardised to unit <i>L_1</i>
+norm (and printed as percentage contributions).</p>
+</td></tr>
+<tr valign="top"><td><code>digits</code></td>
+<td>
+<p>Number of decimal digits to show.</p>
+</td></tr>
+<tr valign="top"><td><code>variablesnames</code></td>
+<td>
+<p>Hybrid: if not FALSE, need to pass a vector of varaiable names.</p>
+</td></tr>
+<tr valign="top"><td><code>thresh</code></td>
+<td>
+<p>Loadings with absolute value below this are considered zero.</p>
+</td></tr>
+<tr valign="top"><td><code>rtn</code></td>
+<td>
+<p>Logical: should the text table of loadings and the matrix of
+summaries be returneded?</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Useful for large matrices to see the loadings at the same
+time or to assign long descriptive names.
+</p>
+<p>variablesnames must have the names of the p variables in the first p
+positions.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If rtn = TRUE, it returns a list with the loadings.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>print.spca, plot.spca. Examples in
+<code>spcabe</code>
+</p>
+
+
+</div>
+
+
+<h3 id="spca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">spca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for spca"><tr><td>spca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Computes sparse principal components solutions</h2>
+
+<h3>Description</h3>
+
+<p>Computes LS SPCA sparse principal components loadings for a given set of
+indices.<br> See the package vignettes for details.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+spca(S, ind, unc = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>S</code></td>
+<td>
+<p>A correlation or covariance matrix.</p>
+</td></tr>
+<tr valign="top"><td><code>ind</code></td>
+<td>
+<p>A list of indices for each dimension. The number of dimensions to
+compute is determined by its length. If only the first dimension is
+required, it can be a vector.</p>
+</td></tr>
+<tr valign="top"><td><code>unc</code></td>
+<td>
+<p>A logical vector indicating which components should be should be
+computed uncorrelated to the preceeding ones. Can be shorter than the number
+of dimensions to compute. See details.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The number of components to compute is determind from the length of
+<EM>ind</EM>.  If <EM>unc</EM> has fewer elements than the number of indices
+passed, the remaining elements are set equal to the last one.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <EM>spca</EM> is returned. It is the smallest
+instance of an spca object, which contains: </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>loadings</code></td>
+<td>
+<p>The matrix of
+loadings</p>
+</td></tr> <tr valign="top"><td><code>contributions</code></td>
+<td>
+<p>Matrix of loadings scaled to unit <i>L_1</i>
+norm.</p>
+</td></tr> <tr valign="top"><td><code>vexpv</code></td>
+<td>
+<p>a vector of variances explained by each component</p>
+</td></tr>
+<tr valign="top"><td><code>vexp</code></td>
+<td>
+<p>a vector of variances explained by each PC</p>
+</td></tr></table>
+<p> In addition, if
+<code>any unc[j] = FALSE</code>: </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>corComp</code></td>
+<td>
+<p>The matrix with correlations among
+components.</p>
+</td></tr> <tr valign="top"><td><code>loadingsUnc</code></td>
+<td>
+<p>Loadings of the components made
+uncorrelated.</p>
+</td></tr>
+</table>
+
+
+<h3>See Also</h3>
+
+<p><code>spcabb</code>, <code>spcabe</code>, <code>summary.spca</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre class="r">
+## Not run: 
+	 data(anthrop, package = "spca")
+	 # for uncorrelated components
+	 myspca &lt;- spca(anthrop, ind = list(1:2, 3:7))
+	 ## print loadings
+	 myspca
+	 ## print summaries
+	 summary(myspca)
+	 # for correlated components
+	 myspcac &lt;- spca(anthrop, ind = list(1:2, 3:7), unc = FALSE)
+	 myspcac
+	 summary(myspcac)
+	 ## print correlation between components
+	 myspcac$corComp
+	 ## print loadings of components made uncorrelated
+	 myspcac$loadingsUnc
+	 ## compare the two results numerically and graphically
+	compare(myspca, myspcac, methodsnames = c("Unc", "Cor"), shortnamescomp = FALSE)
+   
+## End(Not run)
+</pre>
+
+
+</div>
+
+
+<h3 id="spcabb" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">spcabb</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for spcabb"><tr><td>spcabb</td><td align="right">R Documentation</td></tr></table>
+
+<h2>SPCA by Branch-and-Bound</h2>
+
+<h3>Description</h3>
+
+<p>Finds the LS SPCA loadings with given cardinalities using Branch-and-Bound
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+spcabb(S, card, unc = TRUE, startind, excludeload = FALSE, nvexp = FALSE,
+  msg = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>S</code></td>
+<td>
+<p>A correlation or covariance matrix.</p>
+</td></tr>
+<tr valign="top"><td><code>card</code></td>
+<td>
+<p>A vector of cardinalities for each component. the number of
+dimensions to compute is determined from its length.</p>
+</td></tr>
+<tr valign="top"><td><code>unc</code></td>
+<td>
+<p>A logical vector indicating if each component should be should be
+uncorrelated to the preceeding ones or not.</p>
+</td></tr>
+<tr valign="top"><td><code>startind</code></td>
+<td>
+<p>A list of indices from which the sparse loadings will be
+computed. If missing all combinations of indices are searched.</p>
+</td></tr>
+<tr valign="top"><td><code>excludeload</code></td>
+<td>
+<p>Logical: vector (length nd or shorter) should indices of
+non-zero loadings in previous components be excluded from future searches?</p>
+</td></tr>
+<tr valign="top"><td><code>nvexp</code></td>
+<td>
+<p>Logical. If TRUE the real variance estimated is used as
+objective function. Otherwise an approximated form of the variance
+explainedis used.</p>
+</td></tr>
+<tr valign="top"><td><code>msg</code></td>
+<td>
+<p>Logical: should messages be printed after each component is
+computed</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If unc = FALSE, when nvexp = TRUE the objective function is the true
+variance explained, otherwise the approximated one (see references or Vignettes for details). unc and excludeload can
+be vectors of length less than nd (hence also a single value), in this case,
+the last element is assigned to the missing ones. The BB search is
+computationally demanding, for large problems (n &gt; 50) consider using
+<code>spcabe</code> Just in case the functions takes too long and it is
+interrupted, a minimal output of the loadings computed is returned.
+This is a minimal spca
+object with elements A, the loadings so far computed, vexp and vexpv.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An object of class <EM>spca</EM> is returned. It contains:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>loadings</code></td>
+<td>
+<p>The matrix of loadings</p>
+</td></tr> <tr valign="top"><td><code>vexp</code></td>
+<td>
+<p>A vector of variances
+explained by each component</p>
+</td></tr> <tr valign="top"><td><code>vexpPC</code></td>
+<td>
+<p>A vector of variances explained
+by each PC</p>
+</td></tr> <tr valign="top"><td><code>ind</code></td>
+<td>
+<p>A list containing the indices of the non-sparse
+loadings</p>
+</td></tr> <tr valign="top"><td><code>niter</code></td>
+<td>
+<p>Number of iterations to compute each component</p>
+</td></tr></table>
+<p> Call
+arguments </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>unc</code></td>
+<td>
+<p>the argument unc passed</p>
+</td></tr> <tr valign="top"><td><code>nvexp</code></td>
+<td>
+<p>The argument
+nvexp passed</p>
+</td></tr></table>
+<p> If <code>any unc[j] = FALSE</code> </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>corComp</code></td>
+<td>
+<p>Matrix with
+correlations among components.</p>
+</td></tr> <tr valign="top"><td><code>Aunc</code></td>
+<td>
+<p>Loadings of components made
+uncorrelated.</p>
+</td></tr>
+</table>
+
+
+<h3>Note</h3>
+
+<p>Thanks to Dr Alessio Farcomeni for making avilable his R code for the
+BB algorithm. This version is a slight variation of it.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Giovanni Merola
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>spcabe</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre class="r">
+## Not run: 
+data(anthrop)
+## 3 uncorrelated components with sparse loadings each of cardinality
+## 3, 3 and 2 (the last value will be set to 3 because uncorrelated components
+## must have cardinality at least equal to their order)
+myspca1 &lt;- spcabb(anthrop, card = c(3,3, 2) )
+# print the results
+myspca1
+# print summary results
+summary(myspca1)
+# show how many iterations each compnent took
+myspca1$niter
+# plot loadings and cumulative variance explained (4 plots)
+plot(myspca1, plotload = TRUE, onlynonzero = FALSE, variablesnames = TRUE)
+
+## 3 correlated components with sparse loadings also each of cardinality 3
+myspca2 &lt;- spcabb(anthrop, card = rep(3, 3), unc = FALSE, nvexp = FALSE )
+# print results
+myspca2
+# print summary results
+summary(myspca2)
+# show how many iterations each compnent took
+myspca2$niter
+## compare the correlated with the uncorrelated solutions
+compare(myspca1, myspca2, methodsnames = c("unc", "cor"))
+# print the correlations among the correlated components
+myspca2$corComp
+# print the loadings of components made uncorrelated
+myspca2$loadingsUnc
+
+## 3 correlated components with sparse loadings of cardinality 2, 1 and 3
+myspca3 &lt;- spcabb(anthrop, card = c(2, 1, 1), unc = FALSE )
+# print the results
+myspca3
+# print summary results
+summary(myspca3)
+## print correlation between components
+myspca3$corComp
+## print loadings of components made uncorrelated
+myspca3$loadingsUnc
+   
+## End(Not run)
+</pre>
+
+
+</div>
+
+
+<h3 id="spcabe" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">spcabe</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for spcabe"><tr><td>spcabe</td><td align="right">R Documentation</td></tr></table>
+
+<h2>SPCA by Backward Elimination algorithm</h2>
+
+<h3>Description</h3>
+
+<p>Computes LS SPCA components by iteratively trimming small loadings.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+spcabe(S, nd = FALSE, ndbyvexp = FALSE, mincard = NULL, thresh = FALSE,
+  threshvar = FALSE, threshvaronPC = FALSE, perc = TRUE, unc = TRUE,
+  trim = 1, reducetrim = TRUE, startind = NULL, excludeload = FALSE,
+  diag = FALSE, choosecard = NULL, eps = 1e-04, msg = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>S</code></td>
+<td>
+<p>A correlation or covariance matrix.</p>
+</td></tr>
+<tr valign="top"><td><code>nd</code></td>
+<td>
+<p>Integer. Number of dimensions to compute. If FALSE and ndbyvexp &lt;
+1 the number of components is determined by the latter value. If FALSE and
+ndbyvexp = 1 or = FALSE the program will give an error.</p>
+</td></tr>
+<tr valign="top"><td><code>ndbyvexp</code></td>
+<td>
+<p>Real in [0,1] or FALSE. Minimum percentage of total variance
+explained by the components computed. If reached before the specified nd, it
+takes priority.</p>
+</td></tr>
+<tr valign="top"><td><code>mincard</code></td>
+<td>
+<p>Vector of minimal cardinality of each components. If FALSE
+and unc[j] = TRUE, the j-th value is set to j, otherwise all values are set
+to 1. Takes priority on other controls on trimming.</p>
+</td></tr>
+<tr valign="top"><td><code>thresh</code></td>
+<td>
+<p>Vector of values below which loadings are trimmed. Can be
+shorter than nd. See details.</p>
+</td></tr>
+<tr valign="top"><td><code>threshvar</code></td>
+<td>
+<p>Vector of minimal percentage of variance loss from the full
+initial solution allowed for each component. If reached current trimming is
+cancelled and solution returned. If FALSE it is set to 1.</p>
+</td></tr>
+<tr valign="top"><td><code>threshvaronPC</code></td>
+<td>
+<p>Vector of minimal total percentage of variance loss
+from the total variance explained by the PCs allowed to trimming. If reached
+current trimming is cancelled and solution returned. If FALSE it is set to
+1. It takes priority over threshvar[j], if both specified.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: does the threshold refers to the percentage
+contributions (the loadings scaled to unitary L1 norm)?</p>
+</td></tr>
+<tr valign="top"><td><code>unc</code></td>
+<td>
+<p>Logical vector. If TRUE the corresponding component is computed
+uncorrelated, otherwise correlated. Can be shorter than nd. See details.</p>
+</td></tr>
+<tr valign="top"><td><code>trim</code></td>
+<td>
+<p>Number of loadings to trim at each iteration. mincard[j] takes
+priority if conflicting.</p>
+</td></tr>
+<tr valign="top"><td><code>reducetrim</code></td>
+<td>
+<p>Logical. If TRUE and trim &gt; 1 when are left less than trim
++ mincard[j] loadings, trim is reduced to 1 for these last loadings.</p>
+</td></tr>
+<tr valign="top"><td><code>startind</code></td>
+<td>
+<p>List of vectors with the initial set of indices for each
+component. If NULL, the full set of indices (1:ncol(S)) is assigned to each
+component</p>
+</td></tr>
+<tr valign="top"><td><code>excludeload</code></td>
+<td>
+<p>Logical: vector (length nd or shorter) should the indices
+of non-zero loadings in previous components be excluded from future
+searches?</p>
+</td></tr>
+<tr valign="top"><td><code>diag</code></td>
+<td>
+<p>Logical: should diagnostic output be returned?.</p>
+</td></tr>
+<tr valign="top"><td><code>choosecard</code></td>
+<td>
+<p>NULL or Integer. Setting the value to an integer makes the
+function return a full trace of the elimination for that component.  It is
+used by the choosecard function.</p>
+</td></tr>
+<tr valign="top"><td><code>eps</code></td>
+<td>
+<p>Value below which the absolute value of a loading is considered
+zero.</p>
+</td></tr>
+<tr valign="top"><td><code>msg</code></td>
+<td>
+<p>Logical: should messages be printed after each component is
+computed</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Sparse loadings are computed by iteratively trimming the ones smaller than
+thresh[j] for each component. If <EM>ndbyvexp</EM> &lt; 1, the algorithm will
+stop when that percentage of total Vexp is reached with the last component
+computed.<br>
+</p>
+<p>Arguments <EM>threshvar</EM>, <EM>threshvaronPC</EM>, <EM>thresh</EM>,
+<EM>excludeload</EM> and <EM>unc</EM> can be entered with fewer elements than
+the number of components to compute, <EM>nd</EM>. In this case, or if
+<EM>nd</EM> is determined by the variance explained, the missing elements are
+set equal to the last one entered (also if just one value is given). The
+same is true for <EM>mincard</EM> but for the components required to be
+uncorrelated their values are set equal to the order of the component.
+</p>
+<p><EM>startind</EM> can be set for the first few components, the following will
+be computed on the whole set of variables.
+</p>
+<p>Trimming stops if mincard[j] is reached. Trimming is controlled in two more
+optional ways: if the last trimming caused a loss of variance explained from
+the initial solution greater than <EM>threshvar</EM> or the loss of proportion
+of total variance explained over the corresponding PCA value drops below the
+specified percentage <EM>threshvaronPC</EM>. The rules can be used together,
+setting the values to FALSE or 1 to avoid them.
+</p>
+<p>When <EM>excludeload</EM> = TRUE or <EM>startindex</EM> is set, the cardinality
+of the starting indices could be less than the order of the component to
+compute. In this case uncorrelatedness cannot be achieved and the component
+will be computed as correlated. The flag <EM>converged</EM> will be set to 3
+and a warning message printed.
+</p>
+<p>If vector arguments of length less than the number of components to compute
+are passed (hence also if a single one is passed), the last element is
+assigned to the missing ones.
+</p>
+
+
+<h3>Value</h3>
+
+<p>spcabe returns an object of class <EM>spca</EM>. On top of the basic
+elements of spca objects, it contains other ones useful for diagnostics and
+analysis. Some elements are present only if some of the arguments are
+activated. The object contains the following components:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>loadings</code></td>
+<td>
+<p>Matrix with the loadings scaled to unit <i>L_2</i> norm in
+the columns.</p>
+</td></tr></table>
+<p> If <code>perc = TRUE</code> </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>contributions</code></td>
+<td>
+<p>Matrix of loadings
+scaled to unit <i>L_1</i> norm.</p>
+</td></tr> <tr valign="top"><td><code>vexp</code></td>
+<td>
+<p>Vector with the % variance
+explained by each component.</p>
+</td></tr> <tr valign="top"><td><code>vexpPC</code></td>
+<td>
+<p>Vector with the % variance
+explained by each principal component.</p>
+</td></tr> <tr valign="top"><td><code>cardinality</code></td>
+<td>
+<p>Vector with the
+cardinalities of each loadings.</p>
+</td></tr> <tr valign="top"><td><code>ind</code></td>
+<td>
+<p>List with the indices of the
+non-zero loadings for each component.</p>
+</td></tr> <tr valign="top"><td><code>unc</code></td>
+<td>
+<p>the argument unc passed.</p>
+</td></tr>
+<tr valign="top"><td><code>converged</code></td>
+<td>
+<p>Vector with the stop for trimming: 0 by <EM>thresh</EM>, 1 by
+<EM>mincard</EM>, 2 by <EM>threshvar</EM> or <EM>threshvaronPC</EM>. The value 3
+means that uncorrelatedness could not be achieved because too few indices
+were available (see notes).</p>
+</td></tr></table>
+<p> If any <code>unc[j] = TRUE</code>
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>corComp</code></td>
+<td>
+<p>Matrix of correlations among the sparse components</p>
+</td></tr>
+<tr valign="top"><td><code>Aunc</code></td>
+<td>
+<p>Loadings of components made uncorrelated</p>
+</td></tr></table>
+<p> If <code>diag == TRUE</code>
+a number of details are returned: </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>vexpo</code></td>
+<td>
+<p>Vector with the % variance
+explained by the initial untrimmed components.</p>
+</td></tr> <tr valign="top"><td><code>totvcloss</code></td>
+<td>
+<p>Vector with
+the % loss in total variance explained including each component over that
+explained by the corresponding PC (vexpPC - vexp)/vexpPC.</p>
+</td></tr>
+<tr valign="top"><td><code>vlossbe</code></td>
+<td>
+<p>Vector with the % loss in variance explained loss by
+trimming over that explained by the initial component (vexpo).</p>
+</td></tr>
+<tr valign="top"><td><code>niter</code></td>
+<td>
+<p>Vector with number of iterations for each trimming round.</p>
+</td></tr>
+<tr valign="top"><td><code>eliminated</code></td>
+<td>
+<p>List of indices of loadings eliminated for each component</p>
+</td></tr>
+</table>
+<p>Call arguments, possibly modified by the algorithm: </p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>thresh</code></td>
+<td>
+<p>Vector of
+tresholds for the size of loadings</p>
+</td></tr> <tr valign="top"><td><code>threshvar</code></td>
+<td>
+<p>Vector of tresholds on
+loss of variance explained by each component</p>
+</td></tr> <tr valign="top"><td><code>ndbyvexp</code></td>
+<td>
+<p>Required total
+variance explained</p>
+</td></tr> <tr valign="top"><td><code>stopbyvar</code></td>
+<td>
+<p>Logical, did the algorithm terminate
+because the required total variance explained was reached?</p>
+</td></tr>
+<tr valign="top"><td><code>mincard</code></td>
+<td>
+<p>Minimal cardinalities required</p>
+</td></tr>
+</table>
+
+
+<h3>See Also</h3>
+
+<p><code>spcabb, summary.spca, compare.spca</code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre class="r">
+## Not run: 
+  "Note the warnings and messages produced by the examples"
+  data(anthrop, package = "spca")
+
+  # 3 basic spcabe components with default values,
+  # since uncorrelated component these have card = 1, 2, and 3
+  myspca1 &lt;- spcabe(anthrop, nd = 3)
+  myspca1
+  summary(myspca1)
+  ## plot the results
+  plot(myspca1, plotload = TRUE, onlynonzero = FALSE, mfrowload = 3, variablesnames = TRUE)
+
+  ## spcabe with 3 components trimmed to different thresholds and mincard
+  myspca2 &lt;- spcabe(anthrop, nd = 3, thresh = c(0.3, 0.25, 0.15), mincard = c(2,3,3))
+  summary(myspca2)
+  myspca2
+  # show the first two loadings as percentage contributions
+  showload(myspca2, cols = 1:2, perc = TRUE)
+
+  ## spcabe requirig explaining at least 75% of total variance and that each component
+  ## explains at least 95% of variance explained by the pcs (see details)
+  myspca3 &lt;- spcabe( anthrop, ndbyvexp = 0.75, threshvaronPC = 0.95)
+  summary(myspca3)
+  myspca3
+  # compare the three solutions
+  compare(smpc = myspca1, compareto = list( myspca2, myspca3),
+  methodsnames = c("myspca1", "myspca2", "myspca3"))
+ 
+## End(Not run)
+</pre>
+
+
+</div>
+
+
+<h3 id="summary.spca" style="background-color:WhiteSmoke;color:SlateBlue;vertical-align: middle;text-align: center;box-shadow: 2.5px 2.5px 1.25px #888888;">summary.spca</h3>
+<div class="r-help-page">
+
+<table width="100%" summary="page for summary.spca"><tr><td>summary.spca</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Prints summaries from an spca object</h2>
+
+<h3>Description</h3>
+
+<p>Prints summaries and comparisons with the full PCA solutions for a set of LS
+SPCA loadings.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre class="r">
+## S3 method for class 'spca'
+summary(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
+  thrsehcard = 0.001, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>An spca object.</p>
+</td></tr>
+<tr valign="top"><td><code>cols</code></td>
+<td>
+<p>A vector indicating which components should be included. Default
+all.  If an iteger is passed, it is set to 1:cols.</p>
+</td></tr>
+<tr valign="top"><td><code>perc</code></td>
+<td>
+<p>Logical: should the laodings be standardised to unit L1 norm
+(and printed as percentage contributions)</p>
+</td></tr>
+<tr valign="top"><td><code>rtn</code></td>
+<td>
+<p>Logical: should the summary matrix of summaries be returneded?</p>
+</td></tr>
+<tr valign="top"><td><code>prn</code></td>
+<td>
+<p>Logical: should anything be printed? Takes priority on prnload.</p>
+</td></tr>
+<tr valign="top"><td><code>thrsehcard</code></td>
+<td>
+<p>Value below which loadings are considered zero and not
+counted in the cardinality</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Additonal arguments for generic summary, additional arguments will
+generate an error.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The summaries are printed as formatted text, if rtn = TRUE, the value
+returned is a numerical matrix.
+</p>
+<p>For each component the following summaries are computed: </p>
+
+<table summary="Rd table">
+<tr>
+ <td align="left"> PVE
+</td><td align="left"> The percentage variance explained</td>
+</tr>
+<tr>
+ <td align="left"> PCVE </td><td align="left"> The percentage
+cumulative variance explained</td>
+</tr>
+<tr>
+ <td align="left"> PRCVE </td><td align="left"> The percentage cumulative
+variance explained relative to that of the corresponding principal
+components</td>
+</tr>
+<tr>
+ <td align="left"> Card </td><td align="left"> The cardinality, that is the number of non zero
+loadings</td>
+</tr>
+<tr>
+ <td align="left"> Ccard </td><td align="left"> The cumulative cardinality.</td>
+</tr>
+<tr>
+ <td align="left"> PVE/Card </td><td align="left"> The
+percentage variance explained over the cardinality.</td>
+</tr>
+<tr>
+ <td align="left"> PCVE/Ccard </td><td align="left"> The
+percentage cumulative variance explained over the cumulative cardinality.</td>
+</tr>
+<tr>
+ <td align="left">
+Converged </td><td align="left"> If the object was computed with <EM>spcabe</EM>, type of
+convergence: 0 if all loadings bigger than <EM>thresh</EM>, 1 if minimal
+cardinality reached or 2 if the maximal variance loss in trimming was
+reached.</td>
+</tr>
+<tr>
+ <td align="left"> MinLoad </td><td align="left"> Minimum absolute value of the non-zero loadings. </td>
+</tr>
+
+</table>
+
+<p>If perc = TRUE, the last row gives the minimum absolute percentage
+contribution, MinPContr
+</p>
+
+
+<h3>Value</h3>
+
+<p>If rtn = TRUE, a numerical matrix with the summaries.
+</p>
+
+
+<h3>Note</h3>
+
+<p>This is a wrapper for the main function in which the &quot;dots&quot; are disabled
+so that only exact (or partial) prescribed arguments can be entered.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Examples in spcabe and spcabb
+</p>
+
+
+</div>
+

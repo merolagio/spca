@@ -1,0 +1,149 @@
+<!--
+vignette: >
+  %\VignetteIndexEntry{BE Algorithm}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+-->
+
+---
+title: "Backward Elimination Algorithm"
+author: "Giovanni Merola"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    fig_caption: yes  
+vignette: >
+  %\VignetteIndexEntry{Backward Elimination Algorithm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE}
+library(spca)
+library(formatR)
+```
+
+
+## LS SPCA(BE)
+
+BE iteratively eliminates the smallest loading from a solution and
+recomputes the component without that variable until a stop rule is met.
+We call this procedure *trimming*. 
+
+### The spcabe function
+We implemented BE in the `spca` package
+adding options that accommodate different aspects of interpretability.
+BE is called with the function *spcabe*:
+
+```{r, echo = FALSE, comment = ""}
+usage(spcabe)
+
+```
+
+## Backward Elimination  
+The function takes a covariance or correlation matrix [`S`] as first
+argument. 
+
+The **number of components to compute** can be either specified
+directly [`nd`] or decided by a stop rule defined by the percentage of
+cumulative variance explained (PCVE) reached [`ndbyvexp`] or [`ndbyvexponPC`]. 
+If no stopping rule is specified all components are computed.
+
+There are three **stop rules for trimming** applicable differently to each component:
+
+**cardinality**:  
+$\quad$The minimal cardinality of the loadings [`mincard`];
+
+**loss of variance explained**:  
+$\quad$The maximum acceptable loss of variance explained. This can be computed either with respect to the loss of cumulated variance explained either from that explained by the same number of PCs [`threshvaronPC`] or from that explained by the component before trimming [`threshvar`] (both arguments must be real in $[0,1]$);
+
+**threshold**:  
+$\quad$This is the minimal absolute value required for a loading [`thresh`]. The threshold can be either specified with respect to the loadings scaled to unit $\text{L}_2$ norm or to the percentage contributions (scaled to unit $\text{L}_1$ norm, [`perc = TRUE`]).
+
+The stop rules for trimming are given in order of precedence and can have a different value for each component. The stop rules are all optional, if none is given, the minimal cardinality is set equal to the rank of the component if they have to be uncorrelated otherwise it is set equal 1.
+
+In problems with a large number of variables the computation can be sped up by **trimming more than one loading at the time** [`trim`]. When the number of loadings left is less than the number of loadings to trim trimming stops. However, more accurate solutions can be obtained by finishing off the elimination by **trimming the remaining ones one by one** [`reducetrim`].
+
+The algorithm by default computes **uncorrelated components**. However, one or more can be computed without this requirement [`unc = c(FALSE, ...)`].
+
+The components can be constrained to be combinations of only a subset of the variables with two options:
+
+**starting indices**: 
+    A list containing the indices from which trimming must start for each component [`startind`];
+
+**exclude indices previously used**: 
+    With this flag the next components are trimmed starting from only the indices of the variables that were not included in previous loadings [`excludeload`].
+
+The standard output is an *spca* object containing the loadings, variance explained and other items. 
+
+A **richer output** containing diagnostic information can be obtained by setting [`diag = TRUE`]. 
+Setting the argument ['choosecard`] to an integer makes the function return a full trace of the elimination for that component. This option is used by the method *choosecard*. [`msg = FALSE`] suppresses execution messages.
+
+The value under which a loading is considered to be zero can be changed from the default $0.0001$ with the argument [`eps`]. 
+
+The BE algorithm is outlined in the flowchart below and in the pseudo-code shown below. Not all options are shown. 
+
+
+### BE Flowchart
+
+![BE algorithm flow.](BE_flowchart\\BE_flowchart.png)
+
+### BE Algorithm
+
+******************************  
+LS SPCA BE Algorithm  
+ 
+******************************
+
+**initialize**  
+
+**Stopping rules for the number of components**  
+$\quad$*nd* {the number of components to compute}  
+$\quad$*ndbyvexp* {minimum variance cumulated explained}  
+$\quad${one of the two must be specified}  
+
+**Select which variables can enter the solutions**  
+$\quad startind_j$ {the starting indices for trimming}  
+$\quad excludeload_j$ {flags for excluding variables used in a previous solution}  
+
+**Stopping rules for elimination** {Can be different for each component}  
+$\quad mincard_j$  {minimum cardinality of the sparse loadings}  
+$\quad thresh_j$  {minimum absolute value of the sparse loadings}  
+$\quad$ threshvar_j$ {optional maximum relative loss of variance explained}  
+$\quad threshvaronPC_j$ {maximum relative loss of variance explained}  
+$\quad$ *if none is set, mincard will be set to lowest possible value}*  
+
+**Other parameters**  
+$\quad unc$ {whether to compute uncorrelated components or not}  
+$\quad perc$ {whether to scale the loadings to percentage contributions or to unit sum of squares}  
+
+**end initialize** 
+
+----------------------------------------------------
+
+**for** $j = 1$ **to** $nd$ **do**  
+
+$\quad$ Compute ${\bf{a}}_j$ as the j-th LS SPCA solution for $startind_j$  
+$\quad Vexpfull_j = Vexp(a_j)$  {var exp by the full solution}  
+$\quad$ **while**  $\min_{i \in startind_j} |a_{ij}| < thresh_j$ **and** 
+$length(startind_j) > mincard_j$  
+$\quad\quad indold_j = startind_j$, ${\bf aold}_j = {\mathbf{a}}_j$  
+$\quad\quad k:\:$ $|a_{kj}| \leq |a_{ij}|,\, i \in startind_j$  
+$\quad\quad startind_j = startind_j\backslash k$  
+$\quad\quad$ Compute $\mathbf{a}_j$ as the j-th LS SPCA solution for $startind_j$  
+$\quad\quad$ **if**
+$Vexp(a_j)/{Vexpfull}_j < threshvar_j$ **then**  
+$\quad\quad\quad startind_j = indold_j$, ${\mathbf{a}}_j = {\bf aold}_j$  
+$\quad\quad\quad$ **break**   
+$\quad\quad$ **end if**  
+$\quad$ **end while**  
+$\quad$ **if** $\sum_{i=1}^j \text{Vexp}({\mathbf{a}}_i)  \geq {threshvar_j}$ **then**   
+$\quad\quad$ $nd = j$  
+$\quad\quad$**break**  
+$\quad$ **end if**  
+**end for**  
+
+******************************
+
+Not shown in the algorithms are the options *trim* and *reducetrim*. The first sets the number of loadings to be trimmed at each iteration. If the second is *TRUE*  
