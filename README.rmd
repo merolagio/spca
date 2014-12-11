@@ -9,7 +9,6 @@ output:
     toc: true
     theme: united
     highlight: haddock
-bibliography: readme_spca.bibtex    
 ---
 
 ### Intro  
