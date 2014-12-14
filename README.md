@@ -37,7 +37,7 @@ For these reasons, usually there exist different competing solutions and it is n
 
 ### Optimisation Models  
 Finding the optimal indices for an *spca* solution is an intractable NP-hard problem.  
-
+ 
 Therefore, we find the solutions through two greedy algorthms: Branch-and-Bound (**BB**) and Backward Elimination (**BE**).
 
 * **BB** searches for the solutions that sequentially maximise the variance explained under the constraints. The solutions may not be a global maximum when more than one component is computed. The BB algorithm is a modification of Farcomeni's (2010) (thanks!).

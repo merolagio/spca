@@ -116,7 +116,7 @@ bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)
 bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
 
 #-summary output
-summary(bbe1)
+summary(bbe1) 
 #-# Explaining over 96% of the variance explained by PCA with 2, 3, 3 and 1 variables.
 
 #-print percentage contributions
