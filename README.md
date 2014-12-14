@@ -6,7 +6,7 @@ email: lsspca@gmail.com<br>
 bug reports: https://github.com/merolagio/spca----pre-release/issues/new"
 output:
   rmarkdown::html_document:
-    toc: true
+    toc: true 
     theme: united
     highlight: haddock
 ---
