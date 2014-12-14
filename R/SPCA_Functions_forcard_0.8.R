@@ -77,25 +77,10 @@ choosecard <- function(S, method = c("BE", "BB"),
                       plotminload = TRUE, plotcvexp = c("rel", "abs", FALSE), 
                       plotlovsvexp = TRUE, plotentropy = TRUE, plotfarcomeni = FALSE,
                       mfrowplot = 2, mfcolplot = 2, cardstoplot, ce = 1){
-{
-  #####
-  ## TODO change name loadings to contributions if perc == TRUE, 
-  ## added doplot to turnoff plotting
-  ## add the number of traces to print, use print.trace func
-  ## suppress messaging and saving tmp output in BB, add which card is doing
-  #####
-  ## v 0.6 removed plotpca and option PCA, see v0.5 for this but wasnt finished
-  #### add possibility to strat from a later component (maybe one day)
-  ## v0.5 added bb
-  ### added entropyand farcomeni to Values
-  ## added cardstoplot can be TRUE or number of cardinalities to plot
-  ## plotpca is a output from pca or vector of pca loadings
-  ## added prntrace with only 3 digits, should print contr as %
-  ## v 1.0
-  ## added making of spca object
+##==============================================================
   ## iterative function to choose the cardinality
   ## calls do card and plot card
-}
+##==============================================================
   
   p = NULL
   p = ncol(S)
@@ -154,9 +139,6 @@ choosecard <- function(S, method = c("BE", "BB"),
     if (method == "BE"){ ## do BE
       tmp = docard(S, compno = k, prevload = prevload, perc = perc, unc = unc[1:k], trim = trim , 
                  reducetrim =reducetrim  )
-#       nc = seq(p, ifelse(unc[k], k, 1), -trim)
-#       if (min(nc) > ifelse(unc[k], k, 1))
-#         nc = c(nc, ifelse(unc[k], k, 1))
       }####
     else
       if (method == "BB") {     # Do BB
@@ -169,17 +151,10 @@ choosecard <- function(S, method = c("BE", "BB"),
       for (i in nc){
         bb = spcabb(S, card = c(card, i), startind = ind, unc = unc, msg = FALSE)
         indo = bb$ind[[k]]
-        #         if (perc == TRUE)
-        #           a = bb$contributions
-        #         else 
         a = bb$loadings[,k]
         
-        #out
         contr = a/sum(abs(a[bb$ind[[k]]]))
-        #        if(perc == FALSE)
         minl = c( min(abs(a[bb$ind[[k]]])), min(abs(contr[bb$ind[[k]]])))
-        #         else
-        #           minl = c(min(abs(a[bb$ind])/sqrt(sum((a[bb$ind])^2))), min(abs(a[bb$ind])))
         
         tmp$Values = rbind(tmp$Values, c(i, minl, bb$vexp[k], sum(bb$vexp[1:k])/sum(bb$vexpPC[1:k]) ) )
         if (perc == TRUE)
@@ -214,10 +189,10 @@ choosecard <- function(S, method = c("BE", "BB"),
 cardstoprint = min(nrow(tmp$Values), cardstoprint)
 
     if (prntrace == TRUE){
-     message(paste("Trace Comp", k)) #cacca
-      myt = print.trace(tmp, comp = k, cards = cardstoprint, rtn = TRUE, perc = perc)## check dgt
+     message(paste("Trace Comp", k)) 
+      myt = print_trace(tmp, comp = k, cards = cardstoprint, rtn = TRUE, perc = perc)## check dgt
     }else
-      myt = print.trace(tmp, comp = k, cards = cardstoprint, prn = FALSE, rtn = TRUE, perc = perc)## check dgt
+      myt = print_trace(tmp, comp = k, cards = cardstoprint, prn = FALSE, rtn = TRUE, perc = perc)## check dgt
 
   if (rtntrace == TRUE){
       Trace[[k]] =  myt
@@ -288,9 +263,12 @@ cardstoprint = min(nrow(tmp$Values), cardstoprint)
 
 docard = function(S, compno, prevload = list(), perc = TRUE, unc = TRUE, trim = 1, reducetrim = TRUE)
 {    
-  #  computes spcabe for a given comp producing the trace
-  #     prevload = list(prevload)
-  if (compno == 2)
+##==============================================================
+  ##  called by choosecard
+  ## computes spcabe for a given comp producing the trace
+  ##     prevload = list(prevload)
+##==============================================================
+if (compno == 2)
     if (length(prevload[[1]]) < ncol(S))
       stop("the whole set of loadings must be passed in prevload")
   if (compno > 2 & length(prevload) < (compno - 1))
@@ -324,12 +302,10 @@ plotcard = function(cdobj, compno = NULL, perc = TRUE, np = TRUE,
                     plotentropy = TRUE, plotfarcomeni = FALSE, pcaload = NULL, scalepca = TRUE,
                     mfrowplot = 2, mfcolplot = 2, ce = 1){
   
-  ## v0.3 added np, the number of tracings to plot
-  ## v 0.2 added scaling of pcs loadings and format axes with1 digit if small changes  
-  ## does all plots for choosing cardinality
-  ## plotcvexp can be , abs to plot PCV or "rel" to plot PRCV
-  ## cdobj is output from docard with docard > 0
-  old.par <- par(no.readonly = TRUE) # all par settings which
+##==============================================================
+## produces plots for choosecard
+##==============================================================
+old.par <- par(no.readonly = TRUE) # all par settings which
   if(is.null(compno) )
     par(mar = c(4.5, 4.7, 1, 1))
   else
@@ -417,7 +393,6 @@ if (plotcvexp == "abs" | plotcvexp == "rel"){
     }
     
     ra = range(tv[np,4])
-    #ra[1] = min(0, ra[1])
     if (diff(ra)< 0.015)
       fmt = "%2.1f%%"
     else
@@ -474,7 +449,7 @@ if (plotcvexp == "abs" | plotcvexp == "rel"){
       title(paste("component", compno))
   }
   
-  ### plot entropy
+  ### plot farcomeni
   if (plotfarcomeni == TRUE){
     en = farc(cdobj, compno, np)
     plot(tv[np,1], en, type = "l", xlab = "cardinality" , ylab = "Index")
@@ -511,7 +486,7 @@ ent = function(a, np){
   -sum(abs(a) * log(abs(a)))/length(a)
 }
 
-print.trace = function(smcc, comp = 1, cards = NULL, prn = TRUE, rtn = FALSE, dgt = 3, perc = TRUE){
+print_trace = function(smcc, comp = 1, cards = NULL, prn = TRUE, rtn = FALSE, dgt = 3, perc = TRUE){
   ## prints the trace of choosecard with variables ordered with respect to elimination
   ### =======
   ## smcc output from choosecard
@@ -592,23 +567,23 @@ ordload = function(h){
   return(indo)
 }
 
-print.ltrace = function(smcc, comptoprint, cardstoprint, dgt = 3, perc = TRUE){
-  
-##Problem formatting in print.trace assumes different Vals
-  ## prints the traces from spcabe output
-  
-  if (missing(comptoprint))
-    comptoprint = length(smcc)
-  if (length(comptoprint) == 1)
-    comptoprint = 1:comptoprint
-   if (missing(cardstoprint)) 
-     cardstoprint = nrow(smcc[[1]]$Val)
+# print_ltrace = function(smcc, comptoprint, cardstoprint, dgt = 3, perc = TRUE){
 #   
-    for (j in comptoprint){
-      message(paste("Component", j))
-      print.trace(smcc[[j]],  cards = cardstoprint, prn = TRUE, rtn = FALSE, dgt = dgt, perc = perc)
-        
-    }
-  invisible()
-  
-}
+# ##Problem formatting in print_trace assumes different Vals
+#   ## prints the traces from spcabe output
+#   
+#   if (missing(comptoprint))
+#     comptoprint = length(smcc)
+#   if (length(comptoprint) == 1)
+#     comptoprint = 1:comptoprint
+#    if (missing(cardstoprint)) 
+#      cardstoprint = nrow(smcc[[1]]$Val)
+# #   
+#     for (j in comptoprint){
+#       message(paste("Component", j))
+#       print_trace(smcc[[j]],  cards = cardstoprint, prn = TRUE, rtn = FALSE, dgt = dgt, perc = perc)
+#         
+#     }
+#   invisible()
+#   
+# }

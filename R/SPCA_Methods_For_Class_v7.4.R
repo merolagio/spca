@@ -1,5 +1,4 @@
 
-#help(.onLoad)
 #' Verifies if an object is of class spca
 #' 
 #' @param x Any object suspected of being of class spca.
@@ -42,14 +41,8 @@ print.spca = function(x, cols, only.nonzero = TRUE, perc = TRUE, digits = 3, thr
   badarg = eval(substitute(alist(...)))
   if (length(badarg) > 0){
     stop(paste0("\nUnused arguments: ", paste(names(badarg), collapse=", ")))
-#    stop(call. = FALSE)
   }
 ## -------------------------------------------------------------------------
-## changed rows to only.nonzero  
-### S3 print method for spca objects
-  ## takes either spca object pr matrix/vector of loadings
-  #tryCatch(
-    #{  
       smpc = x
   if (is.spca(smpc) == TRUE){ ## should use is.spca 
     if (perc == TRUE){
@@ -134,11 +127,6 @@ print.spca = function(x, cols, only.nonzero = TRUE, perc = TRUE, digits = 3, thr
   }  
   else 
     invisible()
-#   }, 
-#   error = function(c) {
-#     stop(paste0("in print.spca\n", c$message ), call. = FALSE)
-#   }
-#   )
 }
 
 
@@ -185,12 +173,9 @@ summary.spca = function(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
   badarg = eval(substitute(alist(...)))
   if (length(badarg) > 0){
     stop(paste0("\nUnused arguments: ", paste(names(badarg), collapse=", ")))
-  #  stop( call. = FALSE)
   }
 # ---------------------------------------------------------------------------------  
   ## generic S3 method creates summaries from spca object printing for contributions
-  ## cols can be either vector or integer. if missing set = all 
-#  tryCatch( {
     smpc = object
   if (!any(class(smpc) == "spca")){
     stop("summary.spca works only for spca objects")
@@ -213,7 +198,6 @@ summary.spca = function(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
               round(cumsum(smpc$vexp)/cumsum(apply(abs(smpc$loadings)> 0.01,2,sum))*100,1)
   )
   out = as.matrix(out[,cols])
-  #     if (length(cols)>1){
   colnames(out) = paste("Comp", cols, sep = "")  
   rownames(out) = 
     c("PVE", "PCVE", "PRCVE",
@@ -262,12 +246,6 @@ summary.spca = function(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
     return(out)
   else
     invisible()
-# }
-# , 
-# error = function(c) {
-#   stop(paste0("in summary.spca\n", c$message ), call. = FALSE)
-# }
-# )
 }
 
 
@@ -326,12 +304,15 @@ compare.spca = function(smpc, compareto, nd, methodsnames, perc = TRUE,
                         shortnamescomp = TRUE, rtn = FALSE, prn = TRUE, 
                         only.nonzero = TRUE, bnw = FALSE, mfrowload = 1, mfcolload = 1, 
                         sizelegend = 0.85, ... ) {
-  if(class(smpc) != "spca")
+## -------------------------------------------------------
+  ## compares two or more spca solutions
+  ## smpc an spca object, compare to a list with one or more spca obj to ocmpare
+##==============================================================
+if(class(smpc) != "spca")
     stop("must pass an spca object as first argument to compare")
   badarg = eval(substitute(alist(...)))
   if (length(badarg) > 0){
     stop(paste0("\nUnused arguments: ", paste(names(badarg), collapse=", ")))
-#   ( call. = FALSE)
   }  
   nam = rownames(smpc$loadings)
   if (class(compareto) == "spca")
@@ -388,7 +369,6 @@ else
   methodsnames = c("PCA", methodsnames)
   }
 pchlist = c(15:20,7:14)
-#  plot(1:20, 1:20, pch = 1:20)
 if (bnw == TRUE)
   colo = rep(1,n+1)
 else
@@ -404,7 +384,6 @@ else
     else
       npl = FALSE
   }
-#npl
 if(npl > 0){
   cefx = mfrowload
   cefy = mfcolload 
@@ -422,11 +401,9 @@ if(npl > 0){
          ylab = ifelse(perc, "contributions", "loadings"), 
          main = paste("Component",j), xaxt = "n", yaxt = ifelse(perc, "n", "s")) 
     axis(side = 1,at =1:nr, labels = paste(1:nr), cex.axis = 0.5)
-    #}
     ####
     if( perc == TRUE){
-      
-      #####
+
       axis(2, at = pretty(yLabels), labels = sprintf(round(pretty(yLabels) * 100, 0), fmt="%3.0f%%"), 
            cex.axis = 0.75, cex.lab = 0.75, las = 1)   
     }
@@ -482,7 +459,7 @@ if(npl > 0){
         }
       }
     }
-    # print(paste("posle is ", posle))
+    #plots legend if posle not = false
     if (!(posle == FALSE))
       legend(posle, legend = methodsnames[-1], col = colo[1:n], pch = pchlist[1:n], 
              cex = sizelegend, xjust = 0, y.intersp = 0.75/cefx, x.intersp = 0.75/cefy)
@@ -554,7 +531,7 @@ for ( i in 1:nd)
   }  
 colnames(Suall) = donam
 rownames(Suall) = rownames(su[[1]])#[1:nur]    
-### check this
+### if perc
 if (perc == TRUE){
   nr = nrow(Suall)
   rownames(Suall)[nr] = "Min %Cont"
@@ -684,19 +661,7 @@ plot.spca = function(x, cols, plotvexp = TRUE, methodname= FALSE, plotload = FAL
                      mfrowload = 1, mfcolload = 1, bnw = FALSE, rotlabels = 0, 
                      sizelabels = 1, ...){
 ## -----------------------------------------------------------------------
-##== changed arg methodname = FALSE from missing, noted!
-#== added thresh = FALSE
-#== 
 ## generic S3 method that plots varexplained and loadings
-  ## added rotlabels and sizelabels
-  ## added labels on loading plot and removed horiz
-  ## added plotvexp = TRUE
-  ## fixed cols > ncols(A)
-  ## added perc for barplot
-  ## perfected barplot
-  ## methodname = names for method. If missing takes SPCA-LS 
-#   tryCatch(
-#     {
 
 goodarg = as.list(environment())
 badarg = eval(substitute(alist(...)))
@@ -845,7 +810,6 @@ smpc = x
     rownames(vexp) = paste("n comps", cols, sep="=")
     M = max(vexp)
     m = min(vexp)
-    #par(oldpar)## was   par(mfrow = c(2,1)) but bad legend
     par(mfrow = c(1,1), mar = c(4.5, 4, 1, 1))
 
     ## see  http://stackoverflow.com/questions/8736966/r-common-title-and-legend-for-combined-plots
@@ -872,11 +836,6 @@ smpc = x
   
   on.exit(par(oldpar))
   invisible()
-# }, 
-# error = function(c) {
-#   stop(paste0("in plot.spca\n", c$message ), call. = FALSE)
-# }
-#   )
 }
 
 
@@ -909,7 +868,7 @@ smpc = x
 showload = function(smpc, cols, perc = TRUE, digits = 3,  variablesnames = FALSE, 
                     thresh = 0.001, rtn = FALSE){
   
-  ## function that prints nonzero loadings one component at the time from an spca object
+## function that prints nonzero loadings one component at the time from an spca object
   
   if(missing(cols)){
     cols = 1:ncol(smpc$loadings)
@@ -962,26 +921,11 @@ showload = function(smpc, cols, perc = TRUE, digits = 3,  variablesnames = FALSE
 plotload = function(smpc, pcs, cols, perc = TRUE, variablesnames = FALSE, 
                     addlabels = TRUE, onlynonzero = FALSE, mfrowload = 1, 
                     mfcolload = 1, bnw = FALSE){
-  ## plots load called in plot.spca  method for spca objects
-  # not exported
-  ## plots the loadings versus the PCA ones
-  ##
-  ###smpc = an spca object
-  ## pcs an spca object containg the PC's loadings
-  ## cols which lcomponents are considered, can be integer (then 1:ncols) or a vector, if missing all
-  #   perc plot percent contributions or not
-  ## variablesnames heredits the labels from function either real names or Vj
-  #   addlabels plot labels? If FALSE, no, if TRUE uses the variablesnames argument
-  #   onlynonzero plot only the nonzero loadings
-  #   mfrowload and mfcolload number of rows and columns in plot grid
-  #   bnw plot in Black and white
-  
-  ############# =====================================================
-  ## OUTPUT None
-  
-  ## produces mfrowload by mfcolload grids of plots of the loadings versus the PCA' ones. 
-  ##It adds a line for equality of the PC's loadings
-  #### =====================================================================
+#### =====================================================================
+## called in plot.spca  method for spca objects
+## not exported
+## plots the sparse loadings versus the PCA ones
+#### =====================================================================
   oldpar = par(no.readonly = TRUE)
   if (!any(class(smpc) == "spca")){
     stop("plot.spca works only for spca objects")
@@ -1004,18 +948,14 @@ plotload = function(smpc, pcs, cols, perc = TRUE, variablesnames = FALSE,
       cols = 1:cols
   if (rev(cols)[1] > ncol(A))
     cols = 1:ncol(A)
-  
-  
-  
-  #  A = smpc$loadings # ok inside plot done
+
   if(perc == TRUE)
     pcs = make.cont(pcs$loadings)
   else
     pcs = pcs$loadings
-  #  onlynonzero =FALSE
-  par(mfrow = c(mfrowload, mfcolload))
+
+par(mfrow = c(mfrowload, mfcolload))
   par(mar = c(4.1, 4.1, 2.5, 1))
-  #  par(mar = mar)
   if (perc == TRUE)
     na = "contributions"
   else

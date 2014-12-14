@@ -1,0 +1,144 @@
+\documentclass[a4paper]{article}
+
+\usepackage{bookmark}
+
+% Load packages
+\usepackage{inconsolata}
+\usepackage{Rd}
+%\usepackage{ucs}
+\usepackage[latin1]{inputenc}
+\usepackage{fontenc}
+\usepackage{amsmath}    % need for subequations
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\usepackage{graphicx}   % need for figures
+\usepackage{verbatim}   % useful for program listings
+%\usepackage{color}      % use if color is used in text
+%\usepackage[pdfborder={0 0 0}]{hyperref}   % use for hypertext links, including
+% those to external  documents and
+% URLs
+
+% Page layout
+%\oddsidemargin 0.5in \evensidemargin 0.5in \textwidth 6in
+
+\begin{document}
+\author{Giovanni Merola}
+\date{\today}
+\title{spca package help files}
+\maketitle
+
+<<include=FALSE>>=
+library(knitr)
+options(width=60, prompt="R> ")
+opts_chunk$set(concordance=FALSE, comment=NA, tidy = TRUE)
+@%, fig.path="abc", size="footnotesize")
+<< echo = FALSE>>=
+library(knitr)
+library(printr)
+knitr::opts_chunk$set(
+  comment = "",
+  error = FALSE,
+  echo = FALSE)
+@
+
+\subsubsection*{spca-package}
+<< spcapackage>>=
+  help("spca-package")
+@
+
+
+\subsubsection*{anthrop}
+<< anthrop>>=
+  ?anthrop
+@
+
+
+\subsubsection*{bsbl}
+<< bsbl>>=
+  ?bsbl
+@
+
+
+\subsubsection*{bsbl\_avg}
+<< bsbl_avg>>=
+  ?bsbl_avg
+@
+
+
+\subsubsection*{bsbl\_labels}
+<< bsbl_labels>>=
+  ?bsbl_labels
+@
+
+
+\subsubsection*{choosecard}
+<< choosecard>>=
+  ?choosecard
+@
+
+
+\subsubsection*{compare}
+<< compare>>=
+  ?compare
+@
+
+
+\subsubsection*{compare.spca}
+<< compare.spca>>=
+  ?compare.spca
+@
+
+
+\subsubsection*{is.spca}
+<< is.spca>>=
+  ?is.spca
+@
+
+\subsubsection*{pca}
+<< pca>>=
+  ?pca
+@
+
+
+  \subsubsection*{plot.spca}
+<< plot.spca>>=
+  ?plot.spca
+@
+
+
+  \subsubsection*{print.spca}
+<< print.spca>>=
+  ?print.spca
+@
+
+
+  \subsubsection*{showload}
+<< showload>>=
+  ?showload
+@
+
+
+  \subsubsection*{spca}
+<< spca>>=
+  ?spca
+@
+
+
+  \subsubsection*{spcabb}
+<< spcabb>>=
+  ?spcabb
+@
+
+
+  \subsubsection*{spcabe}
+<< spcabe>>=
+  ?spcabe
+@
+
+
+  \subsubsection*{summary.spca}
+<< summary.spca>>=
+  ?summary.spca
+@
+
+\end{document} 

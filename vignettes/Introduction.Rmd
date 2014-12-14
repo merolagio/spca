@@ -32,7 +32,7 @@ options(width=120)
 ```
 
 ### Foreword 
-Unfortunately, creating package vignettes in LaTex using Rmarkdown is virtually impossible. I spent several days trying to figure out **how to make my (flawless) LaTex vignettes accepted by CRAN**. I have finally given in and I had to spend **a lot of time figuring out knitr, rmarkdown, markdown, pandoc and yaml, instead of debugging the package**. Rmarkdown and knitr seem to be still immature products with limitations, bugs, inconsistencies and poor documentation available. 
+Unfortunately, creating package vignettes in LaTex using Rmarkdown is virtually impossible. I spent several days trying to figure out **how to make my (flawless) LaTex vignettes accepted by CRAN**. I have finally given in and I had to spend **a lot of time figuring out knitr, rmarkdown, markdown, pandoc and yaml, instead of debugging the package**. Rmarkdown and knitr seem to be still immature products with limitations, bugs, inconsistencies and poor documentation available (I found some helpful tutorials but I had mainly to rely on stackoverflow posts and looking inside packages on GitHub to solve problems). 
 So, the quality of these vignettes is not what I would have liked. On the positive side, I can now send cool emails with markdown :-)
 
 ### Intro

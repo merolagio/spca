@@ -1,9 +1,6 @@
 
 makevexp =  function (A,D) {
-{  ## new improved using ind
-  ## revised to allow one component only
   ## computes vexp for uncorrelated components
-}
 if (is.matrix(A)){
     A = sweep(A, 2, sqrt(apply(A^2,2,sum)), "/")  
     nd = ncol(A)
@@ -165,7 +162,6 @@ make.cont = function(smpc){
   ## standardise a matrix of loadings to unity l1 norm
   ## scales loadings to unit L1 contributions
   ## input either a spca object or matrix of loadings
-  ## v2 modified, doesnt return vexp anymore
   if (any(class(smpc) == "spca")){
     if (any(names(smpc) == "contributions"))
       Ac = smpc$contributions
@@ -311,9 +307,7 @@ myprintspca = function(smpc, cols, digits = 3, rows, noprint = 1E-03,
   if (ncol(A) == 1L){
     #    fx = t(fx)
     print(t(fx), quote = FALSE)#, ...)
-    
-    
-    #     rownames(fx)[1] = "Loadings"
+
   }
   else
     print(fx, quote = FALSE)#, ...)
