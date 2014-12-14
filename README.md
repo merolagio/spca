@@ -111,7 +111,7 @@ devtools::install_github("merolagio/spca")
 ```
 
 ###Comments
-This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report][https://github.com/merolagio/spca/] or contributions.
+This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report](https://github.com/merolagio/spca/ "report bug") or contributions.
 
 For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplt2 (requires learning the package better).
 
