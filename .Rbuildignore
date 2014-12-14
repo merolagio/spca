@@ -4,5 +4,7 @@
 ^\.gitignore$
 ^.*\.md$
 ^README\.rmd$
+^README\.html$
 ^README_files$
+^cran-comments.md$
 
