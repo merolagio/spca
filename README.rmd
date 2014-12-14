@@ -6,12 +6,14 @@ email: lsspca@gmail.com<br>
 repository: https://github.com/merolagio/spca"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-  rmarkdown::md_document:
-    variant: markdown_github
+rmarkdown::html_document:
     toc: true
+    theme: united
+    highlight: haddock
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->  
+
 
 ### Intro  
 `spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
@@ -57,7 +59,7 @@ Interpretability is not univocally defined. Hence, for a problem there exist a n
     
 Therefore, for a given problem there usually exist several competing *interpretable* solutions. 
 
-`spca` **is implemented as an exploratory data analysis tool** 
+**spca is implemented as an exploratory data analysis tool** 
 
 The cardinality of the components can be chosen interactively after inspecting trace and plots of solutions of different cardinality.
 
