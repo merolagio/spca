@@ -1,4 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rproj\tmp$
-^\.gitignore
+^\.gitignore$
+^.*\.md$
+^README\.rmd$
+^README_files$
+
