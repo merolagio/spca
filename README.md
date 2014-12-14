@@ -6,7 +6,7 @@ email: lsspca@gmail.com<br>
 repository: https://github.com/merolagio/spca"
 date: "14 December 2014"
 output:
-rmarkdown::html_document:
+  rmarkdown::html_document:
     toc: true
     theme: united
     highlight: haddock
@@ -37,7 +37,7 @@ For these reasons, usually there exist different competing solutions and it is n
 
 ### Optimisation Models  
 Finding the optimal indices for an *spca* solution is an intractable NP-hard problem.  
- 
+
 Therefore, we find the solutions through two greedy algorthms: Branch-and-Bound (**BB**) and Backward Elimination (**BE**).
 
 * **BB** searches for the solutions that sequentially maximise the variance explained under the constraints. The solutions may not be a global maximum when more than one component is computed. The BB algorithm is a modification of Farcomeni's (2010) (thanks!).
@@ -48,7 +48,7 @@ The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca
 
 ### Use of the package
 
-**SPCA aims to obtain interpretable solutions**
+**spca aims to obtain interpretable solutions**
 
 Interpretability is not univocally defined. Hence, for a problem there exist a number of competing solutions. In factor Analayis literature there is plenty of discussion about the  definition of *interpretable* and *simple* solution (as qualities and in mathematical terms). 
 
@@ -123,7 +123,7 @@ bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)
 bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
 
 #-summary output
-summary(bbe1)
+summary(bbe1) 
 ```
 
 ```
@@ -199,8 +199,6 @@ devtools::install_github("merolagio/spca")
 
 ###Comments
 This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report](https://github.com/merolagio/spca/issues/new ) or contributions.
-
-Choosing a naming convention in R is difficult because over the years people used different ones. I tried to follow [Harley Wickam's suggestions](http://r-pkgs.had.co.nz/style.html), not completely. I tried to use consistent argument names in different functions and to give self-explanatory names. In most cases argument names start with different letters, so incomplete names can be used.
 
 For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplt2 (requires learning the package better).
 

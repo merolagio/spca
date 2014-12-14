@@ -6,7 +6,7 @@ email: lsspca@gmail.com<br>
 repository: https://github.com/merolagio/spca"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
-rmarkdown::html_document:
+  rmarkdown::html_document:
     toc: true
     theme: united
     highlight: haddock
@@ -48,7 +48,7 @@ The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca
 
 ### Use of the package
 
-**SPCA aims to obtain interpretable solutions**
+**spca aims to obtain interpretable solutions**
 
 Interpretability is not univocally defined. Hence, for a problem there exist a number of competing solutions. In factor Analayis literature there is plenty of discussion about the  definition of *interpretable* and *simple* solution (as qualities and in mathematical terms). 
 
@@ -149,8 +149,6 @@ devtools::install_github("merolagio/spca")
 
 ###Comments
 This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report](https://github.com/merolagio/spca/issues/new ) or contributions.
-
-Choosing a naming convention in R is difficult because over the years people used different ones. I tried to follow [Harley Wickam's suggestions](http://r-pkgs.had.co.nz/style.html), not completely. I tried to use consistent argument names in different functions and to give self-explanatory names. In most cases argument names start with different letters, so incomplete names can be used.
 
 For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplt2 (requires learning the package better).
 
