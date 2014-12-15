@@ -26,7 +26,7 @@ Principal Component Analysis is used for analysing a multivariate dataset with t
 
 In some situations more than three components are used. But this simply reduces a problem into a lower dimensional one, which is still difficult to analyse.
 
-SPCA aims to obtain interpretable components.  In factor Analayis literature there is plenty of discussion about the  definition of interpretable and simple solutions (as qualities and in mathematical terms).
+SPCA aims to obtain interpretable components.  In Factor Analysis literature there is plenty of discussion about the  definition of interpretable and simple solutions (as qualities and in mathematical terms).
 
 * **Simplicity** can be defined by different measures, being linked to **sparsness**, **variance explained** and **size of the loadings**. 
 

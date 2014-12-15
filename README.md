@@ -26,7 +26,7 @@ Principal Component Analysis is used for analysing a multivariate dataset with t
 
 In some situations more than three components are used. But this simply reduces a problem into a lower dimensional one, which is still difficult to analyse.
 
-SPCA aims to obtain interpretable components.  In factor Analayis literature there is plenty of discussion about the  definition of interpretable and simple solutions (as qualities and in mathematical terms).
+SPCA aims to obtain interpretable components.  In Factor Analysis literature there is plenty of discussion about the  definition of interpretable and simple solutions (as qualities and in mathematical terms).
 
 * **Simplicity** can be defined by different measures, being linked to **sparsness**, **variance explained** and **size of the loadings**. 
 
@@ -50,15 +50,8 @@ The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca
 
 **spca aims to obtain interpretable solutions**
 
-Interpretability is not univocally defined. Hence, for a problem there exist a number of competing solutions. In factor Analayis literature there is plenty of discussion about the  definition of *interpretable* and *simple* solution (as qualities and in mathematical terms). 
-
-* *simplicity* can be defined by different measures, being linked to sparsness, variance explained and size of the loadings. 
-
-* *interpretability* is also linked to which of the variables are included in the solution  and is not measurable.
-    * it usually requires expert knowledge.
-    
-Therefore, for a given problem there usually exist several competing *interpretable* solutions. 
-
+Choosing an interpretable sparse solution requires comparing two or more of them, which may differ by the variables included or the cardinality and may explain more or less variance. Therefore, it is necessary to analyse more than one and this implies comparing statistics and plots. 
+ 
 **spca is implemented as an exploratory data analysis tool** 
 
 The cardinality of the components can be chosen interactively after inspecting trace and plots of solutions of different cardinality.
