@@ -16,10 +16,10 @@ Depends:
 VignetteBuilder: knitr
 Suggests:
     formatR,
-    knitr,
     ggplot2,
     reshape2
 Imports:
-    MASS
-License: GPL-3 + file LICENSE
+    MASS,
+    knitr (>= 1.7)
+License: GPL-3
 LazyData: true
