@@ -21,9 +21,7 @@ env:
 script: ./travis-tool.sh run_tests
 
 after_failure:
-  - ./travis-tool.sh dump_logs
-
-on_failure:
+  - "cat /home/travis/build/merolagio/spca/spca.Rcheck/00check.log"
   - ./travis-tool.sh dump_logs
 
 notifications:
