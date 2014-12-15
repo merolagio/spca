@@ -159,7 +159,7 @@ data(bsbl)
 bpca = pca(bsbl, screeplot = TRUE, kaiser.print = TRUE)
 ```
 
-```{r ex second}
+```{r exsecond}
 #- sparse PCA with minimal contribution 25%
 bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
 

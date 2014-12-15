@@ -72,7 +72,7 @@ plot(bc.pca, cols = 4, plotvex = FALSE, plotload = TRUE,
 As expexcted, there are a few larger ones and other smaller ones. 
 
 The plot of only the contributions larger than with absolute value > 4% is shown below.
-```{r pca-trimmout, fig.show = "hold"}
+```{r pcatrimmout, fig.show = "hold"}
 plot(bc.pca, cols = 4, thresh = 0.04, plotvex = FALSE, plotload = TRUE, 
      variables = TRUE, rotlab = 45, size = 0.75, mfrow = 1, mfcol = 1)
 ```
@@ -113,7 +113,7 @@ The solutions can be printed n different ways, as shown below.
 `choosecard` produces a proper **spca** object, in this case obtained with the BE algorithm, which is 
 printed below
 
-````{r look cc}
+````{r lookcc}
 #<__ print summaries of cc
 summary(bc.cc)
 ##<__ print the contributions__
@@ -124,7 +124,7 @@ The first table shows that the LS SPCA solutions explain about 97% of the varian
 From the second table it can be seen that the first component regards offensive play, about 50% season and 50% career performances. The other component are different contrasts of the different dimensions.
 
 Since we chose to compute correlated components, the correlations among them are shown below and they are negligeable.
-```{r check cor cc}
+```{r checkcorcc}
 
 ##<__ check the correlation among the components
 round(bc.cc$cor, 2)
@@ -133,10 +133,10 @@ round(bc.cc$cor, 2)
 
 The results can be also inspected visually, as shown below. 
 
-```{r plot cc}
+```{r plotcc}
 ```
 The sparse contributions can also be plotted against the contributions of the corresponding PCs, as follows.
-```{r plot cc pc, echo = TRUE, tidy = TRUE, fig.keep="all", show="hold"}
+```{r plotccpc, echo = TRUE, tidy = TRUE, fig.keep="all", show="hold"}
 ##<== Percentage contributions of the the LS SPCA(BE)(3, 4, 4)  
 ##<== and Cumulative variance explained by  LS SPCA(BE) compared with PCA
 plot(bc.cc, plotload = TRUE, methodname = "BE", variablesnames = TRUE, addlabels = TRUE,
