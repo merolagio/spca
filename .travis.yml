@@ -24,7 +24,7 @@ env:
    global:
      - CRAN: http://cran.rstudio.com
      - R_BUILD_ARGS="--no-manual"
-     - R_CHECK_ARGS="--as-cran"
+     - R_CHECK_ARGS="--no-manual --as-cran"
      
      
 after_failure:
