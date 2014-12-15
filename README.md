@@ -14,6 +14,7 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->  
 
+[![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
 
 ### Intro  
 `spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
