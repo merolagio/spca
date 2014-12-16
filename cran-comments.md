@@ -10,7 +10,7 @@ This is a resubmission. In this version I have:
 The package passed the `R CMD check --as-cran` in Rstudio on Windows 7.
 
 The package passed the `R CMD check --as-cran` also on Ubuntu 12. 
-The Travis (https://travis-ci.org/merolagio/spca/builds/44067354) log is below.
+The Travis (https://travis-ci.org/merolagio/spca/builds/44196876) log is below.
 
 Using worker: worker-linux-6-2.bb.travis-ci.org:travis-linux-16
 system_info
