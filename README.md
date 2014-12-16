@@ -4,7 +4,7 @@ author: "Giovanni Merola<br>
 RMIT International University Vietnam<br>
 email: lsspca@gmail.com<br>
 repository: https://github.com/merolagio/spca"
-date: "14 December 2014"
+date: "16 December 2014"
 output:
   rmarkdown::html_document:
     toc: true
@@ -14,7 +14,6 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->  
 
-[![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
 
 ### Intro  
 `spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
@@ -51,15 +50,15 @@ The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca
 
 **spca aims to obtain interpretable solutions**
 
-Choosing an interpretable sparse solution requires comparing two or more of them, which may differ by the variables included or the cardinality and may explain more or less variance. Therefore, it is necessary to analyse more than one and this implies comparing statistics and plots. 
- 
+Choosing an interpretable sparse solution requires comparing two or more of them, which may differ by the variables included or the cardinality and may explain more or less variance. Therefore, with spca solutions with different characteristics can be easily produced and compared. 
+
 **spca is implemented as an exploratory data analysis tool** 
 
 The cardinality of the components can be chosen interactively after inspecting trace and plots of solutions of different cardinality.
 
-Furthermore, the solutions can be automatically computed so as to:
+Furthermore, several solutions can be easily computed so as to:
 
-* be uncorrelated with the others or not.
+* have uncorrelated components or not.
 
 * have a minimal cardinality. 
 
@@ -67,11 +66,11 @@ Furthermore, the solutions can be automatically computed so as to:
 
 * have only contributions larger than a given threshold.
 
-Solutions obtained under different settings can be easily compared.
+The solutions obtained under different settings can be plotted and printed in different ways. also comparng two or more.
 
 `spca` can be helpful also in a confirmatory stage of the analysis, since the sparse components can be constrained to be made up of only chosen variables.
 
-Beside this quick tour of the package, there are vignettes with examples and explanations. You can start with `vignette("Introduction to spca", package = "spca"), which is similar to this but more detailed.` Other vignettes contain an extended example and a navigable help. 
+Beside this quick tour of the package, there are vignettes with examples and explanations. You can start with `vignette("Introduction to spca", package = "spca")`, which is similar to this document but more detailed.` Other vignettes contain an extended example and a navigable help. 
 
 ### Functions
 The workhorse of the package is the function `spca`, which computes the optimal solutions for a given set of indices.
@@ -194,7 +193,7 @@ devtools::install_github("merolagio/spca")
 ###Comments
 This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report](https://github.com/merolagio/spca/issues/new ) or contributions.
 
-For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplt2 (requires learning the package better).
+For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplot2 (requires learning the package better).
 
 The code is implemented in R, so it will not work for large datasets. 
 I have in mind to develop C routines at least for the matrix algebra. Anybody willing to help, please, let me know. 

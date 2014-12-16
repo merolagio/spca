@@ -50,7 +50,7 @@ The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca
 
 **spca aims to obtain interpretable solutions**
 
-Choosing an interpretable sparse solution requires comparing two or more of them, which may differ by the variables included or the cardinality and may explain more or less variance. Therefore, it is necessary to analyse more than one and this implies comparing statistics and plots. 
+Choosing an interpretable sparse solution requires comparing two or more of them, which may differ by the variables included or the cardinality and may explain more or less variance. Therefore, with spca solutions with different characteristics can be easily produced and compared. 
 
 **spca is implemented as an exploratory data analysis tool** 
 
@@ -66,7 +66,7 @@ Furthermore, several solutions can be easily computed so as to:
 
 * have only contributions larger than a given threshold.
 
-the solutions obtained under different settings can be easily compared.
+The solutions obtained under different settings can be plotted and printed in different ways. also comparng two or more.
 
 `spca` can be helpful also in a confirmatory stage of the analysis, since the sparse components can be constrained to be made up of only chosen variables.
 
@@ -143,7 +143,7 @@ devtools::install_github("merolagio/spca")
 ###Comments
 This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report](https://github.com/merolagio/spca/issues/new ) or contributions.
 
-For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplt2 (requires learning the package better).
+For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplot2 (requires learning the package better).
 
 The code is implemented in R, so it will not work for large datasets. 
 I have in mind to develop C routines at least for the matrix algebra. Anybody willing to help, please, let me know. 

@@ -1,18 +1,13 @@
+## Resubmission
+This is a resubmission. In this version I have:
 
-No problems in with Windows for `R CMD check --as-cran`. The only note was:
- NOTE
-Maintainer: 'Giovanni Merola <lsspca@gmail.com>'
-New submission
-Components with restrictions and base license permitting such:
-  GPL-3 + file LICENSE
-File 'LICENSE':
-  YEAR: 2014-2015 
-  
-  COPYRIGHT HOLDER: Giovanni Merola
-  
-Which shouldn't create a problem.
+* removed the LICENCE file which was unnecessary
 
-Actually when I check the package on my computer I get a warning about missing fonts for the manual.rnw file. No worries, it's just some problems with the incosolata laTex package.
+* renamed all the knitr chunks to names without blank spaces. This likely caused a problem when building the package on Linux
+
+* amended some documentation files
+
+The package passed the `R CMD check --as-cran` in Rstudio on Windows 7.
 
 The package passed the `R CMD check --as-cran` also on Ubuntu 12. 
 The Travis (https://travis-ci.org/merolagio/spca/builds/44067354) log is below.
