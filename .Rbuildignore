@@ -1,11 +1,12 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rproj\tmp$
+.Rprofile
 ^\.gitignore$
 ^.*\.md$
 ^README\.rmd$
 ^README\.html$
 ^README_files$
+NEWS\.md
 ^cran-comments\.md$
-
 ^\.travis\.yml$

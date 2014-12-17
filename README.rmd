@@ -24,7 +24,7 @@ I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improv
 ### Sparse Principal Component Analysis
 Principal Component Analysis is used for analysing a multivariate dataset with two or three uncorrelated components that explain the most variance of the data. 
 
-In some situations more than three components are used. But this simply reduces a problem into a lower dimensional one, which is still difficult to analyse.
+In some situations more than three components are used. But this simply reduces a multivariate problem into a lower dimensional one, which is still difficult to analyse.
 
 SPCA aims to obtain interpretable components.  In Factor Analysis literature there is plenty of discussion about the  definition of interpretable and simple solutions (as qualities and in mathematical terms).
 
@@ -85,19 +85,19 @@ With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and t
 
 - `choosecard`: interactive method for choosing the cardinality. It plots and prints statistics for comparing solutions of different cardinality.
 
-- `print`: shows a formatted matrix of sparse loadings or *contributions* of a solution. Contributions are loadings expressed as percentages, while the loadings are scaled to unit sum of squares.
+- `print`: shows a formatted matrix of sparse loadings, or *contributions*, of a solution. Loadings are scaled to unit sum of squares, contributions are scaled to percentages.
 
 - `showload`: prints only the non-zero sparse loadings. This is useful when the number of variables is large.
 
 - `summary`: shows formatted summary statistics of a solution
 
-- `plot`: plots the cumulative variance explained by the sparse solutions versus that explained by the PCs, whish is their upper bound. It can also plot the contributions in different ways.
+- `plot`: plots the cumulative variance explained by the sparse solutions with that explained by the PCs, which is its upper bound. It can also plot the sparse contributions in different ways.
 
-- `compare`: plots and prints comparison of two or more *spca* objects.
+- `compare`: plots and prints comparisons of two or more *spca* objects.
 
 ### Example
 
-The naming of the arguments in R is not simple, mainly because different syntaxes have been used over the years. I tried to follow [Harley Wickam's suggestions](http://r-pkgs.had.co.nz/style.html), not completely. I tried to use consistent argument names in different functions and to give meaningful names starting differently so that R's useful feature of partial matching the arguments can be exploited. In the following example I sometime use partial arguments names.
+The naming of the arguments in R is not simple, mainly because different conventions have been used over the years. I tried to follow [Harley Wickam's suggestions](http://r-pkgs.had.co.nz/style.html), not completely. I tried to use consistent argument names in different functions and to give meaningful names, starting differently so that `R`'s useful feature of partial matching the arguments can be exploited. In the following example I sometime use partial arguments names.
 
 ```{r example, fig.path='README_files/'}
 library(spca)
@@ -114,7 +114,8 @@ summary(bbe1)
 
 #-print percentage contributions
 bbe1
-#-# Simple combinations of offensive play in career and season are most important. Defensive play in season appears only in 3rd component.
+#-# Simple combinations of offensive play in career and in season are most important.
+#-# Defensive play appears only in 3rd component.
 
 #-plot solution
 plot(bbe1, plotloadvsPC = TRUE, pc = bpca, mfr = 2, mfc = 2, 
