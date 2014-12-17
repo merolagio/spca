@@ -12,6 +12,21 @@ output:
     highlight: haddock
 ---
 
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# spca  
+
+[![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
+
+
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->  
 
 
