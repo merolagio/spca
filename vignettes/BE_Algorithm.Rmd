@@ -1,3 +1,10 @@
+<!--
+vignette: >
+  %\VignetteIndexEntry{BE Algorithm}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+-->
+
 ---
 title: "Backward Elimination Algorithm"
 author: "Giovanni Merola"
@@ -9,6 +16,7 @@ output:
 vignette: >
   %\VignetteIndexEntry{Backward Elimination Algorithm}
   %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
 ---
 
 ```{r, echo = FALSE}
