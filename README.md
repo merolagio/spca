@@ -28,7 +28,7 @@ I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improv
 ### Sparse Principal Component Analysis
 Principal Component Analysis is used for analysing a multivariate dataset with two or three uncorrelated components that explain the most variance of the data. 
 
-In some situations more than three components are used. But this simply reduces a problem into a lower dimensional one, which is still difficult to analyse.
+In some situations more than three components are used. But this simply reduces a multivariate problem into a lower dimensional one, which is still difficult to analyse.
 
 SPCA aims to obtain interpretable components.  In Factor Analysis literature there is plenty of discussion about the  definition of interpretable and simple solutions (as qualities and in mathematical terms).
 
