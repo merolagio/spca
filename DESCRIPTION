@@ -1,7 +1,7 @@
 Package: spca
 Type: Package
 Title: Sparse Principal Component Analysis
-Version: 0.6.0
+Version: 0.6.0.9001
 Date: 2014-12-14
 Author: Giovanni Maria Merola
 Maintainer: Giovanni Merola <lsspca@gmail.com>

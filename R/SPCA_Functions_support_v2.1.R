@@ -1,6 +1,9 @@
 
 makevexp =  function (A,D) {
+{  ## new improved using ind
+  ## revised to allow one component only
   ## computes vexp for uncorrelated components
+}
 if (is.matrix(A)){
     A = sweep(A, 2, sqrt(apply(A^2,2,sum)), "/")  
     nd = ncol(A)
@@ -95,19 +98,15 @@ eig = function(D, nd = 4, prn = FALSE){
 make.uncLoad = function(A, S){
 ## ortogonalises loadings
   p = ncol(S)
-  if ( p > 1){
-    d = ncol(A)
-    B = A   
-    Z = diag(1, p)
-    for (i in 2:d){
-      Z = makez(A[,i-1], S, Z)
-      B[,i] = Z %*% A[,i]
-    }  
-    B = sweep(B,2, sqrt(apply(B^2,2,sum)), "/")
-    return(B)
-  }
-  else
-    return(A)
+  d = ncol(A)
+  B = A   
+  Z = diag(1, p)
+  for (i in 2:d){
+    Z = makez(A[,i-1], S, Z)
+    B[,i] = Z %*% A[,i]
+  }  
+  B = sweep(B,2, sqrt(apply(B^2,2,sum)), "/")
+  return(B)
 }
 
 make.corx = function(S, A){
@@ -166,6 +165,7 @@ make.cont = function(smpc){
   ## standardise a matrix of loadings to unity l1 norm
   ## scales loadings to unit L1 contributions
   ## input either a spca object or matrix of loadings
+  ## v2 modified, doesnt return vexp anymore
   if (any(class(smpc) == "spca")){
     if (any(names(smpc) == "contributions"))
       Ac = smpc$contributions
@@ -311,7 +311,9 @@ myprintspca = function(smpc, cols, digits = 3, rows, noprint = 1E-03,
   if (ncol(A) == 1L){
     #    fx = t(fx)
     print(t(fx), quote = FALSE)#, ...)
-
+    
+    
+    #     rownames(fx)[1] = "Loadings"
   }
   else
     print(fx, quote = FALSE)#, ...)

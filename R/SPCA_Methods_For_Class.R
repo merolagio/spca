@@ -183,6 +183,7 @@ summary.spca = function(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
   if( is.vector(smpc$loadings) )
     smpc$loadings = as.matrix(smpc$loadings)
   if (missing(cols)){
+    ## questo cambialo in = vexp
     cols = 1:length(smpc$vexpPC)  
   }
   else

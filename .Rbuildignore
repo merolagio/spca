@@ -1,8 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rproj\tmp$
-.Rprofile
 ^\.gitignore$
+^\.Rprofile
 ^.*\.md$
 ^README\.rmd$
 ^README\.html$
@@ -10,3 +10,4 @@
 NEWS\.md
 ^cran-comments\.md$
 ^\.travis\.yml$
+Change_Log\.txt

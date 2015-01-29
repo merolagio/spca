@@ -1,0 +1,9 @@
+22/12/14
+fixed problem with make.uncLoad in spca when only one loadings 
+
+fix line 449 of spcabe
+          Ap = t(t(A)/ apply(abs(A), 2, sum)) 
+use make.cont DONE
+
+27/01/15
+changed an svd to eigen in cspca

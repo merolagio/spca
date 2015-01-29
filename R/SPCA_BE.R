@@ -335,7 +335,7 @@ if (length(threshvaronPC) == 1)
     else
       Trace$Values = c(ns, minl, vexpo[j], (vexpo[j])/sum(vexpPC[1:j]))
     Trace$loadings =  a
-    # ---- trimming   -------------------------
+# ---- trimming   -------------------------
     while (sum(abs(a[abs(a) > eps]) < thresh[j]) > 0 ) 
     {
       if ( (ns - 1) < mincard[j]){
@@ -360,8 +360,7 @@ if (length(threshvaronPC) == 1)
       # finds smallest loading
       indb = rev(order(abs(a)))   
       indin = sort(indb[1:nl])
-      elim = c(elim, indb[nl + 1]) ## try this
-      #    elim = c(elim, indb[1 + nl])
+      elim = c(elim, indb[nl + 1])
       indo = (1:p)[indin]
       ns = length(indo)
       # compute trimmed solution
@@ -496,7 +495,7 @@ if (length(threshvaronPC) == 1)
   }
   else{ out = list(loadings = A)
         if(perc == TRUE){
-          Ap = t(t(A)/ apply(abs(A), 2, sum))
+          Ap = make.cont(A) #t(t(A)/ apply(abs(A), 2, sum))
           out$contributions = Ap 
         }
         out = c(out, list(vexp = vexpv, vexpPC = vexpPC, cardinality = card, ind = indlast, 

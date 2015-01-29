@@ -8,10 +8,10 @@ cspca = function(S, ind, Z = NULL, vexpn = FALSE){
   else
     Sz = S
   D = S[ind, ind] 
-  sv = svd(D, nu = 0)
-  nv = sum(sv$d > 1E-6)
+  sv = eigen(D, symm = TRUE)
+  nv = sum(sv$val > 1E-6)
   ## Dm = D^1/2. 
-  Dm = t(t(sv$v[,1:nv]) / sqrt(sv$d[1:nv])) %*% t(sv$v[,1:nv])
+  Dm = t(t(sv$vec[,1:nv]) / sqrt(sv$val[1:nv])) %*% t(sv$vec[,1:nv])
 
   ## eigen J D^1/2 (eigvec(D^1/2 Sz Sz D^1/2)) J' like in paper
   ee = eigen(crossprod(Sz[,ind] %*% Dm), symmetric = TRUE)
@@ -214,10 +214,12 @@ if(missing(ind))
   if (all(unc==TRUE))
     unc = TRUE  
   out = list(loadings = A, contributions = contributions, vexp = vexpv, vexpPC = vexp, unc = unc, ind = ind)
-  if (any(unc == FALSE)){
-    out$corComp = make.cor(S, A)
-    out$Uncloadings = make.uncLoad(A, S)
+  if (nd > 1){
+    if (any(unc == FALSE)){
+      out$corComp = make.cor(S, A)
+      out$Uncloadings = make.uncLoad(A, S)
+    }
   }
-  class(out) = "spca"
+class(out) = "spca"
   return(out)
 }
