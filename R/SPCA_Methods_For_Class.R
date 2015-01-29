@@ -1,5 +1,5 @@
 
-#' Verifies if an object is of class spca
+#' Verifies if an object is of class spca 
 #' 
 #' @param x Any object suspected of being of class spca.
 #' @return Logical: TRUE if object is of class spca, FALSE otherwise.

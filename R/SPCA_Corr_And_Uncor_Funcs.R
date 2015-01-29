@@ -7,7 +7,7 @@ cspca = function(S, ind, Z = NULL, vexpn = FALSE){
     Sz = S %*% Z
   else
     Sz = S
-  D = S[ind, ind] 
+  D = S[ind, ind]  
   sv = eigen(D, symm = TRUE)
   nv = sum(sv$val > 1E-6)
   ## Dm = D^1/2. 

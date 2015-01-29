@@ -149,7 +149,7 @@ spcabe = function(S, nd = FALSE, ndbyvexp = FALSE, mincard = NULL, thresh = FALS
 ## iteratively eliminates the coefficients larger than the threshold
 ### ===========================================================================  
   p = ncol(S)
-  # ------------------------------- CHECK AND VARIABLES FOR LOOPING
+  # ------------------------------- CHECK AND VARIABLES FOR LOOPING 
   #nd
   if (nd == FALSE){
     if (( ndbyvexp == FALSE) ){

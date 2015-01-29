@@ -93,7 +93,7 @@ eig = function(D, nd = 4, prn = FALSE){
 }
 
 make.uncLoad = function(A, S){
-## ortogonalises loadings
+## ortogonalises loadings added if P >1
   p = ncol(S)
   if ( p > 1){
     d = ncol(A)

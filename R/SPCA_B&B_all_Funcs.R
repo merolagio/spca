@@ -1,4 +1,4 @@
-#' SPCA by Branch-and-Bound
+#' SPCA by Branch-and-Bound 
 #' 
 #' Finds the LS SPCA loadings with given cardinalities using Branch-and-Bound
 #' 

@@ -12,7 +12,7 @@ Description: Computes Least Squares Sparse Principal Components either by a
     algorithm. Sparse solutions can be plotted, printed and compared using the
     methods included.
 Depends:
-    R (>= 3.1)
+    R (>= 3.1) 
 VignetteBuilder: knitr
 Suggests:
     formatR,

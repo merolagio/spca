@@ -6,4 +6,4 @@ fix line 449 of spcabe
 use make.cont DONE
 
 27/01/15
-changed an svd to eigen in cspca
+changed an svd to eigen in cspca 
