@@ -11,3 +11,4 @@ NEWS\.md
 ^cran-comments\.md$
 ^\.travis\.yml$
 Change_Log\.txt
+^Documentation_roxygen_etc.R

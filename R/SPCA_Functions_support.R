@@ -1,35 +1,39 @@
-
+## ok from devel
 makevexp =  function (A,D) {
+{ ## should add a flag for unc 
+  ## new improved using ind
+  ## revised to allow one component only
   ## computes vexp for uncorrelated components
+}
 if (is.matrix(A)){
-    A = sweep(A, 2, sqrt(apply(A^2,2,sum)), "/")  
-    nd = ncol(A)
-    vt = sum(diag(D))
-    vexp = rep(0, nd)
-    for (i in 1:nd) {
-      ind = which(abs(A[,i])> 0.001)
-      if (length(ind) == 1){
-        B = D[,ind]
-        b = D[ind,ind]
-        vexp[i] = sum(B^2)/(vt * b)
-      }
-      else{
-        B = D[,ind] %*%  A[ind, i]
-        b = drop(crossprod(B[ind,], A[ind, i]))
-        vexp[i] = crossprod(B, B)/(vt * b)
-      }
-      D = D - B %*% t(B)/b
+  A =  t(t(A)/ sqrt(colSums(A^2)))
+  nd = ncol(A)
+  vt = sum(diag(D))
+  vexp = rep(0, nd)
+  for (i in 1:nd) {
+    ind = which(abs(A[,i])> 0.001)
+    if (length(ind) == 1){
+      B = D[,ind] 
+      b = D[ind,ind]
+      vexp[i] = sum(B^2)/(vt * b)
     }
+    else{
+      B = D[,ind] %*%  A[ind, i]
+      b = drop(crossprod(B[ind,], A[ind, i]))
+      vexp[i] = crossprod(B, B)/(vt * b)
+    }
+    D = D - tcrossprod(B ,B)/b
   }
-  else{
-    ind = which(abs(A) > 0.001)
-    A = A[ind]/sqrt(sum(A[ind]^2))
-    vt = sum(diag(D))
-    B = D[,ind] %*% as.matrix(A)
-    b = drop(crossprod(B[ind,], as.matrix(A)))
-    vexp = crossprod(B, B)/(vt * b)
-  }
-  return(vexp)
+}
+else{
+  ind = which(abs(A) > 0.001)
+  A = A[ind]/sqrt(sum(A[ind]^2))
+  vt = sum(diag(D))
+  B = D[,ind] %*% as.matrix(A)
+  b = drop(crossprod(B[ind,], as.matrix(A)))
+  vexp = crossprod(B, B)/(vt * b)
+}
+return(vexp)
 }
 
 makevexpNO = function(A, D){
@@ -79,8 +83,8 @@ makevexpNOn = function(A, D){
 }
 
 eig = function(D, nd = 4, prn = FALSE){
-## does eigendecomposition returning also vexp and cvexp
-## returns object spca  
+  ## does eigendecomposition returning also vexp and cvexp
+  ## returns object spca  
   ee = eigen(D, symmetric = TRUE)
   ee$vexp = ee$val/sum(ee$val)
   ee$cvexp = cumsum(ee$val)/sum(ee$val)
@@ -93,17 +97,20 @@ eig = function(D, nd = 4, prn = FALSE){
 }
 
 make.uncLoad = function(A, S){
-## ortogonalises loadings added if P >1
+  ## ortogonalises loadings
   p = ncol(S)
-  if ( p > 1){
+  if (is.vector(A))
+    d = 1
+  else
     d = ncol(A)
+  if (d > 1){
     B = A   
     Z = diag(1, p)
     for (i in 2:d){
-      Z = makez(A[,i-1], S, Z)
+      Z = makez(B[,i-1], S, Z)
       B[,i] = Z %*% A[,i]
     }  
-    B = sweep(B,2, sqrt(apply(B^2,2,sum)), "/")
+    B = t(t(B)/ sqrt(colSums(B^2)))
     return(B)
   }
   else
@@ -119,25 +126,28 @@ make.corx = function(S, A){
 } 
 
 make.cor = function(D, A, dgt = 4){
-## computes correlation among components
+  ## computes correlation among components
   if (is.vector(A))
     out = (NULL)
   else 
     if (ncol(A) == 1)
       out = (NULL)
-    else 
-      if (is.matrix(A) & ncol(A) > 1 ){  
-          out = crossprod(A, D) %*% A
-          o = sqrt(diag(out))^-1
-          out = round(diag(o) %*% out %*% diag(o), dgt)
-      }
+  else 
+    if (is.matrix(A) & ncol(A) > 1 ){  
+      out = crossprod(A, D) %*% A
+      o = sqrt(diag(out))^-1
+      out = round(diag(o) %*% out %*% diag(o), dgt)
+    }
   return(out)
 }
 
 makez = function(a, S, Z){
-### updates the Z matrix with next loadings 
+  ### updates the Z matrix with next loadings vector
   ## only for unc components
   p = ncol(S)
+  if (!is.vector(a))
+    if(ncol(a)> 1)
+      stop("you must pass a vector or column matrix to makez, consider using makezM")
   if (missing(Z))
     Z = diag(1,p)
   a = as.matrix(a)
@@ -152,7 +162,7 @@ makezM = function(A,D){
 
 
 make.vexpeig= function(ee, ndim, cum = TRUE, dgt = 3){
-## computes the proportional variance explained by eigenvectors
+  ## computes the proportional variance explained by eigenvectors
   if(missing(ndim))
     ndim = length(ee$val)
   if (cum == TRUE)
@@ -166,69 +176,70 @@ make.cont = function(smpc){
   ## standardise a matrix of loadings to unity l1 norm
   ## scales loadings to unit L1 contributions
   ## input either a spca object or matrix of loadings
+  ## v2 modified, doesnt return vexp anymore
   if (any(class(smpc) == "spca")){
     if (any(names(smpc) == "contributions"))
       Ac = smpc$contributions
     else{
-      smpc = smpc$loadings
-      Ac = round(sweep(smpc, 2, apply(abs(smpc),2,sum), "/"), 5)
+      Ac = t(t(smpc$loadings)/colSums(abs(smpc$loadings)))
     }
   }  
   else{ 
     if (is.list(smpc) & length(smpc) == 1)
       smpc = smpc[[1]]
     if ( is.matrix(smpc))
-      Ac = round(sweep(smpc, 2, apply(abs(smpc),2,sum), "/"), 5)
+      Ac = t(t(smpc)/colSums(abs(smpc)))
+
     else
       if (is.vector(smpc))
         Ac = smpc/sum(abs(smpc))
-      else
-        stop("a matrix of loadings or an spca object is needed")      
+    else
+      stop("a matrix of loadings or an spca object is needed")      
   }
   return(Ac)
 }
 
 get.minload = function(smpc, perc = FALSE, eps = 0.001){
-## returns the non-zero loading with the smallest absolute value for each column
-## input a matrix of loadings or an spca object
-## if perc == TRUE will compute on the percent contribution  
-   if (any(class(smpc) == "spca"))
+  ## returns the non-zero loading with the smallest absolute value for each column
+  ## input a matrix of loadings or an spca object
+  ## if perc == TRUE will compute on the percent contribution  
+  if (any(class(smpc) == "spca"))
     smpc = smpc$loadings
-   else 
+  else 
     if (! is.matrix(smpc))
-    stop("get.minload: a matrix of loadings or an spca object is needed")  
-   if (perc == TRUE)
-     smpc = make.cont(smpc)
-   d = ncol(smpc)
-   gl = function(x)
-   min(abs(x[abs(x)> eps]))
-   apply(smpc, 2, gl)
+      stop("get.minload: a matrix of loadings or an spca object is needed")  
+  if (perc == TRUE)
+    smpc = make.cont(smpc)
+  d = ncol(smpc)
+  gl = function(x)
+    min(abs(x[abs(x)> eps]))
+  apply(smpc, 2, gl)
 }
 
 get.card = function(A, eps = 0.01){
-## returns the cardinality of the columns of a matrix of loadings  
-if (any(class(A) == "spca"))
-  A = A$loadings
+  ## returns the cardinality of the columns of a matrix of loadings  
+  if (any(class(A) == "spca"))
+    A = A$loadings
   if(is.null(dim(A)))
     sum(abs(A) > eps)
   else
-    apply(abs(A)> eps, 2, sum)
+    colSums(abs(A)> eps)
 }
 
 mult.eigen = function(A, b, ind, power = 1L){
 {#multiplies A %*% diag(b) %*% t(A)
   # used for fitted variance matrix
 }
-  if (missing(ind))
-    ind = 1:ncol(A)
-  if (length(b[ind]) != ncol(A[,ind]))
-    stop("matrix A and vector b must be of compatible dimension")
-  if (power == 1)
-    t(A[,ind] %*% (t(A[,ind]) * b[ind]))
-  if (power != 1)
-    if (power == 0.5 & any(b < 0))
-      stop("mult.eigen: cannot take sqrt of negative b")
-    t(A[,ind] %*% (t(A[,ind]) * (b[ind])^power))
+if (missing(ind))
+  ind = 1:ncol(A)
+if (length(b[ind]) != ncol(A[,ind]))
+  stop("matrix A and vector b must be of compatible dimension")
+if (power == 1)
+  t(A[,ind] %*% (t(A[,ind]) * b[ind]))
+if (power != 1)
+  if (power == 0.5 & any(b < 0))
+    stop("mult.eigen: cannot take sqrt of negative b")
+t(A[,ind] %*% (t(A[,ind]) * (b[ind])^power))
 }
 
 myprintspca = function(smpc, cols, digits = 3, rows, noprint = 1E-03, 
@@ -297,7 +308,7 @@ myprintspca = function(smpc, cols, digits = 3, rows, noprint = 1E-03,
   #  fx[ind] = "--"
   fx = format(fx, justify = "right" )
   if (any(class(smpc) == "spca")){
-## chv
+    ## chv
     vexp = smpc$vexp[cols]
     doo = rep("-----", ifelse(is.null(ncol(fx)), 1, ncol(fx)))
     fx = rbind(fx, doo, round(100*vexp,1))
@@ -311,7 +322,9 @@ myprintspca = function(smpc, cols, digits = 3, rows, noprint = 1E-03,
   if (ncol(A) == 1L){
     #    fx = t(fx)
     print(t(fx), quote = FALSE)#, ...)
-
+    
+    
+    #     rownames(fx)[1] = "Loadings"
   }
   else
     print(fx, quote = FALSE)#, ...)

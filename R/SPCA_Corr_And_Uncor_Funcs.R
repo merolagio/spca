@@ -208,7 +208,7 @@ if(missing(ind))
   vexp = e[1:nd] / sum(e)
   vexpv = makevexpNO(A, S)
   rownames(A) = colnames(S)
-  contributions = sweep(A, 2, apply(abs(A),2, sum), "/")  
+  contributions = sweep(A, 2, colSums(abs(A)), "/") () 
   if (all(unc==FALSE))
     unc = FALSE
   if (all(unc==TRUE))

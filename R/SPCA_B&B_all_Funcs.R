@@ -103,7 +103,7 @@ spcabb = function(S, card, unc = TRUE, startind, excludeload = FALSE, nvexp = FA
     if (li < nd){
       startind = append(startind, lapply(1:(nd-li), function(i, hh) 1:hh, hh = p))
     }
-    if (any(sapply(startind, length) < card))
+    if (any(vapply(startind, length) < card))
       stop(paste("length of startind cannot be less than the cardinality"))
   }
   if (length(unc) == 1){
