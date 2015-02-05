@@ -1,0 +1,568 @@
+---
+title: "Introduction to the spca package"
+author: "Giovanni Merola<br>
+RMIT International University Vietnam<br>
+email: lsspca@gmail.com<br>
+repository: https://github.com/merolagio/spca"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+rmarkdown::html_document:
+    toc: true
+    theme: united
+    highlight: haddock
+    fig_caption: true
+bibliography: spca.bibtex    
+vignette: >
+  %\VignetteIndexEntry{Introduction to spca}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+
+
+---
+
+```{r, echo = FALSE, message = FALSE}
+library(spca)
+library(formatR)
+library(knitr)
+knitr::opts_chunk$set(
+  comment = "#>",
+  error = FALSE,
+  tidy = FALSE)
+options(width=120)
+```
+
+### Foreword 
+Unfortunately, creating package vignettes in LaTex using Rmarkdown is difficult because of the fragilty of the interface. After spending several days on this I finally gave in and rewrote them in markdown. This was painful, as I had to spend a lot of time on rewriting the documentation instead of debugging the package.  This means that 
+the quality of these vignettes is not what I would have liked. On the positive side, I can now send cool emails with markdown :-)
+
+### Intro
+`spca` is an R package for running Sparse Principal Component Analysis. It implements the **LS SPCA** approach that computes the Least Squares estimates of sparse PCs (@mer). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
+
+The implementation is completely in `R`, so it can only be run on *small* datasets (the limit depends on the hardware used, we were able to solve problems with about 1000 variables in minutes). The package is self contained as it only depends on the library `MASS` which is part of the basic distribution of R. 
+
+Details about LS SPCA and the methodology impmented in the package can be found in ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")) and in the forthcoming paper in *Australia and New Zealand Journal of Statistics*. 
+
+I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc  :-D** This on top of a number of blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn't scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, A reviewer from *ANZJS* asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)! However, the editors of this journal accepted my refusal to do so.
+
+### A little math
+Principal Component Analysis was developed by @pea to attain the components that minimised the LS criterion when approximating the data matrix. If $X$ is a matrix with *n* rows of observations on *p* variables, the PCs are defined by the loadings $a_j$ as $t_j = X a_j$. The matrix of $d<p$ PCs, $T = XA$, is derived as the regressors that minimise the Residual Sum of Squares. By the principle of the Extra Sum of Squares the components can be constrained to be uncorrelated without loss of optimality. Therefore the PCA problem is obtained by solving: 
+$$
+A = \text{arg}\min ||X - TP'||^2 = \text{arg}\max\frac{A'SSA}{A'SA} = \text{arg}\max \sum_{1}^d \frac{a_j'SSa_j}{a_j'Sa_j}\\
+\text{subject to}\ a_j'Sa_k = 0,\ j\neq k,
+$$
+where $S$ is the covariance matrix of the $x$ variables. The terms in the last summation are the *variance explained* by each component. The solutions are proportional to the eigenvectors of $S$ corresponding to the eigenvalues taken in nonicreasing order. It is well known that the eigenvectors are mutually uncorrelated.
+
+@hot gives the PCs' loadings as the eigenvectors of $S$ with unit Euclidean norm. Using this normalisation the maximisation of the variance explained by each component simplifies to
+$$
+A =  \text{arg}\max \sum_{1}^d {a_j'Sa_j}\\
+\text{subject to}\ a_j'Sa_k = \delta_{jk},
+$$
+where $\delta_{jk} = 1$ if $j=k$ and  $\delta_{jk} = 0$ otherwise.
+
+Because of its simplicity, Hotelling's derivation has been adopted for popularizing PCA among pratictioners. This choice was unfortunate because the original objective of minimising the LS criterion has been somewhat forgotten. However, other than in Person's original paper, the LS derivation is given in several books and papers cited in my paper ( *e.g.* @ten and @ize08).  
+
+When cardinality constraints (also called $L_0$ *norm* constraints) are imposed on the original PCA problem, the loadings are no longer eigenvectors of $S$. Therefore, Hotelling's simplification is no longer equivalent to the variance explained. Furthermore, by the Cauchy-Schwartz inequality:
+$$
+\frac{a_j'SSa_j}{a_j'Sa_j} \geq \frac{a_j'Sa_j}{a_j'a_j}
+$$
+for any square matrix *S*, with equality if and only if the vectors $a_j$ are eigenvectors of $S$. Therefore, the components with maximal variance are suboptimal for explaining the variance. 
+
+Other SPCA methods apply cardinality constraints to Hotelling's definition, hence not optimising the variance explained. Instead, in LS SPCA we derive the loadings from to Pearson's LS optimisation adding cardinality constraints.
+
+The uncorrelated LS SPCA solutions are constrained Reduced Rank Regression solutions (see @ize, for the unconstrained solutions). The uncorrelatedness constraints limit the amount of variance explained by the solutions and require that the loadings have cardinality not smaller than their rank. Even though uncorrelated components are easier to interpret, in some cases uncorrelated ones can be useful. Therefore, we also provide correlated sparse loadings that approximately minimise the LS criterion.
+
+### Optimisation Models
+Finding the optimal indices for an *spca* solution is an intractable NP-hard problem.  
+
+Therefore, we find the solutions through two greedy algorithms: Branch-and-Bound (**BB**) and Backward Elimination (**BE**).
+
+* **BB** searches for the solutions that sequentially maximise the variance explained under the constraints. The solutions may not be a global maximum when more than one component is computed. The BB algorithm is a modification of @fra's (thanks!).
+
+* **BE** has the goal of attaining larger contributions while minimising the LS criterium. It sequentially eliminates the smallest contributions (in absolute value) from a non-sparse solution. 
+
+* The  **BE** solutions will generally explain less variance than the **BB** ones. However, the **BE** algorithm is much faster and the solutions, usually, have larger loadings. The algorithm is illustrated in more details in the *BE Algorithm* vignette `vignettes("BE algorithm", package = "spca").
+
+
+### Use of the package
+
+**SPCA aims to obtain interpretable solutions**
+
+Interpretability is not univocally defined. Hence, for a problem there exist a number of competing solutions. In Factor Analysis literature there is plenty of discussion about the  definition of *interpretable* and *simple* solution (as qualities and mathematical functions). 
+
+* *Simplicity* can be defined by different measures, being linked to sparseness, parsimony, variance explained and size of the loadings. 
+
+* *interpretability* is also linked to which of the variables are included in the solution  and is not measurable.
+    * it usually requires expert knowledge.
+    
+Therefore, for a given problem there usually exist several competing *simple* and *interpretable* solutions. 
+
+`spca` **is implemented as an exploratory data analysis tool** 
+
+The cardinality of the components can be chosen interactively after inspecting trace and plots of solutions of different cardinality.
+
+Solutions can be also computed non-interactively so as to:
+
+* be uncorrelated with the others or not.
+* have a minimal cardinality. 
+* reproduce a given proportion of the variance explained by the full PCs. 
+* have only contributions larger than a given threshold.
+
+**spca** contains methods for plotting and printing the solutions and for comparing different ones. In this way the solution can be chosen with respect to several different characteristicsm which cannot be all included in a function at the same time.  
+
+`spca` can be helpful also in a confirmatory stage of the analysis, in fact
+* the components can be constrained to be made up of only a subset of the variables.
+
+### Functions
+The workhorse of the package is the function `spca`, which computes the optimal solutions for a given set of indices.
+
+It is called simply with a list of indices and the the flags for correlated or uncorrelated components (one for each component, if necessary)
+```{r spca,   comment = "", echo = FALSE}
+usage(spca)
+```
+
+The functions `spcabb` and `spcabe` implement the **BB** and **BE** searches, respectively.
+
+```{r spcabb, comment = "", echo = FALSE}
+usage(spcabb)
+```
+
+```{r spcabe, comment = "", echo = FALSE}
+usage(spcabe)
+```
+
+With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and the utilities. In the `vignettes(spca)` you will find a more complete example and details on the methods. These are available also in the *Manual* and a more complete example is given in the *Advanced Example* vignette.
+
+There is also the function 'pca' which computes the PCA solutions and returns an *spca* object. The function is called as:
+
+
+```{r pca, comment = "", echo = FALSE}
+usage(pca)
+```
+
+### Methods
+
+The package contains methods for plotting, printing and comparing spca solutions. These are:
+
+- `choosecard`: interactive method for choosing the cardinality. It plots and prints statistics for comparing solutions of different cardinality.
+
+- `print`: shows a formatted matrix of sparse loadings or *contributions* of a solution. Contributions are loadings expressed as percentages, while the loadings are scaled to unit sum of squares.
+
+- `showload`: prints only the non-zero sparse loadings. This is useful when the number of variables is large.
+
+- `summary`: shows formatted summary statistics of a solution
+
+- `plot`: plots the cumulative variance explained by the sparse solutions versus that explained by the PCs, which is their upper bound. It can also plot the contributions in different ways.
+
+- `compare`: plots and prints comparison of two or more *spca* objects.
+
+### Minimal Example
+The naming of the arguments in R is not simple, mainly because different syntaxes have been used over the years. I tried to give meaningful names starting differently so that R's useful feature of partial matching the arguments can be exploited. In the following wxample I sometime use partial arguments names.
+
+```{r ex, fig.width = 3.5, fig.height = 3.5, fig.cap ="screeplot", fig.align= "center"}
+library(spca)
+cat(paste("loaded spca version:", packageVersion("spca")))
+data(bsbl)
+
+#- ordinary PCA
+bpca = pca(bsbl, screeplot = TRUE, kaiser.print = TRUE)
+```
+
+```{r exsecond}
+#- sparse PCA with minimal contribution 25%
+bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
+
+#- summary output
+summary(bbe1)
+#-# Explaining over 96% of the PCs' variance with 2, 3, 3 and 1 variables.
+
+#- print percentage contributions
+bbe1
+#-# Simple combinations of offensive play in career and season are most important. Defensive play in season appears only in 3rd component.
+
+#- The contributions can be printed one by one using the descriptive names in `bsbl_label`
+data(bsbl_labels, package = "spca")
+head(bsbl_labels)
+showload(bbe1, variablesnames = bsbl_labels[,2])
+#- plot solution
+plot(bbe1, plotloadvsPC = TRUE, pc = bpca, mfr = 2, mfc = 2, 
+               variablesnames = as.character(bsbl_labels[,2]))
+#-# Explaining the variance pretty closely to PCA with much fewer variables.
+
+#
+```
+
+### Installing the package
+
+The package development is in the GitHub repository [GitHub repo](https://github.com/merolagio/spca)
+
+* the latest released version from CRAN with
+
+```{r instc, eval = FALSE}
+install.packages("spca")
+````
+
+* The latest development version from github with
+
+```{r instg, eval = FALSE}
+if (packageVersion("spca") < 0.4.0) {
+  install.packages("devtools")
+}
+devtools::install_github("merolagio/spca")
+```
+
+### Future releases
+This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the *Github* tools for submitting bugs [Bug report](https://github.com/merolagio/spca/issues/new ) or contributions.
+
+For now most of the plots are produced with the basic plotting functions. In a later release I will produce the plots with ggplot2 (requires learning the package better).
+
+The code is implemented in R, so it will not work for large datasets. 
+I have in mind to develop C routines at least for the matrix algebra. Anybody willing to help, please, let me know. 
+
+# References---
+
+
+### Advanced Example
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    fig_caption: yes    
+  md_document::md_vignette:  
+    toc: true
+    fig_caption: yes    
+bibliography: spca.bibtex    
+vignette: >  
+  %\VignetteIndexEntry{Advanced Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+******
+
+```{r, echo = FALSE, message = FALSE}
+library(knitr)
+knitr::opts_chunk$set(
+  comment = "#>",
+  error = FALSE,
+  tidy = TRUE,
+  collapse = TRUE)
+options(width=100)
+```
+<!-- read_chunk('Chunks_baseball_1986_avgs.R') -->
+## Example on the baseball data
+ 
+```{r ldspca, echo=TRUE, eval=TRUE}
+library(spca)
+```
+
+```{r vrsn, echo=FALSE, eval=TRUE, comment=""}
+cat(paste("loaded spca version:", packageVersion("spca")))
+```
+
+###The data
+The `bsbl_avg` contains 16 career and 1986 season statistics on Major League Baseball players.
+```{r data}
+data(bsbl_avg)
+data(bsbl_labels)
+print(bsbl_labels, right = FALSE)
+```
+
+The heatmap of the correlation shows a block structure defined by offensive and defensive play in career and in season. However the offensive play statistics are also correlated  across blocks.
+
+```{r heatmap, fig.width = 6, fig.height = 4}
+library(ggplot2)
+library(reshape2)
+q = qplot(x=Var1, y=Var2, xlab = "", ylab = "", las = 2,
+      data=melt(bsbl_avg[,16:1]), fill=value, geom="tile") +
+      scale_fill_gradient2(limits=c(-1, 1))
+q + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  ```
+
+###  Principal Component Analysis
+PCA can be computed with the `pca` function. This is a simple eigendecomposition and produces an *spca* object. It can also generate the screeplot and prrint Kaiser rule, which are useful for determining the number of components to include in the model.
+```{r pca, cache = FALSE, fig.show='hold'}
+bc.pca = pca(bsbl_avg, scree = T, kai = T)
+#
+#<__ names in object -->
+names(bc.pca)
+```
+
+```{r plotpca, fig.show = "hold"}
+#<__ plot the first four loadings
+plot(bc.pca, cols = 4, plotvex = FALSE, plotload = TRUE, 
+     variables = TRUE, rotlab = 45, size = 0.75,  mfrow = 1, mfcol = 1)
+```
+
+As expexcted, there are a few larger ones and other smaller ones. 
+
+The plot of only the contributions larger than with absolute value > 4% is shown below.
+```{r pcatrimmout, fig.show = "hold"}
+plot(bc.pca, cols = 4, thresh = 0.04, plotvex = FALSE, plotload = TRUE, 
+     variables = TRUE, rotlab = 45, size = 0.75, mfrow = 1, mfcol = 1)
+```
+
+The first component is more or less an average without defensive play and years in career.\cr 
+The others are different contrasts.
+
+Following the literature, instead of interpreting the threshold loadings we compute the sparse ones.
+
+###  Choosing the cardinality
+
+In order to choose the cardinality of the sparse loadings, the traces of the elimination can be inspected using the function `choosecard`. Computing the solutions requires choosing the cardinality at each step. This is usually done interactively. We thunk that the best choice is cardinality *(3, 3, 4)*. However, for this script, we ran the selection automatically only for the first component by setting *interact = 3*.  The solution would have been computed using the BE elimination. Alternatively, the the BB algorithm could have been used. This may take a long time for larger matrices.
+
+In the call below we require to print the traces of the trimming for the last six cardinalities the sparse contributions and their statistics. We also plot the statistics for all cardinalities, fewer could be plotted with `cardstoplot`. The *Cardinality Plots* show for each cardinality, in clockwise order: 
+
+* Minaimal contribution (*Min contr*) versus the cardinality;
+* Percentage of cumulative variance of the PCs explained (*PRCVE*) versus the cardinality;
+* Percentage of cumulated variance explained (*PCVE*) versus *Min Contr*;
+* Entropy vs cardinality.
+
+For brevity we show only the first trace, but we chose cardinalities 3, 3 and 4 .We choose the first cardinality as 3 in order to avoid being greedy. Cardinality 4 for the first component could have been chosen.
+
+```{r choosecard, echo = TRUE, tidy = FALSE, fig.show='hold'}
+##<__ print and plot the trace of trimming for each component using card 3, 3 and 4 
+bc.cc = choosecard(bsbl_avg, unc = FALSE, prntrace = TRUE, cardstoprint = 6, mfrow = 1, mfcol = 1, 
+                   interact = c(3))
+```
+
+The command below computes the BE solution as if we had chosen the cardinalities interactively.
+```{r docc, echo = TRUE, tidy = TRUE}
+##<__ print and plot the trace of trimming for each component using card 3, 3 and 4 
+bc.cc = spcabe(bsbl_avg, nd = 3, unc = FALSE, mincard = c(3, 3, 4), msg = FALSE)
+```
+
+The solutions can be printed n different ways, as shown below.
+
+### Print the sparse solutions
+`choosecard` produces a proper **spca** object, in this case obtained with the BE algorithm, which is 
+printed below
+
+````{r lookcc}
+#<__ print summaries of cc
+summary(bc.cc)
+##<__ print the contributions__
+bc.cc
+```
+The first table shows that the LS SPCA solutions explain about 97% of the variance explained by PCs. The smallest contribution is above 18% for all components.
+
+From the second table it can be seen that the first component regards offensive play, about 50% season and 50% career performances. The other component are different contrasts of the different dimensions.
+
+Since we chose to compute correlated components, the correlations among them are shown below and they are negligeable.
+```{r checkcorcc}
+
+##<__ check the correlation among the components
+round(bc.cc$cor, 2)
+```
+### Plot the sparse solutions
+
+The results can be also inspected visually, as shown below. 
+
+```{r plotcc}
+```
+The sparse contributions can also be plotted against the contributions of the corresponding PCs, as follows.
+```{r plotccpc, echo = TRUE, tidy = TRUE, fig.keep="all", show="hold"}
+##<== Percentage contributions of the the LS SPCA(BE)(3, 4, 4)  
+##<== and Cumulative variance explained by  LS SPCA(BE) compared with PCA
+plot(bc.cc, plotload = TRUE, methodname = "BE", variablesnames = TRUE, addlabels = TRUE,
+        rotlabels = 0, size = 0.75)
+
+##----plot cc pc, echo = TRUE, tidy = TRUE, fig.keep="all", fig.show="hold", fig.cap = "Sparse vs PC contr.", fig.align="center")----
+#
+##<== Percentage contributions of the the LS SPCA(BE)(3, 4, 4)  
+##<== and Cumulative variance explained by  LS SPCA(BE) compared with PCA
+plot(bc.cc, plotv = TRUE, plotloadvsPC = TRUE, pcs = bc.pca, variablesnames = TRUE, 
+     addlabels = TRUE, rotlabels = 0, size = 0.75)
+```
+These plots show how the PCs' contributions relate to the sparse ones. The solid line across the plots marks the equality for the PCs' contributions.
+
+### BE solutions with minimal variance explained
+
+Instead of using choosecard, the BE solutions can be computed to have a certain characteristic, for example explain a given amount of the variance explained by the PCs.
+
+```{r bbvpv, fig.show = 'hold'}
+bc.be95 = spcabe(bsbl_avg, nd = 3, threshvaronPC = 0.95)
+#
+summary(bc.be95)
+bc.be95
+
+compare(bc.cc, bc.be95, plotload = TRUE, meth = c("CC", "BE95"), short = FALSE )
+```
+Note: the legend and the labels are distorted because of the nonscalability of png images used for these HTML vignettes.
+
+### BB solutions
+The sparse solutions can be computed by the Branch-and-bound algorithm proposed by @fra. The function `spcabb`. The BB solutions with the same cardinality as the BE found above are shown below.
+```{r bb}
+bc.bb = spcabb(bsbl_avg, card = c(3, 3, 4), unc = FALSE)
+summary(bc.bb)
+
+compare(bc.cc, bc.bb, plotload = TRUE, meth = c("CC", "BB"), short = FALSE )
+```
+
+### Sparse solutions of subsets of variables
+Components made up of only subsets of variables can be easily computed with the argument *startind*. In the following example we compute three components, one fomed by offensive season play, the second formed by offensive career play and the last by defensive season play.
+```{r subind, echo = TRUE, tidy = TRUE }
+indos = 1: 6
+indoc = 7: 13
+indds = 14: 16
+bc.sub = spcabe(bsbl_avg, nd = 3, threshvaronPC = 0.85, startind = list(indoc, indos, indds), unc = FALSE)
+
+summary(bc.sub)
+
+bc.sub
+```
+The BB solutions of the same cardinality are the same.
+
+### Trimming more than one contribution at the time
+When the number of variables is large also the BE algorithm can take a long time. In this case the process can be sped up by setting the argument *trim > 1*. In the example below we trim three loadings at the time. This he exmple below shows how the trimming is reverted to one at the time when the number of loadings left to trim is less than three. This last feature is controlled by the argument *reducetrim*, which is *TRUE* by default.
+
+```{r redtrim}
+bc.bet = spcabe(bsbl_avg, nd = 3, mincard = c(2, 2, 2), trim = 3, unc = F)
+```
+<!--
+vignette: >
+  %\VignetteIndexEntry{BE Algorithm}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+-->
+
+---
+title: "Backward Elimination Algorithm"
+author: "Giovanni Merola"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    fig_caption: yes  
+vignette: >
+  %\VignetteIndexEntry{Backward Elimination Algorithm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE}
+library(spca)
+library(formatR)
+```
+
+
+## LS SPCA(BE)
+
+BE iteratively eliminates the smallest loading from a solution and
+recomputes the component without that variable until a stop rule is met.
+We call this procedure *trimming*. 
+
+### The spcabe function
+We implemented BE in the `spca` package
+adding options that accommodate different aspects of interpretability.
+BE is called with the function *spcabe*:
+
+```{r, echo = FALSE, comment = ""}
+usage(spcabe)
+
+```
+
+## Backward Elimination  
+The function takes a covariance or correlation matrix [`S`] as first
+argument. 
+
+The **number of components to compute** can be either specified
+directly [`nd`] or decided by a stop rule defined by the percentage of
+cumulative variance explained (PCVE) reached [`ndbyvexp`] or [`ndbyvexponPC`]. 
+If no stopping rule is specified all components are computed.
+
+There are three **stop rules for trimming** applicable differently to each component:
+
+**cardinality**:  
+$\quad$The minimal cardinality of the loadings [`mincard`];
+
+**loss of variance explained**:  
+$\quad$The maximum acceptable loss of variance explained. This can be computed either with respect to the loss of cumulated variance explained either from that explained by the same number of PCs [`threshvaronPC`] or from that explained by the component before trimming [`threshvar`] (both arguments must be real in $[0,1]$);
+
+**threshold**:  
+$\quad$This is the minimal absolute value required for a loading [`thresh`]. The threshold can be either specified with respect to the loadings scaled to unit $\text{L}_2$ norm or to the percentage contributions (scaled to unit $\text{L}_1$ norm, [`perc = TRUE`]).
+
+The stop rules for trimming are given in order of precedence and can have a different value for each component. The stop rules are all optional, if none is given, the minimal cardinality is set equal to the rank of the component if they have to be uncorrelated otherwise it is set equal 1.
+
+In problems with a large number of variables the computation can be sped up by **trimming more than one loading at the time** [`trim`]. When the number of loadings left is less than the number of loadings to trim trimming stops. However, more accurate solutions can be obtained by finishing off the elimination by **trimming the remaining ones one by one** [`reducetrim`].
+
+The algorithm by default computes **uncorrelated components**. However, one or more can be computed without this requirement [`unc = c(FALSE, ...)`].
+
+The components can be constrained to be combinations of only a subset of the variables with two options:
+
+**starting indices**: 
+    A list containing the indices from which trimming must start for each component [`startind`];
+
+**exclude indices previously used**: 
+    With this flag the next components are trimmed starting from only the indices of the variables that were not included in previous loadings [`excludeload`].
+
+The standard output is an *spca* object containing the loadings, variance explained and other items. 
+
+A **richer output** containing diagnostic information can be obtained by setting [`diag = TRUE`]. 
+Setting the argument ['choosecard`] to an integer makes the function return a full trace of the elimination for that component. This option is used by the method *choosecard*. [`msg = FALSE`] suppresses execution messages.
+
+The value under which a loading is considered to be zero can be changed from the default $0.0001$ with the argument [`eps`]. 
+
+The BE algorithm is outlined in the flowchart below and in the pseudo-code shown below. Not all options are shown. 
+
+
+### BE Flowchart
+
+![BE algorithm flow.](BE_flowchart\\BE_flowchart.png)
+
+### BE Algorithm
+
+******************************  
+LS SPCA BE Algorithm  
+ 
+******************************
+
+**initialize**  
+
+**Stopping rules for the number of components**  
+$\quad$*nd* {the number of components to compute}  
+$\quad$*ndbyvexp* {minimum variance cumulated explained}  
+$\quad${one of the two must be specified}  
+
+**Select which variables can enter the solutions**  
+$\quad startind_j$ {the starting indices for trimming}  
+$\quad excludeload_j$ {flags for excluding variables used in a previous solution}  
+
+**Stopping rules for elimination** {Can be different for each component}  
+$\quad mincard_j$  {minimum cardinality of the sparse loadings}  
+$\quad thresh_j$  {minimum absolute value of the sparse loadings}  
+$\quad$ threshvar_j$ {optional maximum relative loss of variance explained}  
+$\quad threshvaronPC_j$ {maximum relative loss of variance explained}  
+$\quad$ *if none is set, mincard will be set to lowest possible value}*  
+
+**Other parameters**  
+$\quad unc$ {whether to compute uncorrelated components or not}  
+$\quad perc$ {whether to scale the loadings to percentage contributions or to unit sum of squares}  
+
+**end initialize** 
+
+----------------------------------------------------
+
+**for** $j = 1$ **to** $nd$ **do**  
+
+$\quad$ Compute ${\bf{a}}_j$ as the j-th LS SPCA solution for $startind_j$  
+$\quad Vexpfull_j = Vexp(a_j)$  {var exp by the full solution}  
+$\quad$ **while**  $\min_{i \in startind_j} |a_{ij}| < thresh_j$ **and** 
+$length(startind_j) > mincard_j$  
+$\quad\quad indold_j = startind_j$, ${\bf aold}_j = {\mathbf{a}}_j$  
+$\quad\quad k:\:$ $|a_{kj}| \leq |a_{ij}|,\, i \in startind_j$  
+$\quad\quad startind_j = startind_j\backslash k$  
+$\quad\quad$ Compute $\mathbf{a}_j$ as the j-th LS SPCA solution for $startind_j$  
+$\quad\quad$ **if**
+$Vexp(a_j)/{Vexpfull}_j < threshvar_j$ **then**  
+$\quad\quad\quad startind_j = indold_j$, ${\mathbf{a}}_j = {\bf aold}_j$  
+$\quad\quad\quad$ **break**   
+$\quad\quad$ **end if**  
+$\quad$ **end while**  
+$\quad$ **if** $\sum_{i=1}^j \text{Vexp}({\mathbf{a}}_i)  \geq {threshvar_j}$ **then**   
+$\quad\quad$ $nd = j$  
+$\quad\quad$**break**  
+$\quad$ **end if**  
+**end for**  
+
+******************************
+
+Not shown in the algorithms are the options *trim* and *reducetrim*. The first sets the number of loadings to be trimmed at each iteration. If the second is *TRUE*  

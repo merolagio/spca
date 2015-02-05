@@ -31,10 +31,9 @@ knitr::opts_chunk$set(
 
 
 ### Intro  
-`spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
+`spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs. Unlike other SPCA methods, these solutions maximise the variance of the data explained. Details can be found in [Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print") and in the forthcoming paper in *Australia and New Zealand Journal of Statistics*. 
 
-
-I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc  :-D** This on top of a number of blatantly wrong arguments.  I am now waiting for the response of a reviewer who asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)!    
+I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc  :-D** This on top of a number of blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn't scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, A reviewer from *ANZJS* asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)! However, the editors of this journal accepted my refusal to do so.   
 
 ### Sparse Principal Component Analysis
 Principal Component Analysis is used for analysing a multivariate dataset with two or three uncorrelated components that explain the most variance of the data. 

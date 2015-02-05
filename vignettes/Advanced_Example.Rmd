@@ -39,7 +39,7 @@ cat(paste("loaded spca version:", packageVersion("spca")))
 ```
 
 ###The data
-The `bsbl_avg` contains 16 carrer and 1986 season statistics on Major League Baseball players.
+The `bsbl_avg` contains 16 career and 1986 season statistics on Major League Baseball players.
 ```{r data}
 data(bsbl_avg)
 data(bsbl_labels)
