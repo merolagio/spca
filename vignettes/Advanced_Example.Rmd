@@ -6,6 +6,9 @@ output:
   rmarkdown::html_vignette:
     toc: true
     fig_caption: yes    
+  md_document::md_vignette:  
+    toc: true
+    fig_caption: yes    
 bibliography: spca.bibtex    
 vignette: >  
   %\VignetteIndexEntry{Advanced Example}
