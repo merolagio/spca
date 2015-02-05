@@ -12,3 +12,4 @@ NEWS\.md
 ^\.travis\.yml$
 Change_Log\.txt
 ^Documentation_roxygen_etc.R
+^\Vignettes\Vignettes_html$
