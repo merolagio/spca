@@ -4,7 +4,7 @@ author: "Giovanni Merola<br>
 RMIT International University Vietnam<br>
 email: lsspca@gmail.com<br>
 repository: https://github.com/merolagio/spca"
-date: "16 December 2014"
+date: "05 February 2015"
 output:
   rmarkdown::html_document:
     toc: true
@@ -12,18 +12,22 @@ output:
     highlight: haddock
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->  
+
+
 
 # spca  
 
 [![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
 
 
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->  
+
+
 ### Intro  
-`spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")). Unlike other SPCA methods, these solutions maximise the variance of the data explained. 
+`spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs. Unlike other SPCA methods, these solutions maximise the variance of the data explained. Details can be found in [Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print") and in the forthcoming paper in *Australia and New Zealand Journal of Statistics*. 
 
-
-I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc  :-D** This on top of a number of blatantly wrong arguments.  I am now waiting for the response of a reviewer who asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)!    
+I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc  :-D** This on top of a number of blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn't scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, A reviewer from *ANZJS* asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)! However, the editors of this journal accepted my refusal to do so.   
 
 ### Sparse Principal Component Analysis
 Principal Component Analysis is used for analysing a multivariate dataset with two or three uncorrelated components that explain the most variance of the data. 
@@ -89,19 +93,19 @@ With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and t
 
 - `choosecard`: interactive method for choosing the cardinality. It plots and prints statistics for comparing solutions of different cardinality.
 
-- `print`: shows a formatted matrix of sparse loadings or *contributions* of a solution. Contributions are loadings expressed as percentages, while the loadings are scaled to unit sum of squares.
+- `print`: shows a formatted matrix of sparse loadings, or *contributions*, of a solution. Loadings are scaled to unit sum of squares, contributions are scaled to percentages.
 
 - `showload`: prints only the non-zero sparse loadings. This is useful when the number of variables is large.
 
 - `summary`: shows formatted summary statistics of a solution
 
-- `plot`: plots the cumulative variance explained by the sparse solutions versus that explained by the PCs, whish is their upper bound. It can also plot the contributions in different ways.
+- `plot`: plots the cumulative variance explained by the sparse solutions with that explained by the PCs, which is its upper bound. It can also plot the sparse contributions in different ways.
 
-- `compare`: plots and prints comparison of two or more *spca* objects.
+- `compare`: plots and prints comparisons of two or more *spca* objects.
 
 ### Example
 
-The naming of the arguments in R is not simple, mainly because different syntaxes have been used over the years. I tried to follow [Harley Wickam's suggestions](http://r-pkgs.had.co.nz/style.html), not completely. I tried to use consistent argument names in different functions and to give meaningful names starting differently so that R's useful feature of partial matching the arguments can be exploited. In the following example I sometime use partial arguments names.
+The naming of the arguments in R is not simple, mainly because different conventions have been used over the years. I tried to follow [Harley Wickam's suggestions](http://r-pkgs.had.co.nz/style.html), not completely. I tried to use consistent argument names in different functions and to give meaningful names, starting differently so that `R`'s useful feature of partial matching the arguments can be exploited. In the following example I sometime use partial arguments names.
 
 
 ```r
@@ -109,68 +113,49 @@ library(spca)
 data(bsbl)
 #Ordinary PCA
 bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)
-```
+#> [1] "number of eigenvalues larger than 1 is 3"
 
-```
-## [1] "number of eigenvalues larger than 1 is 3"
-```
-
-```r
 #-Sparse PCA
 bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
 
 #-summary output
 summary(bbe1) 
-```
-
-```
-##            Comp1 Comp2 Comp3 Comp4
-## PVE        44.4% 24.9% 10.3% 5.6% 
-## PCVE       44.4% 69.3% 79.6% 85.2%
-## PRCVE      96.4% 96.1% 96.6% 97.1%
-## Card       2     3     3     1    
-## Ccard      2     5     8     9    
-## PVE/Card   22.2% 8.3%  3.4%  5.6% 
-## PCVE/Ccard 22.2% 13.9% 10%   9.5% 
-## Converged  0     0     0     0    
-## MinCont    31.5% 26.3% 28.2% 100%
-```
-
-```r
+#>            Comp1 Comp2 Comp3 Comp4
+#> PVE        44.4% 24.9% 10.3% 5.6% 
+#> PCVE       44.4% 69.3% 79.6% 85.2%
+#> PRCVE      96.4% 96.1% 96.6% 97.1%
+#> Card       2     3     3     1    
+#> Ccard      2     5     8     9    
+#> PVE/Card   22.2% 8.3%  3.4%  5.6% 
+#> PCVE/Ccard 22.2% 13.9% 10%   9.5% 
+#> Converged  0     0     0     0    
+#> MinCont    31.5% 26.3% 28.2% 100%
 #-# Explaining over 96% of the variance explained by PCA with 2, 3, 3 and 1 variables.
 
 #-print percentage contributions
 bbe1
-```
-
-```
-## Percentage Contributions
-```
-
-```
-##        Comp1 Comp2 Comp3 Comp4
-## TAB_86  31.5  35.2            
-## HR_86               28.2      
-## RUN_86        26.3            
-## RUN          -38.5            
-## RUNB    68.5                  
-## PO_86                      100
-## ASS_86             -40.9      
-## ERR_86             -30.9      
-##        ----- ----- ----- -----
-## PCVE   44.4  69.3  79.6  85.2 
-## 
-```
-
-```r
-#-# Simple combinations of offensive play in career and season are most important. Defensive play in season appears only in 3rd component.
+#> Percentage Contributions
+#>        Comp1 Comp2 Comp3 Comp4
+#> TAB_86  31.5  35.2            
+#> HR_86               28.2      
+#> RUN_86        26.3            
+#> RUN          -38.5            
+#> RUNB    68.5                  
+#> PO_86                      100
+#> ASS_86             -40.9      
+#> ERR_86             -30.9      
+#>        ----- ----- ----- -----
+#> PCVE   44.4  69.3  79.6  85.2 
+#> 
+#-# Simple combinations of offensive play in career and in season are most important.
+#-# Defensive play appears only in 3rd component.
 
 #-plot solution
 plot(bbe1, plotloadvsPC = TRUE, pc = bpca, mfr = 2, mfc = 2, 
                variablesnames = TRUE)
 ```
 
-<img src="README_files/example-1.png" title="" alt="" width="672" /><img src="README_files/example-2.png" title="" alt="" width="672" />
+![plot of chunk example](README_files/example-1.png) ![plot of chunk example](README_files/example-2.png) 
 
 ```r
 #-# Explaining the variance pretty closely to PCA with much fewer variables.
