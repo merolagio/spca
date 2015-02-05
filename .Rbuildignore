@@ -13,3 +13,4 @@ NEWS\.md
 Change_Log\.txt
 ^Documentation_roxygen_etc.R
 ^\Vignettes\Vignettes_html$
+^\figure$
