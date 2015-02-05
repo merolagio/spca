@@ -33,7 +33,7 @@ loaded spca version: 0.6.0.9005
 ```
 
 ###The data
-The `bsbl_avg` contains 16 carrer and 1986 season statistics on Major League Baseball players.
+The `bsbl_avg` contains 16 carreer and 1986 season statistics on Major League Baseball players.
 
 ```r
 data(bsbl_avg)
