@@ -117,7 +117,7 @@ With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and t
 
 - `compare`: plots and prints comparisons of two or more *spca* objects.
 
-## Class spca
+## Class spca 
 `spca` functions return objects of class *spca* to which methods are applied. The minimal spca object contains the following elements:
 
 - loadings   A matrix with the loadings scaled to unit L_2 norm in the columns.
