@@ -51,7 +51,7 @@ makevexpNO = function(A, D){
     ind = which(abs(A[,i]) > 0.001)
     if (length(ind) > 1){
       B = drop(crossprod(Dz[,ind] %*% A[ind, i]))
-      b = drop(t(A[ind,i]) %*% Dz[ind, ind] %*% A[ind, i])
+      b = drop(crossprod((A[ind,i]), Dz[ind, ind]) %*% A[ind, i])      
     } else{### uses * because simple number
       B = drop(crossprod(Dz[,ind]   * A[ind, i]))
       b = drop(t(A[ind,i]) * Dz[ind, ind] * A[ind, i])
@@ -76,7 +76,7 @@ makevexpNOn = function(A, D){
     }
     A = as.matrix(A)
     B = drop(crossprod(Dz %*% A[, i]))
-    b = drop(t(A[,i]) %*% D %*% A[, i])
+    b = drop(crossprod((A[,i]), D) %*% A[, i])
     vexp[i] = B/(b*sum(diag(D)))
   }
   return(vexp)
@@ -148,10 +148,11 @@ makez = function(a, S, Z){
   if (!is.vector(a))
     if(ncol(a)> 1)
       stop("you must pass a vector or column matrix to makez, consider using makezM")
-  if (missing(Z))
-    Z = diag(1,p)
   a = as.matrix(a)
-  Z - (a %*% crossprod(a,S))/(drop( crossprod(a,S) %*% a))  
+  if (missing(Z))
+    (a %*% crossprod(a,S))/(drop( crossprod(a,S) %*% a)) 
+  else  
+    Z - (a %*% crossprod(a,S))/(drop( crossprod(a,S) %*% a))  
 }
 
 makezM = function(A,D){

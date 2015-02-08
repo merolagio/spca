@@ -123,6 +123,8 @@ choosecard <- function(S, method = c("BE", "BB"),
   }
     
   enough = FALSE
+###   fix these no list() or c()
+## also remove cbinds
   prevload = list()
   k = 0
   card = c()

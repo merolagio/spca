@@ -79,8 +79,7 @@ print.spca = function(x, cols, only.nonzero = TRUE, perc = TRUE, digits = 3, thr
   if (only.nonzero == FALSE)
     rows = 1:nrow(A)
   else{
-    rows = which(apply(abs(A) > 0.0001, 1, any))
-    
+    rows = which(rowSums(abs(A) > 0.0001) > 0)
 }  
   A = as.matrix(A[rows,cols])
   ## assigns names to laodings

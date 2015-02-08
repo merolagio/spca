@@ -40,7 +40,7 @@ the quality of these vignettes is not what I would have liked. On the positive s
 
 The implementation is completely in `R`, so it can only be run on *small* datasets (the limit depends on the hardware used, we were able to solve problems with about 1000 variables in minutes). The package is self contained as it only depends on the library `MASS` which is part of the basic distribution of R. 
 
-Details about LS SPCA and the methodology impmented in the package can be found in ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")) and in the forthcoming peer reviewed paper. 
+Details about LS SPCA and the methodology impmented in the package can be found in ([Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print")) and in the forthcoming paper in *Australia and New Zealand Journal of Statistics*. 
 
 I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc  :-D** This on top of a number of blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn't scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, A reviewer from *ANZJS* asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)! However, the editors of this journal accepted my refusal to do so.
 

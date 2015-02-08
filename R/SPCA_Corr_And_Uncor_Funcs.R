@@ -3,6 +3,10 @@ cspca = function(S, ind, Z = NULL, vexpn = FALSE){
   ## V2 uses mult eigen
   #calling ginv directly from MASS, so don't load it
   p = ncol(S)
+#   if (vexpn == FALSE){
+#     vexpn = TRUE
+# #    message("using vexpn funzacchia meglio")
+#   }
   if (!is.null(Z))
     Sz = S %*% Z
   else
@@ -11,7 +15,8 @@ cspca = function(S, ind, Z = NULL, vexpn = FALSE){
   sv = eigen(D, symm = TRUE)
   nv = sum(sv$val > 1E-6)
   ## Dm = D^1/2. 
-  Dm = t(t(sv$vec[,1:nv]) / sqrt(sv$val[1:nv])) %*% t(sv$vec[,1:nv])
+  Dm = t(t(sv$vec[,1:nv]) / sqrt(sv$val[1:nv])) %*%  t(sv$vec[,1:nv])
+#Dm = tcrossprod(t(sv$vec[,1:nv]) / sqrt(sv$val[1:nv]), sv$vec[,1:nv])
 
   ## eigen J D^1/2 (eigvec(D^1/2 Sz Sz D^1/2)) J' like in paper
   ee = eigen(crossprod(Sz[,ind] %*% Dm), symmetric = TRUE)
@@ -22,9 +27,9 @@ cspca = function(S, ind, Z = NULL, vexpn = FALSE){
   a = rep(0,p)
   a[ind] = av
   if (vexpn == TRUE)
-    vexp = drop(crossprod(Sz[,ind] %*% av))/ (drop(t(av) %*% S[ind, ind] %*% av) * sum(diag(S)))
+    vexp = drop(crossprod(Sz[,ind] %*% av))/ (drop(crossprod(av, S[ind, ind]) %*% av) * sum(diag(S)))
   else
-    vexp = drop(crossprod(Sz[,ind] %*% av))/ (drop(t(av) %*% Sz[ind, ind] %*% av) * sum(diag(S)))
+    vexp = drop(crossprod(Sz[,ind] %*% av))/ (drop(crossprod(av, Sz[ind, ind]) %*% av) * sum(diag(S)))
   return(list(a = a, vexp = vexp))
 }
 
@@ -208,7 +213,7 @@ if(missing(ind))
   vexp = e[1:nd] / sum(e)
   vexpv = makevexpNO(A, S)
   rownames(A) = colnames(S)
-  contributions = sweep(A, 2, colSums(abs(A)), "/") () 
+  contributions = sweep(A, 2, colSums(abs(A)), "/") 
   if (all(unc==FALSE))
     unc = FALSE
   if (all(unc==TRUE))

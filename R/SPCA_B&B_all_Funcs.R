@@ -124,8 +124,8 @@ spcabb = function(S, card, unc = TRUE, startind, excludeload = FALSE, nvexp = FA
   A = matrix(0, p, nd)
   
   Z = diag(p)
-  ind = list()
-  indused = c()
+  ind = as.list(rep(0, nd))
+  indused = rep(0, nd)
   e = eigen(S, symmetric = TRUE)
   vexp = e$val[1:nd] / sum(e$val)
 #  spca.out = NULL
@@ -163,7 +163,7 @@ spcabb = function(S, card, unc = TRUE, startind, excludeload = FALSE, nvexp = FA
         inds = c(nind[or], (1:p)[-nind])
         S2 = S[inds, inds]
         ## here startind is replaced by 1:lnind because matrix sorted with startind first
-        tmp = branchSpca(S2, k = card[j], ind = 1:lnind, mod = "ncorr")
+        tmp = branchSpca(S2, k = card[j], ind = 1:lnind, mod = "corr")
         niter = tmp$niter
         A[nind, j] = tmp$a[1:length(nind)][ra]
         indo = which(abs(A[,j]) > 0.001)
@@ -224,7 +224,10 @@ spcabb = function(S, card, unc = TRUE, startind, excludeload = FALSE, nvexp = FA
         indo = which(abs(A[,j]) > 0.001)
 #        print(c(paste("comp",j, "ind are"), indo))
         vexpv = c(vexpv, tmp$vexp)
-        ind[[j]] = sort(indo)      
+        ind[[j]] = sort(indo) 
+ind = ind[1:nd]
+indused = indused[1:nd]
+
         outo = list(loadings = A[,1:j], vexp = vexpv[1:j], vexpPC = vexp[1:j], ind = ind[1:j])
         class(outo) = "spca"
            }## end j>1 and card > 1
@@ -268,7 +271,7 @@ branchSpca = function(D, k, A = NULL, Z = NULL, ind = FALSE, mod = c("uncorr","c
   # k caedinality
   # A previous loadings
   # Z matrix to make covariance of residuals as D Z
-  # mod if uncorr or corr SPCA
+  # mod if uncorr or corr SPCA DONT USE nvexp, only for testing!!
   
   ## output:
   ## w optimal indices
@@ -276,6 +279,12 @@ branchSpca = function(D, k, A = NULL, Z = NULL, ind = FALSE, mod = c("uncorr","c
   ## vexp cariance explained
   
   ## evalsplit returns variance explained and loadings for a set of indices
+#   if (mod == "ncorr"){
+#     message("you chose to use nvexp, this is highly unstable")
+#     d <- readline("enter Y to continue or N to change to the correct variance: ")
+#     if (substring(d, 1, 1)  != "Y")
+#       mod == "corr"
+#   }
   if (mod[1] == "uncorr")
   {
     evalsplit = function(D, ind, A = NULL, Z = NULL ) {

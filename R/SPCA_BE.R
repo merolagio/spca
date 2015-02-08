@@ -245,8 +245,8 @@ if (length(threshvaronPC) == 1)
   # ------------------------------- INITIALIZE VARIABLES FOR LOOPING
   ## prepares variables for looping
   A = matrix(0, p, nd)
-  vexpv =c()
-  indlast = list()
+  vexpv =rep(0, nd) #c()
+  indlast = as.list(rep(0, nd)) #list()
   Z = diag(1, p)
   converged = rep(0, nd)
   stopbyvar = FALSE
@@ -264,11 +264,11 @@ if (length(threshvaronPC) == 1)
   ## its value is the vloss that would be reached 
   stopvex = rep(0, nd)
   niter = rep(0,nd)
-  indused = c()
+  indused = rep(0, nd) #c()
   changedunc = rep(FALSE, nd)
-  eliminated = list()
-  tracing = list()
-  Trace = list()
+  eliminated = as.list(rep(0, nd))# list()
+  tracing = as.list(rep(0, nd)) #list()
+  Trace = as.list(rep(0, nd)) #list()
   # ------------- start looping --------------
   for ( j in 1:nd){  
     # 
@@ -364,8 +364,8 @@ if (length(threshvaronPC) == 1)
       indo = (1:p)[indin]
       ns = length(indo)
       # compute trimmed solution
-      if (j ==1)
-        out = cspca(S, indo)
+      if (j == 1)
+        out = cspca(S, indo, vexpn = FALSE)
       else{
         if( unc[j] == TRUE){
           out = uspca(S, indo, A[, 1:(j-1)])
@@ -465,7 +465,11 @@ if (length(threshvaronPC) == 1)
     vexpPC =   ee$val[1:nd]/sum(ee$val)  
     thresh = thresh[1:nd]
     threshvar = threshvar[1:nd]    
-    
+    indused =   indused[1 : nd]
+    changedunc =	changedunc[1 : nd]
+    eliminated =	eliminated[1 : nd]
+    tracing = 	tracing[1 : nd]
+    Trace = 	Trace[1 : nd]
   }
   if(!is.null(colnames(S)))
     if (nd > 1)
@@ -474,9 +478,9 @@ if (length(threshvaronPC) == 1)
       names(A) = colnames(S)
   else
     if (nd > 1)
-      rownames(A) = paste("V", 1:nd,sep = "")
+      rownames(A) = paste("V", 1:p,sep = "")
   else
-    names(A) = paste("V", 1:nd,sep = "")
+    names(A) = paste("V", 1:p,sep = "")
   
   if (nd > 1)
     nomi = rownames(A)
@@ -507,7 +511,7 @@ if (length(threshvaronPC) == 1)
         if (diag == TRUE){ ## diagnostic output
           eliminated = lapply(eliminated, 
                               function(a, nn){if (length(a) > 0){ names(a) = nn[a]}; return(a)}, nn = nomi)    
-          names(eliminated) = paste("Comp", 1:nd)
+          names(eliminated) = paste("Comp", 1:length(eliminated))
           out = c(out, list(vexpo = vexpo, totvcloss = totvcloss, vlossbe = vlossbe, niter = niter, eliminated = eliminated, 
                             thresh = thresh, threshvar = threshvar, threshvaronPC = threshvaronPC, ndbyvexp = ndbyvexp, 
                             stopbyvar = stopbyvar, mincard = mincard, tracing = tracing))
