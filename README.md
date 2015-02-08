@@ -25,9 +25,9 @@ output:
 
 
 ### Intro  
-`spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs. Unlike other SPCA methods, these solutions maximise the variance of the data explained. Details can be found in [Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381 "Pre-print") and in the forthcoming paper in *Australia and New Zealand Journal of Statistics*. 
+`spca` is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs. the LS SPCA solutions maximise the variance of the data explained,  Unlike other existing SPCA methods. Details can be found in [Merola, 2014. arXiv](http://arxiv.org/abs/1406.1381v2 "Pre-print") and in the forthcoming paper in *Australia and New Zealand Journal of Statistics*. 
 
-I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc**   :-D This on top of a number of other blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn't scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, In a resubmission reviewer from *ANZJS* asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't)! Thankfully, the editors of this journal accepted my refusal to do so.   
+I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics' chief editor, Dr Qiu, rejected the paper endorsing a report stating that: **the LS criterion is a new measure used ad-hoc**   :-D This on top of a number of other blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn't scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, In a resubmission reviewer from *ANZJS* asked me to **compare the about 20 existing SPCA methods with mine on more datasets** (only because I show that my solutions maximise the variance explained and theirs don't!) Thankfully, the editors of this journal accepted my refusal to do so.   
 
 ### Sparse Principal Component Analysis
 Principal Component Analysis is used for analysing a multivariate dataset with two or three uncorrelated components that explain the most variance of the data. 
@@ -81,7 +81,13 @@ The solutions obtained under different settings can be plotted and printed in di
 Beside this quick tour of the package, there are vignettes with examples and explanations. You can start with `vignette("Introduction to spca", package = "spca")`, which is similar to this document but more detailed.` Other vignettes contain an extended example and a navigable help. 
 
 ### Functions
-The workhorse of the package is the function `spca`, which computes the optimal solutions for a given set of indices.
+The workhorses of the package are the functions `uspca` and `cspca`, which compute the optimal solutions for a given set of indices. These are not available but the function
+
+```r
+library(formatR)
+usage(spca)
+#> spca(S, ind, unc = TRUE)
+```
 
 The functions `spcabb` and `spcabe` implement the **BB** and **BE** searches, rispectively.
 
@@ -119,8 +125,8 @@ bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)
 bbe1 <- spcabe(bsbl, nd = 4, thresh = 0.25, unc = FALSE)
 
 #-summary output: 
-messagee("variance explained, cardinality e minimum contribution")
-#> Error in eval(expr, envir, enclos): could not find function "messagee"
+message("variance explained, cardinality e minimum contribution")
+#> variance explained, cardinality e minimum contribution
 summary(bbe1) 
 #>            Comp1 Comp2 Comp3 Comp4
 #> PVE        44.4% 24.9% 10.3% 5.6% 
@@ -135,8 +141,8 @@ summary(bbe1)
 #-# Explaining over 96% of the variance explained by PCA with 2, 3, 3 and 1 variables.
 
 #-print percentage contributions
-messagee("Sparse contributions")
-#> Error in eval(expr, envir, enclos): could not find function "messagee"
+message("Sparse contributions")
+#> Sparse contributions
 bbe1
 #> Percentage Contributions
 #>        Comp1 Comp2 Comp3 Comp4
