@@ -16,10 +16,8 @@ output:
 
 
 # spca  
-
+<!--    -->
 [![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
-
-
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->  
 
@@ -80,26 +78,28 @@ Therefore, we find the solutions through two greedy algorthms: Branch-and-Bound 
 
 The **BE** algorthm is illustrated in `vignettes("BE algorithm", package = "spca")`
 
-### Computing solutions
+### Computing the solutions
 `spca` uses simple S3 methods. The exported functions and methods are given below.
 
 ## Functions
 The workhorses of the package are the functions `uspca` and `cspca`, which compute the uncorrelated and correlated solutions for a given set of indices. These are not available but the function
 
-```r
-library(formatR)
-usage(spca)
-#> spca(S, ind, unc = TRUE)
-```
+- ` spca `
+
 implements them for given indices of a nember of components.
 
-The functions `spcabb` and `spcabe` implement the **BB** and **BE** searches, rispectively.
+Sets of indices can be found through the **BB** and **BE** searches with:
 
-The package contains methods for plotting, printing and comparing spca solutions, given below.
+- ` spcabb ` 
 
-With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and the utilities. Calling `vignettes("Advanced Example", package = "spca")` you will find a more complete example and details on the methods.
+and 
+
+- `spcabe`
+
+`help(spcabb)` and `help(spcabe)` provide examples of using spca and the utilities. Calling `vignettes("Advanced Example", package = "spca")` a complete example and details on the methods will be displayed.
 
 ## Methods
+The package contains methods for plotting, printing and comparing spca solutions, given below.
 
 - `choosecard`: interactive method for choosing the cardinality. It plots and prints statistics for comparing solutions of different cardinality.
 
@@ -113,13 +113,14 @@ With`help(spcabb)` and `help(spcabe)` you will find examples of using spca and t
 
 - `compare`: plots and prints comparisons of two or more *spca* objects.
 
-## Class spca
+
+## Class spca 
 `spca` functions return objects of class *spca* to which methods are applied. The minimal spca object contains the following elements:
 
-- loadings   A matrix with the loadings scaled to unit L_2 norm in the columns.
-- vexp	 A vector with the % variance explained by each component.
-- vexpv	 A vector with the % variance explained by each principal component.
-- ind	 A list of the indices of the sparse loadings
+- *loadings*   A matrix with the loadings scaled to unit L_2 norm in the columns.
+- *vexp*	 A vector with the % variance explained by each component.
+- *vexpv*	 A vector with the % variance explained by each principal component.
+- *ind*	 A list of the indices of the sparse loadings
 
 ### Minimal Example
 
@@ -182,7 +183,6 @@ plot(bbe1, plotloadvsPC = TRUE, pc = bpca, mfr = 2, mfc = 2,
 ```r
 #-# Explaining the variance pretty closely to PCA with much fewer variables.
 ```
-
 
 ### Installing the package
 
