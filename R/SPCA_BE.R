@@ -148,6 +148,7 @@ spcabe = function(S, nd = FALSE, ndbyvexp = FALSE, mincard = NULL, thresh = FALS
 ## spca with loadings trimmed by backward elimination
 ## iteratively eliminates the coefficients larger than the threshold
 ### ===========================================================================  
+tryCatch({
   p = ncol(S)
   # ------------------------------- CHECK AND VARIABLES FOR LOOPING 
   #nd
@@ -454,7 +455,11 @@ if (length(threshvaronPC) == 1)
       break
     }
   }
-  
+jj = j
+outo = list(loadings = A[,1:jj], vexp = vexpv[1:jj], vexpPC = vexpPC[1:jj], 
+            ind = indlast[1:jj])
+class(outo) = "spca"
+
   }## end for j in 1:nd
   # ---- tidy up output   -------------------------
   # if stop reached by ndbyvexp trims the results to the new value of nd
@@ -520,5 +525,17 @@ if (length(threshvaronPC) == 1)
         #print("done")
         return(out)
   }
+  },
+  ### if error 
+  interrupt = function(c){
+    return(outo)
+  }, error = function(c) 
+  {
+    message("error in spcabe")
+    message(paste("returning solution with", j-1, "components"))
+    return(outo)
+    stop(c)
+  }
+)
 }  
 

@@ -253,12 +253,17 @@ indused = indused[1:nd]
   class(out) = "spca"
  return(out) 
 },
+### if error 
 interrupt = function(c){
-#    atmp = list(loadings = as.matrix(A[,1:j]), vexpv = vexpv, vexp = vexp[1:j])
-#    class(atmp) = "spca"
-    return(outo)
-  }, error = function(c) stop(c)
-)
+  return(outo)
+}, error = function(c) 
+{
+  message("error in spcabb")
+  message(paste("returning solution with", j-1, "components"))
+  return(outo)
+  stop(c)
+}
+  )
 }
 
 branchSpca = function(D, k, A = NULL, Z = NULL, ind = FALSE, mod = c("uncorr","corr", "ncorr")) {
