@@ -3,6 +3,7 @@
 export(choosecard)
 export(compare)
 export(compare.spca)
+export(fspca)
 export(is.spca)
 export(pca)
 export(plot.spca)

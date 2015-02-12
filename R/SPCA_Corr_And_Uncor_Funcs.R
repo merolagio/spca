@@ -1,4 +1,5 @@
 cspca = function(S, ind, Z = NULL, vexpn = FALSE){
+  ## will be replced by fcspca
   ## computes CSPCA for one component
   ## V2 uses mult eigen
   #calling ginv directly from MASS, so don't load it
@@ -38,6 +39,7 @@ uspca = function(S, ind, A = NULL, onlyone = FALSE){
 ##==============================================================
   #  computes one uspca oadings as in paper 
   # onlyone = TRUE means cardinality = 1
+  ### WILL BE REPLCED BY fuspca
 ##==============================================================
 
   p = ncol(S)
@@ -116,9 +118,12 @@ uspca = function(S, ind, A = NULL, onlyone = FALSE){
 #' Computes LS SPCA sparse principal components loadings for a given set of
 #' indices.\cr See the package vignettes for details.
 #' 
+#' This function is dead, it will be replaced by fspca in next releases. 
+#' Left for backward comptibility
 #' The number of components to compute is determind from the length of
 #' \emph{ind}.  If \emph{unc} has fewer elements than the number of indices
 #' passed, the remaining elements are set equal to the last one.
+#' 
 #' 
 #' @param S A correlation or covariance matrix.
 #' @param ind A list of indices for each dimension. The number of dimensions to
@@ -135,7 +140,7 @@ uspca = function(S, ind, A = NULL, onlyone = FALSE){
 #' \code{any unc[j] = FALSE}: \item{corComp}{The matrix with correlations among
 #' components.} \item{loadingsUnc}{Loadings of the components made
 #' uncorrelated.}
-#' @seealso \code{\link{spcabb}}, \code{\link{spcabe}}, \code{\link{summary.spca}}
+#' @seealso \code{\link{fspca}}, \code{\link{spcabb}}, \code{\link{spcabe}}, \code{\link{summary.spca}}
 #' @keywords LS SPCA
 #' @examples
 #'    \dontrun{ 
@@ -153,7 +158,7 @@ uspca = function(S, ind, A = NULL, onlyone = FALSE){
 #' 	 ## print correlation between components
 #' 	 myspcac$corComp
 #' 	 ## print loadings of components made uncorrelated
-#' 	 myspcac$loadingsUnc
+#' 	 myspcac$Uncloadings
 #' 	 ## compare the two results numerically and graphically
 #' 	compare(myspca, myspcac, methodsnames = c("Unc", "Cor"), shortnamescomp = FALSE) 
 #'    }
@@ -164,6 +169,8 @@ spca = function(S, ind, unc = TRUE){
 ##==============================================================  
 ## runs SPCA-LS for a given set of indices
 ##==============================================================
+message("This function will be replaced by fspca soon, consider using that.
+It's much faster")
 
 if(missing(ind))
     stop("need to give a list of indices in spca. if not known, use spcabe or spcabb")

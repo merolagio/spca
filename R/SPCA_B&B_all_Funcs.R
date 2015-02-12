@@ -300,7 +300,7 @@ branchSpca = function(D, k, A = NULL, Z = NULL, ind = FALSE, mod = c("uncorr","c
       }
       else{          
         A = as.matrix(A)
-        ee = eigen(crossprod(t(A) %*% D[,ind]), only.values = TRUE, symmetric = TRUE)$val
+        ee = eigen(A %*% D[,ind], only.values = TRUE, symmetric = TRUE)$val
         if (sum(abs(ee)> 0.001)>= length(ind))
           vexp = 0
         else{  

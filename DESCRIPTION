@@ -1,8 +1,8 @@
 Package: spca
 Type: Package
 Title: Sparse Principal Component Analysis
-Version: 0.6.0.9008
-Date: 2015-2-10
+Version: 0.6.0.9100
+Date: 2015-2-12
 Author: Giovanni Maria Merola
 Maintainer: Giovanni Merola <lsspca@gmail.com>
 URL: http://github.com/merolagio/spca
@@ -20,6 +20,6 @@ Suggests:
     ggplot2,
     reshape2
 Imports:
-    MASS
+    MASS, Matrix
 License: GPL-3
 LazyData: true
