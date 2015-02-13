@@ -134,6 +134,7 @@ The naming of the arguments in R is not simple, mainly because different convent
 
 ```{r example, fig.path='README_files/'}
 library(spca)
+packageVersion("spca")
 data(bsbl)
 #Ordinary PCA
 bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)

@@ -10,7 +10,7 @@
 
 <meta name="author" content="Giovanni Merola RMIT International University Vietnam email: lsspca@gmail.com repository: https://github.com/merolagio/spca" />
 
-<meta name="date" content="2015-02-08" />
+<meta name="date" content="2015-02-13" />
 
 <title>spca package</title>
 
@@ -70,7 +70,7 @@ img {
 <div id="header">
 <h1 class="title">spca package</h1>
 <h4 class="author"><em>Giovanni Merola<br> RMIT International University Vietnam<br> email: <a href="mailto:lsspca@gmail.com">lsspca@gmail.com</a><br> repository: <a href="https://github.com/merolagio/spca" class="uri">https://github.com/merolagio/spca</a></em></h4>
-<h4 class="date"><em>08 February 2015</em></h4>
+<h4 class="date"><em>13 February 2015</em></h4>
 </div>
 
 <div id="TOC">
@@ -94,13 +94,14 @@ img {
 
 <div id="spca" class="section level1">
 <h1>spca</h1>
-<!-- [![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
--->
+<!--   
+[![Build Status](https://travis-ci.org/merolagio/spca.png?branch=master)](https://travis-ci.org/merolagio/spca)
+ -->
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <div id="intro" class="section level3">
 <h3>Intro</h3>
 <p><code>spca</code> is an R package for running Sparse Principal Component Analysis. It implements the LS SPCA approach that computes the Least Squares estimates of sparse PCs. the LS SPCA solutions maximise the variance of the data explained, Unlike other existing SPCA methods. Details can be found in <a href="http://arxiv.org/abs/1406.1381v2" title="Pre-print">Merola, 2014. arXiv</a> and in the forthcoming paper in <em>Australia and New Zealand Journal of Statistics</em>.</p>
-<p>I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics’ chief editor, Dr Qiu, rejected the paper endorsing a report stating that: <strong>the LS criterion is a new measure used ad-hoc</strong> :-D This on top of a number of other blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithm wasn’t scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, In a resubmission reviewer from <em>ANZJS</em> asked me to <strong>compare the about 20 existing SPCA methods with mine on more datasets</strong> (only because I show that my solutions maximise the variance explained and theirs don’t!) Thankfully, the editors of this journal accepted my refusal to do so.</p>
+<p>I had difficulties publishing the LS SPCA paper, possibly because LS SPCA improves on existing methods. This is confirmed by the fact that Technometrics’ chief editor, Dr Qiu, rejected the paper endorsing a report stating that: <strong>the LS criterion is a new measure used ad-hoc</strong> :-D This on top of a number of other blatantly wrong arguments. Dr Qiu added in his rejection letter that the algorithms are not scalable. Now, this is arbitrary because computational efficiency is not in the scope and aims of Technometrics, In a resubmission a reviewer from <em>ANZJS</em> asked me to <strong>compare the about 20 existing SPCA methods with mine on more datasets</strong> (only because I show that my solutions maximise the variance explained and theirs don’t!) Thankfully, the editors of this journal accepted my refusal to do so.</p>
 </div>
 <div id="sparse-principal-component-analysis" class="section level3">
 <h3>Sparse Principal Component Analysis</h3>
@@ -119,18 +120,18 @@ img {
 <div id="use-of-the-package" class="section level3">
 <h3>Use of the package</h3>
 <p><strong>spca aims to obtain interpretable solutions</strong></p>
-<p>SPCA solutions, not unlikely regression models, can be evaluated under different criteria. The package <code>spca</code> can easily produce plots and tables to easily compare solutions under different criteria.</p>
+<p>SPCA solutions, not unlikely regression models, can be evaluated under different criteria. The package <code>spca</code> can easily produce plots and tables useful for comparing solutions under satisfying different criteria.</p>
 <p><strong>spca is implemented as an exploratory data analysis tool</strong></p>
 <p>The cardinality of the components can be chosen interactively after inspecting trace and plots of solutions of different cardinality.</p>
-<p>Furthermore, several solutions can be easily computed so as to:</p>
+<p>Several solutions can be easily computed so as to:</p>
 <ul>
 <li><p>have uncorrelated components or not.</p></li>
 <li><p>have a minimal cardinality.</p></li>
 <li><p>reproduce a given proportion of the variance explained by the full PCs.</p></li>
 <li><p>have only contributions larger than a given threshold.</p></li>
 </ul>
-<p>The solutions obtained under different settings can be plotted and printed in different ways, also comparng two or more.</p>
-<p><code>spca</code> can be helpful also in a confirmatory stage of the analysis, since the sparse components can be constrained to be made up of only chosen variables.</p>
+<p>Solutions computed under different settings can be visualised in different ways with pots and summaries, also coparatitevely.</p>
+<p><code>spca</code> can be helpful also in a confirmatory stage of the analysis, since the sparse components can be constrained to be made up of only chosen variables. If a partition (a list) of indices is known before, it can be passed as the <code>startind</code> argument to <code>spca::spca()</code></p>
 <p>Beside this quick tour of the package, there are vignettes with examples and explanations. You can start with <code>vignette(&quot;Introduction to spca&quot;, package = &quot;spca&quot;)</code>, which is similar to this document but more detailed.` Other vignettes contain an extended example and a navigable help.</p>
 </div>
 <div id="optimisation-models" class="section level3">
@@ -151,25 +152,25 @@ img {
 <h2>Functions</h2>
 <p>The workhorses of the package are the functions <code>uspca</code> and <code>cspca</code>, which compute the uncorrelated and correlated solutions for a given set of indices. These are not available but the function</p>
 <ul>
-<li><code>spca</code></li>
+<li><code>spca::spca</code></li>
 </ul>
 <p>implements them for given indices of a nember of components.</p>
 <p>Sets of indices can be found through the <strong>BB</strong> and <strong>BE</strong> searches with:</p>
 <ul>
-<li><code>spcabb</code></li>
+<li><code>spca::spcabb</code></li>
 </ul>
 <p>and</p>
 <ul>
-<li><code>spcabe</code></li>
+<li><code>spca::spcabe</code></li>
 </ul>
 <p><code>help(spcabb)</code> and <code>help(spcabe)</code> provide examples of using spca and the utilities. Calling <code>vignettes(&quot;Advanced Example&quot;, package = &quot;spca&quot;)</code> a complete example and details on the methods will be displayed.</p>
 </div>
 <div id="methods" class="section level2">
 <h2>Methods</h2>
-<p>The package contains methods for plotting, printing and comparing spca solutions, given below.</p>
+<p>The package contains the methods for plotting, printing and comparing spca solutions given below.</p>
 <ul>
 <li><p><code>choosecard</code>: interactive method for choosing the cardinality. It plots and prints statistics for comparing solutions of different cardinality.</p></li>
-<li><p><code>print</code>: shows a formatted matrix of sparse loadings, or <em>contributions</em>, of a solution. Contributions are scaled to percentages while loadings are scaled to unit sum of squares,</p></li>
+<li><p>print`: shows a formatted matrix of sparse loadings, or <em>contributions</em>, of a solution. Contributions are scaled to percentages while loadings are scaled to unit sum of squares,</p></li>
 <li><p><code>showload</code>: prints only the non-zero sparse loadings. This is useful when the number of variables is large.</p></li>
 <li><p><code>summary</code>: shows formatted summary statistics of a solution</p></li>
 <li><p><code>plot</code>: plots the cumulative variance explained by the sparse solutions with that explained by the PCs, which is its upper bound. It can also plot the sparse contributions in different ways.</p></li>
@@ -182,13 +183,15 @@ img {
 <ul>
 <li><em>loadings</em> A matrix with the loadings scaled to unit L_2 norm in the columns.</li>
 <li><em>vexp</em> A vector with the % variance explained by each component.</li>
-<li><em>vexpv</em> A vector with the % variance explained by each principal component.</li>
+<li><em>vexpPC</em> A vector with the % variance explained by each principal component.</li>
 <li><em>ind</em> A list of the indices of the sparse loadings</li>
 </ul>
 <div id="minimal-example" class="section level3">
 <h3>Minimal Example</h3>
 <p>The naming of the arguments in R is not simple, mainly because different conventions have been used over the years. I tried to follow <a href="http://r-pkgs.had.co.nz/style.html">Harley Wickam’s suggestions</a>, not completely. I tried to use consistent argument names in different functions and to give meaningful names, starting differently so that <code>R</code>’s useful feature of partial matching the arguments can be exploited. In the following example I sometime use partial arguments names.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(spca)
+<span class="kw">packageVersion</span>(<span class="st">&quot;spca&quot;</span>)
+<span class="co">#&gt; [1] '0.6.0.9100'</span>
 <span class="kw">data</span>(bsbl)
 <span class="co">#Ordinary PCA</span>
 bpca =<span class="st"> </span><span class="kw">pca</span>(bsbl, <span class="dt">screeplot =</span> <span class="ot">FALSE</span>, <span class="dt">kaiser.print =</span> <span class="ot">TRUE</span>)
@@ -255,7 +258,7 @@ devtools::<span class="kw">install_github</span>(<span class="st">&quot;merolagi
 </div>
 <div id="comments" class="section level3">
 <h3>Comments</h3>
-<p>This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. Please use the <em>Github</em> tools for <a href="https://github.com/merolagio/spca/issues/new">submitting issues</a> or contributions.</p>
+<p>This is the first release and will surely contain some bugs, even though I tried to test it. Please do let me know if you find any or can suggest improvements. You can use the <em>Github</em> tools for <a href="https://github.com/merolagio/spca/issues/new">submitting issues</a> or contributions.</p>
 <p>For now most of the plots are produced with the basic plotting functions. In a later release i will produce them with ggplot2 (it requires learning the package :-).</p>
 <p>The code is implemented in R, so it will not work for large datasets. Optimizing R is a difficult task because one is using functions written for generic tasks. This is surely a problem with matrix algebra, also due to the poor documentation available. Packages like <code>ff</code> and <code>bigmemory</code> may be useful to analyze very large matrices that would exhaust rhe RAM, once they are fully developed and documented. Working on my tetra-core laptop, I found useful using the <code>foreach</code> and <code>doParallel</code> packages to speed up the computations. These, however, will not help the RAM.</p>
 <p>I have in mind to develop C routines at least for the matrix algebra. Anybody willing to help, please, let me know.</p>

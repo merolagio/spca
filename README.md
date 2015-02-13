@@ -129,6 +129,8 @@ The naming of the arguments in R is not simple, mainly because different convent
 
 ```r
 library(spca)
+packageVersion("spca")
+#> [1] '0.6.0.9100'
 data(bsbl)
 #Ordinary PCA
 bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)
