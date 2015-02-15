@@ -198,6 +198,13 @@ fspca = function(S, ind, unc = TRUE, fulloutput = FALSE){
       nm = nd - le
       unc = c(unc, rep(unc[le], nm))
     }
+    if (sum(unc) > 0){
+      if (any(sapply(ind, length)[unc == TRUE] < (1:nd)[unc == TRUE]))
+        stop(paste("need to give enough cardinality in uncorrelated comp", 
+                   paste((1:nd)[unc == TRUE])))
+      
+    }
+      
     A = matrix(0, p, nd)
     fvexp = rep(0, p)
     if (any(unc == FALSE))
