@@ -734,25 +734,24 @@ smpc = x
   ## variable names for plotting loadings  
   if (is.factor(variablesnames))
     variablesnames = as.character(variablesnames)
-  if (length(variablesnames) > 1)
+  if (is.vector(variablesnames)){
     if (length(variablesnames) < p)
       stop("too few names passed in variablesnames ")
     else
       varnames = variablesnames[1:p]
+  }  
   else{
     if (variablesnames[1] == FALSE){
     varnames = paste("V", 1:p, sep = "")
-  }
-  else{
-    if (variablesnames[1] == TRUE & !is.null(rownames(A)))
-      varnames = rownames(A)
-    else {      
-      warning("something wrong in variablesnames argument. Set to default")
-      varnames = paste("V", 1:p, sep = "")
-      
     }
-
-  }  
+    else{
+      if (variablesnames[1] == TRUE & !is.null(rownames(A)))
+        varnames = rownames(A)
+      else {      
+        warning("something wrong in variablesnames argument. Set to default")
+        varnames = paste("V", 1:p, sep = "") 
+      }
+    }  
   }
   ###
   if (plotload == TRUE){    
