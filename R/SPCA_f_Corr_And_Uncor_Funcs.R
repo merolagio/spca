@@ -12,7 +12,7 @@ fcspca = function(SS, S, nc = 1, vexp = FALSE){
   #   SS = SS[ind, ind]
   
   if (is.null(dim(S))){
-    loadings = as.matrix(1)
+    a = as.matrix(1)
     nc = 1
   }
   else{    
@@ -32,28 +32,28 @@ fcspca = function(SS, S, nc = 1, vexp = FALSE){
     
     ##   =========================== COMPUTES ========
     aa = eigen(crossprod(R, SS)  %*%  R, symm = TRUE)
-    loadings = as.matrix(R %*% aa$vec[,1:nc]  )
-    csm <- colSums(loadings^2)
+    a = as.matrix(R %*% aa$vec[,1:nc]  )
+    csm <- colSums(a^2)
     #csm = colSums((G %*% aa$vec[,1:nc])^2)
     if (nc == 1)
-      sig = sign(loadings[1]) 
+      sig = sign(a[1]) 
     else 
-      sig = sign(loadings[1, ]) 
-    loadings = t(t(loadings)/ (sig * sqrt(csm)))
+      sig = sign(a[1, ]) 
+    a = t(t(a)/ (sig * sqrt(csm)))
   }  
   ### the  
   if (vexp == FALSE)
-    return(loadings)  
+    return(list(a = a))  
   else{
     if (is.null(dim(S)))
-      eval = SS/S 
+      vexp = SS/S 
     else
-      eval = aa$val[1:nc]/sum(diag(S))
+      vexp = aa$val[1:nc]#/sum(diag(S))
   }
-  #     vexpns = vexp/drop(sqrt(diag(crossprod(R %*% loadings))))
-  #     vexpns = vexp/drop((diag(crossprod(R %*% loadings))))
+  #     vexpns = vexp/drop(sqrt(diag(crossprod(R %*% a))))
+  #     vexpns = vexp/drop((diag(crossprod(R %*% a))))
   
-  return( list(loadings = loadings, eval = eval) )#, csm = csm) )#, vexpns = vexpns) ) 
+  return( list(a = a, vexp = vexp) )#, csm = csm) )#, vexpns = vexpns) ) 
 }
 
 fuspca = function(SS, S, R, nc = 1, vexp = FALSE){
@@ -71,7 +71,7 @@ fuspca = function(SS, S, R, nc = 1, vexp = FALSE){
   }
   else{
     if (is.null(dim(S))){
-      loadings = as.matrix(1)
+      a = as.matrix(1)
       nc = 1
     }
     else{    
@@ -92,29 +92,29 @@ fuspca = function(SS, S, R, nc = 1, vexp = FALSE){
       
       ## geigen computes generalied eigenvecs     
       aa =  geigen(M, SS, nc, vexp = vexp)
-      loadings = aa$vec[, 1:nc, drop = FALSE]
-      csm <- colSums(loadings^2)
+      a = aa$vec[, 1:nc, drop = FALSE]
+      csm <- colSums(a^2)
       #csm = colSums((G %*% aa$vec[,1:nc])^2)
       if (nc == 1)
-        sig = sign(loadings[1]) 
+        sig = sign(a[1]) 
       else 
-        sig = sign(loadings[1, ]) 
-      loadings = t(t(loadings)/ (sig * sqrt(csm)))
+        sig = sign(a[1, ]) 
+      a = t(t(a)/ (sig * sqrt(csm)))
     }  
     ### the  
     if (vexp == FALSE)
-      return(loadings)  
+      return(list(a = a))  
     else{
       if (is.null(dim(S)))
-        eval = SS/(S)
+        vexp = SS/S
       else
-        eval = aa$val[1:nc]
+        vexp = aa$val[1:nc]
       
     }
-    #     vexpns = vexp/drop(sqrt(diag(crossprod(R %*% loadings))))
-    #     vexpns = vexp/drop((diag(crossprod(R %*% loadings))))
+    #     vexpns = vexp/drop(sqrt(diag(crossprod(R %*% a))))
+    #     vexpns = vexp/drop((diag(crossprod(R %*% a))))
     
-    return( list(loadings = loadings, eval = eval) )#, csm = csm) )#, vexpns = vexpns) ) 
+    return( list(a = a, vexp = vexp) )#, csm = csm) )#, vexpns = vexpns) ) 
   }
 }
 
@@ -134,6 +134,8 @@ fuspca = function(SS, S, R, nc = 1, vexp = FALSE){
 #' @param unc A logical vector indicating which components should be should be
 #' computed uncorrelated to the preceeding ones. Can be shorter than the number
 #' of dimensions to compute. See details.
+#' @param fulloutput Logical. If FALSE returns only the loadings. Usefull if the
+#' variance explained and other statistics are computed by another function. 
 #' @return An object of class \emph{spca} is returned. It is the smallest
 #' instance of an spca object, which contains: \item{loadings}{The matrix of
 #' loadings} \item{contributions}{Matrix of loadings scaled to unit \eqn{L_1}
@@ -169,7 +171,7 @@ fuspca = function(SS, S, R, nc = 1, vexp = FALSE){
 #'    }
 #'  
 #' @export fspca
-fspca = function(S, ind, unc = TRUE){
+fspca = function(S, ind, unc = TRUE, fulloutput = FALSE){
   
   ##==============================================================  
   ## runs SPCA-LS for a given set of indices
@@ -186,8 +188,8 @@ fspca = function(S, ind, unc = TRUE){
     nd = 1
     cr = fcspca(SS[ind, ind], S[ind, ind], vexp = TRUE)
     A = matrix(rep(0, p), ncol = 1)
-    A[ind,] = cr$loadings
-    fvexp = cr$eval/totv
+    A[ind,] = cr$a
+    fvexp = cr$vexp#/totv
   }
   else{
     nd = length(ind)
@@ -210,8 +212,8 @@ fspca = function(S, ind, unc = TRUE){
         else{            
           # old          cr = fcspca(S,ind[[j]], vexpn = TRUE)
           cr = fcspca(SS[ind[[j]], ind[[j]]], S[ind[[j]], ind[[j]]], vexp = TRUE)
-          A[ind[[j]],j] = cr$loadings
-          fvexp[j] = cr$eval/totv
+          A[ind[[j]],j] = cr$a
+          fvexp[j] = cr$vexp#/totv
         }    
       }# end j = 1
       else{## j > 1
@@ -227,30 +229,35 @@ fspca = function(S, ind, unc = TRUE){
           SSZ = crossprod(Z[, ind[[j]]],  SS %*% Z[, ind[[j]]])
           cr = fcspca(SSZ, S[ind[[j]], ind[[j]]],  vexp = TRUE)
         }          
-        fvexp[j] = cr$eval/totv
-        A[ind[[j]], j] = cr$loadings
+        fvexp[j] = cr$vexp#/totv
+        A[ind[[j]], j] = cr$a
         
       }
       
     }
   }## end j > 1
-  e = eigen(S, only.values = TRUE, symmetric = TRUE)$val
-  vexp = e[1:nd] / totv
-  vexpv = fmakevexp(A, S)
   rownames(A) = namess
-  contributions = sweep(A, 2, colSums(abs(A)), "/") 
-  if (all(unc==FALSE))
-    unc = FALSE
-  if (all(unc==TRUE))
-    unc = TRUE  
-  out = list(loadings = A, contributions = contributions, vexp = vexpv, vexpPC = vexp, fvexp= fvexp, 
-             unc = unc, ind = ind)
-  if (nd > 1){
-    if (any(unc == FALSE)){
-      out$corComp = spca:::make.cor(S, A)
-      out$Uncloadings = make.uncLoad2(A, S)
+  if (fulloutput == TRUE){  
+    e = eigen(S, only.values = TRUE, symmetric = TRUE)$val
+    vexp = e[1:nd] / totv
+    vexpv = fmakevexp(A, S)
+    contributions = sweep(A, 2, colSums(abs(A)), "/") 
+    if (all(unc==FALSE))
+      unc = FALSE
+    if (all(unc==TRUE))
+      unc = TRUE  
+    out = list(loadings = A, contributions = contributions, vexp = vexpv, vexpPC = vexp, fvexp= fvexp, 
+               unc = unc, ind = ind)
+    if (nd > 1){
+      if (any(unc == FALSE)){
+        out$corComp = spca:::make.cor(S, A)
+        out$Uncloadings = make.uncLoad2(A, S)
+      }
     }
+    class(out) = "spca"
+    return(out)
   }
-  class(out) = "spca"
-  return(out)
+  else{
+    return(list(loadings = A, vexp = fvexp))
+  }
 }

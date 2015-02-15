@@ -267,10 +267,11 @@ summary.spca = function(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
 #' @param nd Number of dimensions to compare. If not specified set to the
 #' minimum number of loadings in the objects.
 #' @param methodsnames Names for each object included. If not specified, labels are
-#' created as Met1, Met2, etc.
+#' created from the names of the objects compared.
 #' @param perc Logical: should the loadings be standardised to unit \eqn{L_1}
 #' norm (and printed as percentage contributions).
 #' @param plotvar Logical: should the cumulative variances be plotted?
+#' @param cardlabel Logical, should variance lot be labelled with the the cardinalities?
 #' @param plotload Logical or integer (>0): should the loadings be plotted and
 #' how many?
 #' @param labelload Logical: write variables names loading plots?
@@ -300,7 +301,7 @@ summary.spca = function(object, cols, perc = TRUE, rtn = FALSE, prn = TRUE,
 #' @method compare spca
 #' @export compare.spca
 compare.spca = function(smpc, compareto, nd, methodsnames, perc = TRUE, 
-                        plotvar = TRUE, plotload = FALSE, labelload = TRUE, 
+                        plotvar = TRUE, cardlabel = TRUE, plotload = FALSE, labelload = TRUE, 
                         sizelabelsload = 0.85, poslabeload = 3, prnload = TRUE,
                         shortnamescomp = TRUE, rtn = FALSE, prn = TRUE, 
                         only.nonzero = TRUE, bnw = FALSE, mfrowload = 1, mfcolload = 1, 
@@ -360,12 +361,30 @@ if(class(smpc) != "spca")
   vxp = vexp
   
   vexp = apply(vexp, 2, cumsum)
-{  if (missing(methodsnames)){
-  if (!is.null(names(smpc)))
-    methodsnames = c("PCA", names(smpc))
-  else
-    methodsnames = c("PCA", paste("Met", 1:n, sep = ""))
+
+# creates cards
+if(cardlabel == TRUE){
+  cards = sapply(smpc, function(x, ndd){vx = x$card[1:ndd]; return(vx)}, ndd = nd)
 }
+
+
+
+{  if (missing(methodsnames)){
+## GETS ARG NAMES
+    {argnam = match.call()
+     argnam =  as.character(argnam)[2:3]
+     # print(argnam)
+     if(is.list(compareto)){
+       
+       argnam2 = sub("list\\(", "", argnam[[2]])
+       argnam2 = sub("\\)", "", argnam2)
+       argnam2 = stringr::word(argnam2, 1:(n-1), sep = ",")
+       argnam2 = stringr::str_trim(argnam2, "both")
+       argnam = c(argnam[1], argnam2)
+     }
+    }
+    methodsnames = c("PCA", argnam)  
+  }
 else
   methodsnames = c("PCA", methodsnames)
   }
@@ -471,7 +490,7 @@ if(plotvar == TRUE){
   par( mar = c(4.6, 4.1, 1.1, 1.1), mfrow = c(1,1))
   M = max(vexp[1:nd,])
   m = min(vexp[1:nd,])
-  ra = c(m, M*(1.05))
+  ra = c(m, M*(1.0))
   #ra[1] = min(0, ra[1])
   di = diff(ra)/5
   yLabels <- seq(ra[1], ra[2], di)
@@ -480,15 +499,27 @@ if(plotvar == TRUE){
   plot(c(1,nd), c(min(plab), max(plab)), type = "n",  xlab = "components", ylab = "Cum. Var. Expl.", 
        xaxt = "n", yaxt = "n")
   axis(side = 1, at = 1:nd)  
+if (cardlabel == TRUE){
+    lines(1:nd, vexp[1:nd,1], type = "l", col = colo[1], lty =  1 )# pch = pchlist[1],
+      for (i in 2:(n+1)){
+       lines(1:nd, vexp[1:nd,i], type = "l", col = colo[i], lty = ( i) )
+        text(1:nd, vexp[1:nd,i], labels = cards[,i - 1], cex = 0.75)
+      }
+    legend("bottomright", col = colo[1:(n+1)], lty = 1:(n+1), 
+           legend= methodsnames,
+           y.intersp = 0.85, cex = 0.85)
+    }
+else{
   for (i in 1:(n+1))
     lines(1:nd, vexp[1:nd,i], type = "b", col = colo[i], pch = pchlist[i], lty = ((i != 1) + 1) )
-  
-  
+  legend("bottomright", col = colo[1:(n+1)], pch = pchlist[1:(n+1)], lty = 1:(n+1), 
+         legend= methodsnames,
+         y.intersp = 0.85, cex = 0.85)  
+}  
   axis(2, at = pretty(yLabels), labels = sprintf(round(pretty(yLabels) * 100, 0), fmt="%3.0f%%"), 
        cex.axis = 0.75, cex.lab = 0.75, las = 1)          
   
-  legend("bottomright", col = colo[1:(n+1)], pch = pchlist[1:(n+1)], lty = 1:(n+1), legend= methodsnames,
-         y.intersp = 0.85, cex = 0.85)
+
 }  
 ## Aall working matrix with ordered laodings for nd components, will retun this  
 Aall = matrix(0, nrow = nr, ncol = n *nd) 
