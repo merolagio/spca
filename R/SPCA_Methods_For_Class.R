@@ -734,7 +734,7 @@ smpc = x
   ## variable names for plotting loadings  
   if (is.factor(variablesnames))
     variablesnames = as.character(variablesnames)
-  if (is.vector(variablesnames)){
+  if (length(variablesnames) > 1){
     if (length(variablesnames) < p)
       stop("too few names passed in variablesnames ")
     else

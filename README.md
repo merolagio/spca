@@ -4,7 +4,7 @@ author: "Giovanni Merola<br>
 RMIT International University Vietnam<br>
 email: lsspca@gmail.com<br>
 repository: https://github.com/merolagio/spca"
-date: "13 February 2015"
+date: "15 February 2015"
 output:
   rmarkdown::html_document:
     toc: true
@@ -130,7 +130,7 @@ The naming of the arguments in R is not simple, mainly because different convent
 ```r
 library(spca)
 packageVersion("spca")
-#> [1] '0.6.0.9100'
+#> [1] '0.6.1.9000'
 data(bsbl)
 #Ordinary PCA
 bpca = pca(bsbl, screeplot = FALSE, kaiser.print = TRUE)
