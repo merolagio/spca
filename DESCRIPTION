@@ -1,0 +1,24 @@
+Package: spca
+Type: Package
+Title: Least Squares Sparse Principal Components Analysis
+Version: 1.0.0
+Date: 2026-03-08
+Authors@R: 
+    person("Giovanni M.", "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
+Description: Implements least-squares sparse principal component analysis (LSSPCA).
+    The approach follows Merola (2015) and Merola and Chen (2019).
+Maintainer: Giovanni M. Merola <merolagio@gmail.com>
+URL: https://github.com/merolagio/spca
+BugReports: https://github.com/merolagio/spca/issues
+License: AGPL-3
+Encoding: UTF-8
+Depends:
+    R (>= 4.3) 
+Imports: 
+  Rcpp (>= 1.0.14),
+  ggplot2 (>= 4.0.0), 
+  RMTstat (>= 0.3.1),
+  reshape2, leaps, scales
+LinkingTo: Rcpp, RcppEigen
+RoxygenNote: 7.3.2
+LazyData: true
