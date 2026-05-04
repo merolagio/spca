@@ -29,9 +29,10 @@ warning is issued, even if the object's class is \emph{spca}.
 }
 \seealso{
 Other spca: 
-\code{\link{lsspca}()},
 \code{\link{new_spca}()},
+\code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}
 }

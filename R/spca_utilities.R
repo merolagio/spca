@@ -1,7 +1,5 @@
 
 
-
-
 list2vec = function(li, uniq = T, sorted = F) {
   a = c(unlist(li))
   if (uniq)
@@ -51,22 +49,6 @@ vec2fac = function(v) {
 
 # Rounds a list prints or return a rounded list @param li a list of numerical
 # objects @param d nuber of digits @return rounded list
-
 roundl = function(li, d = 2) {
   lapply(li, round, digits = d)
 }
-
-
-makevec = function(vec, n) {
-  le = length(vec)
-  if (le == 0)
-    stop("need to pass a vector of lenght > 0")
-  if (le < n) {
-    m = n - le
-    v = c(vec, rep(vec[le], m))
-  }
-  if (le == n)
-    v = vec
-  return(v)
-}
-

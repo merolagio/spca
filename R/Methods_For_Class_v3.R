@@ -746,7 +746,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
 #' @details variablesnames must have the names of the p variables in the first p
 #' positions.  
 #' @return If rtn = TRUE, it returns a list with the loadings.
-#' @seealso \link{PMlsspca-package}.
+#' @seealso \link{spca-package}.
 #' @export 
 showload = function(spca_obj, cols, perc = TRUE, digits = 3,  variablesnames = FALSE, 
                     thresh = 0.001, rtn = FALSE){

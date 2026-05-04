@@ -71,9 +71,10 @@ Examples in \code{\link{aggregate_by_group}}.
 
 Other spca: 
 \code{\link{is.spca}()},
-\code{\link{lsspca}()},
 \code{\link{new_spca}()},
+\code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{spca}()},
 \code{\link{spca_object}}
 }
 \concept{spca}

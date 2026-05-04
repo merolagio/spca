@@ -43,5 +43,5 @@ variablesnames must have the names of the p variables in the first p
 positions.
 }
 \seealso{
-\link{PMlsspca-package}.
+\link{spca-package}.
 }

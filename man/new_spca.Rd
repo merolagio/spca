@@ -45,8 +45,9 @@ corresponding PCs.}
 \seealso{
 Other spca: 
 \code{\link{is.spca}()},
-\code{\link{lsspca}()},
+\code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}
 }

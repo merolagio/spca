@@ -33,9 +33,10 @@ Optional
 \seealso{
 Other spca: 
 \code{\link{is.spca}()},
-\code{\link{lsspca}()},
 \code{\link{new_spca}()},
+\code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{spca}()},
 \code{\link{summary.spca}()}
 }
 \concept{spca}

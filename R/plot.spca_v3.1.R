@@ -616,7 +616,7 @@ if (is.null(controls)) {
 #'   
 #' @return If `return_plot = TRUE`, the `ggplot2` object; otherwise `NULL`
 #'   (invisibly).
-#' @seealso \code{\link{lsspca}}.
+#' @family spca
 #' @references
 #' Circular bar plot layouts follow examples from
 #' \url{https://www.r-graph-gallery.com/all-graphs/}.
@@ -627,12 +627,13 @@ if (is.null(controls)) {
 #' @examples
 #' not run
 #' data(holzinger)
-#' myspca = lsspca(ho)
+#' myspca = spca(ho)
 #' myplot = plot(ho)
 #' change facetting and legend position
 #' myplot + facet_wrap(facets = vars(component), ncol = 4, nrow = 1) +
 #'   theme(legend.position = "r")
 #' 
+#' @family spca
 #' @export
 #' @method plot spca
 plot.spca = function(

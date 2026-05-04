@@ -2,7 +2,6 @@
 % Please edit documentation in R/spca-package.R
 \docType{package}
 \name{spca-package}
-\alias{spca}
 \alias{spca-package}
 \title{spca: Least Squares Sparse PCA}
 \description{

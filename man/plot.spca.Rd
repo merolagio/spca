@@ -145,7 +145,7 @@ variable names. If the length is different it is switched to \code{NULL}.
 \examples{
 not run
 data(holzinger)
-myspca = lsspca(ho)
+myspca = spca(ho)
 myplot = plot(ho)
 change facetting and legend position
 myplot + facet_wrap(facets = vars(component), ncol = 4, nrow = 1) +
@@ -161,5 +161,20 @@ The \code{printsafe} palette corresponds to \code{OrRd} from
 \url{http://colorbrewer2.org/}.
 }
 \seealso{
-\code{\link{lsspca}}.
+Other spca: 
+\code{\link{is.spca}()},
+\code{\link{new_spca}()},
+\code{\link{print.spca}()},
+\code{\link{spca}()},
+\code{\link{spca_object}},
+\code{\link{summary.spca}()}
+
+Other spca: 
+\code{\link{is.spca}()},
+\code{\link{new_spca}()},
+\code{\link{print.spca}()},
+\code{\link{spca}()},
+\code{\link{spca_object}},
+\code{\link{summary.spca}()}
 }
+\concept{spca}

@@ -1,6 +1,6 @@
-#' Validate inputs for lsspca
+#' Validate inputs for spca
 #'
-#' Checks user inputs for \code{lsspca}. This helper only validates inputs.
+#' Checks user inputs for \code{spca}. This helper only validates inputs.
 #' It does not parse strings for C++, change index bases, choose the C++
 #' backend, or modify the data matrix.
 #'
@@ -29,7 +29,7 @@
 #' @return Invisible TRUE.
 #' @noRd
 
-validate_lsspca_inputs = function(M,
+validate_spca_inputs = function(M,
                                   alpha,
                                   ncomps,
                                   ncomp_byvexp,
@@ -172,13 +172,12 @@ validate_lsspca_inputs = function(M,
 #' Computes LS SPCA components
 #'
 #' Computes sparse principal components from either a data matrix or a
-#' covariance/correlation matrix. The wrapper keeps the original lsspca
-#' structure and routes the computation to the thin-matrix C++ engine
-#' (\code{lsspcaC}) or the fat-matrix C++ engine (\code{lsspcaTC}).
+#' covariance/correlation matrix. The wrapper routes the computation to the thin or the fat-matrix C++ engine.
 #'
 #' Character inputs are parsed transparently by their first letter inside the
 #' main function. Fixed indices are passed through \code{fixedindex_list}, one
-#' list element per component.
+#' list element per component. Different variable selection approaches can be
+#' selected, as explained in the `Deatails` section.
 #'
 #' @param M Real matrix. The \eqn{n \times p} data matrix or the
 #'   \eqn{p \times p} covariance/correlation matrix.
@@ -231,10 +230,7 @@ validate_lsspca_inputs = function(M,
 #' 
 #' @family spca
 #' @export
-#' 
-## aggiungi in C++ a change of sign based on k  (max(abs(a_j))),
-##     if (sign(a_j[k], v[j]) == -1 a_j = -a_j  
-lsspca = function(M,
+spca = function(M,
                   alpha = 0.95,
                   ncomps = 0,
                   ncomp_byvexp = 0.99,
@@ -256,7 +252,7 @@ lsspca = function(M,
                   epsPMVS = 1e-5,
                   maxiterPMVS = 200) {
 
-  validate_lsspca_inputs(M = M,
+  validate_spca_inputs(M = M,
                          alpha = alpha,
                          ncomps = ncomps,
                          ncomp_byvexp = ncomp_byvexp,
@@ -482,10 +478,9 @@ lsspca = function(M,
   colnames(spout$loadings) = paste0("sPC", 1:spout$ncomps)
 
 #contributions =====================  
-#  browser()
   contributions = make_contributions(spout$loadings)
   
-# methods take contributions to be a matrix
+# spca methods take contributions to be a matrix
   if (is.vector(contributions))
       contributions = matrix(contributions, ncol = 1)
   dimnames(contributions) = dimnames(spout$loadings)
@@ -501,7 +496,7 @@ lsspca = function(M,
 
   ncomps = spout$ncomps
   
-  ## now lsspcaC passes totvar and vexpPC to [1:ncomps]
+  ## gathering values from lsspcaC 
   if(is.null(spout$totvar))
   spout$totvar = sum(spout$vexpPC)
   spout$vexp = spout$vexp/spout$totvar
