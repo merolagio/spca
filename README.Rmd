@@ -12,34 +12,36 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+<img src="man/figures/spca_Logo.png" align="right" height="139" alt="spca logo" />
 
-# Package PMlsspca
+# Package spca
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/merolagio/PMlsspca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/PMlsspca/actions/workflows/R-CMD-check.yaml)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18829364.svg)](https://doi.org/10.5281/zenodo.18829364)
+[![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
+<!-- [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) -->
+<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18829364.svg)](https://doi.org/10.5281/zenodo.18829364) -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)]()
 <!-- badges: end -->
 
-The goal of PMlsspca is to help reproduce the Least Squares Sparse Principal Components Analysis (LS SPCA) examples in the paper published in ............... 
-The  main function is lsspca(). Methods are print, summery and plot. Functions are new.spca (to create an `spca' object from a set of loadings and aggregate_by_scale to visualize the contribution by scale.
+This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA)
+
+The  main function is *spca()*. Methods are print, summery and plot. Functions are new.spca (to create an `spca' object from a set of loadings and aggregate_by_scale to visualize the contribution by scale.
 
 ## Installation
 
-You can install the development version of PMlsspca from [GitHub](https://github.com/) with:
+You can install the development version of spca from [GitHub](https://github.com/) with:
 
 ``` r
 # `remotes' is the lightest alternative
 install.packages("remotes")
-remotes::install_github("merolagio/PMlsspca")
+remotes::install_github("merolagio/spca")
 #or
 #install.packages("devtools")
-devtools::install_github("merolagio/PMlsspca")
+devtools::install_github("merolagio/spca")
 # or
 # install.packages("pak")
-pak::pak("merolagio/PMlsspca")
+pak::pak("merolagio/spca")
 ```
 
 ## Example
@@ -48,7 +50,7 @@ This is a basic example which shows you how to compute basic LSSPCA solutions:
 
 ### load data
 ```{r load data, results='hide', message=FALSE, warning=FALSE, dpi = 300}
-library(PMlsspca)
+library(spca)
 ## basic example code
 data(crime_data)
 ```
