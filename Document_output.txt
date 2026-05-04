@@ -1,0 +1,19 @@
+ℹ Updating spca documentation
+ℹ Loading spca
+✖ RcppExports.R:352: @title markdown translation failed.
+✖ Level 1 headings are not supported in @title
+ℹ Do you want to put the heading in @description or @details?
+✖ RcppExports.R:395: @returns requires a value.
+✖ pca.R:262: @nord is not a known tag.
+✖ RcppExports.R:293: Block must have a @name.
+ℹ Either document an existing object or manually specify with @name
+✖ RcppExports.R:332: Block must have a @name.
+ℹ Either document an existing object or manually specify with @name
+✖ RcppExports.R:353: Block must have a @name.
+ℹ Either document an existing object or manually specify with @name
+✖ RcppExports.R:364: Block must have a @name.
+ℹ Either document an existing object or manually specify with @name
+✖ RcppExports.R:411: Block must have a @name.
+ℹ Either document an existing object or manually specify with @name
+✖ RcppExports.R:421: Block must have a @name.
+ℹ Either document an existing object or manually specify with @name

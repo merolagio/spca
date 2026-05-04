@@ -1,0 +1,30 @@
+loadings = spout$loadings,
+             contributions = contributions,
+             ncomps = spout$ncomps,
+             cardinality = spout$card,
+             vexp = spout$vexp,
+             vexpPC = spout$vexpPC[1:ncomps],
+             cvexp = spout$cvexp,
+             rvexp = rvexp,
+             rcvexp = rcvexp,
+             cor = spout$r2,
+             total_variance = spout$totvar,
+             loadlist = spout$loadlist,
+             indices = spout$ind
+             
+singleprecision = FALSE,
+
+  if (!is.matrix(M) && !is.data.frame(M))
+    stop("M must be a matrix or data.frame", call. = FALSE)
+
+  if (is.data.frame(M))
+    M = as.matrix(M)
+
+  if (!is.numeric(M))
+    stop("M must be numeric", call. = FALSE)
+
+  if (length(dim(M)) != 2)
+    stop("M must be two-dimensional", call. = FALSE)
+
+  if (anyNA(M))
+    stop("M cannot contain missing values", call. = FALSE)

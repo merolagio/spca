@@ -1,0 +1,4 @@
+CXX_STD = CXX11
+
+PKG_CXXFLAGS += -Wa,-mbig-obj
+PKG_CXX11FLAGS += -Wa,-mbig-obj

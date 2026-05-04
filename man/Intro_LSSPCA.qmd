@@ -1,0 +1,104 @@
+---
+title: "LSSPCA intro"
+format:
+  pdf:
+    pdf-engine: pdflatex
+editor: visual
+---
+
+# Introduction to LSSPCA
+
+## Data
+
+$X$ is an $n \times p$ matrix with columns centered to 0 mean.
+
+Objective: compute sparse principal components (sPCs), that is linear combinations of only a few of the variables.
+
+$S = X'X$ is the covariance matrix. $v_1, \ldots, v_p$ ($||v_j||= 1, j=1,\cdots, p$) are the eigenvectors of $S$ ordered with respect decreasing corresponding eigenvalues $\lambda_1 \ge \lambda_2\ge \cdots \ge \lambda_p$ . These are also called the *loadings* of the PCs\
+The principal components (PCs) are defined as $y_j = X v_j$.
+
+The sparse loadings are the vectors $a_1, \ldots, a_r$, $r\le p$ , with ($||a_j||= 1, j=1,\cdots, r$). each of which has only $c_j$ non-zero elements; $c_j$ is called cardinality. The sPCs are then equal to $t_j = X a_j$.
+
+## Least squares Sparse Principal Component Analysis (LSSPCA)
+
+LSSPCA solutions are derived using two different objectives
+
+### Objective 1 (min CVEXP)
+
+$$\min_{a_j} ||X - t_jb^\top||^2,\ \text{subject to}\ \text{card}(a_j) < p,\ a_j^\top Sa_i= 0, i<j$$ Objective 2 (max cor PCs)
+
+$$
+\max_{a_j} cor(t_j, y_j), \text{subject to } a_j^\top S a_i = 0,\ i< j, \text{card}(a_j)<p $$
+
+We have two challenges now: the first is to derive the solutions when the indices of the nonzero loadings are known, second to identify the optimal set of these indices for each sPC.\
+
+We begin assuming that these indices are known for now. So, let $ind_j$ denote the set of indices for the $j$-th sPC and a \`\`\$\\cdot\$'' above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to these indices, in a more explicit notation (R like) we can write $ad_j = a_j[ind_j]$ and $Sd_j = S[, indj]$ .
+
+### Objective 1 max variance explained
+
+It can be shown that the solution of objective (1) requires solving
+
+$$
+\max_{a_j}\frac{a_j^\top X^\top X X^\top X a_j}{a_j^\top X^\top X a_j} \equiv \max_{a_j}\frac{a_j^\top SS a_j}{a_j^\top S a_j},\quad a_j^\top S a_i = 0,\ i< j, \text{card}(a_j) < p
+$$
+
+the objective function above is the *variance explained* (VEXP) by the $j$-th component component
+
+### Uncorrelated LSSPCA (uSPCA)
+
+The exact solutions are computed by adding the constraints directly into the variance explained expression. Hence the optimal sparse loadings, $ad_j$ are the generalized eigenvectors corresponding to the largest eigenvalue, $\lambda_j$, solution to\
+
+$$
+C_j Sd_j^\top Sd_j ad_j = \lambda_j Xd_j^\top Xd_j ad_j,
+$$
+
+where $C_1 = I$ and $C_j$ are obtained by enforcing the orthogonality constraints.
+
+The orthogonality constraints require that the cardinality of the solution loadings is such that $c_j\geq j$. Furthermore the solutions can be computationally demanding and unstable.
+
+### Correlated LSSPCA (cSPCA)
+
+Approximated but simpler to compute solutions can be obtained from the orthogonal residuals of the previously computed sPCs. Let
+
+$$
+Q_j = \left(I_p - \frac{t_{j-1}t_{j-1}^\top}{t_{j-1}^\top t_{j-1}}\right)Q_{j-1} = H_j Q_{j-1}, j = 2, 3,\ldots,r,
+$$
+
+where $H_j$ is the *hat*-matrix and $Q_1 = X$. The matrices $Q_j$ are often called *deflated* matrices. Note that the use of the deflated matrices is a direct consequence of the Courant–Fischer min–max theorem and is typically used in the power method for computing the eigendecomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue
+
+$$Qd_j^\top X X^\top Qd_j ad_j = \mu_j Xd_j^\top Xd_j ad_j.$$
+
+The first solution will be equal to the first uSPCA solutions but , in general, the following ones will not be equal to the corresponding uSPCA solutions. The cSPCA solutions typically show a very mild correlation among each others, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and in most cases it will be lower than their order. Note that
+
+$$
+\mu_j = \max_{a_j}\frac{a_j^\top X^\top Q_j Q_j^\top X a_j}{a_j^\top X^\top X a_j} 
+$$ {#eq-apprvexp}
+
+is an approximated measure of the variance explained. In fact, because the resulting PCs are correlated, the exact VEXP must be obtained by difference of the cumulative VEXP (CVEXP) explained by all the first $j$ csPCs and the that of the preceding $(j-1)$ csPCs:
+
+$$
+VEXP(t_j) = \text{trace}\Big(X^\top T_j\left(T_j^\top T_j\right)^{-1} T_j^\top X\Big) -
+\text{trace}\Big(X^\top T_{j - 1}\left(T_{j - 1}^\top T_{j - 1}\right)^{-1} T_{j - 1}^\top X\Big), 
+$$
+
+where $T_j$ is the matrix with columns equal to the first $j$ sPCs.
+
+### 
+
+### Objective 2 max correlation with the PCs
+
+The solutions sPCs obtained by maximising the variance explained are usually highly correlated with the corresponding PCs. However, as the order of the components increases these correlations tend to decrease. A different approach to computing sPCs is Projection LSSPCA (pSPCA). In this approach the sPCs are simply obtained by projecting the residual PCs onto the $x$-variables. Let $z_j = Q_j v_j$ denote the first PC of the eigenvectors of the deflated matrices $Q_j$, then the pSPCA solution loadings are obtained as the regression coefficients standardized to unit norm of the regression of $z_j$ onto $Xd_j$ :
+
+$$
+ad_j \propto (Xd_j^\top Xd_j)^{-1}Xd_j^\top z_j.
+$$
+
+The psPCs will have maximum multiple squared correlation (the $R^2$ coefficient) for the given set of indices $ind_j$.
+
+## Variable selection
+
+Variable selection is notoriously a computationally demanding (NP-hard) task that requires greedy algorithms for its solution.
+
+Regression based variable selection algorithms are used to determine the subsets for pSPCA. Thus, we implemented standard forward, backward and forward stepwise variable selection algorithms used for regression with stopping rule based on the current $R^2$. Because the response variable, $z_j$ is proportional to an eigenvector $Q_j$, the algorithms are simplified using the fact that $z_j^\top X =z_j^\top Q_j = v_j \lambda_j$. These algorithms have approximately $O(p^2)$ complexity.
+
+For uSPCA and cSPCA we implemented a forward and a backward algorithms which terminate after a minimal proportion of the CVEXP of the corresponding number of PCs is reached or not passed, respectively. These algorithms use the approximate VEXP (@eq-apprvexp) to determine the variables to select or to eliminate and are computationally very expensive (the forward selection is approximately $O(pk^4)$ for selecting $k$ variables), even considering that VEXP is computed by the power method to save computation time. However, a dramatic reduction in computational complexity can be achieved by selecting the variables using one of the algorithms implemented for pSPCA and computing the CVEXP at each iteration, which is used as stopping rule. While the exact CSPCA based algorithm may yield more efficient solutions, in many cases there are little differences with the results obtained using the regression variable selection algorithms.

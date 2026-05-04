@@ -1,0 +1,10 @@
+citHeader("To cite PMlsspca in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title   = "PMlsspca: Least-Squares Sparse PCA and Companion Tools",
+  author  = person("Giovanni M.", "Merola"),
+  year    = "2026",
+  note    = "R package version 1.0.5",
+  url     = "https://github.com/merolagio/PMlsspca"
+)
