@@ -331,7 +331,7 @@ plot_spca_bars = function(data_df,
     ggplot2::ylab(ifelse(contributions == TRUE, 
                          "contributions", "loadings"))
   
-  if (!isTRUE(plotlab))
+  if (isTRUE(plotlab))
     pl = pl + ggplot2::theme(axis.text.x = 
                                ggplot2::element_text(angle = 90, 
                                                      vjust = 0.5, 
