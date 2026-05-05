@@ -551,8 +551,9 @@ spca = function(M,
 # check if exist both scores and corComp add to cpp (done in thin but not checked) add to docs
 
     if ((is_datamatrix_M)) {
-      out$scores = atbC(M, spout$loadings[, seq_len(spout$ncomps), 
+      out$scores = abC(M, spout$loadings[, seq_len(spout$ncomps), 
                                           drop = FALSE])
+      
       colnames(out$scores) = paste0("sPC", seq_len(spout$ncomps))
       if (ncomps > 1){
       out$corComp = cor(out$scores)
@@ -561,12 +562,12 @@ spca = function(M,
       }
     }
     else{
+      out$scores = NULL
       if (ncomps > 1){
-     out$corComp = make_corComp_S(spout$loadings, S)
+        out$corComp = make_corComp_S(spout$loadings, S)
       }
       else 
         out$corComp = NULL
-     out$scores = NULL
     }
     colnames(spout$Time) = spout$Time_colnames
     out$parameters = parameters

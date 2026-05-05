@@ -9,9 +9,9 @@ pca(
   ncomps = NULL,
   centerdata = FALSE,
   scaledata = FALSE,
-  spca_screeplot = FALSE,
-  nrow_data = NULL,
+  screeplot = FALSE,
   wachter = TRUE,
+  nrow_data = NULL,
   neigen_toplot = NULL
 )
 }
@@ -27,14 +27,14 @@ performed automatically.}
 
 \item{scaledata}{Logical. If \code{TRUE}, scale variables.}
 
-\item{spca_screeplot}{Logical. If \code{TRUE}, produce a scree plot.}
+\item{screeplot}{Logical. If \code{TRUE}, produce a scree plot.}
+
+\item{wachter}{Logical. If \code{TRUE}, produce a Wachter QQ-plot with
+\link{wachter_qqplot}. The fitted line is based on \code{ncomps}.}
 
 \item{nrow_data}{Integer. Number of rows in the original data set.
 Required when \code{wachter = TRUE} and \code{M} is a covariance or correlation
 matrix. If not available, the Wachter QQ-plot cannot be produced.}
-
-\item{wachter}{Logical. If \code{TRUE}, produce a Wachter QQ-plot with
-\link{wachter_qqplot}. The fitted line is based on \code{ncomps}.}
 
 \item{neigen_toplot}{Integer. Number of eigenvalues to show in diagnostic
 plots. If \code{NULL}, all eigenvalues are shown.}
@@ -53,13 +53,14 @@ Setting it below the maximum does not reduce the cost of the eigendecomposition.
 \examples{
 \dontrun{
 data(holzinger)
-ho_pca <- pca(hom, ncomps = 4, spca_screeplot = TRUE, nrow_data = 144, wachter = TRUE)
+ho_pca <- pca(hom, ncomps = 4, screeplot = TRUE, nrow_data = 144, wachter = TRUE)
 summary(ho_pca)
 }
 
 }
 \seealso{
 Other pca: 
+\code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }
 \concept{pca}

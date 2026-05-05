@@ -8,11 +8,11 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.path = "man/figures/README-"
 )
+#  ,out.width = "60%"
 ```
-<img src="man/figures/spca_Logo.png" align="right" height="139" alt="spca logo" />
+<img src = "man/figures/spca_Logo.png" align = "left" height = "139" alt = "spca logo" />
 
 # Package spca
 
@@ -26,7 +26,9 @@ knitr::opts_chunk$set(
 
 This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA)
 
-The  main function is *spca()*. Methods are print, summery and plot. Functions are new.spca (to create an `spca' object from a set of loadings and aggregate_by_scale to visualize the contribution by scale.
+The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). print, summery and plot methods are available. 
+
+Functions are new.spca (to create an `spca' object from a set of loadings and aggregate_by_scale to visualize the contribution by scale.
 
 ## Installation
 
@@ -46,48 +48,56 @@ pak::pak("merolagio/spca")
 
 ## Example
 
-This is a basic example which shows you how to compute basic LSSPCA solutions:
-
 ### load data
-```{r load data, results='hide', message=FALSE, warning=FALSE, dpi = 300}
+`holzinger` is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables.
+```{r load data, results = 'hide', message = FALSE, warning = FALSE, dpi = 300}
 library(spca)
 ## basic example code
-data(crime_data)
+data(holzinger)
 ```
 ### Decide the number of components
-```{r pca_checks, message = FALSE, warning = FALSE}
-cr_r = cor(crime_data)
-cr_ee = eigen(cr_r)
-screeplot(cr_ee$value, kaiser_line = T)
-wachterqq(cr_ee$values, p = ncol(crime_data), n = nrow(crime_data), nfit_line = -4)
+```{r pca_checks, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
+ho_r = cor(holzinger)
+ho_ee = eigen(ho_r)
+spca_screeplot(ho_ee$value)
+wachter_qqplot(ho_ee$values, p = ncol(holzinger), n = nrow(holzinger), nfit_line = -4)
 ```
 
 ### Compute PCA
-```{r run_pca, message=FALSE, warning=FALSE}
-mypca = pca(crime_data, ncomp = 4)
+```{r run_pca, message = FALSE, warning = FALSE}
+ho_pca = pca(holzinger, ncomp = 4, screeplot = FALSE, wachter = FALSE)
+summary(ho_pca)
 ```
 
 ### Compute the sparse loadings
-Important parameters are $\alpha$ the minimum $R^2$, *ncomp* the number of components to compute, *method* the LSSPCA to use ("u" for unicrrelated, "c" for correlated and "p" for projection [default]) and *varselection* ("stepwise" [default], "backward",  or "forward"). see the help for this function for more.
+Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *ncomp* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated and "p" for projection [default]); and *var_selection* ("stepwise" [default], "backward",  or "forward"). see the help for these parameters and more.
 
-```{r run_spca, message=FALSE, warning=FALSE}
-mylsspca = lsspca(crime_data, alpha = 0.95, ncomp = 4)
+The following command computes four sPCs using forward variable selection with the cSPCA method so that each sPC as at least 0.95 squared correlation with the corresponding PC ($r > 0.9$).
+```{r run_spca, message = FALSE, warning = FALSE}
+myspca = spca(holzinger, alpha = 0.95, ncomps = 4)
 ```
 
 ### Inspect the lsspca results
 Methods are *print*, *plot* (several options available) and *summary*
-```{r methods, message=FALSE, warning=FALSE}
-summary(mylsspca)
+```{r methods, message = FALSE, warning = FALSE, out.width="60%"}
+# fig.width = 5, fig.height = 3}
+myspca 
 
-plot(mylsspca, plottype = "bar")
+summary(myspca)
+
+plot(myspca, plot_type = "bar")
 ```
-```{r methods2, message=FALSE, warning=FALSE}
-plot(mylsspca, plottype = "circular")
+Other types of plots are available, circular, 
 
-mylsspca
+```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
+plot(myspca, plot_type = "circular") # "c" is enough to call "heatmap" type
 ```
 
- 
+Heatmap
+```{r heatmap, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
+plot(myspca, plot_type = "h") # "h" is enough to call "heatmap" type
+```
+
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 
 <!-- ```{r cars} -->

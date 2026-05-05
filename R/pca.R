@@ -10,12 +10,12 @@
 #'   is detected as a data matrix and any column mean is nonzero, centering is
 #'   performed automatically.
 #' @param scaledata Logical. If `TRUE`, scale variables.
-#' @param spca_screeplot Logical. If `TRUE`, produce a scree plot.
+#' @param screeplot Logical. If `TRUE`, produce a scree plot.
+#' @param wachter Logical. If `TRUE`, produce a Wachter QQ-plot with
+#'   \link{wachter_qqplot}. The fitted line is based on `ncomps`.
 #' @param nrow_data Integer. Number of rows in the original data set. 
 #'   Required when `wachter = TRUE` and `M` is a covariance or correlation
 #'    matrix. If not available, the Wachter QQ-plot cannot be produced.
-#' @param wachter Logical. If `TRUE`, produce a Wachter QQ-plot with
-#'   \link{wachter_qqplot}. The fitted line is based on `ncomps`.
 #' @param neigen_toplot Integer. Number of eigenvalues to show in diagnostic
 #'   plots. If `NULL`, all eigenvalues are shown.
 #'
@@ -28,26 +28,26 @@
 #' @examples
 #' \dontrun{
 #' data(holzinger)
-#' ho_pca <- pca(hom, ncomps = 4, spca_screeplot = TRUE, nrow_data = 144, wachter = TRUE)
+#' ho_pca <- pca(hom, ncomps = 4, screeplot = TRUE, nrow_data = 144, wachter = TRUE)
 #' summary(ho_pca)
 #' }
 #'
 #' @family pca
 #' @export
 pca = function(M, ncomps = NULL, centerdata = FALSE, scaledata = FALSE,
-                spca_screeplot= FALSE, nrow_data = NULL, wachter = TRUE, 
+                screeplot= FALSE,  wachter = TRUE, nrow_data = NULL,
                neigen_toplot = NULL){
   
 # validation ==========  
 
 
-  vbool = validate_booleans(centerdata = centerdata, scaledata = scaledata, spca_screeplot = spca_screeplot, wachter =  wachter)
+  vbool = validate_booleans(centerdata = centerdata, scaledata = scaledata, screeplot = screeplot, wachter =  wachter)
   
   if(!vbool){
-    return()
+    stop("wrong input for boolean argument")
 }
     if(any(is.na(M)))
-    stop("The matrix cannot contain missing values")
+    stop("The data matrix cannot contain missing values")
   
   if (is.data.frame(M))
     M = as.matrix(M)
@@ -88,23 +88,28 @@ pca = function(M, ncomps = NULL, centerdata = FALSE, scaledata = FALSE,
   
   if (is.null(neigen_toplot))
     neigen_toplot = p
+  if (neigen_toplot < 2){
+    warning(paste("neigen_toplot must be greater than 1, setting it to", p))
+      neigen_toplot = p
+  }
+
   if (is.null(nrow_data)){
       warning("qq-wachter plot cannot be produced beacuse nrow_data is not available")
-      wachter == FALSE
+      wachter = FALSE
     }
 
 # computation========
   
     ee = EigenC(as.matrix(S))
     totvar = sum(ee$val)
-    
-    ee$vec = scaleColsC(ee$vec[, 1:ncomps], 0, sign(rep[1, 1:ncomps]))
+  
 
 # output   ==== 
     rownames(ee$vec) = nam
-    colnames(ee$vec) = paste0("PC", 1:ncomps)
+    colnames(ee$vec) = paste0("PC", 1:p)
     
-    contributions = scaleColsC(ee$vec[,1:ncomps], 1, rep(1, ncomps))
+    contributions = scaleColsC(ee$vec[,1:ncomps, drop = FALSE], 
+                               1, rep(1, ncomps))
     rownames(contributions) = nam
     
     loadlist = lapply(1:ncomps, function(i, x) x[, i], x = ee$vec[, 1:ncomps])
@@ -124,20 +129,18 @@ pca = function(M, ncomps = NULL, centerdata = FALSE, scaledata = FALSE,
              total_variance = totvar,
              loadlist = loadlist, 
              indices = as.list(rep(list(1:p), ncomps)), 
-             eigenvalues = ee$val
+             eigenvalues = ee$val[1:ncomps]
   )
   if (is_datamatrix_M){
     out$scores = M %*% out$loadings[, 1:ncomps, drop = FALSE]
     colnames(out$scores) = paste0("Comp", 1:ncomps)
-    
-  if (out$ncomps > 1){
-      out$corComp = makeCorCompC(out$loadings, S, d = out$ncomps)
   }
-  }
+    out$corComp = diag(out$ncomps)
+
   class(out) = c("list", "spca")
 
 # plots =============
-  if (spca_screeplot == TRUE){
+  if (screeplot == TRUE){
     pl = spca_screeplot(ee$val, nplot = neigen_toplot, ylab = "eigenvalues")
     
   }
@@ -232,7 +235,7 @@ wachter_qqplot = function(eigvals, p = NULL, n, gamma, cor = T, nplot, nfit_line
 #'
 #' @return If `rtn = TRUE`, a `ggplot` object; otherwise `NULL` (invisibly).
 #' @family pca
-#' @noRd
+#' @export
 spca_screeplot = function(eigvals, nplot = NULL, ylab = "eigenvalues", 
                      addtitle = T, prn = TRUE, rtn = FALSE){
   if (!is.vector(eigvals) || any(is.na(eigvals)))     

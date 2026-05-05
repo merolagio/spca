@@ -55,6 +55,7 @@ Produces a QQ-plot comparing observed eigenvalues to Marchenko--Pastur
 }
 \seealso{
 Other pca: 
-\code{\link{pca}()}
+\code{\link{pca}()},
+\code{\link{spca_screeplot}()}
 }
 \concept{pca}

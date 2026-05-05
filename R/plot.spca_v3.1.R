@@ -361,6 +361,7 @@ plot_spca_heatmap = function(
     legend_position, 
     flip_heatmap, 
     heatmap_color_range) {
+  
       tile_pal = spca_tile_palette()
       
     #browser()
