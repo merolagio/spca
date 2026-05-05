@@ -56,7 +56,7 @@ library(spca)
 data(holzinger)
 ```
 ### Decide the number of components
-```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="49%", fig.width=4, fig.height=4}
+```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="47%", fig.width=4, fig.height=4}
 ho_r = cor(holzinger)
 ho_ee = eigen(ho_r)
 spca_screeplot(ho_ee$value)
