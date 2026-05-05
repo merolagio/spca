@@ -56,7 +56,7 @@ library(spca)
 data(holzinger)
 ```
 ### Decide the number of components
-```{r pca_checks, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
+```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="49%", fig.width=4, fig.height=4}
 ho_r = cor(holzinger)
 ho_ee = eigen(ho_r)
 spca_screeplot(ho_ee$value)
@@ -77,18 +77,19 @@ The following command computes four sPCs using forward variable selection with t
 myspca = spca(holzinger, alpha = 0.95, ncomps = 4)
 ```
 
-### Inspect the lsspca results
+### Inspect spca results
 Methods are *print*, *plot* (several options available) and *summary*
 ```{r methods, message = FALSE, warning = FALSE, out.width="60%"}
-# fig.width = 5, fig.height = 3}
 myspca 
 
 summary(myspca)
 
 plot(myspca, plot_type = "bar")
 ```
-Other types of plots are available, circular, 
 
+Other types of plots are available.
+
+Circular, 
 ```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
 plot(myspca, plot_type = "circular") # "c" is enough to call "heatmap" type
 ```
@@ -97,19 +98,3 @@ Heatmap
 ```{r heatmap, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
 plot(myspca, plot_type = "h") # "h" is enough to call "heatmap" type
 ```
-
-<!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
-
-<!-- ```{r cars} -->
-<!-- summary(cars) -->
-<!-- ``` -->
-
-<!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. -->
-
-<!-- You can also embed plots, for example: -->
-
-<!-- ```{r pressure, echo = FALSE} -->
-<!-- plot(pressure) -->
-<!-- ``` -->
-
-<!-- In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN. -->

@@ -62,15 +62,10 @@ data(holzinger)
 ho_r = cor(holzinger)
 ho_ee = eigen(ho_r)
 spca_screeplot(ho_ee$value)
-```
-
-![](man/figures/README-pca_checks-1.png)<!-- -->
-
-``` r
 wachter_qqplot(ho_ee$values, p = ncol(holzinger), n = nrow(holzinger), nfit_line = -4)
 ```
 
-![](man/figures/README-pca_checks-2.png)<!-- -->
+<img src="man/figures/README-pca_checks-1.png" width="49%" /><img src="man/figures/README-pca_checks-2.png" width="49%" />
 
 ### Compute PCA
 
@@ -103,12 +98,11 @@ squared correlation with the corresponding PC ($`r > 0.9`$).
 myspca = spca(holzinger, alpha = 0.95, ncomps = 4)
 ```
 
-### Inspect the lsspca results
+### Inspect spca results
 
 Methods are *print*, *plot* (several options available) and *summary*
 
 ``` r
-# fig.width = 5, fig.height = 3}
 myspca 
 #>         sPC1   sPC2   sPC3   sPC4
 #> V1     11.9%         13.2%  24.2%
@@ -138,8 +132,11 @@ summary(myspca)
 plot(myspca, plot_type = "bar")
 ```
 
-<img src="man/figures/README-methods-1.png" width="60%" /> Other types
-of plots are available, circular,
+<img src="man/figures/README-methods-1.png" width="60%" />
+
+Other types of plots are available.
+
+Circular,
 
 ``` r
 plot(myspca, plot_type = "circular") # "c" is enough to call "heatmap" type
@@ -154,23 +151,3 @@ plot(myspca, plot_type = "h") # "h" is enough to call "heatmap" type
 ```
 
 ![](man/figures/README-heatmap-1.png)<!-- -->
-
-<!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
-
-<!-- ```{r cars} -->
-
-<!-- summary(cars) -->
-
-<!-- ``` -->
-
-<!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. -->
-
-<!-- You can also embed plots, for example: -->
-
-<!-- ```{r pressure, echo = FALSE} -->
-
-<!-- plot(pressure) -->
-
-<!-- ``` -->
-
-<!-- In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN. -->
