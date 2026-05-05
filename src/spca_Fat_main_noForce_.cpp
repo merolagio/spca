@@ -51,19 +51,6 @@ static inline double cpu_now_ns()
 // HELPERS
 // =====================================================================
 
-static void validate_index_vector(const VectorXi& x,
-                                  const std::string& x_name,
-                                  int p)
-{
-  std::set<int> seen;
-  for (int i = 0; i < x.size(); i++) {
-    if (x(i) < 0 || x(i) >= p)
-      Rcpp::stop("%s: index %d is out of range [0, %d)", x_name.c_str(), x(i), p);
-    if (!seen.insert(x(i)).second)
-      Rcpp::stop("%s: index %d appears more than once", x_name.c_str(), x(i));
-  }
-}
-
 static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
                                     int n,
                                     int p,
@@ -71,9 +58,7 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
                                     bool exact_cvexp,
                                     double alpha,
                                     double ncompbycvexp,
-                                    double rank_tol,
-                                    const VectorXi& forcein,
-                                    const VectorXi& forceout)
+                                    double rank_tol)
 {
   if (X.rows() == 0 || X.cols() == 0)
     Rcpp::stop("X must have at least one row and one column");
@@ -89,8 +74,6 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
     Rcpp::stop("rank_tol must be >= 0");
 
   (void)exact_cvexp;
-  validate_index_vector(forcein, "force_in", p);
-  validate_index_vector(forceout, "force_out", p);
 }
 
 // @title Least-Squares Sparse Principal Component Analysis for Fat Matrices
@@ -119,10 +102,6 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
 //   variance for automatic component stopping (default 0.95).
 // @param method Character vector. SPCA type per component: \code{"c"},
 //   \code{"u"}, or \code{"p"}. Recycled if shorter than \code{ncomps}.
-// @param force_in Nullable integer vector. Accepted for interface consistency
-//   with \code{lsspcaCVC}; currently ignored for T-based forward selection.
-// @param force_out Nullable integer vector. Accepted for interface consistency
-//   with \code{lsspcaCVC}; currently ignored for T-based forward selection.
 // @param indvec_in Nullable integer vector. 0-based variable indices for fixed
 //   components (unlisted). Use with \code{cardvec_in}.
 // @param cardvec_in Nullable integer vector. Cardinalities for each fixed
@@ -170,8 +149,6 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
               double alpha = 0.95,
               double ncompbycvexp = 0.95,
               Rcpp::CharacterVector method = Rcpp::CharacterVector::create("c"),
-              Rcpp::Nullable<Rcpp::IntegerVector> force_in  = R_NilValue,
-              Rcpp::Nullable<Rcpp::IntegerVector> force_out = R_NilValue,
               Rcpp::Nullable<Rcpp::IntegerVector> indvec_in  = R_NilValue,
               Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in = R_NilValue,
               bool PMPC = false, bool PMS = false,
@@ -185,17 +162,8 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
   const long long t_setup0_wall = wall_now_ns();
   const double t_setup0_cpu = cpu_now_ns();
 
-  VectorXi forcein(0), forceout(0);
-  if (force_in.isNotNull()) forcein = Rcpp::as<VectorXi>(force_in.get());
-  if (force_out.isNotNull()) forceout = Rcpp::as<VectorXi>(force_out.get());
-
   validate_lsspcaT_inputs(X, n, p, stop_criterion,
-                          exact_cvexp, alpha, ncompbycvexp, rank_tol,
-                          forcein, forceout);
-
-  if ((forcein.size() > 0 || forceout.size() > 0) &&
-      !(indvec_in.isNotNull() && cardvec_in.isNotNull()))
-    Rcpp::warning("lsspcaTC: force_in and force_out are currently ignored for T-based forward selection");
+                          exact_cvexp, alpha, ncompbycvexp, rank_tol);
 
   if (ncomps == 0 && ncompbycvexp > 0.0 && ncompbycvexp < 1.0)
     ncomps = n;

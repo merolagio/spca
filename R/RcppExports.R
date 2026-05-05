@@ -97,11 +97,11 @@ makeCorScoresC <- function(T, d = 0L) {
     .Call(`_spca_makeCorScoresC`, T, d)
 }
 
-lsspcaTC <- function(X, ncomps = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), force_in = NULL, force_out = NULL, indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 300L, maxiterPMS = 200L, rank_tol = 0.0) {
-    .Call(`_spca_lsspcaTC`, X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, force_in, force_out, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
+lsspcaTC <- function(X, ncomps = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 300L, maxiterPMS = 200L, rank_tol = 0.0) {
+    .Call(`_spca_lsspcaTC`, X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
 }
 
-lsspcaC <- function(S, ncomps = 0L, selection_method = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), force_in = NULL, force_out = NULL, indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 100L, maxiterPMS = 200L, rank_tol = 0.0) {
-    .Call(`_spca_lsspcaC`, S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, force_in, force_out, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
+lsspcaC <- function(S, ncomps = 0L, selection_method = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 100L, maxiterPMS = 200L, rank_tol = 0.0) {
+    .Call(`_spca_lsspcaC`, S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
 }
 

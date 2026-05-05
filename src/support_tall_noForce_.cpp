@@ -7,7 +7,7 @@
 #include <string>
 
 #include "support_shared.h"
-#include "support_tall.h"
+#include "support_tall_noForce_.h"
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -512,30 +512,12 @@ static void deflate_selected(MatrixXd& S_work,
 }
 
 // builds initial active set for backward.
-// Puts force_in first, then all admissible (not in force_in or force_out).
 static int build_full_active_set(int p,
-                                 int n_force_in,
-                                 const VectorXi& force_in,
-                                 int n_force_out,
-                                 const VectorXi& force_out,
-                                 const std::set<int>& set_force_out,
                                  VectorXi& indices)
 {
   int cardinality = 0;
-  for (int i = 0; i < n_force_in; i++)
-    indices(cardinality++) = force_in(i);
-
-  for (int j = 0; j < p; j++) {
-    bool in_force_in = false;
-    for (int i = 0; i < n_force_in; i++) {
-      if (force_in(i) == j) {
-        in_force_in = true;
-        break;
-      }
-    }
-    if (!in_force_in && !set_force_out.count(j))
-      indices(cardinality++) = j;
-  }
+  for (int j = 0; j < p; j++)
+    indices(cardinality++) = j;
   return cardinality;
 }
 
@@ -723,7 +705,6 @@ static double compute_subset_cvexp(
 // Ranking by partial R^2 (si/S deflation trick).
 // Stopping: if stop_criterion=0, check R^2 >= alpha.
 //           if stop_criterion=1, check cvexp >= alpha*target_cvexp.
-// Supports force_in, force_out.
 //
 // The algorithm is unchanged from v4.1.
 // =====================================================================
@@ -732,8 +713,6 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
                           double pc_vexp,
                           double alpha,
                           int selection_method,
-                          const VectorXi& force_in,
-                          const VectorXi& force_out,
                           double rank_tol,
                           int mincard,
                           int stop_criterion,
@@ -746,10 +725,6 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
                           bool PMSPC,
                           double epsPMSPC,
                           int maxiterPMSPC,
-                          const std::set<int>& set_force_in,
-                          const std::set<int>& set_force_out,
-                          int n_force_in,
-                          int n_force_out,
                           VectorXi& indices,
                           int& cardinality,
                           double& criterion_value,
@@ -770,39 +745,6 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
     VectorXi status = VectorXi::Constant(p, -2);
     VectorXd vt = VectorXd::Zero(p);
     bool reached = false;
-
-    // mark force_out as unavailable
-    for (int i = 0; i < n_force_out; i++) {
-      if (set_force_out.count(force_out(i)))
-        status(force_out(i)) = -1;
-    }
-
-    // force-in phase
-    for (int i = 0; i < n_force_in; i++) {
-      int j = force_in(i);
-      if (status(j) == -1) status(j) = -2;
-      indices(cardinality) = j;
-      status(j) = 0;
-      if (S_work(j, j) > rank_tol) {
-        if (stop_criterion == 0)
-          criterion_value += si_work(j) * si_work(j) / S_work(j, j);
-        deflate_selected(S_work, si_work, status, j, p);
-      }
-      cardinality++;
-    }
-
-    // evaluate CVEXP after force-in
-    if (stop_criterion == 1 && cardinality > 0) {
-      bool singmat = false;
-      criterion_value = compute_subset_cvexp(S, M, indices, cardinality, p, comp_number,
-                                             prev_cvexp, B, loadings_tmp, singmat,
-                                             exact_cvexp, PMSPC,
-                                             epsPMSPC, maxiterPMSPC);
-      if (singmat) {
-        Rcpp::warning("varsel_fbs_r2C: force_in subset is singular");
-        return 0;
-      }
-    }
 
     if (criterion_value >= target && cardinality >= mincard)
       reached = true;
@@ -875,9 +817,6 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
           double best_score = -1.0;
 
           for (int k = 0; k < cardinality; k++) {
-            if (set_force_in.count(indices(k)))
-              continue;
-
             VectorXi trial(p);
             int ntrial = 0;
             for (int h = 0; h < cardinality; h++) {
@@ -941,8 +880,7 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
   }
 
   // BACKWARD
-  cardinality = build_full_active_set(p, n_force_in, force_in, n_force_out,
-                                      force_out, set_force_out, indices);
+  cardinality = build_full_active_set(p, indices);
 
   if (cardinality == 0) {
     Rcpp::warning("varsel_fbs_r2C: no admissible variables for backward");
@@ -967,16 +905,12 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
     Rcpp::warning("varsel_fbs_r2C: target not reachable with admissible variables");
 
   bool any_removed = true;
-  while (any_removed && cardinality > n_force_in &&
-         cardinality > mincard && criterion_value >= target) {
+  while (any_removed && cardinality > mincard && criterion_value >= target) {
     any_removed = false;
     int best_remove = -1;
     double best_score = -1.0;
 
     for (int k = 0; k < cardinality; k++) {
-      if (set_force_in.count(indices(k)))
-        continue;
-
       VectorXi trial(p);
       int ntrial = 0;
       for (int h = 0; h < cardinality; h++) {
@@ -1204,8 +1138,6 @@ int varsel_fbsC(const Eigen::Ref<const Eigen::MatrixXd>& S,
                      bool exact_cvexp,
                      double pc_vexp,
                      double target_cvexp,
-                     const VectorXi force_in,
-                     const VectorXi force_out,
                      int mincard,
                      MatrixXd& M,
                      double prev_cvexp,
@@ -1222,44 +1154,16 @@ int varsel_fbsC(const Eigen::Ref<const Eigen::MatrixXd>& S,
   (void) ntrim;
   (void) reducetrim;
 
-  int n_force_in = force_in.size();
-  int n_force_out = force_out.size();
-
-  // force_in takes priority over force_out. Warn on overlap.
-  std::set<int> set_force_out;
-  for (int i = 0; i < n_force_out; i++) {
-    bool overlap = false;
-    for (int k = 0; k < n_force_in; k++) {
-      if (force_out(i) == force_in(k)) {
-        overlap = true;
-        break;
-      }
-    }
-    if (overlap)
-      Rcpp::warning("varsel_fbsC: index %d is in both force_in and force_out; force_in wins",
-                    force_out(i) + 1);
-    else
-      set_force_out.insert(force_out(i));
-  }
-
-  std::set<int> set_force_in;
-  for (int i = 0; i < n_force_in; i++)
-    set_force_in.insert(force_in(i));
-
   indices.resize(p);
   cardinality = 0;
 
   if (stop_criterion == 0 || !intensive) {
     return varsel_fbs_r2C(S, si, pc_vexp, alpha, selection_method,
-                          force_in, force_out, rank_tol, mincard, stop_criterion,
+                          rank_tol, mincard, stop_criterion,
                           M, target_cvexp, prev_cvexp, exact_cvexp, comp_number, B,
                           PMSPC, epsPMSPC, maxiterPMSPC,
-                          set_force_in, set_force_out, n_force_in, n_force_out,
                           indices, cardinality, criterion_value, loadings_out, vexp_out);
   }
-
-  if (n_force_in > 0 || n_force_out > 0)
-    Rcpp::warning("varsel_fbsC: intensive forward ignores force_in and force_out");
 
   if (selection_method == 0) {
     return varsel_fwd_cvexpC(S, si, M, target_cvexp, prev_cvexp, alpha,

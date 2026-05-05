@@ -5,7 +5,7 @@
 #include <Rcpp/Benchmark/Timer.h>
 
 #include "support_shared.h"
-#include "support_tall.h"
+#include "support_tall_noForce_.h"
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -50,21 +50,6 @@ using std::string;
 // @noRd
 // =====================================================================
 
-// checks that all elements of x are in [0, p-1] and unique
-static void validate_index_vector(const VectorXi& x,
-                                  const std::string& x_name,
-                                  int p)
-{
-  // std::set is used here only for duplicate detection
-  std::set<int> seen;
-  for (int i = 0; i < x.size(); i++) {
-    if (x(i) < 0 || x(i) >= p)
-      Rcpp::stop("%s: index %d is out of range [0, %d)", x_name.c_str(), x(i), p);
-    if (!seen.insert(x(i)).second)
-      Rcpp::stop("%s: index %d appears more than once", x_name.c_str(), x(i));
-  }
-}
-
 static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
                                    int p,
                                    int selection_method,
@@ -72,9 +57,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
                                    bool exact_cvexp,
                                    double alpha,
                                    double ncompbycvexp,
-                                   double rank_tol,
-                                   const VectorXi& forcein,
-                                   const VectorXi& forceout)
+                                   double rank_tol)
 {
   // S must be square
   if (S.rows() != p)
@@ -101,10 +84,6 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
   // rank_tol
   if (rank_tol < 0.0)
     Rcpp::stop("rank_tol must be >= 0");
-
-  // force_in and force_out indices
-  validate_index_vector(forcein, "force_in", p);
-  validate_index_vector(forceout, "force_out", p);
 }
 
 
@@ -140,10 +119,6 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 // @param method Character vector. SPCA type per component: \code{"c"}
 //   (correlated), \code{"u"} (uncorrelated), \code{"p"} (projection). Recycled
 //   if shorter than \code{ncomps}.
-// @param force_in Nullable integer vector. 0-based indices forced into every
-//   component.
-// @param force_out Nullable integer vector. 0-based indices excluded from every
-//   component.
 // @param indvec_in Nullable integer vector. 0-based variable indices for fixed
 //   components (unlisted). Use with \code{cardvec_in}.
 // @param cardvec_in Nullable integer vector. Cardinalities for each fixed
@@ -176,10 +151,6 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 //     3 \tab 1 \tab Intensive forward CVEXP (eigensolve per step) \cr
 //     3 \tab 0 \tab \strong{Not allowed} \cr
 //   }
-//
-//   When \code{selection_method = 3}, \code{force_in} and \code{force_out}
-//   are ignored with a warning. Loadings computed during intensive selection
-//   are kept as the final solution and not recomputed.
 //
 //   If \code{exact_cvexp = FALSE}, the returned \code{vexp} and \code{cvexp}
 //   are recomputed exactly from the final loading matrix before the result is
@@ -221,8 +192,6 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
               double alpha = 0.95, 
               double ncompbycvexp = 0.95,
               Rcpp::CharacterVector method = Rcpp::CharacterVector::create("c"),
-              Rcpp::Nullable<Rcpp::IntegerVector> force_in  = R_NilValue,
-              Rcpp::Nullable<Rcpp::IntegerVector> force_out = R_NilValue,
               Rcpp::Nullable<Rcpp::IntegerVector> indvec_in  = R_NilValue,
               Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in = R_NilValue,
               bool PMPC = false, bool PMS = false,
@@ -235,23 +204,13 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
    // PARSE NULLABLE ARGUMENTS (before validation, so we can check them)
    // =====================================================================
 
-   VectorXi forcein(0);
-   if (force_in.isNotNull()) {
-     forcein = Rcpp::as<VectorXi>(force_in.get());
-   }
-   
-   VectorXi forceout(0);
-   if (force_out.isNotNull()) {
-     forceout = Rcpp::as<VectorXi>(force_out.get());
-   }
-
    // =====================================================================
    // INPUT VALIDATION (all checks before any computation)
    // =====================================================================
    
    validate_lsspca_inputs(S, p, selection_method, stop_criterion,
                           exact_cvexp, alpha,
-                          ncompbycvexp, rank_tol, forcein, forceout);
+                          ncompbycvexp, rank_tol);
 
    // ncomps validation
    if (ncomps == 0 && ncompbycvexp > 0.0 && ncompbycvexp < 1.0)
@@ -425,7 +384,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
            alpha, varsel_method, stop_criterion,
            varsel_intensive, exact_cvexp,
            maxvexp, target_cvexp_j,
-           forcein, forceout, mincard_vec(j),
+           mincard_vec(j),
            M_varsel, prev_cvexp_j, j, B_varsel,
            1, -1,  // ntrim, reducetrim (unused, kept for varsel_fbsC signature)
            rank_tol, PMS, epsPMS, maxiterPMS);

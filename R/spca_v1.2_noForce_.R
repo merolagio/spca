@@ -15,8 +15,6 @@
 #' @param fat_matrix Logical scalar or `NULL`.
 #' @param singleprecision Logical scalar.
 #' @param fixedindex_list List of integer vectors, one per component.
-#' @param force_in Optional integer vector of indices forced in.
-#' @param force_out Optional integer vector of indices forced out.
 #' @param centerdata Logical scalar.
 #' @param scaledata Logical scalar.
 #' @param PMC Logical scalar.
@@ -40,8 +38,6 @@ validate_spca_inputs = function(M,
                                   fat_matrix,
                                   singleprecision,
                                   fixedindex_list,
-                                  force_in,
-                                  force_out,
                                   centerdata,
                                   scaledata,
                                   PMC,
@@ -127,20 +123,6 @@ validate_spca_inputs = function(M,
       stop("fixedindex_list cannot contain missing indices", call. = FALSE)
   }
 
-  if (!is.null(force_in)) {
-    if (!(is.numeric(force_in) || is.integer(force_in)))
-      stop("force_in must be NULL or an integer/numeric vector", call. = FALSE)
-    if (anyNA(force_in))
-      stop("force_in cannot contain missing indices", call. = FALSE)
-  }
-
-  if (!is.null(force_out)) {
-    if (!(is.numeric(force_out) || is.integer(force_out)))
-      stop("force_out must be NULL or an integer/numeric vector", call. = FALSE)
-    if (anyNA(force_out))
-      stop("force_out cannot contain missing indices", call. = FALSE)
-  }
-
   if (!is.boolean(centerdata))
     stop("centerdata must be TRUE or FALSE", call. = FALSE)
 
@@ -209,8 +191,6 @@ validate_spca_inputs = function(M,
 #'   \code{integer(0)} for a component with no fixed indices. If the list is
 #'   shorter than the number of components to be computed, the remaining
 #'   components are treated as unconstrained.
-#' @param force_in Integer vector of indices forced into every component.
-#' @param force_out Integer vector of indices excluded from every component.
 #' @param centerdata Logical. Center the columns of \code{M} to zero mean?
 #'   Used only when a data matrix is passed.
 #' @param scaledata Logical. Scale the columns of \code{M}? Used only when a
@@ -241,8 +221,6 @@ spca = function(M,
                   fat_matrix = NULL,
                   singleprecision = FALSE,
                   fixedindex_list = list(),
-                  force_in = NULL,
-                  force_out = NULL,
                   centerdata = FALSE,
                   scaledata = FALSE,
                   PMC = FALSE,
@@ -263,8 +241,6 @@ spca = function(M,
                          fat_matrix = fat_matrix,
                          singleprecision = singleprecision,
                          fixedindex_list = fixedindex_list,
-                         force_in = force_in,
-                         force_out = force_out,
                          centerdata = centerdata,
                          scaledata = scaledata,
                          PMC = PMC,
@@ -294,11 +270,6 @@ spca = function(M,
   stop_criterion_cpp = switch(tolower(substr(trimws(stop_criterion[1]), 1, 1)),
                               "r" = 0,
                               "c" = 1)
-
-  if (!is.null(force_in))
-    force_in = as.integer(force_in) - 1L
-  if (!is.null(force_out))
-    force_out = as.integer(force_out) - 1L
 
   is_datamatrix_M = TRUE
   if ((n == p) && isSymmetric(M))
@@ -411,8 +382,6 @@ spca = function(M,
                      alpha = alpha,
                      ncompbycvexp = ncomp_byvexp,
                      method = method_cpp,
-                     force_in = force_in,
-                     force_out = force_out,
                      indvec_in = indvec_in,
                      cardvec_in = cardvec_in,
                      PMPC = PMC,
@@ -436,8 +405,6 @@ spca = function(M,
                       alpha = alpha,
                       ncompbycvexp = ncomp_byvexp,
                       method = method_cpp,
-                      force_in = force_in,
-                      force_out = force_out,
                       indvec_in = indvec_in,
                       cardvec_in = cardvec_in,
                       PMPC = PMC,

@@ -297,8 +297,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // lsspcaTC
-List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X, int ncomps, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> force_in, Rcpp::Nullable<Rcpp::IntegerVector> force_out, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
-RcppExport SEXP _spca_lsspcaTC(SEXP XSEXP, SEXP ncompsSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP force_inSEXP, SEXP force_outSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
+List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X, int ncomps, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
+RcppExport SEXP _spca_lsspcaTC(SEXP XSEXP, SEXP ncompsSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -309,8 +309,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< double >::type ncompbycvexp(ncompbycvexpSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type force_in(force_inSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type force_out(force_outSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type indvec_in(indvec_inSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type cardvec_in(cardvec_inSEXP);
     Rcpp::traits::input_parameter< bool >::type PMPC(PMPCSEXP);
@@ -320,13 +318,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type maxiterPMPC(maxiterPMPCSEXP);
     Rcpp::traits::input_parameter< int >::type maxiterPMS(maxiterPMSSEXP);
     Rcpp::traits::input_parameter< double >::type rank_tol(rank_tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(lsspcaTC(X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, force_in, force_out, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
+    rcpp_result_gen = Rcpp::wrap(lsspcaTC(X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
     return rcpp_result_gen;
 END_RCPP
 }
 // lsspcaC
-List lsspcaC(const Eigen::Map<Eigen::MatrixXd>& S, int ncomps, int selection_method, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> force_in, Rcpp::Nullable<Rcpp::IntegerVector> force_out, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
-RcppExport SEXP _spca_lsspcaC(SEXP SSEXP, SEXP ncompsSEXP, SEXP selection_methodSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP force_inSEXP, SEXP force_outSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
+List lsspcaC(const Eigen::Map<Eigen::MatrixXd>& S, int ncomps, int selection_method, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
+RcppExport SEXP _spca_lsspcaC(SEXP SSEXP, SEXP ncompsSEXP, SEXP selection_methodSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -338,8 +336,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< double >::type ncompbycvexp(ncompbycvexpSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type force_in(force_inSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type force_out(force_outSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type indvec_in(indvec_inSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type cardvec_in(cardvec_inSEXP);
     Rcpp::traits::input_parameter< bool >::type PMPC(PMPCSEXP);
@@ -349,7 +345,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type maxiterPMPC(maxiterPMPCSEXP);
     Rcpp::traits::input_parameter< int >::type maxiterPMS(maxiterPMSSEXP);
     Rcpp::traits::input_parameter< double >::type rank_tol(rank_tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(lsspcaC(S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, force_in, force_out, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
+    rcpp_result_gen = Rcpp::wrap(lsspcaC(S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -379,8 +375,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_var2corC", (DL_FUNC) &_spca_var2corC, 1},
     {"_spca_makeCorCompC", (DL_FUNC) &_spca_makeCorCompC, 3},
     {"_spca_makeCorScoresC", (DL_FUNC) &_spca_makeCorScoresC, 2},
-    {"_spca_lsspcaTC", (DL_FUNC) &_spca_lsspcaTC, 18},
-    {"_spca_lsspcaC", (DL_FUNC) &_spca_lsspcaC, 19},
+    {"_spca_lsspcaTC", (DL_FUNC) &_spca_lsspcaTC, 16},
+    {"_spca_lsspcaC", (DL_FUNC) &_spca_lsspcaC, 17},
     {NULL, NULL, 0}
 };
 
