@@ -44,6 +44,8 @@ corresponding PCs.}
 }
 \seealso{
 Other spca: 
+\code{\link{change_loadings_sign_spca}()},
+\code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},

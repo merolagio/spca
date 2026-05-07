@@ -104,6 +104,8 @@ For thin matrices, either the covariance/correlation matrix can be passed. In th
 }
 \seealso{
 Other spca: 
+\code{\link{change_loadings_sign_spca}()},
+\code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},

@@ -29,6 +29,8 @@ warning is issued, even if the object's class is \emph{spca}.
 }
 \seealso{
 Other spca: 
+\code{\link{change_loadings_sign_spca}()},
+\code{\link{compare_spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},

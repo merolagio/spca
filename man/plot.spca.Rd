@@ -69,7 +69,7 @@ otherwise it is applied to the components.}
 \item{legend_position}{Character or numeric. Legend position. Can be one
 of \code{"bottom"}, \code{"right"}, \code{"top"}, \code{"left"}, or a numeric vector of
 length 2 giving coordinates inside the panel. For circular plots, the
-legend is placed on the right.}
+legend is placed on the right to avoid unpleasant effects..}
 
 \item{grid_type}{character. If \code{"none"}, removes the
 background grid. If \code{"horizontal"}, keeps only horizontal grid lines.
@@ -162,6 +162,8 @@ The \code{printsafe} palette corresponds to \code{OrRd} from
 }
 \seealso{
 Other spca: 
+\code{\link{change_loadings_sign_spca}()},
+\code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{print.spca}()},
@@ -170,6 +172,8 @@ Other spca:
 \code{\link{summary.spca}()}
 
 Other spca: 
+\code{\link{change_loadings_sign_spca}()},
+\code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{print.spca}()},

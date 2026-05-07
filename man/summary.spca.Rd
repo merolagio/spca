@@ -70,6 +70,8 @@ R2\tab Squared correlation between SPC and corresponding PC.
 Examples in \code{\link{aggregate_by_group}}.
 
 Other spca: 
+\code{\link{change_loadings_sign_spca}()},
+\code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
