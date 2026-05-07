@@ -709,7 +709,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
     rownames(fx)[nrow(fx)] = "Cvexp"
   }  
   if (contributions == TRUE)
-    message("Percentage contributions")
+    message("Contributions (%)")
   else
     message("Loadings")
   if (ncol(A) == 1L){
@@ -726,6 +726,49 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
     invisible()
 }
 
+#' Change the sign of selected loadings in an `spca` object 
+#' 
+#' Multiplies by \eqn{-1} the loadings (including in loadlist), contributions, 
+#'   and, when present the scores and component-correlation entries 
+#'   for the components listed in `index_to_change`.  
+#' This is useful because (sparse) principal components are defined up to sign
+#'  which could be different for Pcs and sPCS. 
+#' @param spca_obj An object of class `spca`.  
+#' @param index_to_change Integer vector of component indices whose sign should
+#'   be flipped.  
+#' @return The modified `spca_obj`, with the selected components sign-flipped.  
+#' @family spca
+#' @export
+change_loadings_sign_spca = function(spca_obj, index_to_change) {
+  if (!is.spca(spca_obj))
+    stop("The first argument must be an spca object")
+  if (!is.vector())
+    n = length(index_to_change)
+  
+  for (i in 1:n) {
+    spca_obj$loadings[, index_to_change[i]] = 
+      - spca_obj$loadings[, index_to_change[i]]
+    
+    spca_obj$contributions[, index_to_change[i]] = 
+      - spca_obj$contributions[, index_to_change[i]]
+    
+    if (!is.null(spca_obj$loadingslist)) {
+      spca_obj$loadingslist[[index_to_change[i]]] =
+        - spca_obj$loadingslist[[index_to_change[i]]]
+    }
+    if (!is.null(spca_obj$scores))
+      spca_obj$scores[, index_to_change[i]] =
+      - spca_obj$scores[,index_to_change[i]]
+    
+    if (!is.null(spca_obj$corComp)) {
+      spca_obj$corComp[index_to_change[i], ] =
+        - spca_obj$corComp[index_to_change[i], ]
+      spca_obj$corComp[, index_to_change[i]] = 
+        - spca_obj$corComp[, index_to_change[i]]
+    }
+  }
+  return(spca_obj)
+}
 
 
 ## showload ==================
@@ -1044,7 +1087,10 @@ summary.spca = function(
   
   # Add minimum loading/contributions if requested
   if (min_load) {
-    min_vals = get_minload(x, perc = contributions)
+    if(contributions)
+      min_vals = get_minload(x$contributions)
+    else
+      min_vals = get_minload(x$loadings)
     out = rbind(out, temp = min_vals)
     min_label = ifelse(contributions, "Min cont", "Min load")
     rownames(out)[nrow(out)] = min_label
