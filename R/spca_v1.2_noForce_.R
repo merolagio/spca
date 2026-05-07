@@ -321,22 +321,27 @@ spca = function(M,
     if (length(fixedindex_list) < ncomps_cpp)
       fixedindex_list = c(fixedindex_list, rep(list(NULL), ncomps_cpp - length(fixedindex_list)))
 
-    index_lengths = vapply(fixedindex_list, 
-                           function(x) ifelse(is.null(x), 0L,length(x), 
-                           integer(1)))
-    fixedindex_list_num = lapply(fixedindex_list, 
-                                 function(x) ifelse(is.null(x), integer(0), 
-                                 as.integer(x)))
+    index_lengths = vapply(fixedindex_list,
+                           function(x) if (is.null(x)) 0L else length(x),
+                           integer(1))
+    
+    fixedindex_list_num = lapply(fixedindex_list,
+                                 function(x) if (is.null(x)) integer(0) 
+                                 else as.integer(x))
+    
+    
     indvec_in = as.integer(unlist(fixedindex_list_num)) - 1L
     cardvec_in = as.integer(index_lengths)
 
-    if (((length(method_cpp) > 0) && any((method_cpp == "u")) & 
-         (cardvec_in > 0) & (cardvec_in < seq_len(ncomps_cpp))))
+    bad_fixed_u = (method_cpp == "u") &
+      (cardvec_in > 0) &
+      (cardvec_in < seq_len(ncomps_cpp))
+    
+    if ((length(method_cpp) > 0) && any(bad_fixed_u))
       stop(paste("for uncorrelated components need cardinality not less than component order; too few fixed indices for components",
-                 paste(which((method_cpp == "u") & (cardvec_in > 0) &
-                               (cardvec_in < seq_len(ncomps_cpp))), 
-                       collapse = ", ")),
+                 paste(which(bad_fixed_u), collapse = ", ")),
            call. = FALSE)
+    
   } else {
     indvec_in = NULL
     cardvec_in = NULL
