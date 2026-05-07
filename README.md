@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "110" alt = "spca logo" />
+<img src = "man/figures/spca_Logo.png" align = "left" height = "110" alt = "spca logo" />
 
 # Package spca
 
@@ -65,7 +65,7 @@ spca_screeplot(ho_ee$value)
 wachter_qqplot(ho_ee$values, p = ncol(holzinger), n = nrow(holzinger), nfit_line = -4)
 ```
 
-<img src="man/figures/README-pca_checks-1.png" width="49%" /><img src="man/figures/README-pca_checks-2.png" width="49%" />
+<img src="man/figures/README-pca_checks-1.png" width="47%" /><img src="man/figures/README-pca_checks-2.png" width="47%" />
 
 ### Compute PCA
 
@@ -100,10 +100,13 @@ myspca = spca(holzinger, alpha = 0.95, ncomps = 4)
 
 ### Inspect spca results
 
-Methods are *print*, *plot* (several options available) and *summary*
+Methods are *print*, *plot* (several options available) and *summary*.
+By defaut, plot and print show the percentage *contributions*, that is
+the loadings scaled to have sum of their absolute values equal to 1.
 
 ``` r
 myspca 
+#> Percentage contributions
 #>         sPC1   sPC2   sPC3   sPC4
 #> V1     11.9%         13.2%  24.2%
 #> V2                   22.1% -20.8%
@@ -147,7 +150,21 @@ plot(myspca, plot_type = "circular") # "c" is enough to call "heatmap" type
 Heatmap
 
 ``` r
-plot(myspca, plot_type = "h") # "h" is enough to call "heatmap" type
+plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
 ```
 
 ![](man/figures/README-heatmap-1.png)<!-- -->
+
+## variable groups
+
+The variables in the `holzinger` dataset belong to four different
+scales, recorded in the factor `holzinger_scales`. These can be
+differenciated in the barplot
+
+``` r
+plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
+```
+
+![](man/figures/README-scales,%20circular-1.png)<!-- -->
+
+## comparison with the standard PCs’ contributions
