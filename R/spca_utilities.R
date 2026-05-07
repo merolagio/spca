@@ -1,5 +1,8 @@
 
 
+
+
+
 list2vec = function(li, uniq = T, sorted = F) {
   a = c(unlist(li))
   if (uniq)

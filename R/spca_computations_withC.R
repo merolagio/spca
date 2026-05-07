@@ -1,32 +1,14 @@
-
-get_minload = function(smpc, perc = FALSE, eps = 0.001){
-  ## returns the non-zero loading with the smallest absolute value for each column
-  ## input a matrix of loadings or an spca object
-  ## if perc == TRUE will compute on the percent contribution  
-  
-  # saves computations if already available
-  if (is.spca(smpc)){
-    if (isFALSE(perc)){
-      smpc = smpc$loadings
-    } else
-      if (!is.null(smpc$contributions))
-        smpc = smpc$contributions
-      else
-        smpc = make_contributions(smpc)
-  } else
-    if (is.vector(smpc))
-      smpc = matrix(smpc, ncol = 1)
-    else
-      if(!is.matrix(smpc))
-        stop("get.minload: a matrix of loadings or an spca object is
-             needed") 
-    d = ncol(smpc)
-    gl = function(x)
-      min(abs(x[abs(x)> eps]))
-    apply(smpc, 2, gl)
+# returns the non-zero loading with the smallest absolute value for each column
+# input a matrix of loadings or contributions
+get_minload = function(smpc){
+  if(!is.matrix(smpc))
+    stop("get.minload: a matrix of loadings or an spca object is needed") 
+  gl = function(x)
+    min(abs(x[abs(x)> eps]))
+  apply(smpc, 2, gl)
 }
 
-## returns the cardinality of the columns of a matrix of loadings  
+# returns the cardinality of the columns of a matrix of loadings  
 get_card = function(A, thresh = 1e-4){
   if (is.spca(A) )
     A = A$loadings
@@ -61,42 +43,9 @@ make_contributions = function(x){
          containing the sam with the name loadings")
   }
 
-# Change the sign of selected sparse components Multiplies by \eqn{-1} the
-# loadings, contributions, and (when present) scores and component-correlation
-# entries for the components listed in `index_to_change`.  This is useful
-# because (sparse) principal components are defined up to sign.  @param
-# spca_obj An object of class `spca`.  @param index_to_change Integer vector of
-# component indices whose sign should be flipped.  @return The modified
-# `spca_obj`, with the selected components sign-flipped.  @noRd
-changeSign_loads_spca = function(spca_obj, index_to_change) {
-  if (!is.spca(spca_obj))
-    stop("The first argument must be an spca object")
-  if (!is.vector())
-    n = length(index_to_change)
-  
-  for (i in 1:n) {
-    spca_obj$loadings[, index_to_change[i]] = -spca_obj$loadings[, index_to_change[i]]
-    
-    spca_obj$contributions[, index_to_change[i]] = -spca_obj$contributions[,
-                                                                           index_to_change[i]]
-    
-    if (!is.null(spca_obj$loadingslist)) {
-      spca_obj$loadingslist[[index_to_change[i]]] = -spca_obj$loadingslist[[index_to_change[i]]]
-    }
-    if (!is.null(spca_obj$scores))
-      spca_obj$scores[, index_to_change[i]] = -spca_obj$scores[, index_to_change[i]]
-    if (!is.null(spca_obj$corComp)) {
-      spca_obj$corComp[index_to_change[i], ] = -spca_obj$corComp[index_to_change[i],
-      ]
-      spca_obj$corComp[, index_to_change[i]] = -spca_obj$corComp[, index_to_change[i]]
-    }
-  }
-  return(spca_obj)
-}
 
 
-#transforms a variance matrix to a correlation marix
-# S variance matrix
+#transforms a variance matrix to a correlation marix S variance matrix
 var2cor = function(S){
   if ((!is.matrix(S)) || (!isSymmetric(S)) || any(diag(S) < 1e-4))
     stop(("S must be a symmetric matrix with non zero diagonal values"))
@@ -109,71 +58,77 @@ var2cor = function(S){
   invisible()
 }
 
+## computes correlation between pairs of sPCs
+# wrapper for the C++ function
+# inputs
+# @param Matrix of loadings
+# @param Covariance matrix
 make_corComp_S = function(A, S){
-  ## computes correlation among components
-  if ((is.vector(A)) || (ncol(A) == 1)){
+ if ((is.vector(A)) || (ncol(A) == 1)){
     warning("A must be a matrix with at least two columns")
     return(NULL)
   } 
   if ((!is.matrix(S)) || (!isSymmetric(S)) || any(diag(S) < 1e-4)){
     warning(("S must be a symmetric matrix with non zero diagonal values"))
     return(NULL)
-  }
-  
-  else 
+  }  else 
       return(makeCorCompC(A, S))
   invisible()
 }
 
-extra_variance_explained = function(A, S, tol = 1e-12) {
-  k = ncol(A)
-  trS = sum(diag(S))
-  SA =  abC(S, A)
-  
-  cv = numeric(k)
-  L = matrix(0, k, k)
-  
-  for (j in seq_len(k)) {
-    
-    aj = A[, j]
-    
-    if (j == 1L) {
-      d = drop(vtuC(aj, SA[, j, drop = TRUE]))
-      if (!is.finite(d) || (d <= tol))
-        stop("Non-finite or zero denominator for first component")
-      
-      L[1, 1] = sqrt(d)
-      
-    } else {
-      b = drop( vtaC(aj, SA[, 1:(j - 1), drop = FALSE]))
-      d = drop(vtuC(aj, SA[, j, drop = TRUE]))
-      
-      v = forwardsolve(L[1:(j - 1), 1:(j - 1), drop = FALSE], b)
-      
-      piv = d - sum(v^2)
-      if (!is.finite(piv) || (piv <= tol)) {
-        stop(paste(
-          "Non-finite or non-positive pivot at component", j
-        ))
-      }
-      
-      L[j, 1:(j - 1)] = v
-      L[j, j] = sqrt(piv)
-    }
-    
-    Lj = L[1:j, 1:j, drop = FALSE]
-    
-    ## trace(G_j^{-1} H_j) = || L_j^{-1} (SA_j)' ||_F^2
-    Z = forwardsolve(Lj, t(SA[, 1:j, drop = FALSE]))
-    cv[j] = sum(Z^2) / trS
-  }
-  
-  list(
-    vexp = c(cv[1], diff(cv)),
-    cvexp = cv
-  )
-}
 
+# #unused
+# extra_variance_explained = function(A, S, tol = 1e-12) {
+#   k = ncol(A)
+#   trS = sum(diag(S))
+#   SA =  abC(S, A)
+#   
+#   cv = numeric(k)
+#   L = matrix(0, k, k)
+#   
+#   for (j in seq_len(k)) {
+#     
+#     aj = A[, j]
+#     
+#     if (j == 1L) {
+#       d = drop(vtuC(aj, SA[, j, drop = TRUE]))
+#       if (!is.finite(d) || (d <= tol))
+#         stop("Non-finite or zero denominator for first component")
+#       
+#       L[1, 1] = sqrt(d)
+#       
+#     } else {
+#       b = drop( vtaC(aj, SA[, 1:(j - 1), drop = FALSE]))
+#       d = drop(vtuC(aj, SA[, j, drop = TRUE]))
+#       
+#       v = forwardsolve(L[1:(j - 1), 1:(j - 1), drop = FALSE], b)
+#       
+#       piv = d - sum(v^2)
+#       if (!is.finite(piv) || (piv <= tol)) {
+#         stop(paste(
+#           "Non-finite or non-positive pivot at component", j
+#         ))
+#       }
+#       
+#       L[j, 1:(j - 1)] = v
+#       L[j, j] = sqrt(piv)
+#     }
+#     
+#     Lj = L[1:j, 1:j, drop = FALSE]
+#     
+#     ## trace(G_j^{-1} H_j) = || L_j^{-1} (SA_j)' ||_F^2
+#     Z = forwardsolve(Lj, t(SA[, 1:j, drop = FALSE]))
+#     cv[j] = sum(Z^2) / trS
+#   }
+#   
+#   list(
+#     vexp = c(cv[1], diff(cv)),
+#     cvexp = cv
+#   )
+# }
+
+# wrapper for C++ function
+# computes the extra variance explained by difference
 make_vexp =  function (A, S) {
 { ## should add a flag for unc 
   ## new improved using ind
