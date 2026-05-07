@@ -56,22 +56,21 @@ spca_circular_theme = function(legend_position,
 
 # DEFINE COLORS =============================
 spca_color_scale = function(color_scale) {
+  
   color_scale = color_scale[1]
-  if (!(color_scale %in% c("ggplot", "cbb", "printsafe", "bw"))) {
-    warning(paste("color_scale must be one of (ggplot, cbb, printsafe,",
-                  "bw) setting it to ggplot"))
+  
+  if (grepl("^c", color_scale))
+    return("cbb")
+  if (grepl("^p", color_scale))
+    return("printsafe")
+  if (grepl("^b", color_scale))
+    return("bw")
+  if ((length(color_scale) == 1) && grepl("^g", color_scale))
     return("ggplot")
-  }
-  else {
-    if (grepl("^c", color_scale))
-      return("cbb")
-    if (grepl("^p", color_scale))
-      return("printsafe")
-    if (grepl("^b", color_scale))
-      return("bw")
-    if ((length(color_scale) == 1) && grepl("^g", color_scale))
-      return("ggplot")
-  }
+  
+  warning(paste("color_scale must be one of (ggplot, cbb, printsafe,",
+                "bw) setting it to ggplot"))
+  return("ggplot")
 }
 
 
@@ -98,16 +97,16 @@ spca_fill_palette = function(color_scale, pc_loadings = NULL) {
     if (!is.null(pc_loadings))
       pal = pal[c(1, 4)]
     else{
-    if (ncolors > 8) {
-      warning(paste("cannot use printsafe palette with more than 9",
-                    "colours. Switching to colour_scale ggplot"))
-      color_scale = "ggplot"
-    } else {
+    # if (ncolors > 8) {
+    #   warning(paste("cannot use printsafe palette with more than 9",
+    #                 "colours. Switching to colour_scale ggplot"))
+    #   color_scale = "ggplot"
+    # } else {
     pal = rev(c(
       "#FFF7EC", "#FEE8C8", "#FDD49E", "#FDBB84", "#FC8D59",
       "#EF6548", "#D7301F", "#B30000", "#7F0000"
     ))
-    }
+    #}
   }
     return(pal)
   }
@@ -157,10 +156,18 @@ create_data = function(x, nplot, contributions, only_nonzero,  variable_groups, 
   p = nrow(x$loadings)
   
   # common part, PCloadings binded later if needed
+  
+  #browser()
+  
+  if(!is.null(pc_loadings))
+    facet_labels = paste("Comp", 1:nplot)
+  
   data_df = data.frame(
     variable = factor(rep(1:p, nplot), labels = lbl),
-    component = factor(rep(1:nplot, each = p), labels = facet_labels)
-  )
+    component = factor(rep(1:nplot, each = p), 
+                       labels = facet_labels
+                       )
+    )
   if (contributions) 
     data_df$value = c(x$contributions[, 1:nplot])
   else
@@ -168,11 +175,8 @@ create_data = function(x, nplot, contributions, only_nonzero,  variable_groups, 
   if (!is.null(variable_groups))
     data_df$variable_groups = rep(variable_groups, nplot)
   
-  #browser()
   if (!is.null(pc_loadings)){
     df = data_df
-    levels(df$component) = paste0("PC", 1:nplot)
-    
     if (contributions) 
       df$value = c(make_contributions(pc_loadings[, 1:nplot]))
     else
@@ -185,7 +189,8 @@ create_data = function(x, nplot, contributions, only_nonzero,  variable_groups, 
   } else{
     #only_nonzero disabled if pc_loadings == TRUE
     if (only_nonzero == TRUE) {
-      data_df = droplevels(data_df[data_df$value != 0, ])
+      ind_nonzero = apply(x$loadings, 1, function(a) any(a != 0))
+      data_df = droplevels(data_df[ind_nonzero, ])
     }
   }
   
@@ -233,7 +238,7 @@ plot_spca_circular = function(data_df, nplot, plotlab, lbl,
   }
   pl = pl + 
     ggplot2::geom_col(position = "dodge", 
-                      alpha = 0.75,
+                      alpha = 0.80,
                       color = ifelse(color_scale[1] == "printsafe", 
                                      "black", NA)) +
     ggplot2::ylim(-0.5 - stats::median(abs(stats::na.omit(
@@ -284,7 +289,6 @@ plot_spca_circular = function(data_df, nplot, plotlab, lbl,
   pl
 }
 
-
 # Helper: Create standard barplot (handles both SPCA-only and with PCs)
 plot_spca_bars = function(data_df, 
                           nplot, 
@@ -301,7 +305,8 @@ plot_spca_bars = function(data_df,
   # Create plot (same code for both cases)
   nrows = ceiling(nplot / 3)
   ncols = ceiling(nplot / nrows)
-  
+#  browser()
+  #variable groups
   if (!is.null(variable_groups) && (!has_pc_loadings))
     pl = ggplot2::ggplot(data_df, 
                          ggplot2::aes(x = variable, y = value, 
@@ -428,9 +433,9 @@ plot_spca_heatmap = function(
           labels = lab_y, expand = c(0, 0)
         ) +
         ggplot2::geom_abline(intercept = (1:nplot) + 1, slope = 0, 
-                             colour = "black", size = 1.5) +
+                             colour = "black", linewidth = 1.5) +
         ggplot2::geom_abline(intercept = (1:nplot) + 0.5, slope = 0, 
-                             colour = "gray75", size = 1) +
+                             colour = "gray75", linewidth = 1) +
         ggplot2::geom_vline(xintercept = (seq_along(lbl)) + 1, 
                             colour = "grey75") +
         ggplot2::theme(
@@ -568,7 +573,7 @@ if (is.null(controls)) {
 #' @param legend_position Character or numeric. Legend position. Can be one
 #'   of `"bottom"`, `"right"`, `"top"`, `"left"`, or a numeric vector of
 #'   length 2 giving coordinates inside the panel. For circular plots, the
-#'   legend is placed on the right.
+#'   legend is placed on the right to avoid unpleasant effects.. 
 #' @param grid_type character. If `"none"`, removes the
 #'   background grid. If `"horizontal"`, keeps only horizontal grid lines.
 #'   If `full`, uses the default grid.
@@ -759,6 +764,10 @@ plot.spca = function(
                   "using standard barplot"))
     plot_type = "bars"
   }
+  #legend is need to distinguish sPCs from Pcs
+  if(!is.null(pc_loadings))
+    legend_position = "bottom"
+  
   color_scale = spca_color_scale(color_scale)
   
   # needed to pass to plot 
@@ -834,7 +843,8 @@ plot.spca = function(
   ##heatmap ======================  
   } else if (plot_type == "heatmap") {
     idx = unlist(x$indices)
-    
+    if(legend_position == "none") 
+      legend_position = "bottom"
     pl = plot_spca_heatmap(
     data_df,
     nplot = nplot,
