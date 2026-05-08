@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.2)  7 APR 2026 08:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.2)  8 MAY 2026 15:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -778,7 +778,8 @@ Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
 \FrameRule=\dimen277
 \FrameSep=\dimen278
 )
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 81
+(spca_JSS_macros.TeX)
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 75
 .
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
@@ -788,28 +789,37 @@ File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 tex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count337
+) (spca_JSS.aux
+
+LaTeX Warning: Label `eq:pscpca_obj' multiply defined.
+
+
+LaTeX Warning: Label `eq_uspca_sol' multiply defined.
+
+
+LaTeX Warning: Label `eq_defX_def' multiply defined.
+
 )
-No file spca_JSS.aux.
 \openout1 = `spca_JSS.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 81.
-LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
@@ -836,194 +846,128 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring ON on input line 81.
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\\' on input line 75.
+
+Package hyperref Info: Link coloring ON on input line 75.
+(spca_JSS.out) (spca_JSS.out)
 \@outlinefile=\write5
 \openout5 = `spca_JSS.out'.
 
-<jsslogo.jpg, id=6, 540.0175pt x 393.47pt>
+<jsslogo.jpg, id=46, 540.0175pt x 393.47pt>
 File: jsslogo.jpg Graphic file (type jpg)
 <use jsslogo.jpg>
-Package pdftex.def Info: jsslogo.jpg  used on input line 81.
+Package pdftex.def Info: jsslogo.jpg  used on input line 75.
 (pdftex.def)             Requested size: 89.80768pt x 65.43607pt.
-LaTeX Font Info:    Trying to load font information for T1+pzc on input line 81
+LaTeX Font Info:    Trying to load font information for T1+pzc on input line 75
 .
- (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pzc.fd
+
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pzc.fd
 File: t1pzc.fd 2020/03/25 font definitions for T1/pzc.
 )
 LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <28> not available
-(Font)              Font shape `T1/pzc/m/it' tried instead on input line 81.
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 8
-1.
-
-(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmss.fd
-File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 8
-1.
+(Font)              Font shape `T1/pzc/m/it' tried instead on input line 75.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
+5.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 8
-1.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
+5.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-81.
+75.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-81.
+75.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 81.
+(Font)              <10.95> on input line 75.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 81.
+(Font)              <8> on input line 75.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 81.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 81.
+(Font)              <6> on input line 75.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 75.
 
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 81.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 75.
 
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 81
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 75
 .
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/jknappen\ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 81.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 81.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 81.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 7
+5.
 
-
-Package natbib Warning: Citation `Zeileis+Kleiber+Jackman:2008' on page 1 undef
-ined on input line 81.
-
-
-Underfull \vbox (badness 3439) has occurred while \output is active []
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmss.fd
+File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Underfull \vbox (badness 1314) has occurred while \output is active []
 
  [1
 
 {C:/Users/merol/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/mero
 l/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/merol/Ap
-pData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}{C:/Users/merol/AppData
-/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/merol/AppData
-/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/merol/AppData
-/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc} <./jsslogo.jpg>]
-! Missing $ inserted.
-<inserted text> 
-                $
-l.124 
-      
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
+pData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc} <./jsslogo.jpg>]
+
+LaTeX Warning: Reference `sec:spcapack' on page 2 undefined on input line 89.
 
 
-LaTeX Warning: Reference `eq:vexp_obj' on page 2 undefined on input line 139.
-
-
-LaTeX Warning: Reference `eq:vexp_obj' on page 2 undefined on input line 141.
-
-
-Package natbib Warning: Citation `pea' on page 2 undefined on input line 141.
-
-
-Package natbib Warning: Citation `hot' on page 2 undefined on input line 145.
-
-
-Package natbib Warning: Citation `mer15' on page 2 undefined on input line 145.
-
-
-
-LaTeX Warning: Reference `eq:vexp_obj' on page 2 undefined on input line 148.
+LaTeX Warning: Command \dj invalid in math mode on input line 99.
 
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 2 []
  []
 
-[2]
-
-! Package amsmath Error: Multiple \label's: label 'eq_cspca_sol' will be lost.
-
-See the amsmath package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.171 \label
-            {eq:apprvexp}
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
+[2{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.en
+c}{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.en
+c}{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C
+:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <14.4> on input line 161.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 161.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 161.
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 3
  []
 
-[3{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.en
-c}]
-
-LaTeX Warning: Reference `eq:apprvexp' on page 4 undefined on input line 201.
-
-! Missing } inserted.
-<inserted text> 
-                }
-l.206 ...updates as $Q_{j + 1} = Q_j - \frac{t_j}$
-                                                  
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-! Too many }'s.
-\frac  #1#2->{\begingroup #1\endgroup \@@over #2}
-                                                 
-l.206 ...updates as $Q_{j + 1} = Q_j - \frac{t_j}$
-                                                  
-You've closed more groups than you opened.
-Such booboos are generally harmless, so keep going.
-
-
+[3]
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 4 []
  []
 
 [4]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
-83.
- (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
-File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-
-LaTeX Warning: Reference `app:bibtex' on page 5 undefined on input line 283.
-
-
-Package natbib Warning: Citation `Mullahy:1986' on page 5 undefined on input li
-ne 305.
-
-
-Package natbib Warning: Citation `Cameron+Trivedi:2013' on page 5 undefined on 
-input line 309.
+Overfull \hbox (19.87718pt too wide) detected at line 228
+[][][][]\OT1/lmr/m/n/14.4 (\OML/lmm/m/it/14.4 t[]\OT1/lmr/m/n/14.4 ) = [][]\OML
+/lmm/m/it/14.4 X[]T[]\OT1/lmr/m/n/14.4 (\OML/lmm/m/it/14.4 T[]T[]\OT1/lmr/m/n/1
+4.4 )[]\OML/lmm/m/it/14.4 T[]X[] \OMS/lmsy/m/n/14.4 ^^@ [][]\OML/lmm/m/it/14.4 
+X[]T[]\OT1/lmr/m/n/14.4 (\OML/lmm/m/it/14.4 T[]T[]\OT1/lmr/m/n/14.4 )[]\OML/lmm
+/m/it/14.4 T[]X[];
+ []
 
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
@@ -1032,51 +976,7 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 
 [5]
 
-Package natbib Warning: Citation `R' on page 6 undefined on input line 311.
-
-
-Package natbib Warning: Citation `Venables+Ripley:2002' on page 6 undefined on 
-input line 313.
-
-
-Package natbib Warning: Citation `Zeileis+Kleiber+Jackman:2008' on page 6 undef
-ined on input line 315.
-
-
-Package natbib Warning: Citation `Jackman:2015' on page 6 undefined on input li
-ne 317.
-
-
-Package natbib Warning: Citation `Wood:2006' on page 6 undefined on input line 
-319.
-
-
-Package natbib Warning: Citation `Stasinopoulos+Rigby:2007' on page 6 undefined
- on input line 320.
-
-
-Package natbib Warning: Citation `Yee:2009' on page 6 undefined on input line 3
-20.
-
-
-Package natbib Warning: Citation `McCullagh+Nelder:1989' on page 6 undefined on
- input line 337.
-
-LaTeX Font Info:    Trying to load font information for OT1+lmss on input line 
-340.
-(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmss.fd
-File: ot1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-
-Package natbib Warning: Citation `Chambers+Hastie:1992' on page 6 undefined on 
-input line 357.
-
-
-Package natbib Warning: Citation `Chambers+Hastie:1992' on page 6 undefined on 
-input line 366.
-
-
-LaTeX Warning: Reference `tab:overview' on page 6 undefined on input line 383.
+LaTeX Warning: Reference `eq:apprvexp' on page 6 undefined on input line 239.
 
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
@@ -1084,140 +984,81 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
  []
 
 [6]
-Underfull \hbox (badness 1342) in paragraph at lines 394--396
-[]\T1/lmr/m/n/10.95 Poisson re-gres-sion: clas-si-cal GLM, es-ti-
- []
-
-
-Underfull \hbox (badness 2617) in paragraph at lines 396--402
-[]\T1/lmr/m/n/10.95 ``Quasi-Poisson re-gres-sion'': same mean
- []
-
-
-LaTeX Warning: Reference `fig:quine' on page 7 undefined on input line 451.
-
-<spca_JSS-visualization.pdf, id=94, 505.89pt x 375.4025pt>
-File: spca_JSS-visualization.pdf Graphic file (type pdf)
-<use spca_JSS-visualization.pdf>
-Package pdftex.def Info: spca_JSS-visualization.pdf  used on input line 469.
-(pdftex.def)             Requested size: 354.12434pt x 262.78568pt.
-
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 7
  []
 
-[7]
+[7] (spca_JSS.bbl
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
+0.
+
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 8 []
  []
 
-[8 <./spca_JSS-visualization.pdf>]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-541.
+[8])
+LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
+(Font)              Font shape `T1/pzc/m/it' tried instead on input line 648.
 
-(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmtt.fd
-File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 9
  []
 
-[9{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}]
-(spca_JSS.bbl
-
-Package natbib Warning: Empty `thebibliography' environment on input line 12.
-
-)
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 10 []
- []
-
-[10]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 6
-30.
- (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-
-LaTeX Font Warning: Font shape `T1/lmr/bx/sc' undefined
-(Font)              using `T1/lmr/bx/n' instead on input line 640.
-
-
-Package natbib Warning: There were undefined citations.
-
-LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
-(Font)              Font shape `T1/pzc/m/it' tried instead on input line 670.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 11
- []
-
-[11]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 12 []
- []
-
-[12] (spca_JSS.aux)
+[9] (spca_JSS.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 
 
-LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
-
 LaTeX Warning: There were undefined references.
 
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+LaTeX Warning: There were multiply-defined labels.
 
-
-Package rerunfilecheck Warning: File `spca_JSS.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `spca_JSS.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  A975785F12552C3562E52B4CD62BCE65;3647.
+Package rerunfilecheck Info: File `spca_JSS.out' has not changed.
+(rerunfilecheck)             Checksum: 5D7EB2679FA04E33D6C4EC278470E33D;2293.
  ) 
 Here is how much of TeX's memory you used:
- 23508 strings out of 467871
- 439278 string characters out of 5418377
- 825478 words of memory out of 5000000
- 51859 multiletter control sequences out of 15000+600000
- 740684 words of font info for 114 fonts, out of 8000000 for 9000
+ 23486 strings out of 467871
+ 437668 string characters out of 5418377
+ 827745 words of memory out of 5000000
+ 51841 multiletter control sequences out of 15000+600000
+ 757643 words of font info for 127 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,108p,985b,868s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmb10.pfb
 ><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb
 ><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb
-><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pf
-b><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pf
-b><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pf
-b><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb
-><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb>
-<C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><
-C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:
+><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb
+><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb
+><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi12.pfb
+><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb>
+<C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi7.pfb><
+C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C
+:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><
+C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C
+:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:
 /Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/U
 sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/U
 sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/U
 sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmro10.pfb><C:/U
 sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmss10.pfb><C:/U
+sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmss12.pfb><C:/U
 sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmssbx10.pfb><C:
 /Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsso10.pfb><C
 :/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C
 :/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:
-/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:
-/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtto10.pfb><C
-:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfchan/uzcmi8a.pf
-b>
-Output written on spca_JSS.pdf (12 pages, 495563 bytes).
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/
+msam10.pfb><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfch
+an/uzcmi8a.pfb>
+Output written on spca_JSS.pdf (9 pages, 483002 bytes).
 PDF statistics:
- 267 PDF objects out of 1000 (max. 8388607)
- 59 named destinations out of 1000 (max. 500000)
- 23 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 325 PDF objects out of 1000 (max. 8388607)
+ 54 named destinations out of 1000 (max. 500000)
+ 98 words of extra memory for PDF output out of 10000 (max. 10000000)
 

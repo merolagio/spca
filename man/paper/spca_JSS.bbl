@@ -1,4 +1,4 @@
-\begin{thebibliography}{0}
+\begin{thebibliography}{7}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -8,5 +8,60 @@
   \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
   \urlstyle{rm}\Url}\fi
 \providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Camacho \emph{et~al.}(2020)Camacho, Smilde, Saccenti, and
+  Westerhuis}]{camI}
+Camacho J, Smilde A, Saccenti E, Westerhuis J (2020).
+\newblock \enquote{All sparse PCA models are wrong, but some are useful. Part
+  I: Computation of scores, residuals and explained variance.}
+\newblock \emph{Chemometrics and Intelligent Laboratory Systems}, \textbf{196},
+  103907.
+\newblock ISSN 0169-7439.
+\newblock \doi{https://doi.org/10.1016/j.chemolab.2019.103907}.
+
+\bibitem[{Camacho \emph{et~al.}(2021)Camacho, Smilde, Saccenti, Westerhuis, and
+  Bro}]{camII}
+Camacho J, Smilde A, Saccenti E, Westerhuis J, Bro R (2021).
+\newblock \enquote{All sparse PCA models are wrong, but some are useful. Part
+  II: Limitations and problems of deflation.}
+\newblock \emph{Chemometrics and Intelligent Laboratory Systems}, \textbf{208},
+  104212.
+
+\bibitem[{Camacho \emph{et~al.}(2025)Camacho, Smilde, Saccenti, Westerhuis, and
+  Bro}]{camIII}
+Camacho J, Smilde A, Saccenti E, Westerhuis J, Bro R (2025).
+\newblock \enquote{All sparse PCA models are wrong, but some are useful. Part
+  III: Model interpretation.}
+\newblock \emph{Chemometrics and Intelligent Laboratory Systems}, \textbf{266},
+  105498.
+\newblock ISSN 0169-7439.
+\newblock \doi{https://doi.org/10.1016/j.chemolab.2025.105498}.
+
+\bibitem[{Hotelling(1933)}]{hot}
+Hotelling H (1933).
+\newblock \enquote{Analysis of a Complex of Statistical Variables with
+  Principal Components.}
+\newblock \emph{Journal of Educational Psychology}, \textbf{24}, 498--520.
+
+\bibitem[{Merola(2015)}]{mer15}
+Merola GM (2015).
+\newblock \enquote{Least Squares Sparse Principal Component Analysis: a
+  Backward Elimination approach to attain large loadings.}
+\newblock \emph{Australia \& New Zealand Journal of Statistics}, \textbf{57},
+  391--429.
+
+\bibitem[{Merola and Chen(2019)}]{mer19}
+Merola GM, Chen G (2019).
+\newblock \enquote{Projection sparse principal component analysis: An efficient
+  least squares method.}
+\newblock \emph{Journal of Multivariate Analysis}, \textbf{173}, 366 -- 382.
+\newblock
+  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0047259X18305463}.
+
+\bibitem[{Pearson(1901)}]{pea}
+Pearson K (1901).
+\newblock \enquote{{On lines and planes of closest fit to systems of points in
+  space}.}
+\newblock \emph{Philosophical Magazine}, \textbf{2}(6), 559--572.
 
 \end{thebibliography}
