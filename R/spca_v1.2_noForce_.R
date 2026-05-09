@@ -13,7 +13,6 @@
 #' @param stop_criterion Character vector. Only the first letter of the first entry is relevant later.
 #' @param intensive Logical scalar.
 #' @param fat_matrix Logical scalar or `NULL`.
-#' @param singleprecision Logical scalar.
 #' @param fixedindex_list List of integer vectors, one per component.
 #' @param centerdata Logical scalar.
 #' @param scaledata Logical scalar.
@@ -36,7 +35,6 @@ validate_spca_inputs = function(M,
                                   stop_criterion,
                                   intensive,
                                   fat_matrix,
-                                  singleprecision,
                                   fixedindex_list,
                                   centerdata,
                                   scaledata,
@@ -102,9 +100,6 @@ validate_spca_inputs = function(M,
 
   if (!is.null(fat_matrix) && !is.boolean(fat_matrix))
     stop("fat_matrix must be TRUE, FALSE, or NULL", call. = FALSE)
-
-  if (!is.boolean(singleprecision))
-    stop("singleprecision must be TRUE or FALSE", call. = FALSE)
 
   if (!is.list(fixedindex_list))
     stop("fixedindex_list must be a list", call. = FALSE)
@@ -184,8 +179,6 @@ validate_spca_inputs = function(M,
 #'   other inputs use the thin backend. If `TRUE`, request the fat-matrix
 #'   backend. If `FALSE`, use the thin backend, allowing users to force the thin
 #'   path for mildly fat matrices.
-#' @param singleprecision Logical. Kept for interface compatibility. The current
-#'   C++ engines use double precision only.
 #' @param fixedindex_list List of predetermined indices for components.
 #'   Each list element is a vector of 1-based indices. Use \code{NULL} or
 #'   \code{integer(0)} for a component with no fixed indices. If the list is
@@ -219,7 +212,6 @@ spca = function(M,
                   stop_criterion = c("r2", "cvexp"),
                   intensive = FALSE,
                   fat_matrix = NULL,
-                  singleprecision = FALSE,
                   fixedindex_list = list(),
                   centerdata = FALSE,
                   scaledata = FALSE,
@@ -239,7 +231,6 @@ spca = function(M,
                          stop_criterion = stop_criterion,
                          intensive = intensive,
                          fat_matrix = fat_matrix,
-                         singleprecision = singleprecision,
                          fixedindex_list = fixedindex_list,
                          centerdata = centerdata,
                          scaledata = scaledata,
@@ -360,8 +351,6 @@ spca = function(M,
     warning("intensive search requires stop_criterion = cvexp. Switching to that.", call. = FALSE)
     stop_criterion_cpp = 1
     }
-  if (singleprecision)
-    warning("singleprecision is not implemented in the current C++ engines and will be ignored")
 
 ##  X = M
   if (is_datamatrix_M) {
