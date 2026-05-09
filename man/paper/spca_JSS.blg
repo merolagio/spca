@@ -5,10 +5,11 @@ Reallocating 'name_of_file' (item size: 1) to 4 items.
 The style file: jss.bst
 Reallocating 'name_of_file' (item size: 1) to 4 items.
 Database file #1: JSS.bib
+Warning--I didn't find a database entry for "Zeileis+Kleiber+Jackman:2008"
 Reallocating 'wiz_functions' (item size: 4) to 6000 items.
 You've used 7 entries,
             3215 wiz_defined-function locations,
-            690 strings with 6511 characters,
+            692 strings with 6569 characters,
 and the built_in function-call counts, 7133 in all, are:
 = -- 686
 > -- 170
@@ -47,3 +48,4 @@ warning$ -- 0
 while$ -- 49
 width$ -- 0
 write$ -- 111
+(There was 1 warning)

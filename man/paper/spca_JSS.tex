@@ -22,7 +22,7 @@
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
 
-\input{spca_JSS_macros.TeX}
+
 
 %% -- Article metainformation (author, title, ...) -----------------------------
 
@@ -30,52 +30,55 @@
 %% - \Plainauthor{} without affiliations
 %% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
 %% - \AND starts a new line, \And does not.
-\author{Giovanni Maria Merola~\orcidlink{0000-0003-0918-3766}\\British University Vietnam}
+\author{Giovanni Maria Merola~\orcidlink{0000-0003-2539-9225}\\British University Vietnam}
 
 %% - \title{} in title case
 %% - \Plaintitle{} without LaTeX markup (if any)
 %% - \Shorttitle{} with LaTeX markup (if any), used as running title
-\title{spca: an R package to compute Least Squares Sparse Principal Components}
+\title{An R package to Compute Least Squares Sparse Principal Components}
 \Plaintitle{An R package to compute Least Squares Sparse Principal Components}
 \Shorttitle{An \proglang{R} package to compute LS-SPCA components}
 
 %% - \Abstract{} almost as usual
 \Abstract{
   This article illustrates the use of the package \emph{spca} how to write a manuscript for the
+  \emph{Journal of Statistical Software} (JSS) using its {\LaTeX} style files.
+  Generally, we ask to follow JSS's style guide and FAQs precisely. Also,
+  it is recommended to keep the {\LaTeX} code as simple as possible,
   i.e., avoid inclusion of packages/commands that are not necessary.
   For outlining the typical structure of a JSS article some brief text snippets
-  are employed that have been inspired by discussing count data regression in \proglang{R}. Editorial comments and
+  are employed that have been inspired by \cite{Zeileis+Kleiber+Jackman:2008},
+  discussing count data regression in \proglang{R}. Editorial comments and
   instructions are marked by vertical bars.
 }
 
 %% - \Keywords{} with LaTeX markup, at least one required
 %% - \Plainkeywords{} without LaTeX markup (if necessary)
 %% - Should be comma-separated and in sentence case.
-\Keywords{JSS, SPCA, Least squares, LS, uncorrelated}
-\Plainkeywords{JSS, SPCA, Least squares, LS, uncorrelated}
+\Keywords{JSS, style guide, comma-separated, not capitalized, \proglang{R}}
+\Plainkeywords{JSS, style guide, comma-separated, not capitalized, R}
+\Keywords{JSS, SPCA, Least squares, projection, uncorrelated, \proglang{R}}
+\Plainkeywords{JSS, SPCA, Least squares, projection, uncorrelated, R}
 
-%% - \Address{} of at least one author
-%% - May contain multiple affiliations for each author
-%%   (in extra lines, separated by \emph{and}\\).
-%% - May contain multiple authors for the same affiliation
-%%   (in the same first line, separated by comma).
+
 \Address{
-  Achim Zeileis\\
-  Journal of Statistical Software\\
-  \emph{and}\\
-  Department of Statistics\\
-  Faculty of Economics and Statistics\\
-  Universit\"at Innsbruck\\
-  Universit\"atsstr.~15\\
-  6020 Innsbruck, Austria\\
-  E-mail: \email{Achim.Zeileis@R-project.org}\\
-  URL: \url{https://www.zeileis.org/}
+  Giovanni Merola\\
+  British University Vietnam\\
+  Ecopark, Hung Yen\\
+  Vietnam\\
+  E-mail: \email{merolagio@gmail.com}\\
 }
 
+% to use latex macros inside r chunks
+% <<results='asis'>>=
+% cat("\\[ \\bX = \\bA \\trans \\]\n")
+
+\input{spca_JSS_macros.TeX}
 \begin{document}
 %% changed to FALSE
 
 
+%% changed to FALSE
 \section{Introduction to LS-SPCA}
 sparse principal components analysis (SPCA) is a variant of principal components analysis (PCA) that aims at computing sparse principal components (sPCs) that are linear combinations of only a few of the features, hence having \emph{sparse} loadings with few nonzero elements.
 
@@ -90,19 +93,19 @@ This article will be used as extended vignettes in the package, so will illustra
 
 \subsection{LS-SPCA estimation}
 The material in this section is taken from \citet{mer15} and \citet{mer19} where proofs and further details can be found.
-Let's establish notation first. 
+Let's establish notation first.
 $X$ denotes the $n \times p$ data matrix containing $n$ cases on $p$ features centered to mean zero. $S \propto X\trasp X$ denotes the covariance matrix. The eigenvectors of S, $v_1, \ldots, v_p$ ($\|v_j\| = 1$, $j = 1, \ldots, p$ (the PCs loadings) are  ordered by decreasing corresponding eigenvalues,
 $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p$. The same convention is used for all eigenvectors (including generalized ones).
 
-The sparse loadings are the vectors $a_j = (a_{i1}, \ldots, a_{r}, r\le p$ with unit norm $a\traspj a_j = 1$, each of which has only $c_j \leq p$ non-zero elements. The quantity $c_j$ is called the \emph{cardinality} of $a_j$. The sPCs are then equal to $t_j = X a_j$. 
+The sparse loadings are the vectors $a_j = (a_{i1}, \ldots, a_{r}, r\le p$ with unit norm $a\traspj a_j = 1$, each of which has only $c_j \leq p$ non-zero elements. The quantity $c_j$ is called the \emph{cardinality} of $a_j$. The sPCs are then equal to $t_j = X a_j$.
 
-A dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to a set of indices, $ind_j$. In \proglang{R} syntax, we write $\daj = a_j[ind_j]$ to indicate the vector containing only the $c_j$ non-zero loadings in $\dj$, so that $t_j = \dXj\da_j$.
+A dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to a set of indices, $ind_j$. In \proglang{R} syntax, we write $\daj = a_j[ind_j]$ to indicate the vector containing only the $c_j$ non-zero loadings in $\a_j$, so that $t_j = \dXj\da_j$.
 
 There exist there variants of LS-SPCA, optimizing two different objectives
 LS-SPCA solutions are derived using two different objectives.
 
-\subsubsection{Objective: maximal Variance explained}
-The SPCA objective obtained by adding sparsity constraints to the PCA objective is
+\subsubsection{Objective: maximal variance explained}
+This objective is obtained by adding sparsity constraints to the standard least squares PCA objective of maximizing the variance explained (VEXP).
 \begin{equation}\label{eq:lsscpca_obj}
 \min_{a_j} \|X - t_j b\trasp\|^2,
 \quad \text{subject to}\quad
@@ -112,188 +115,100 @@ The SPCA objective obtained by adding sparsity constraints to the PCA objective 
 
 \paragraph{Uncorrelated LS-SPCA (uSPCA).}
 The optimal sparse loadings for objective \ref{eq:lsscpca_obj}, $\daj$, are the generalized eigenvectors corresponding to the largest eigenvalue, $\lambda_j$, solution to
-\begin{equation}\label{eq_uspca_sol}
-C_j \dot{S}\traspj \dot{S}_j \daj = \lambda_j \dot{X}\traspj \dot{X}_j \daj,
+\begin{equation}\label{eq:uspca_sol}
+C_j \dST \dS \daj = \lambda_j \dXjT \dXj \daj,
 \end{equation}
-where the matrices $C_j$ ($C_1 = I$) enforce the orthogonality constraints.
+where  $\dS = S[ind_j]$ and the matrices $C_j$ enforce the orthogonality constraints ($C_1 = I$).
 
 The orthogonality constraints require that the cardinality of the solution loadings satisfy $c_j \geq j$. Furthermore, the solutions can be computationally demanding and unstable.
 
 \paragraph{Correlated LS-SPCA (cSPCA).}
 Approximated but simpler to compute solutions can be obtained from the residual matrices orthogonal to the previously computed sPCs. Let
-\begin{equation}\label{eq_defX_def}
-Q_j = \left(I_p - \frac{t_{j-1} t\trasps{j-1}}{t\trasps{j-1} t_{j-1}}\right) Q_{j-1} = H_j Q_{j-1},
+\begin{equation}\label{eq:defX_def}
+Q_j = \left(I_p - \frac{t_{j-1} t\trasps{j-1}}{t\trasps{j-1} t_{j-1}}\right) Q_{j-1},
 \quad j = 2, 3, \ldots, r,
 \end{equation}
-where $H_j$ is the \emph{hat} matrix and $Q_1 = X$. IN SPCA context, the residual matrices $Q_j$ are often called \emph{deflated} matrices. Note that the use of the deflated matrices is a direct consequence of the Courant--Fischer min--max theorem and is typically used in the power method for computing the eigen-decomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue:
+with $Q_1 = X$. In SPCA literature the residual matrices $Q_j$ are called \emph{deflated} matrices. Note that the use of the deflated matrices is a direct consequence of the Courant--Fischer min--max theorem and is typically used in the power method for computing the eigen-decomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue:
 \begin{equation}
-\dot{Q}\traspj X X\trasp \dot{Q}_j \daj = \mu_j \dot{X}\traspj \dot{X}_j \daj.
+\dXtj Q_j\QjT\dXj \daj = \mu_j \dXjT\dXj \daj.
 \end{equation}
-The first cSPCA solution is equal to the first uSPCA solution but, in general, the following solutions are not equal to the corresponding uSPCA solutions. The cSPCA solutions typically show very mild correlation with one another, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and, in most cases, it is lower than their order.
+The first cSPCA solution is equal to the first uSPCA solution but, in general, the following solutions are not equal to the corresponding uSPCA solutions and,  typically show very mild correlation with one another, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and, in most cases, it is lower than their order.
 
 \subsubsection{Maximal correlation with the PCs (pSPCA)}
-This objective function requires that the sPCs approximate well the PCs. Since the PCs best approximate the data, the resulting sPCs will be close to the ones computed with the other objective, and vice versa, However, this approach is computationally simpler.
+The sPCs obtained by maximizing the variance explained are usually highly correlated with the corresponding PCs. However, as the order of the components increases, these correlations tend to decrease.
 
-The objective function is 
+The pSPCA objective function requires that the sPCs best approximate the PCs. That is
 \begin{equation}\label{eq:pscpca_obj}
-\max_{a_j} \vert\text{cor}(t_j, y_j)\vert,
+\max_{a_j} \vert\text{cor}(t_j, PC_j)\vert,
 \quad \text{subject to}\:\text{card}(a_j) < p.
 \end{equation}
 It is well known that the optimal solution to this objective is linear regression. Since staring with the first, the sPCs explain less variance than the corresponding PCs, using the first PC of the $Q_j$ matrices, instead of the PCs, allows to recover some of this unexplained variance.
 
-Therefore, in pSPCA, the sPCs are obtained by projecting the residual PCs onto subsets if the $x$-variables. Let $z_j = Q_j v_j$ denote the first PC of the deflated matrix $Q_j$. Then the pSPCA solution loadings are obtained as the regression coefficients, standardized to unit norm, from the regression of $z_j$ onto $\dot{X}_j$:
-
+Therefore, in pSPCA, the sparse loadings are computed as the
+coefficients, standardized to unit norm, of the regression of the residual PCs onto subsets if the $x$-variables. That is
 \begin{equation}
-\daj \propto (\dot{X}\traspj \dot{X}_j)^{-1} \dot{X}\traspj z_j.
+\daj \propto (\dXjT\dXj)^{-1} \dXjT z_j,
 \end{equation}
+where $z_j$ denotes the $j$-th residual PC.
 
-The psPCs have maximum multiple squared correlation (the $R^2$ coefficient) for the given set of indices $\operatorname{ind}_j$.
-
-
-
-The sPCs obtained by maximizing the variance explained are usually highly correlated with the corresponding PCs. However, as the order of the components increases, these correlations tend to decrease. 
-
-\Large{OLD}
-
-
-This objective function requires that the sPCs approximate well the PCs. Since the Pcs best approximate the data, the resulting sPCs will be close to the ones computed with the other objective, and vice versa, However, this approach is computationally simpler.
-
-\begin{equation}\label{eq:pscpca_obj}
-\max_{a_j} \vert\operatorname{cor}(t_j, y_j)\vert,
-\quad \text{subject to}\quad
- a\traspj S a_i = 0,\ i < j,
-\quad \operatorname{card}(a_j) < p.
-\end{equation}
-
-\subsection{LS-SPCA solutions}
-We now face two challenges. The first is to derive the solutions when the indices of the non-zero loadings are known. The second is to identify the optimal set of these indices for each sPC.
-
-We begin by assuming that these indices are known. Let $\operatorname{ind}_j$ denote the set of indices for the $j$th sPC, and let a dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to these indices. In \proglang{R} syntax, we can write $\dot{a}_j = a_j[\operatorname{ind}_j]$ and $\dot{S}_j = S[, \operatorname{ind}_j]$ and $t_j = \dot{X}\dot{a_j}$.
-
-\subsubsection{Maximal variance explained}
-It can be shown that the solution requires solving
-
-\begin{equation}\label{eq:vexp_obj}
-\max_{a_j}
-\frac{a\traspj X\trasp X X\trasp X a_j}{a\traspj X\trasp X a_j}
-\equiv
-\max_{a_j}
-\frac{a\traspj S S a_j}{a\traspj S a_j},
-\quad a\traspj S a_i = 0,\ i < j,
-\quad \operatorname{card}(a_j) < p.
-\end{equation}
-
-The objective function \ref{eq:vexp_obj} is the \emph{variance explained} (VEXP) by the $j$th component. Without cardinality constraints it is the objective of standard PCA.
-
-In passing, we note that, without cardinality constraints, objective function \ref{eq:vexp_obj} is original PCA objective formulated by \citet{pea}, which has solutions
-\[
-\max_{v_j} a\traspj S a_j,\quad a\traspj S a_i = 0,\ i < j.
-\]
-These solutions are \citet{hot} definition of PCA objective. The equivalence between the two objectives is no longer valid when cardinality constraints are introduced \citep{mer15}.
-
-\paragraph{Uncorrelated LS-SPCA (uSPCA).}
-The exact solutions to objective \ref{eq:vexp_obj} are computed by adding the constraints directly into the variance explained expression by means of the generic $\dot{X}$ matrix. Hence the optimal sparse loadings, $\daj$, are the generalized eigenvectors corresponding to the largest eigenvalue, $\lambda_j$, solution to
-\begin{equation}\label{eq_uspca_sol}
-C_j \dot{S}\traspj \dot{S}_j \daj = \lambda_j \dot{X}\traspj \dot{X}_j \daj,
-\end{equation}
-where the matrices $C_j$ ($C_1 = I$) enforce the orthogonality constraints.
-
-The orthogonality constraints require that the cardinality of the solution loadings satisfy $c_j \geq j$. Furthermore, the solutions can be computationally demanding and unstable.
-
-\paragraph{Correlated LS-SPCA (cSPCA).}
-Approximate but simpler to compute solutions can be obtained from the orthogonal residuals of the previously computed sPCs. Let
-\begin{equation}\label{eq_defX_def}
-Q_j = \left(I_p - \frac{t_{j-1} t\trasps{j-1}}{t\trasps{j-1} t_{j-1}}\right) Q_{j-1} = H_j Q_{j-1},
-\quad j = 2, 3, \ldots, r,
-\end{equation}
-where $H_j$ is the \emph{hat} matrix and $Q_1 = X$. The matrices $Q_j$ are often called \emph{deflated} matrices. Note that the use of the deflated matrices is a direct consequence of the Courant--Fischer min--max theorem and is typically used in the power method for computing the eigendecomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue:
-\begin{equation}
-\dot{Q}\traspj X X\trasp \dot{Q}_j \daj = \mu_j \dot{X}\traspj \dot{X}_j \daj.
-\end{equation}
-
-The first solution is equal to the first uSPCA solution but, in general, the following ones are not equal to the corresponding uSPCA solutions. The cSPCA solutions typically show very mild correlation with one another, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and, in most cases, it is lower than their order. %Note that
-\begin{equation}
-\mu_j = \max_{a_j}
-\frac{a\traspj X\trasp Q_j Q\traspj X a_j}{a\traspj X\trasp X a_j}.
-\label{eq_cspca_sol}
-\end{equation}
-
-This is an approximate measure of the variance explained. Because the resulting PCs are correlated, the exact VEXP must be obtained as the difference between the cumulative VEXP (CVEXP) explained by the first $j$ csPCs and that explained by the preceding $(j - 1)$ csPCs:
-
-\begin{equation}
-\operatorname{VEXP}(t_j) =
-\operatorname{trace}\Bigl(X\trasp T_j (T\traspj T_j)^{-1} T\traspj X\Bigr)
--
-\operatorname{trace}\Bigl(X\trasp T_{j-1} (T\trasps{j-1} T_{j-1})^{-1} T\trasps{j-1} X\Bigr),
-\end{equation}
-
-where $T_j$ is the matrix with columns equal to the first $j$ sPCs.
-
-
+In general, the pSPCA loadings are close to the cSPCA ones but show higher mutual correlation, still of small magnitude. This approach ensures best approximation sPC to PC and is computationally simpler. Furthermore, pSPCA provide a very efficient approach to variable selection.
+%%%%%%%%%%%%%%%%%%%
 \subsection{Variable selection}
+Variable selection is notoriously a computationally demanding (NP-hard) task that requires greedy algorithms for its solution.
 
-Variable selection is notoriously a computationally demanding, NP-hard task that requires greedy algorithms for its solution.
+For uSPCA and cSPCA we implemented \emph{intensive} forward selection algorithms based on the actual variable explained that terminate after a minimal proportion of the cumulative variance explained (CVEXP) of the corresponding number of PCs is reached. These are computationally expensive, especially for large matrices, because they require to repeatedly compute generalized eigen-decompositions.
 
-Regression-based variable selection algorithms are used to determine the pSPCA solution. Thus, we implemented standard forward, backward, and forward stepwise variable selection algorithms used for regression, with a stopping rule based on the current $R^2$. Because the response variable $z_j$ is proportional to an eigenvector of $Q_j$, the algorithms are simplified using the fact that $z\traspj X = z\traspj Q_j = v_j \lambda_j$. These algorithms have approximate complexity $O(p^2)$.
-
-For uSPCA and cSPCA we implemented forward and backward algorithms that terminate after a minimal proportion of the CVEXP of the corresponding number of PCs is reached or, respectively, not passed. These algorithms use the approximate VEXP in Equation~\ref{eq:apprvexp} to determine the variables to select or eliminate and are computationally very expensive. The forward selection is approximately $O(pk^4)$ for selecting $k$ variables, even when VEXP is computed with the power method to save computation time. However, a dramatic reduction in computational complexity can be achieved by selecting the variables using one of the algorithms implemented for pSPCA and computing the CVEXP at each iteration, which is then used as the stopping rule. While the exact cSPCA-based algorithm may yield more efficient solutions, in many cases there is little difference from the results obtained using the regression variable selection algorithms.
-
+We also implemented efficient regression based standard forward, backward, and forward stepwise variable selection algorithms. These algorithms always use the computationally cheap $R^2$ to select or eliminate variables. For maximum sPC-PC correlation objective the current $R^2$ should be used as stopping rule. For maximum VEXP objective the current CVEXP should be used. In this case, at every search step, the current CVEXP is computed to evaluate the stopping rule, so they can still be computationally expensive. Forward selection is advised when $p$ is large. Different types of variable selection are chosen via the argument \code{var_selection = c("fwd", "bkw", "step")} and the stop criterion via the argument \code{stop_criterion = c("r2", "cvexp")}. The variance explained based intensive selection is selected by setting \code{intensive = TRUE}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Computational details}
-Since uSPCA and cSPCA require solving generalized eigenvector problems, the computation for large matrices is computationally demanding. The problem is even more taxing in variable selection. Therefore, we put some care to make the computation feasible on large matrices.
+in \pkg{spca}, linear algebra and matrix is handled by the \proglang{C++} back-end. This is used also to prevent deep copies typically made by \proglang{R} functions. The exported functions are called from \proglang{R} wrappers.
 
-The major expedient that we use is to do the demanding $O(np^2)$ multiplication to compute the covariance matrix $S = X\trasp X$ only once at the beginning. Then deflations are done with cheap rank-1 updates as $Q_{j + 1} = Q_j - \frac{t_jt\traspj}{t_j\traspj t_j}$
+The main function \code{spca()} is used to compute LSSPCA solutions of all types  with all options. Different back-ends manage ``fat'' matrices ($n < p$) and ``tall'' matrices. 
+The tall back-end operates on the covariance matrix $S$, while the fat back-end operates on the row-space of the data matrix, using a \emph{reverse-SVD} approach to compute eigen-decompositions and dedicated variable selection algorithms to compute LS-SPCA solutions. Which back-end is used is decided automatically, based on whether the data matrix aspect-ratio is less of one or not, if \code{fat_matrix = NULL}, or it can forced by setting \code{fat_matrix = TRUE/FALSE}.
 
-Let
-\[
-S_j = Q\traspj Q_j,
-\qquad
-M_j = S_j S_j,
-\]
-and let \(a_j\) be the cSPCA loading vector solving
-\[
-M_j a_j = S_j S_j a_j = \mu_j S a_j,
-\]
-where \(S = X\trasp X\) is the original matrix and \(\mu_j\) is the largest generalized eigenvalue. The score vector is always
-\[
-t_j = X a_j,
-\]
-so
-\[
-t\traspj t_j = a\traspj S a_j.
-\]
+The major expedient that we use is to do the potentially demanding $O(np^2)$ multiplication to compute the covariance matrix $S = X\trasp X$ and the $O(p^3)$ multiplication $SS$ only once at the beginning. Then deflations are done with
+cheap rank-1 updates instead of recomputing tthe natrices as products of the deflated data matrix. The computational savings can be substantial when $p$ is large, as they reduce the cost from , roughly, $O(p^3)$ to $O(p^2)$.
 
-With
-\[
-Q_{j + 1} = \left(I - \frac{t_j t\traspj}{t\traspj t_j}\right) Q_j,
-\]
-define
-\[
-g_j = Q\traspj t_j,
-\qquad
-d_j = t\traspj t_j = a\traspj S a_j.
-\]
-Then
-\[
-S_{j + 1} = Q_{j + 1}^T Q_{j + 1}
-=
-S_j - \frac{g_j g\traspj}{d_j},
-\]
-which is a rank-1 downdate. Consequently,
-\[
-M_{j + 1} = S_{j + 1} S_{j + 1} = M_j - \frac{S_j g_j g\traspj + g_j g\traspj S_j}{d_j} +
-\frac{g\traspj g_j}{d_j^2}\, g_j g\traspj.
-\]
-Thus \(M_j\) is updated by a sum of rank-1 terms, avoiding recomputation of \(M_{j + 1}\) from scratch.
+Since, apart from the initial eigen-decomposition, only the leading eigen-pair of a matrix is needed, these can optionally be computed with the power method. The power method option can be triggered by setting \code{PML = TRUE} for loading computation and \code{PMVS = TRUE} for intensive variable selection computation. 
+Using the power method reduces the computational cost for a $p \times p$ matrix from approximately $O(p^3)$ to approximately $O(Kp^2)$, where $K$ is the number of iterations required for convergence. The convergence can be controlled with the \code{maxiterPM...} and \code{epsPM...} for each set of computations.
 
-Hence the update of \(M_j\) is a sum of rank-1 terms.
+Regression based variable selection algorithm is simplified by considering that the regressed variable is an eigen-vector of the regressors and uses rank-1 updates for computing current values of selected stopping criterion. 
 
-The generalized eigenvalue relation is consistent with these definitions, since
-\[
-a\traspj M_j a_j = a\traspj S_j S_j a_j = \mu_j a\traspj S a_j = \mu_j t\traspj t_j,
-\]
-where again \(\mu_j\) is the largest generalized eigenvalue. This identity is useful for interpreting the scalar criterion associated with \(a_j\), while the actual deflation formulas above are expressed in terms of \(g_j = Q\traspj t_j\) and \(d_j = t\traspj t_j = a\traspj S a_j\).
+Similar considerations are valid for the fat back-end engine.
 
-Using these rank-1 updates gives a substantial computational saving compared with recomputing the matrices from the deflated data matrix at each step. Recomputing the covariance matrix \(S_j\) from \(Q_j\) costs \(O(n p^2)\), whereas updating it directly costs only \(O(p^2)\). For \(M_j\), the saving is larger: recomputing it requires multiplying two \(p \times p\) matrices, which costs \(O(p^3)\), whereas the corresponding update uses only matrix-vector products and outer products, so its cost is \(O(p^2)\). The reduction is therefore substantial, especially when \(p\) is large.
+% These algorithms use the approximate VEXP in Equation~\ref{eq:apprvexp} to determine the variables to select or eliminate and are computationally very expensive. The forward selection is approximately $O(pk^4)$ for selecting $k$ variables, even when VEXP is computed with the power method to save computation time. However, a dramatic reduction in computational complexity can be achieved by selecting the variables using one of the algorithms implemented for pSPCA and computing the CVEXP at each iteration, which is then used as the stopping rule. While the exact cSPCA-based algorithm may yield more efficient solutions, in many cases there is little difference from the results obtained using the regression variable selection algorithms.
+
+
+
+
+\bibliography{JSS}
+\end{document}
+
+% \begin{figure}[t!]
+% \centering
+% <<visualization, echo=FALSE, fig=TRUE, height=5.2, width=7>>=
+% par(mar = c(4, 4, 1, 1))
+% plot(table(quine$Days), xlab = "Days", ylab = "Frequency", axes = FALSE)
+% axis(2)
+% axis(1, at = 0:16 * 5, labels = FALSE)
+% axis(1, at = 0:8 * 10)
+% box()
+% @
+% \caption{\label{fig:quine} Frequency distribution for number of days absent
+% from school.}
+% \end{figure}
+% 
+% \begin{Code}
+% glm(formula, data, subset, na.action, weights, offset,
+%   family = gaussian, start = NULL, control = glm.control(...),
+%   model = TRUE, y = TRUE, x = FALSE, ...)
+% \end{Code}
+% where \code{formula} plus \code{data}
+% 
+% <<summary>>=
+% summary(m_nbin)
+% @
+% %%%%%%%%%%%%%%%
 
 
 \section{JSS EXAMPLE}
@@ -314,336 +229,336 @@ Using these rank-1 updates gives a substantial computational saving compared wit
 
 \begin{leftbar}
 The introduction is in principle ``as usual''. However, it should usually embed
-% both the implemented \emph{methods} and the \emph{software} into the respective
-% relevant literature. For the latter both competing and complementary software
-% should be discussed (within the same software environment and beyond), bringing
-% out relative (dis)advantages. All software mentioned should be properly
-% \verb|\cite{}|d. (See also Appendix~\ref{app:bibtex} for more details on)
-% \textsc{Bib}{\TeX}.)
-%
-% For writing about software JSS requires authors to use the markup
-% \verb|\proglang{}| (programming languages and large programmable systems),
-% \verb|\pkg{}| (software packages), \verb|\code{}| (functions, commands,
-% arguments, etc.). If there is such markup in (sub)section titles (as above), a
-% plain text version has to be provided in the {\LaTeX} command as well. Below we
-% also illustrate how abbrevations should be introduced and citation commands can
-% be employed. See the {\LaTeX} code for more details.
+both the implemented \emph{methods} and the \emph{software} into the respective
+relevant literature. For the latter both competing and complementary software
+should be discussed (within the same software environment and beyond), bringing
+out relative (dis)advantages. All software mentioned should be properly
+\verb|\cite{}|d. (See also Appendix~\ref{app:bibtex} for more details on
+\textsc{Bib}{\TeX}.)
+
+For writing about software JSS requires authors to use the markup
+\verb|\proglang{}| (programming languages and large programmable systems),
+\verb|\pkg{}| (software packages), \verb|\code{}| (functions, commands,
+arguments, etc.). If there is such markup in (sub)section titles (as above), a
+plain text version has to be provided in the {\LaTeX} command as well. Below we
+also illustrate how abbrevations should be introduced and citation commands can
+be employed. See the {\LaTeX} code for more details.
 \end{leftbar}
-%
-% Modeling count variables is a common task in economics and the social sciences.
-% The classical Poisson regression model for count data is often of limited use in
-% these disciplines because empirical count data sets typically exhibit
-% overdispersion and/or an excess number of zeros. The former issue can be
-% addressed by extending  the plain Poisson regression model in various
-% directions: e.g., using sandwich covariances or estimating an additional
-% dispersion parameter (in a so-called quasi-Poisson model). Another more formal
-% way is to use a negative binomial (NB) regression. All of these models belong to
-% the family of generalized linear models (GLMs). However, although these models
-% typically can capture overdispersion rather well, they are in many applications
-% not sufficient for  modeling excess zeros. Since \cite{Mullahy:1986} there is
-% increased interest in zero-augmented models that address this issue by a second
-% model component capturing zero counts. An overview of count data models in
-% econometrics, including  hurdle and zero-inflated models, is provided in
-% \cite{Cameron+Trivedi:2013}.
-%
-% In \proglang{R} \citep{R}, GLMs are provided by the model fitting functions
-% \fct{glm} in the \pkg{stats} package and \fct{glm.nb} in the \pkg{MASS} package
-% \citep[][Chapter~7.4]{Venables+Ripley:2002} along with associated methods for
-% diagnostics and inference. The manuscript that this document is based on
-% \citep{Zeileis+Kleiber+Jackman:2008} then introduced hurdle and zero-inflated
-% count models in the functions \fct{hurdle} and \fct{zeroinfl} in the \pkg{pscl}
-% package \citep{Jackman:2015}. Of course, much more software could be discussed
-% here, including (but not limited to) generalized additive models for count data
-% as available in the \proglang{R} packages \pkg{mgcv} \cite{Wood:2006},
-% \pkg{gamlss} \citep{Stasinopoulos+Rigby:2007}, or \pkg{VGAM} \citep{Yee:2009}.
-%
-%
-% -- Manuscript ---------------------------------------------------------------
-%
-% - In principle "as usual" again.
-% - When using equations (e.g., {equation}, {eqnarray}, {align}, etc.
-%   avoid empty lines before and after the equation (which would signal a new
-%   paragraph.
-% - When describing longer chunks of code that are _not_ meant for execution
-%   (e.g., a function synopsis or list of arguments), the environment {Code}
-%   is recommended. Alternatively, a plain {verbatim} can also be used.
-%   (For executed code see the next section.)
-%
-% \section{Models and software} \label{sec:models}
-%
-% The basic Poisson regression model for count data is a special case of the GLM
-% framework \cite{McCullagh+Nelder:1989}. It describes the dependence of a count
-% response variable $y_i$ ($i = 1, \dots, n$) by assuming a Poisson distribution
-% $y_i \sim \mathrm{Pois}(\mu_i)$. The dependence of the conditional mean
-% $\E[y_i \, | \, x_i] = \mu_i$ on the regressors $x_i$ is then specified via a
-% log link and a linear predictor
 
-% \begin{equation} \label{eq:mean}
-% \log(\mu_i) \quad = \quad x_i^\top \beta,
-% \end{equation}
+Modeling count variables is a common task in economics and the social sciences.
+The classical Poisson regression model for count data is often of limited use in
+these disciplines because empirical count data sets typically exhibit
+overdispersion and/or an excess number of zeros. The former issue can be
+addressed by extending  the plain Poisson regression model in various
+directions: e.g., using sandwich covariances or estimating an additional
+dispersion parameter (in a so-called quasi-Poisson model). Another more formal
+way is to use a negative binomial (NB) regression. All of these models belong to
+the family of generalized linear models (GLMs). However, although these models
+typically can capture overdispersion rather well, they are in many applications
+not sufficient for  modeling excess zeros. Since \cite{Mullahy:1986} there is
+increased interest in zero-augmented models that address this issue by a second
+model component capturing zero counts. An overview of count data models in
+econometrics, including  hurdle and zero-inflated models, is provided in
+\cite{Cameron+Trivedi:2013}.
 
-% where the regression coefficients $\beta$ are estimated by maximum likelihood
-% (ML) using the iterative weighted least squares (IWLS) algorithm.
-%
-% \begin{leftbar}
-% Note that around the \verb|{equation}| above there should be no spaces (avoided
-% in the {\LaTeX} code by \verb|%| lines) so that ``normal'' spacing is used and
-% not a new paragraph started.
-% \end{leftbar}
-%
-% \proglang{R} provides a very flexible implementation of the general GLM
-% framework in the function \fct{glm} \citep{Chambers+Hastie:1992} in the
-% \pkg{stats} package. Its most important arguments are
-% \begin{Code}
-% glm(formula, data, subset, na.action, weights, offset,
-%   family = gaussian, start = NULL, control = glm.control(...),
-%   model = TRUE, y = TRUE, x = FALSE, ...)
-% \end{Code}
-% where \code{formula} plus \code{data} is the now standard way of specifying
-% regression relationships in \proglang{R}/\proglang{S} introduced in
-% \cite{Chambers+Hastie:1992}. The remaining arguments in the first line
-% (\code{subset}, \code{na.action}, \code{weights}, and \code{offset}) are also
-% standard  for setting up formula-based regression models in
-% \proglang{R}/\proglang{S}. The arguments in the second line control aspects
-% specific to GLMs while the arguments in the last line specify which components
-% are returned in the fitted model object (of class \class{glm} which inherits
-% from \class{lm}). For further arguments to \fct{glm} (including alternative
-% specifications of starting values) see \code{?glm}. For estimating a Poisson
-% model \code{family = poisson} has to be specified.
-%
-% \begin{leftbar}
-% As the synopsis above is a code listing that is not meant to be executed,
-% one can use either the dedicated \verb|{Code}| environment or a simple
-% \verb|{verbatim}| environment for this. Again, spaces before and after should be
-% avoided.
-%
-% Finally, there might be a reference to a \verb|{table}| such as
-% Table~\ref{tab:overview}. Usually, these are placed at the top of the page
-% (\verb|[t!]|), centered (\verb|\centering|), with a caption below the table,
-% column headers and captions in sentence style, and if possible avoiding vertical
-% lines.
-% \end{leftbar}
-%
-% \begin{table}[t!]
-% \centering
-% \begin{tabular}{lllp{7.4cm}}
-% \hline
-% Type           & Distribution & Method   & Description \\ \hline
-% GLM            & Poisson      & ML       & Poisson regression: classical GLM,
-%                                            estimated by maximum likelihood (ML) \\
-%                &              & Quasi    & ``Quasi-Poisson regression'':
-%                                            same mean function, estimated by
-%                                            quasi-ML (QML) or equivalently
-%                                            generalized estimating equations (GEE),
-%                                            inference adjustment via estimated
-%                                            dispersion parameter \\
-%                &              & Adjusted & ``Adjusted Poisson regression'':
-%                                            same mean function, estimated by
-%                                            QML/GEE, inference adjustment via
-%                                            sandwich covariances\\
-%                & NB           & ML       & NB regression: extended GLM,
-%                                            estimated by ML including additional
-%                                            shape parameter \\ \hline
-% Zero-augmented & Poisson      & ML       & Zero-inflated Poisson (ZIP),
-%                                            hurdle Poisson \\
-%                & NB           & ML       & Zero-inflated NB (ZINB),
-%                                            hurdle NB \\ \hline
-% \end{tabular}
-% \caption{\label{tab:overview} Overview of various count regression models. The
-% table is usually placed at the top of the page (\texttt{[t!]}), centered
-% (\texttt{centering}), has a caption below the table, column headers and captions
-% are in sentence style, and if possible vertical lines should be avoided.}
-% \end{table}
-%
-%
-% -- Illustrations ------------------------------------------------------------
-%
-% - Virtually all JSS manuscripts list source code along with the generated
-%   output. The style files provide dedicated environments for this.
-% - In R, the environments {Sinput} and {Soutput} - as produced by Sweave() or
-%   or knitr using the render_sweave() hook - are used (without the need to
-%   load Sweave.sty).
-% - Equivalently, {CodeInput} and {CodeOutput} can be used.
-% - The code input should use "the usual" command prompt in the respective
-%   software system.
-% - For R code, the prompt "R> " should be used with "+  " as the
-%   continuation prompt.
-% - Comments within the code chunks should be avoided - these should be made
-%   within the regular LaTeX text.
-%
-% \section{Illustrations} \label{sec:illustrations}
-%
-% For a simple illustration of basic Poisson and NB count regression the
-% \code{quine} data from the \pkg{MASS} package is used. This provides the number
-% of \code{Days} that children were absent from school in Australia in a
-% particular year, along with several covariates that can be employed as regressors.
-% The data can be loaded by
+In \proglang{R} \citep{R}, GLMs are provided by the model fitting functions
+\fct{glm} in the \pkg{stats} package and \fct{glm.nb} in the \pkg{MASS} package
+\citep[][Chapter~7.4]{Venables+Ripley:2002} along with associated methods for
+diagnostics and inference. The manuscript that this document is based on
+\citep{Zeileis+Kleiber+Jackman:2008} then introduced hurdle and zero-inflated
+count models in the functions \fct{hurdle} and \fct{zeroinfl} in the \pkg{pscl}
+package \citep{Jackman:2015}. Of course, much more software could be discussed
+here, including (but not limited to) generalized additive models for count data
+as available in the \proglang{R} packages \pkg{mgcv} \cite{Wood:2006}, 
+\pkg{gamlss} \citep{Stasinopoulos+Rigby:2007}, or \pkg{VGAM} \citep{Yee:2009}.
 
-% \begin{Schunk}
-% \begin{Sinput}
-% R> data("quine", package = "MASS")
-% \end{Sinput}
-% \end{Schunk}
 
-% and a basic frequency distribution of the response variable is displayed in
-% Figure~\ref{fig:quine}.
-%
-% \begin{leftbar}
-% For code input and output, the style files provide dedicated environments.
-% Either the ``agnostic'' \verb|{CodeInput}| and \verb|{CodeOutput}| can be used
-% or, equivalently, the environments \verb|{Sinput}| and \verb|{Soutput}| as
-% produced by \fct{Sweave} or \pkg{knitr} when using the \code{render_sweave()}
-% hook. Please make sure that all code is properly spaced, e.g., using
-% \code{y = a + b * x} and \emph{not} \code{y=a+b*x}. Moreover, code input should
-% use ``the usual'' command prompt in the respective software system. For
-% \proglang{R} code, the prompt \code{"R> "} should be used with \code{"+  "} as
-% the continuation prompt. Generally, comments within the code chunks should be
-% avoided -- and made in the regular {\LaTeX} text instead. Finally, empty lines
-% before and after code input/output should be avoided (see above).
-% \end{leftbar}
-%
-% \begin{figure}[t!]
-% \centering
-% \includegraphics{spca_JSS-visualization}
-% \caption{\label{fig:quine} Frequency distribution for number of days absent
-% from school.}
-% \end{figure}
-%
-% As a first model for the \code{quine} data, we fit the basic Poisson regression
-% model. (Note that JSS prefers when the second line of code is indented by two
-% spaces.)
+%% -- Manuscript ---------------------------------------------------------------
 
-% \begin{Schunk}
-% \begin{Sinput}
-% R> m_pois <- glm(Days ~ (Eth + Sex + Age + Lrn)^2, data = quine,
-% +    family = poisson)
-% \end{Sinput}
-% \end{Schunk}
+%% - In principle "as usual" again.
+%% - When using equations (e.g., {equation}, {eqnarray}, {align}, etc.
+%%   avoid empty lines before and after the equation (which would signal a new
+%%   paragraph.
+%% - When describing longer chunks of code that are _not_ meant for execution
+%%   (e.g., a function synopsis or list of arguments), the environment {Code}
+%%   is recommended. Alternatively, a plain {verbatim} can also be used.
+%%   (For executed code see the next section.)
 
-% To account for potential overdispersion we also consider a negative binomial
-% GLM.
+\section{Models and software} \label{sec:models}
 
-% \begin{Schunk}
-% \begin{Sinput}
-% R> library("MASS")
-% R> m_nbin <- glm.nb(Days ~ (Eth + Sex + Age + Lrn)^2, data = quine)
-% \end{Sinput}
-% \end{Schunk}
+The basic Poisson regression model for count data is a special case of the GLM
+framework \cite{McCullagh+Nelder:1989}. It describes the dependence of a count
+response variable $y_i$ ($i = 1, \dots, n$) by assuming a Poisson distribution
+$y_i \sim \mathrm{Pois}(\mu_i)$. The dependence of the conditional mean
+$\E[y_i \, | \, x_i] = \mu_i$ on the regressors $x_i$ is then specified via a
+log link and a linear predictor
+%
+\begin{equation} \label{eq:mean}
+\log(\mu_i) \quad = \quad x_i^\top \beta,
+\end{equation}
+%
+where the regression coefficients $\beta$ are estimated by maximum likelihood
+(ML) using the iterative weighted least squares (IWLS) algorithm.
 
-% In a comparison with the BIC the latter model is clearly preferred.
+\begin{leftbar}
+Note that around the \verb|{equation}| above there should be no spaces (avoided
+in the {\LaTeX} code by \verb|%| lines) so that ``normal'' spacing is used and
+not a new paragraph started.
+\end{leftbar}
 
-% \begin{Schunk}
-% \begin{Sinput}
-% R> BIC(m_pois, m_nbin)
-% \end{Sinput}
-% \begin{Soutput}
-%        df      BIC
-% m_pois 18 2046.851
-% m_nbin 19 1157.235
-% \end{Soutput}
-% \end{Schunk}
+\proglang{R} provides a very flexible implementation of the general GLM
+framework in the function \fct{glm} \citep{Chambers+Hastie:1992} in the
+\pkg{stats} package. Its most important arguments are
+\begin{Code}
+glm(formula, data, subset, na.action, weights, offset,
+  family = gaussian, start = NULL, control = glm.control(...),
+  model = TRUE, y = TRUE, x = FALSE, ...)
+\end{Code}
+where \code{formula} plus \code{data} is the now standard way of specifying
+regression relationships in \proglang{R}/\proglang{S} introduced in
+\cite{Chambers+Hastie:1992}. The remaining arguments in the first line
+(\code{subset}, \code{na.action}, \code{weights}, and \code{offset}) are also
+standard  for setting up formula-based regression models in
+\proglang{R}/\proglang{S}. The arguments in the second line control aspects
+specific to GLMs while the arguments in the last line specify which components
+are returned in the fitted model object (of class \class{glm} which inherits
+from \class{lm}). For further arguments to \fct{glm} (including alternative
+specifications of starting values) see \code{?glm}. For estimating a Poisson
+model \code{family = poisson} has to be specified.
 
-% Hence, the full summary of that model is shown below.
+\begin{leftbar}
+As the synopsis above is a code listing that is not meant to be executed,
+one can use either the dedicated \verb|{Code}| environment or a simple
+\verb|{verbatim}| environment for this. Again, spaces before and after should be
+avoided.
 
-% \begin{Schunk}
-% \begin{Sinput}
-% R> summary(m_nbin)
-% \end{Sinput}
-% \begin{Soutput}
-% Call:
-% glm.nb(formula = Days ~ (Eth + Sex + Age + Lrn)^2, data = quine,
-%     init.theta = 1.60364105, link = log)
+Finally, there might be a reference to a \verb|{table}| such as
+Table~\ref{tab:overview}. Usually, these are placed at the top of the page
+(\verb|[t!]|), centered (\verb|\centering|), with a caption below the table,
+column headers and captions in sentence style, and if possible avoiding vertical
+lines.
+\end{leftbar}
+
+\begin{table}[t!]
+\centering
+\begin{tabular}{lllp{7.4cm}}
+\hline
+Type           & Distribution & Method   & Description \\ \hline
+GLM            & Poisson      & ML       & Poisson regression: classical GLM,
+                                           estimated by maximum likelihood (ML) \\
+               &              & Quasi    & ``Quasi-Poisson regression'':
+                                           same mean function, estimated by
+                                           quasi-ML (QML) or equivalently
+                                           generalized estimating equations (GEE),
+                                           inference adjustment via estimated
+                                           dispersion parameter \\
+               &              & Adjusted & ``Adjusted Poisson regression'':
+                                           same mean function, estimated by
+                                           QML/GEE, inference adjustment via
+                                           sandwich covariances\\
+               & NB           & ML       & NB regression: extended GLM,
+                                           estimated by ML including additional
+                                           shape parameter \\ \hline
+Zero-augmented & Poisson      & ML       & Zero-inflated Poisson (ZIP),
+                                           hurdle Poisson \\
+               & NB           & ML       & Zero-inflated NB (ZINB),
+                                           hurdle NB \\ \hline
+\end{tabular}
+\caption{\label{tab:overview} Overview of various count regression models. The
+table is usually placed at the top of the page (\texttt{[t!]}), centered
+(\texttt{centering}), has a caption below the table, column headers and captions
+are in sentence style, and if possible vertical lines should be avoided.}
+\end{table}
+
+
+%% -- Illustrations ------------------------------------------------------------
+
+%% - Virtually all JSS manuscripts list source code along with the generated
+%%   output. The style files provide dedicated environments for this.
+%% - In R, the environments {Sinput} and {Soutput} - as produced by Sweave() or
+%%   or knitr using the render_sweave() hook - are used (without the need to
+%%   load Sweave.sty).
+%% - Equivalently, {CodeInput} and {CodeOutput} can be used.
+%% - The code input should use "the usual" command prompt in the respective
+%%   software system.
+%% - For R code, the prompt "R> " should be used with "+  " as the
+%%   continuation prompt.
+%% - Comments within the code chunks should be avoided - these should be made
+%%   within the regular LaTeX text.
+
+\section{Illustrations} \label{sec:illustrations}
+
+For a simple illustration of basic Poisson and NB count regression the
+\code{quine} data from the \pkg{MASS} package is used. This provides the number
+of \code{Days} that children were absent from school in Australia in a
+particular year, along with several covariates that can be employed as regressors.
+The data can be loaded by
 %
-% Coefficients: (1 not defined because of singularities)
-%             Estimate Std. Error z value Pr(>|z|)
-% (Intercept)  3.00155    0.33709   8.904  < 2e-16 ***
-% EthN        -0.24591    0.39135  -0.628  0.52977
-% SexM        -0.77181    0.38021  -2.030  0.04236 *
-% AgeF1       -0.02546    0.41615  -0.061  0.95121
-% AgeF2       -0.54884    0.54393  -1.009  0.31296
-% AgeF3       -0.25735    0.40558  -0.635  0.52574
-% LrnSL        0.38919    0.48421   0.804  0.42153
-% EthN:SexM    0.36240    0.29430   1.231  0.21818
-% EthN:AgeF1  -0.70000    0.43646  -1.604  0.10876
-% EthN:AgeF2  -1.23283    0.42962  -2.870  0.00411 **
-% EthN:AgeF3   0.04721    0.44883   0.105  0.91622
-% EthN:LrnSL   0.06847    0.34040   0.201  0.84059
-% SexM:AgeF1   0.02257    0.47360   0.048  0.96198
-% SexM:AgeF2   1.55330    0.51325   3.026  0.00247 **
-% SexM:AgeF3   1.25227    0.45539   2.750  0.00596 **
-% SexM:LrnSL   0.07187    0.40805   0.176  0.86019
-% AgeF1:LrnSL -0.43101    0.47948  -0.899  0.36870
-% AgeF2:LrnSL  0.52074    0.48567   1.072  0.28363
-% AgeF3:LrnSL       NA         NA      NA       NA
-% ---
-% Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\begin{Schunk}
+\begin{Sinput}
+R> data("quine", package = "MASS")
+\end{Sinput}
+\end{Schunk}
 %
-% (Dispersion parameter for Negative Binomial(1.6036) family taken to be 1)
+and a basic frequency distribution of the response variable is displayed in
+Figure~\ref{fig:quine}.
+
+\begin{leftbar}
+For code input and output, the style files provide dedicated environments.
+Either the ``agnostic'' \verb|{CodeInput}| and \verb|{CodeOutput}| can be used
+or, equivalently, the environments \verb|{Sinput}| and \verb|{Soutput}| as
+produced by \fct{Sweave} or \pkg{knitr} when using the \code{render_sweave()}
+hook. Please make sure that all code is properly spaced, e.g., using
+\code{y = a + b * x} and \emph{not} \code{y=a+b*x}. Moreover, code input should
+use ``the usual'' command prompt in the respective software system. For
+\proglang{R} code, the prompt \code{"R> "} should be used with \code{"+  "} as
+the continuation prompt. Generally, comments within the code chunks should be
+avoided -- and made in the regular {\LaTeX} text instead. Finally, empty lines
+before and after code input/output should be avoided (see above).
+\end{leftbar}
+
+\begin{figure}[t!]
+\centering
+\includegraphics{spca_JSS-visualization}
+\caption{\label{fig:quine} Frequency distribution for number of days absent
+from school.}
+\end{figure}
+
+As a first model for the \code{quine} data, we fit the basic Poisson regression
+model. (Note that JSS prefers when the second line of code is indented by two
+spaces.)
 %
-%     Null deviance: 235.23  on 145  degrees of freedom
-% Residual deviance: 167.53  on 128  degrees of freedom
-% AIC: 1100.5
+\begin{Schunk}
+\begin{Sinput}
+R> m_pois <- glm(Days ~ (Eth + Sex + Age + Lrn)^2, data = quine,
++    family = poisson)
+\end{Sinput}
+\end{Schunk}
 %
-% Number of Fisher Scoring iterations: 1
+To account for potential overdispersion we also consider a negative binomial
+GLM.
 %
+\begin{Schunk}
+\begin{Sinput}
+R> library("MASS")
+R> m_nbin <- glm.nb(Days ~ (Eth + Sex + Age + Lrn)^2, data = quine)
+\end{Sinput}
+\end{Schunk}
 %
-%               Theta:  1.604
-%           Std. Err.:  0.214
+In a comparison with the BIC the latter model is clearly preferred.
 %
-%  2 x log-likelihood:  -1062.546
-% \end{Soutput}
-% \end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+R> BIC(m_pois, m_nbin)
+\end{Sinput}
+\begin{Soutput}
+       df      BIC
+m_pois 18 2046.851
+m_nbin 19 1157.235
+\end{Soutput}
+\end{Schunk}
 %
+Hence, the full summary of that model is shown below.
 %
-%
-% -- Summary/conclusions/discussion -------------------------------------------
-%
-% \section{Summary and discussion} \label{sec:summary}
-%
-% \begin{leftbar}
-% As usual \dots
-% \end{leftbar}
-%
-%
-% -- Optional special unnumbered sections -------------------------------------
-%
-% \section*{Computational details}
-%
-% \begin{leftbar}
-% If necessary or useful, information about certain computational details
-% such as version numbers, operating systems, or compilers could be included
-% in an unnumbered section. Also, auxiliary packages (say, for visualizations,
-% maps, tables, \dots) that are not cited in the main text can be credited here.
-% \end{leftbar}
-%
-% The results in this paper were obtained using
-% \proglang{R}~.4 with the
-% \pkg{MASS}~7.3.60.0.1 package. \proglang{R} itself
-% and all packages used are available from the Comprehensive
-% \proglang{R} Archive Network (CRAN) at
-% \url{https://CRAN.R-project.org/}.
-%
-%
-% \section*{Acknowledgments}
-%
-% \begin{leftbar}
-% All acknowledgments (note the AE spelling) should be collected in this
-% unnumbered section before the references. It may contain the usual information
-% about funding and feedback from colleagues/reviewers/etc. Furthermore,
-% information such as relative contributions of the authors may be added here
-% (if any).
-% \end{leftbar}
-%
-%
-% -- Bibliography -------------------------------------------------------------
-% - References need to be provided in a .bib BibTeX database.
-% - All references should be made with \cite, \citet, \citep, \citealp etc.
-%   (and never hard-coded). See the FAQ for details.
-% - JSS-specific markup (\proglang, \pkg, \code) should be used in the .bib.
-% - Titles in the .bib should be in title case.
-% - DOIs should be included where available.
-%
- \bibliography{JSS}
+\begin{Schunk}
+\begin{Sinput}
+R> summary(m_nbin)
+\end{Sinput}
+\begin{Soutput}
+Call:
+glm.nb(formula = Days ~ (Eth + Sex + Age + Lrn)^2, data = quine, 
+    init.theta = 1.60364105, link = log)
+
+Coefficients: (1 not defined because of singularities)
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  3.00155    0.33709   8.904  < 2e-16 ***
+EthN        -0.24591    0.39135  -0.628  0.52977    
+SexM        -0.77181    0.38021  -2.030  0.04236 *  
+AgeF1       -0.02546    0.41615  -0.061  0.95121    
+AgeF2       -0.54884    0.54393  -1.009  0.31296    
+AgeF3       -0.25735    0.40558  -0.635  0.52574    
+LrnSL        0.38919    0.48421   0.804  0.42153    
+EthN:SexM    0.36240    0.29430   1.231  0.21818    
+EthN:AgeF1  -0.70000    0.43646  -1.604  0.10876    
+EthN:AgeF2  -1.23283    0.42962  -2.870  0.00411 ** 
+EthN:AgeF3   0.04721    0.44883   0.105  0.91622    
+EthN:LrnSL   0.06847    0.34040   0.201  0.84059    
+SexM:AgeF1   0.02257    0.47360   0.048  0.96198    
+SexM:AgeF2   1.55330    0.51325   3.026  0.00247 ** 
+SexM:AgeF3   1.25227    0.45539   2.750  0.00596 ** 
+SexM:LrnSL   0.07187    0.40805   0.176  0.86019    
+AgeF1:LrnSL -0.43101    0.47948  -0.899  0.36870    
+AgeF2:LrnSL  0.52074    0.48567   1.072  0.28363    
+AgeF3:LrnSL       NA         NA      NA       NA    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for Negative Binomial(1.6036) family taken to be 1)
+
+    Null deviance: 235.23  on 145  degrees of freedom
+Residual deviance: 167.53  on 128  degrees of freedom
+AIC: 1100.5
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  1.604 
+          Std. Err.:  0.214 
+
+ 2 x log-likelihood:  -1062.546 
+\end{Soutput}
+\end{Schunk}
+
+
+
+%% -- Summary/conclusions/discussion -------------------------------------------
+
+\section{Summary and discussion} \label{sec:summary}
+
+\begin{leftbar}
+As usual \dots
+\end{leftbar}
+
+
+%% -- Optional special unnumbered sections -------------------------------------
+
+\section*{Computational details}
+
+\begin{leftbar}
+If necessary or useful, information about certain computational details
+such as version numbers, operating systems, or compilers could be included
+in an unnumbered section. Also, auxiliary packages (say, for visualizations,
+maps, tables, \dots) that are not cited in the main text can be credited here.
+\end{leftbar}
+
+The results in this paper were obtained using
+\proglang{R}~.4 with the
+\pkg{MASS}~7.3.60.0.1 package. \proglang{R} itself
+and all packages used are available from the Comprehensive
+\proglang{R} Archive Network (CRAN) at
+\url{https://CRAN.R-project.org/}.
+
+
+\section*{Acknowledgments}
+
+\begin{leftbar}
+All acknowledgments (note the AE spelling) should be collected in this
+unnumbered section before the references. It may contain the usual information
+about funding and feedback from colleagues/reviewers/etc. Furthermore,
+information such as relative contributions of the authors may be added here
+(if any).
+\end{leftbar}
+
+
+%% -- Bibliography -------------------------------------------------------------
+%% - References need to be provided in a .bib BibTeX database.
+%% - All references should be made with \cite, \citet, \citep, \citealp etc.
+%%   (and never hard-coded). See the FAQ for details.
+%% - JSS-specific markup (\proglang, \pkg, \code) should be used in the .bib.
+%% - Titles in the .bib should be in title case.
+%% - DOIs should be included where available.
+
+\bibliography{JSS.bib}
 
 \end{document}
 

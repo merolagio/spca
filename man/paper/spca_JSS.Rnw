@@ -34,12 +34,12 @@ library("MASS")
 %% - \Plainauthor{} without affiliations
 %% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
 %% - \AND starts a new line, \And does not.
-\author{Giovanni Maria Merola~\orcidlink{0000-0003-0918-3766}\\British University Vietnam
+\author{Giovanni Maria Merola~\orcidlink{0000-0003-2539-9225}\\British University Vietnam}
 
 %% - \title{} in title case
 %% - \Plaintitle{} without LaTeX markup (if any)
 %% - \Shorttitle{} with LaTeX markup (if any), used as running title
-\title{An R package to compute Least Squares Sparse Principal Components}
+\title{An R package to Compute Least Squares Sparse Principal Components}
 \Plaintitle{An R package to compute Least Squares Sparse Principal Components}
 \Shorttitle{An \proglang{R} package to compute LS-SPCA components}
 
@@ -61,211 +61,158 @@ library("MASS")
 %% - Should be comma-separated and in sentence case.
 \Keywords{JSS, style guide, comma-separated, not capitalized, \proglang{R}}
 \Plainkeywords{JSS, style guide, comma-separated, not capitalized, R}
+\Keywords{JSS, SPCA, Least squares, projection, uncorrelated, \proglang{R}}
+\Plainkeywords{JSS, SPCA, Least squares, projection, uncorrelated, R}
 
-%% - \Address{} of at least one author
-%% - May contain multiple affiliations for each author
-%%   (in extra lines, separated by \emph{and}\\).
-%% - May contain multiple authors for the same affiliation
-%%   (in the same first line, separated by comma).
+
 \Address{
-  Achim Zeileis\\
-  Journal of Statistical Software\\
-  \emph{and}\\
-  Department of Statistics\\
-  Faculty of Economics and Statistics\\
-  Universit\"at Innsbruck\\
-  Universit\"atsstr.~15\\
-  6020 Innsbruck, Austria\\
-  E-mail: \email{Achim.Zeileis@R-project.org}\\
-  URL: \url{https://www.zeileis.org/}
+  Giovanni Merola\\
+  British University Vietnam\\
+  Ecopark, Hung Yen\\
+  Vietnam\\
+  E-mail: \email{merolagio@gmail.com}\\
 }
 
+% to use latex macros inside r chunks
+% <<results='asis'>>=
+% cat("\\[ \\bX = \\bA \\trans \\]\n")
+
+\input{spca_JSS_macros.TeX}
 \begin{document}
 %% changed to FALSE
 \SweaveOpts{concordance = FALSE}
 
+%% changed to FALSE
 \section{Introduction to LS-SPCA}
-sparse principal components analysis (SPCA) is a variant of principal components analysis (PCA) that aims at computing sparse principal components (sPCs) that are linear combinations of only a few of the features, hence having \emph{sparse} loadings with few nonzero elements. 
+sparse principal components analysis (SPCA) is a variant of principal components analysis (PCA) that aims at computing sparse principal components (sPCs) that are linear combinations of only a few of the features, hence having \emph{sparse} loadings with few nonzero elements.
 
 Most of the existing \emph{conventional} SPCA methods compute sPCs that have maximal variance, using the objective function defined by \citet{hot}. There exist a plethora of such methods which, as outlined in the \emph{All sparse PCA models are wrong, but some are useful}
-series of review articles (\citeauth{camI}, \citeyear{camI}, \citeyear{camII}, \citeyear{camIII}), produce competing solutions, that are often not close to the original principal components (PCs). \citet{mer19} also shows other drawbacks of these methods.
+series of review articles (\citeauthor{camI}, \citeyear{camI}, \citeyear{camII}, \citeyear{camIII}), produce competing solutions, that are often not close to the original principal components (PCs). \citet{mer19} also shows other drawbacks of these methods.
 
-LS-SPCA was introduced in \citet{mer15} and its projection variant in \citet{mer19}. This approach aims to compute sPCs that can be used to best approximate the data, in a least-squares (LS) sense, hence adopting \citep{pea} classic PCA's objective. It should be noticed that, while  Pearson's and Hotelling's objectives are equivalent in PCA, this is not the case when sparsity constraints are introduced\citep{mer15, mer19}, and this is probably the reason why \citeauth{camI} say that all (conventional) SPCA methods are wrong.
+LS-SPCA was first proposed in \citet{mer15} and its projection variant in \citet{mer19}. This approach aims to compute sPCs that can be used to best approximate the data, in a least--squares (LS) sense, hence adding sparsity constraints to \citep{pea} classic PCA's data approximation objective. It should be noticed that, while  Pearson's and Hotelling's objectives give the same solutions in PCA, this is not the case when sparsity constraints are introduced\citep{mer15, mer19}, and this is probably the reason why \citeauthor{camI} found that all (conventional) SPCA methods are wrong.
 
-The \pkg{spca} computes LS-SPCA solutions with several options and helper functions to visualize and compare the solutions. rather than a black-box optimizer type, \pkg{spca} provides an intuitive UI with transparent options and goodness of fit metrics.    
+The \pkg{spca} package computes LS-SPCA solutions with several options and helper functions to visualize and compare the solutions. Rather than a black-box optimizer type function, the package provides an intuitive UI with transparent options and goodness--of--fit metrics.
 
-This articles will be used as extended vignettes in the package, so will illustrate several of the available options and helpers, useful to conduct a thorough SPCA. In the next Section we briefly introduce the theory behind LS-SPCA. In Section \ref{sec:spcapack} we illustrate the package with examples.
+This article will be used as extended vignettes in the package, so will illustrate several of the available options and helpers, useful to conduct a thorough SPCA. In the next Section we briefly introduce the theory behind LS-SPCA. In Section \ref{sec:spcapack} we illustrate the package with examples.
 
-\subsection{Least squares Sparse Principal Component Analysis (LS-SPCA)}
+\subsection{LS-SPCA estimation}
+The material in this section is taken from \citet{mer15} and \citet{mer19} where proofs and further details can be found.
+Let's establish notation first.
+$X$ denotes the $n \times p$ data matrix containing $n$ cases on $p$ features centered to mean zero. $S \propto X\trasp X$ denotes the covariance matrix. The eigenvectors of S, $v_1, \ldots, v_p$ ($\|v_j\| = 1$, $j = 1, \ldots, p$ (the PCs loadings) are  ordered by decreasing corresponding eigenvalues,
+$\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p$. The same convention is used for all eigenvectors (including generalized ones).
 
-Given an $n \times p$ matrix $X$ containing $n$ cases on $p$ features, centered to mean zero, 
+The sparse loadings are the vectors $a_j = (a_{i1}, \ldots, a_{r}, r\le p$ with unit norm $a\traspj a_j = 1$, each of which has only $c_j \leq p$ non-zero elements. The quantity $c_j$ is called the \emph{cardinality} of $a_j$. The sPCs are then equal to $t_j = X a_j$.
 
-Let $S = X^\top X$ be the covariance matrix. Let $v_1, \ldots, v_p$ ($\|v_j\| = 1$, $j = 1, \ldots, p$) be the eigenvectors of $S$, ordered by decreasing corresponding eigenvalues,
-$\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p$.
-In SPCA literature, the $v$-vectors are called the \emph{loadings} of the PCs. The principal components (PCs) are defined as $y_j = X v_j$.
+A dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to a set of indices, $ind_j$. In \proglang{R} syntax, we write $\daj = a_j[ind_j]$ to indicate the vector containing only the $c_j$ non-zero loadings in $\a_j$, so that $t_j = \dXj\da_j$.
 
-The sparse loadings are the vectors $a_j = (a_{i1}, \ldots, a_{p}$, $\|a_j\| = 1$, $j = 1, \ldots, r$, each of which has only $c_j \leq p$ non-zero elements. The quantity $c_j$ is called the \emph{cardinality} of $a_j$. The sPCs are then equal to $t_j = X a_j$.
-
-
+There exist there variants of LS-SPCA, optimizing two different objectives
 LS-SPCA solutions are derived using two different objectives.
 
-\subsubsection{Objective: maximal Variance explained}
-In the SPCA context the objective becomes
+\subsubsection{Objective: maximal variance explained}
+This objective is obtained by adding sparsity constraints to the standard least squares PCA objective of maximizing the variance explained (VEXP).
 \begin{equation}\label{eq:lsscpca_obj}
-\min_{a_j} \|X - t_j b^\top\|^2,
+\min_{a_j} \|X - t_j b\trasp\|^2,
 \quad \text{subject to}\quad
 \operatorname{card}(a_j) < p,
-\quad a_j^\top S a_i = 0,\ i < j.
+\quad a\traspj S a_i = 0,\ i < j; j =1, \ldots,r.
 \end{equation}
-
-\subsubsection{Objective: maximal correlation with the PCs)}
-This objective function requires that the sPCs approximate well the PCs. Since the Pcs best approximate the data, the resulting sPCs will be close to the ones computed with the other objective, and vice versa, However, this approach is computationally simpler. 
-
-\begin{equation}\label{eq:pscpca_obj}
-\max_{a_j} \vert\operatorname{cor}(t_j, y_j)\vert,
-\quad \text{subject to}\quad
- a_j^\top S a_i = 0,\ i < j,
-\quad \operatorname{card}(a_j) < p.
-\end{equation}
-
-\subsection{LS-SPCA solutions}
-We now face two challenges. The first is to derive the solutions when the indices of the non-zero loadings are known. The second is to identify the optimal set of these indices for each sPC.
-
-We begin by assuming that these indices are known. Let $\operatorname{ind}_j$ denote the set of indices for the $j$th sPC, and let a dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to these indices. In \proglang{R} syntax, we can write $\dot{a}_j = a_j[\operatorname{ind}_j]$ and $\dot{S}_j = S[, \operatorname{ind}_j]$ and $t_j = \dot{X}\dot{a_j}.
-
-\subsubsection{Maximal variance explained}
-It can be shown that the solution requires solving
-
-\begin{equation}\label{eq:vexp_obj}
-\max_{a_j}
-\frac{a_j^\top X^\top X X^\top X a_j}{a_j^\top X^\top X a_j}
-\equiv
-\max_{a_j}
-\frac{a_j^\top S S a_j}{a_j^\top S a_j},
-\quad a_j^\top S a_i = 0,\ i < j,
-\quad \operatorname{card}(a_j) < p.
-\end{equation}
-
-The objective function \ref{eq:vexp_obj} is the \emph{variance explained} (VEXP) by the $j$th component. Without cardinality constraints it is the objective of standard PCA.
-
-In passing, we note that, without cardinality constraints, objective function \ref{eq:vexp_obj} is original PCA objective formulated by \citet{pea}, which has solutions
-\[
-\max_{v_j} a_j^\top S a_j,\quad a_j^\top S a_i = 0,\ i < j.
-\]
-These solutions are \citet{hot} definition of PCA objective. The equivalence between the two objectives is no longer valid when cardinality constraints are introduced \citep{mer15}. 
 
 \paragraph{Uncorrelated LS-SPCA (uSPCA).}
-The exact solutions to objective \ref{eq:vexp_obj} are computed by adding the constraints directly into the variance explained expression by means of the generic $\dot{X}$ matrix. Hence the optimal sparse loadings, $\dot{a}_j$, are the generalized eigenvectors corresponding to the largest eigenvalue, $\lambda_j$, solution to
-\begin{equation}\label{eq_uspca_sol}
-C_j \dot{S}_j^\top \dot{S}_j \dot{a}_j = \lambda_j \dot{X}_j^\top \dot{X}_j \dot{a}_j,
+The optimal sparse loadings for objective \ref{eq:lsscpca_obj}, $\daj$, are the generalized eigenvectors corresponding to the largest eigenvalue, $\lambda_j$, solution to
+\begin{equation}\label{eq:uspca_sol}
+C_j \dST \dS \daj = \lambda_j \dXjT \dXj \daj,
 \end{equation}
-where the matrices $C_j$ ($C_1 = I$) enforce the orthogonality constraints.
+where  $\dS = S[ind_j]$ and the matrices $C_j$ enforce the orthogonality constraints ($C_1 = I$).
 
 The orthogonality constraints require that the cardinality of the solution loadings satisfy $c_j \geq j$. Furthermore, the solutions can be computationally demanding and unstable.
 
 \paragraph{Correlated LS-SPCA (cSPCA).}
-Approximate but simpler to compute solutions can be obtained from the orthogonal residuals of the previously computed sPCs. Let
-\begin{equation}\label{eq_defX_def}
-Q_j = \left(I_p - \frac{t_{j-1} t_{j-1}^\top}{t_{j-1}^\top t_{j-1}}\right) Q_{j-1} = H_j Q_{j-1},
+Approximated but simpler to compute solutions can be obtained from the residual matrices orthogonal to the previously computed sPCs. Let
+\begin{equation}\label{eq:defX_def}
+Q_j = \left(I_p - \frac{t_{j-1} t\trasps{j-1}}{t\trasps{j-1} t_{j-1}}\right) Q_{j-1},
 \quad j = 2, 3, \ldots, r,
 \end{equation}
-where $H_j$ is the \emph{hat} matrix and $Q_1 = X$. The matrices $Q_j$ are often called \emph{deflated} matrices. Note that the use of the deflated matrices is a direct consequence of the Courant--Fischer min--max theorem and is typically used in the power method for computing the eigendecomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue:
+with $Q_1 = X$. In SPCA literature the residual matrices $Q_j$ are called \emph{deflated} matrices. Note that the use of the deflated matrices is a direct consequence of the Courant--Fischer min--max theorem and is typically used in the power method for computing the eigen-decomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue:
 \begin{equation}
-\dot{Q}_j^\top X X^\top \dot{Q}_j \dot{a}_j = \mu_j \dot{X}_j^\top \dot{X}_j \dot{a}_j.
+\dXtj Q_j\QjT\dXj \daj = \mu_j \dXjT\dXj \daj.
 \end{equation}
+The first cSPCA solution is equal to the first uSPCA solution but, in general, the following solutions are not equal to the corresponding uSPCA solutions and,  typically show very mild correlation with one another, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and, in most cases, it is lower than their order.
 
-The first solution is equal to the first uSPCA solution but, in general, the following ones are not equal to the corresponding uSPCA solutions. The cSPCA solutions typically show very mild correlation with one another, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and, in most cases, it is lower than their order. %Note that
-\begin{equation}\label{eq_cspca_sol}
-\mu_j = \max_{a_j}
-\frac{a_j^\top X^\top Q_j Q_j^\top X a_j}{a_j^\top X^\top X a_j}.
-\label{eq:apprvexp}
+\subsubsection{Maximal correlation with the PCs (pSPCA)}
+The sPCs obtained by maximizing the variance explained are usually highly correlated with the corresponding PCs. However, as the order of the components increases, these correlations tend to decrease.
+
+The pSPCA objective function requires that the sPCs best approximate the PCs. That is
+\begin{equation}\label{eq:pscpca_obj}
+\max_{a_j} \vert\text{cor}(t_j, PC_j)\vert,
+\quad \text{subject to}\:\text{card}(a_j) < p.
 \end{equation}
+It is well known that the optimal solution to this objective is linear regression. Since staring with the first, the sPCs explain less variance than the corresponding PCs, using the first PC of the $Q_j$ matrices, instead of the PCs, allows to recover some of this unexplained variance.
 
-This is an approximate measure of the variance explained. Because the resulting PCs are correlated, the exact VEXP must be obtained as the difference between the cumulative VEXP (CVEXP) explained by the first $j$ csPCs and that explained by the preceding $(j - 1)$ csPCs:
-
+Therefore, in pSPCA, the sparse loadings are computed as the
+coefficients, standardized to unit norm, of the regression of the residual PCs onto subsets if the $x$-variables. That is
 \begin{equation}
-\operatorname{VEXP}(t_j) =
-\operatorname{trace}\Bigl(X^\top T_j (T_j^\top T_j)^{-1} T_j^\top X\Bigr)
--
-\operatorname{trace}\Bigl(X^\top T_{j-1} (T_{j-1}^\top T_{j-1})^{-1} T_{j-1}^\top X\Bigr),
+\daj \propto (\dXjT\dXj)^{-1} \dXjT z_j,
 \end{equation}
+where $z_j$ denotes the $j$-th residual PC.
 
-where $T_j$ is the matrix with columns equal to the first $j$ sPCs.
-
-\subsubsection{Maximal correlation with the PCs}
-
-The sPCs obtained by maximizing the variance explained are usually highly correlated with the corresponding PCs. However, as the order of the components increases, these correlations tend to decrease. A different approach to computing sPCs is Projection LS-SPCA (pSPCA). In this approach, the sPCs are obtained by projecting the residual PCs onto the $x$-variables. Let $z_j = Q_j v_j$ denote the first PC of the deflated matrix $Q_j$. Then the pSPCA solution loadings are obtained as the regression coefficients, standardized to unit norm, from the regression of $z_j$ onto $\dot{X}_j$:
-
-\begin{equation}
-\dot{a}_j \propto (\dot{X}_j^\top \dot{X}_j)^{-1} \dot{X}_j^\top z_j.
-\end{equation}
-
-The psPCs have maximum multiple squared correlation (the $R^2$ coefficient) for the given set of indices $\operatorname{ind}_j$.
-
+In general, the pSPCA loadings are close to the cSPCA ones but show higher mutual correlation, still of small magnitude. This approach ensures best approximation sPC to PC and is computationally simpler. Furthermore, pSPCA provide a very efficient approach to variable selection.
+%%%%%%%%%%%%%%%%%%%
 \subsection{Variable selection}
+Variable selection is notoriously a computationally demanding (NP-hard) task that requires greedy algorithms for its solution.
 
-Variable selection is notoriously a computationally demanding, NP-hard task that requires greedy algorithms for its solution.
+For uSPCA and cSPCA we implemented \emph{intensive} forward selection algorithms based on the actual variable explained that terminate after a minimal proportion of the cumulative variance explained (CVEXP) of the corresponding number of PCs is reached. These are computationally expensive, especially for large matrices, because they require to repeatedly compute generalized eigen-decompositions.
 
-Regression-based variable selection algorithms are used to determine the pSPCA solution. Thus, we implemented standard forward, backward, and forward stepwise variable selection algorithms used for regression, with a stopping rule based on the current $R^2$. Because the response variable $z_j$ is proportional to an eigenvector of $Q_j$, the algorithms are simplified using the fact that $z_j^\top X = z_j^\top Q_j = v_j \lambda_j$. These algorithms have approximate complexity $O(p^2)$.
-
-For uSPCA and cSPCA we implemented forward and backward algorithms that terminate after a minimal proportion of the CVEXP of the corresponding number of PCs is reached or, respectively, not passed. These algorithms use the approximate VEXP in Equation~\ref{eq:apprvexp} to determine the variables to select or eliminate and are computationally very expensive. The forward selection is approximately $O(pk^4)$ for selecting $k$ variables, even when VEXP is computed with the power method to save computation time. However, a dramatic reduction in computational complexity can be achieved by selecting the variables using one of the algorithms implemented for pSPCA and computing the CVEXP at each iteration, which is then used as the stopping rule. While the exact cSPCA-based algorithm may yield more efficient solutions, in many cases there is little difference from the results obtained using the regression variable selection algorithms.
-
+We also implemented efficient regression based standard forward, backward, and forward stepwise variable selection algorithms. These algorithms always use the computationally cheap $R^2$ to select or eliminate variables. For maximum sPC-PC correlation objective the current $R^2$ should be used as stopping rule. For maximum VEXP objective the current CVEXP should be used. In this case, at every search step, the current CVEXP is computed to evaluate the stopping rule, so they can still be computationally expensive. Forward selection is advised when $p$ is large. Different types of variable selection are chosen via the argument \code{var_selection = c("fwd", "bkw", "step")} and the stop criterion via the argument \code{stop_criterion = c("r2", "cvexp")}. The variance explained based intensive selection is selected by setting \code{intensive = TRUE}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Computational details}
-Since uSPCA and cSPCA require solving generalized eigenvector problems, the computation for large matrices is computationally demanding. The problem is even more taxing in variable selection. Therefore, we put some care to make the computation feasible on large matrices.
+in \pkg{spca}, linear algebra and matrix is handled by the \proglang{C++} back-end. This is used also to prevent deep copies typically made by \proglang{R} functions. The exported functions are called from \proglang{R} wrappers.
 
-The major expedient that we use is to do the demanding $O(np^2)$ multiplication to compute the covariance matrix $S = X^\top X$ only once at the beginning. Then deflations are done with cheap rank-1 updates as $Q_{j + 1} = Q_j - \frac{t_j}$
+The main function \code{spca()} is used to compute LSSPCA solutions of all types  with all options. Different back-ends manage ``fat'' matrices ($n < p$) and ``tall'' matrices. 
+The tall back-end operates on the covariance matrix $S$, while the fat back-end operates on the row-space of the data matrix, using a \emph{reverse-SVD} approach to compute eigen-decompositions and dedicated variable selection algorithms to compute LS-SPCA solutions. Which back-end is used is decided automatically, based on whether the data matrix aspect-ratio is less of one or not, if \code{fat_matrix = NULL}, or it can forced by setting \code{fat_matrix = TRUE/FALSE}.
 
-Let
-\[
-S_j = Q_j^\top Q_j,
-\qquad
-M_j = S_j S_j,
-\]
-and let \(a_j\) be the cSPCA loading vector solving
-\[
-M_j a_j = S_j S_j a_j = \mu_j S a_j,
-\]
-where \(S = X^\top X\) is the original matrix and \(\mu_j\) is the largest generalized eigenvalue. The score vector is always
-\[
-t_j = X a_j,
-\]
-so
-\[
-t_j^\top t_j = a_j^\top S a_j.
-\]
+The major expedient that we use is to do the potentially demanding $O(np^2)$ multiplication to compute the covariance matrix $S = X\trasp X$ and the $O(p^3)$ multiplication $SS$ only once at the beginning. Then deflations are done with
+cheap rank-1 updates instead of recomputing tthe natrices as products of the deflated data matrix. The computational savings can be substantial when $p$ is large, as they reduce the cost from , roughly, $O(p^3)$ to $O(p^2)$.
 
-With
-\[
-Q_{j + 1} = \left(I - \frac{t_j t_j^\top}{t_j^\top t_j}\right) Q_j,
-\]
-define
-\[
-g_j = Q_j^\top t_j,
-\qquad
-d_j = t_j^\top t_j = a_j^\top S a_j.
-\]
-Then
-\[
-S_{j + 1} = Q_{j + 1}^T Q_{j + 1}
-=
-S_j - \frac{g_j g_j^\top}{d_j},
-\]
-which is a rank-1 downdate. Consequently,
-\[
-M_{j + 1} = S_{j + 1} S_{j + 1} = M_j - \frac{S_j g_j g_j^\top + g_j g_j^\top S_j}{d_j} +
-\frac{g_j^\top g_j}{d_j^2}\, g_j g_j^\top.
-\]
-Thus \(M_j\) is updated by a sum of rank-1 terms, avoiding recomputation of \(M_{j + 1}\) from scratch. 
+Since, apart from the initial eigen-decomposition, only the leading eigen-pair of a matrix is needed, these can optionally be computed with the power method. The power method option can be triggered by setting \code{PML = TRUE} for loading computation and \code{PMVS = TRUE} for intensive variable selection computation. 
+Using the power method reduces the computational cost for a $p \times p$ matrix from approximately $O(p^3)$ to approximately $O(Kp^2)$, where $K$ is the number of iterations required for convergence. The convergence can be controlled with the \code{maxiterPM...} and \code{epsPM...} for each set of computations.
 
-Hence the update of \(M_j\) is a sum of rank-1 terms.
+Regression based variable selection algorithm is simplified by considering that the regressed variable is an eigen-vector of the regressors and uses rank-1 updates for computing current values of selected stopping criterion. 
 
-The generalized eigenvalue relation is consistent with these definitions, since
-\[
-a_j^\top M_j a_j = a_j^\top S_j S_j a_j = \mu_j a_j^\top S a_j = \mu_j t_j^\top t_j,
-\]
-where again \(\mu_j\) is the largest generalized eigenvalue. This identity is useful for interpreting the scalar criterion associated with \(a_j\), while the actual deflation formulas above are expressed in terms of \(g_j = Q_j^\top t_j\) and \(d_j = t_j^\top t_j = a_j^\top S a_j\).
+Similar considerations are valid for the fat back-end engine.
 
-Using these rank-1 updates gives a substantial computational saving compared with recomputing the matrices from the deflated data matrix at each step. Recomputing the covariance matrix \(S_j\) from \(Q_j\) costs \(O(n p^2)\), whereas updating it directly costs only \(O(p^2)\). For \(M_j\), the saving is larger: recomputing it requires multiplying two \(p \times p\) matrices, which costs \(O(p^3)\), whereas the corresponding update uses only matrix-vector products and outer products, so its cost is \(O(p^2)\). The reduction is therefore substantial, especially when \(p\) is large.
+% These algorithms use the approximate VEXP in Equation~\ref{eq:apprvexp} to determine the variables to select or eliminate and are computationally very expensive. The forward selection is approximately $O(pk^4)$ for selecting $k$ variables, even when VEXP is computed with the power method to save computation time. However, a dramatic reduction in computational complexity can be achieved by selecting the variables using one of the algorithms implemented for pSPCA and computing the CVEXP at each iteration, which is then used as the stopping rule. While the exact cSPCA-based algorithm may yield more efficient solutions, in many cases there is little difference from the results obtained using the regression variable selection algorithms.
+
+
+
+
+\bibliography{JSS}
+\end{document}
+
+% \begin{figure}[t!]
+% \centering
+% <<visualization, echo=FALSE, fig=TRUE, height=5.2, width=7>>=
+% par(mar = c(4, 4, 1, 1))
+% plot(table(quine$Days), xlab = "Days", ylab = "Frequency", axes = FALSE)
+% axis(2)
+% axis(1, at = 0:16 * 5, labels = FALSE)
+% axis(1, at = 0:8 * 10)
+% box()
+% @
+% \caption{\label{fig:quine} Frequency distribution for number of days absent
+% from school.}
+% \end{figure}
+% 
+% \begin{Code}
+% glm(formula, data, subset, na.action, weights, offset,
+%   family = gaussian, start = NULL, control = glm.control(...),
+%   model = TRUE, y = TRUE, x = FALSE, ...)
+% \end{Code}
+% where \code{formula} plus \code{data}
+% 
+% <<summary>>=
+% summary(m_nbin)
+% @
+% %%%%%%%%%%%%%%%
 
 
 \section{JSS EXAMPLE}
