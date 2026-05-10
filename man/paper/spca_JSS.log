@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.2)  10 MAY 2026 07:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.2)  11 MAY 2026 05:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -770,13 +770,21 @@ Package: amsthm 2020/05/29 v2.20.6
 \thm@headsep=\skip67
 \dth@everypar=\toks40
 )
-(spca_JSS_macros.TeX)
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 78
-.
+(spca_JSS_macros.TeX) (C:/PROGRA~1/R/R-43~1.3/share/texmf/tex/latex\Sweave.sty
+Package: Sweave 
+
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+)
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 11
+6.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
+))
+Environment Schunk is already defined, stay with former definition)
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 tex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
@@ -784,24 +792,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 ) (spca_JSS.aux)
 \openout1 = `spca_JSS.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 78.
-LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 70.
+LaTeX Font Info:    ... okay on input line 70.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
@@ -821,108 +829,102 @@ ii
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/grfext\grfext.sty
+Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
+)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 504.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\\' on input line 78.
-
-Package hyperref Info: Link coloring ON on input line 78.
-(spca_JSS.out) (spca_JSS.out)
+Package hyperref Info: Link coloring ON on input line 70.
+ (spca_JSS.out) (spca_JSS.out)
 \@outlinefile=\write5
 \openout5 = `spca_JSS.out'.
 
-<jsslogo.jpg, id=62, 540.0175pt x 393.47pt>
+<jsslogo.jpg, id=74, 540.0175pt x 393.47pt>
 File: jsslogo.jpg Graphic file (type jpg)
 <use jsslogo.jpg>
-Package pdftex.def Info: jsslogo.jpg  used on input line 78.
+Package pdftex.def Info: jsslogo.jpg  used on input line 70.
 (pdftex.def)             Requested size: 89.80768pt x 65.43607pt.
-LaTeX Font Info:    Trying to load font information for T1+pzc on input line 78
+LaTeX Font Info:    Trying to load font information for T1+pzc on input line 70
 .
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pzc.fd
 File: t1pzc.fd 2020/03/25 font definitions for T1/pzc.
 )
 LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <28> not available
-(Font)              Font shape `T1/pzc/m/it' tried instead on input line 78.
+(Font)              Font shape `T1/pzc/m/it' tried instead on input line 70.
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
-8.
+0.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
-8.
+0.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-78.
+70.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-78.
+70.
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 78.
+(Font)              <10.95> on input line 70.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 78.
+(Font)              <8> on input line 70.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 78.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 78.
+(Font)              <6> on input line 70.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 70.
 
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 78.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 70.
 
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 78
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 70
 .
 
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/jknappen\ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 78.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 78.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 78.
-
-
-Package natbib Warning: Citation `Zeileis+Kleiber+Jackman:2008' on page 1 undef
-ined on input line 78.
-
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 7
-8.
+0.
+
 (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [1
+)
+Underfull \vbox (badness 2158) has occurred while \output is active []
+
+ [1
 
 {C:/Users/merol/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/mero
 l/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/merol/Ap
 pData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc} <./jsslogo.jpg>]
 
-LaTeX Warning: Reference `sec:spcapack' on page 2 undefined on input line 93.
-
-
-Underfull \vbox (badness 1043) has occurred while \output is active []
+LaTeX Warning: Reference `sec:spcapack' on page 2 undefined on input line 85.
 
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
@@ -932,46 +934,42 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [2{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.en
 c}{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.en
 c}{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
+52.
+
+(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 3
  []
 
 [3{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.en
 c}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-62.
- (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
-File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 4 []
  []
 
 [4]
-<spca_JSS-pca.pdf, id=150, 433.62pt x 433.62pt>
+<spca_JSS-pca.pdf, id=163, 433.62pt x 433.62pt>
 File: spca_JSS-pca.pdf Graphic file (type pdf)
 <use spca_JSS-pca.pdf>
-Package pdftex.def Info: spca_JSS-pca.pdf  used on input line 225.
+Package pdftex.def Info: spca_JSS-pca.pdf  used on input line 216.
 (pdftex.def)             Requested size: 354.12434pt x 354.14154pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 5
  []
 
 [5]
-<spca_JSS-r qq-plot.pdf, id=159, 216.81pt x 216.81pt>
-File: spca_JSS-r qq-plot.pdf Graphic file (type pdf)
-<use spca_JSS-r qq-plot.pdf>
-Package pdftex.def Info: spca_JSS-r qq-plot.pdf  used on input line 238.
-(pdftex.def)             Requested size: 354.12434pt x 354.16798pt.
-
-Overfull \hbox (6.15793pt too wide) in paragraph at lines 238--240
-[] \T1/lmr/m/n/10.95 We set-tle for 4 com-
- []
-
+<spca_JSS-qq-plot.pdf, id=171, 433.62pt x 433.62pt>
+File: spca_JSS-qq-plot.pdf Graphic file (type pdf)
+<use spca_JSS-qq-plot.pdf>
+Package pdftex.def Info: spca_JSS-qq-plot.pdf  used on input line 230.
+(pdftex.def)             Requested size: 354.12434pt x 354.14154pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -981,78 +979,52 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
  []
 
 [6 <./spca_JSS-pca.pdf>]
-! Undefined control sequence.
-<recently read> \fnt 
-                     
-l.256 \fnt
-          {print} is the default method. By default it shows the percentage ...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 7
  []
 
-[7 <./spca_JSS-r qq-plot.pdf>]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 3
-04.
-
-(C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
+[7 <./spca_JSS-qq-plot.pdf>]
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 8 []
  []
 
-[8{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}]
-
+[8]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 3
+41.
+ (C:\Users\merol\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 9
  []
 
-[9]
-<spca_JSS-r barplot.pdf, id=192, 361.35pt x 361.35pt>
-File: spca_JSS-r barplot.pdf Graphic file (type pdf)
-<use spca_JSS-r barplot.pdf>
-Package pdftex.def Info: spca_JSS-r barplot.pdf  used on input line 381.
-(pdftex.def)             Requested size: 354.12434pt x 354.1261pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+[9{C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}]
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 10 []
  []
 
 [10]
-<spca_JSS-r circplot.pdf, id=197, 361.35pt x 361.35pt>
-File: spca_JSS-r circplot.pdf Graphic file (type pdf)
-<use spca_JSS-r circplot.pdf>
-Package pdftex.def Info: spca_JSS-r circplot.pdf  used on input line 388.
+<spca_JSS-barplot.pdf, id=208, 361.35pt x 361.35pt>
+File: spca_JSS-barplot.pdf Graphic file (type pdf)
+<use spca_JSS-barplot.pdf>
+Package pdftex.def Info: spca_JSS-barplot.pdf  used on input line 421.
 (pdftex.def)             Requested size: 354.12434pt x 354.1261pt.
-
-Overfull \hbox (9.04558pt too wide) in paragraph at lines 388--391
-[] \T1/lmr/m/n/10.95 SPCA con-tri-bu-tions
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+<spca_JSS-circplot.pdf, id=209, 361.35pt x 361.35pt>
+File: spca_JSS-circplot.pdf Graphic file (type pdf)
+<use spca_JSS-circplot.pdf>
+Package pdftex.def Info: spca_JSS-circplot.pdf  used on input line 430.
+(pdftex.def)             Requested size: 354.12434pt x 354.1261pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 11
  []
 
-[11 <./spca_JSS-r barplot.pdf>]
-<spca_JSS-r heatmap_compare.pdf, id=207, 361.35pt x 361.35pt>
-File: spca_JSS-r heatmap_compare.pdf Graphic file (type pdf)
-<use spca_JSS-r heatmap_compare.pdf>
-Package pdftex.def Info: spca_JSS-r heatmap_compare.pdf  used on input line 395
-.
+[11 <./spca_JSS-barplot.pdf>]
+<spca_JSS-heatmap_compare.pdf, id=220, 361.35pt x 361.35pt>
+File: spca_JSS-heatmap_compare.pdf Graphic file (type pdf)
+<use spca_JSS-heatmap_compare.pdf>
+Package pdftex.def Info: spca_JSS-heatmap_compare.pdf  used on input line 439.
 (pdftex.def)             Requested size: 354.12434pt x 354.1261pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -1062,23 +1034,56 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 12 []
  []
 
-[12 <./spca_JSS-r circplot.pdf>] (spca_JSS.bbl
+[12 <./spca_JSS-circplot.pdf>]
+Overfull \hbox (0.27283pt too wide) in paragraph at lines 461--464
+\T1/lmr/m/n/10.95 We add meth-ods names to be used in the plot but keep the de-
+fault ar-gu-ment \T1/lmtt/m/n/10.95 col_short_names
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 13
  []
 
-[13 <./spca_JSS-r heatmap_compare.pdf>])
+[13 <./spca_JSS-heatmap_compare.pdf>]
+<spca_JSS-compare.pdf, id=247, 361.35pt x 361.35pt>
+File: spca_JSS-compare.pdf Graphic file (type pdf)
+<use spca_JSS-compare.pdf>
+Package pdftex.def Info: spca_JSS-compare.pdf  used on input line 506.
+(pdftex.def)             Requested size: 354.12434pt x 354.1261pt.
 
-Package natbib Warning: There were undefined citations.
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
-(Font)              Font shape `T1/pzc/m/it' tried instead on input line 402.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 14 []
  []
 
-[14] (spca_JSS.aux)
+[14]
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+[] \T1/lmr/m/n/10.95 15
+ []
+
+[15 <./spca_JSS-compare.pdf>]
+<spca_JSS-aggregate.pdf, id=262, 361.35pt x 361.35pt>
+File: spca_JSS-aggregate.pdf Graphic file (type pdf)
+<use spca_JSS-aggregate.pdf>
+Package pdftex.def Info: spca_JSS-aggregate.pdf  used on input line 529.
+(pdftex.def)             Requested size: 354.12434pt x 354.1261pt.
+ (spca_JSS.bbl
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+\T1/lmr/m/n/10.95 16 []
+ []
+
+[16 <./spca_JSS-aggregate.pdf>])
+LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
+(Font)              Font shape `T1/pzc/m/it' tried instead on input line 546.
+
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+[] \T1/lmr/m/n/10.95 17
+ []
+
+[17] (spca_JSS.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -1088,14 +1093,14 @@ L3 programming layer <2025-12-24>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `spca_JSS.out' has not changed.
-(rerunfilecheck)             Checksum: B20629D62B41593C751EA3B1FE821614;2989.
+(rerunfilecheck)             Checksum: 33EE53E4B7404CA8446BC95391E3930C;3297.
  ) 
 Here is how much of TeX's memory you used:
- 23507 strings out of 467871
- 439146 string characters out of 5418377
- 825170 words of memory out of 5000000
- 51857 multiletter control sequences out of 15000+600000
- 734690 words of font info for 116 fonts, out of 8000000 for 9000
+ 23638 strings out of 467871
+ 442275 string characters out of 5418377
+ 827659 words of memory out of 5000000
+ 51974 multiletter control sequences out of 15000+600000
+ 716402 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,108p,960b,868s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmb10.pfb
@@ -1107,23 +1112,22 @@ Here is how much of TeX's memory you used:
 <C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><
 C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb>
 <C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><
-C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:
-/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmro10.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmss10.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsso10.pfb><C:/
-Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/
-Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:/U
-sers/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtto10.pfb><C:/
-Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/m
-sam10.pfb><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfcha
-n/uzcmi8a.pfb>
-Output written on spca_JSS.pdf (14 pages, 496771 bytes).
+C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmro10.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmss10.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsso10.pfb><C
+:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C
+:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:
+/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtto10.pfb><C
+:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols
+/msam10.pfb><C:/Users/merol/AppData/Local/Programs/MiKTeX/fonts/type1/urw/zapfc
+han/uzcmi8a.pfb>
+Output written on spca_JSS.pdf (17 pages, 502180 bytes).
 PDF statistics:
- 365 PDF objects out of 1000 (max. 8388607)
- 58 named destinations out of 1000 (max. 500000)
- 155 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 403 PDF objects out of 1000 (max. 8388607)
+ 69 named destinations out of 1000 (max. 500000)
+ 189 words of extra memory for PDF output out of 10000 (max. 10000000)
 
