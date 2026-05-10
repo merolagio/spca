@@ -10,8 +10,8 @@ wachter_qqplot(
   n,
   gamma,
   cor = T,
-  nplot,
-  nfit_line = NULL,
+  nplot = NULL,
+  n_fitline = NULL,
   addtitle = TRUE,
   prn = TRUE,
   rtn = FALSE
@@ -33,8 +33,8 @@ matrix trace (sum to \code{p}).}
 \item{nplot}{Integer. Number of leading eigenvalues to include; defaults to
 length(eigvals)`.}
 
-\item{nfit_line}{Integer or \code{NULL}. If positive, fits an \code{lm} line using the
-last \code{nfit_line} points; if negative, excludes the nfit largest values.}
+\item{n_fitline}{Integer or \code{NULL}. If positive, fits an \code{lm} line using the
+last \code{n_fitline} points; if negative, excludes the nfit largest values.}
 
 \item{addtitle}{Logical. If \code{TRUE}, adds a plot title.}
 
@@ -50,7 +50,7 @@ Produces a QQ-plot comparing observed eigenvalues to Marchenko--Pastur
 (Wachter) theoretical quantiles for aspect ratio \code{gamma} = n/p.
 }
 \examples{
-# wachter_qqplot(eigvals, p = ncol(X), n = nrow(X), cor = TRUE, nfit_line = 5, rtn = TRUE)
+# wachter_qqplot(eigvals, p = ncol(X), n = nrow(X), cor = TRUE, n_fitline = 5, rtn = TRUE)
 
 }
 \seealso{

@@ -49,8 +49,8 @@ pak::pak("merolagio/spca")
 ## Example
 
 ### load data
-`holzinger` is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables.
-```{r load data, results = 'hide', message = FALSE, warning = FALSE, dpi = 300}
+The `holzinger` dataset is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables.
+```{r load_data, results = 'hide', message = FALSE, warning = FALSE, dpi = 300}
 library(spca)
 ## basic example code
 data(holzinger)

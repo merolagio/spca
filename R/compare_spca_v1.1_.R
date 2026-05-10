@@ -217,7 +217,7 @@ compare_spca = function(
       method = factor(rep(1:n_objects, each = p * nplot), 
                       labels = object_names), 
       Comp = factor(rep(rep(1:nplot, each = p), n_objects), 
-                    labels = paste("Comp", 1:nplot))
+                    labels = paste("sPC", 1:nplot))
       )
     
     if(only_nonzero){
@@ -445,7 +445,7 @@ format_loadings = function(A, cols, digits = 3, rows, noprint = 1E-03,
   } else {
     if (!is.null(namescomp) && length(namescomp) != ncol(A))
       warning("the length of namescomp is incorrect, automatic names assigned")
-    colnames(A) = paste("Comp", seq_len(ncol(A)), sep = "")
+    colnames(A) = paste("sPC", seq_len(ncol(A)), sep = "")
   }
   
   if (contributions == TRUE)

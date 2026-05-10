@@ -16,17 +16,8 @@
 #' FALSE otherwise.
 #' 
 #' @family spca
-# @export
-is.spca = function(x, ...) {
-  UseMethod("is.spca")
-}
-
 #' @export
-is.spca.default = function(x, ...) {
-  FALSE
-}
-#' @export 
-is.spca.spca <- function(x) {
+is.spca <- function(x) {
   inherits(x, "spca") && 
   !is.null(x$loadings) &&
   !is.null(x$contributions) &&
@@ -624,7 +615,7 @@ new_spca = function(A, S, X = NULL, method = NULL){
 #' @param thresh Value below which loadings are considered zero and not
 #' printed.
 #' @param rtn Logical: should the formatted (text) table be returned?
-#' @param namescomp A vector of names for the components. If NULL assigned 
+#' @param components_names A vector of names for the components. If NULL assigned 
 #'   as#' "sPCj"
 #' @param ... Further arguments; currently ignored.
 #' @return If rtn = TRUE, it returns a formatted text table. 
@@ -632,7 +623,7 @@ new_spca = function(A, S, X = NULL, method = NULL){
 #' @family spca
 #' @export
 #' @method print spca
-print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-03, rtn = FALSE, namescomp = NULL, ...)
+print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-03, rtn = FALSE, components_names = NULL, ...)
   {
   
   # Validation
@@ -671,12 +662,12 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
   }  
   
   ## assigns names to loadings
-  if ((!is.null(namescomp)) && (length(namescomp) >= length(cols))){
-    colnames(A) = namescomp[cols]
+  if ((!is.null(components_names)) && (length(components_names) >= length(cols))){
+    colnames(A) = components_names[cols]
   }
   else{
-    if (!(is.null(namescomp)) && (length(namescomp) < length(cols)))
-      message("the length of namescomp is incorrect, automatic names assigned")
+    if (!(is.null(components_names)) && (length(components_names) < length(cols)))
+      message("the length of components_names is incorrect, automatic names assigned")
     colnames(A) = paste0("sPC", cols)
   }
   
@@ -742,7 +733,9 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
 change_loadings_sign_spca = function(spca_obj, index_to_change) {
   if (!is.spca(spca_obj))
     stop("The first argument must be an spca object")
-  if (!is.vector())
+  if (!is.vector(index_to_change))
+    stop(paste("index_to_change must be an integer or vector of indices",
+               index_to_change, "was passed"))
     n = length(index_to_change)
   
   for (i in 1:n) {
@@ -993,9 +986,9 @@ aggregate_by_group = function(x, groups,
 #' Rcvexp \tab The cumulative variance explained relative to the 
 #' corresponding PCs.\cr
 #' Card \tab The cardinality, that is the number of non zero loadings.\cr
-#'   min load/Min cont \tab Minimum absolute value of the non-zero 
-#'   loadings or contributions.\cr
-#' R2\tab Squared correlation between SPC and corresponding PC.
+# #'   min load/Min cont \tab Minimum absolute value of the non-zero 
+# #'   loadings or contributions.\cr
+# #' R2\tab Squared correlation between SPC and corresponding PC.
 #' }
 #'
 #' @param x An spca object.
@@ -1098,7 +1091,7 @@ summary.spca = function(
   
   if (isTRUE(r_squared)){
     if ((!is.null(x$r2)))
-      out = rbind(out, R2 = x$r2)
+      out = rbind(out, R2 = x$cor_with_PC)
     else
       warning("R squared coefficients are not available")
   }

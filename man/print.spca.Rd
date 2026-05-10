@@ -12,7 +12,7 @@
   digits = 3,
   thresh = 0.001,
   rtn = FALSE,
-  namescomp = NULL,
+  components_names = NULL,
   ...
 )
 }
@@ -32,7 +32,7 @@ printed.}
 
 \item{rtn}{Logical: should the formatted (text) table be returned?}
 
-\item{namescomp}{A vector of names for the components. If NULL assigned
+\item{components_names}{A vector of names for the components. If NULL assigned
 as#' "sPCj"}
 
 \item{...}{Further arguments; currently ignored.}

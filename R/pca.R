@@ -19,7 +19,7 @@
 #' @param neigen_toplot Integer. Number of eigenvalues to show in diagnostic
 #'   plots. If `NULL`, all eigenvalues are shown.
 #'
-#' @return An  \link{spca_object}. 
+#' @return An  \link{spca_object} with the addition of the vector `eigenvalues` which contains all the eigenvalues of $S$, useful for future plots or computations. 
 #' 
 #' @details
 #' `ncomps` controls how many components are retained in the returned object.
@@ -93,7 +93,7 @@ pca = function(M, ncomps = NULL, centerdata = FALSE, scaledata = FALSE,
       neigen_toplot = p
   }
 
-  if (is.null(nrow_data)){
+  if (!is.numeric(nrow_data)){
       warning("qq-wachter plot cannot be produced beacuse nrow_data is not available")
       wachter = FALSE
     }
@@ -144,8 +144,10 @@ pca = function(M, ncomps = NULL, centerdata = FALSE, scaledata = FALSE,
     pl = spca_screeplot(ee$val, nplot = neigen_toplot, ylab = "eigenvalues")
     
   }
+  #browser()
   if (wachter == TRUE){
-    pl = wachter_qqplot(ee$val, p = p, n = nrow_data, nplot = neigen_toplot, nfit_line = -ncomps)
+    pl = wachter_qqplot(ee$val, p = p, n = nrow_data, nplot = neigen_toplot, n_fitline = -ncomps
+    )
   }
   
   out$method = "PCA"
@@ -179,8 +181,8 @@ theme_pca = function(base_size = 12, base_family = "") {
 #'   matrix trace (sum to `p`).
 #' @param nplot Integer. Number of leading eigenvalues to include; defaults to
 #'   length(eigvals)`.
-#' @param nfit_line Integer or `NULL`. If positive, fits an `lm` line using the
-#'   last `nfit_line` points; if negative, excludes the nfit largest values.
+#' @param n_fitline Integer or `NULL`. If positive, fits an `lm` line using the
+#'   last `n_fitline` points; if negative, excludes the nfit largest values.
 #' @param addtitle Logical. If `TRUE`, adds a plot title.
 #' @param prn Logical. If `TRUE`, prints the plot.
 #' @param rtn Logical. If `TRUE`, returns the ggplot object.
@@ -189,28 +191,33 @@ theme_pca = function(base_size = 12, base_family = "") {
 #'
 #'
 #' @examples
-#' # wachter_qqplot(eigvals, p = ncol(X), n = nrow(X), cor = TRUE, nfit_line = 5, rtn = TRUE)
+#' # wachter_qqplot(eigvals, p = ncol(X), n = nrow(X), cor = TRUE, n_fitline = 5, rtn = TRUE)
 #'
 #' @family pca 
 #' @export
-wachter_qqplot = function(eigvals, p = NULL, n, gamma, cor = T, nplot, nfit_line = NULL, addtitle = TRUE, prn = TRUE, rtn = FALSE){
+wachter_qqplot = function(eigvals, p = NULL, n, gamma, cor = T, nplot = NULL, n_fitline = NULL, addtitle = TRUE, prn = TRUE, rtn = FALSE){
   
   if(is.null(p)) p =length(eigvals)
   if(missing(gamma)) gamma = n/p
   
-  if(missing(nplot)) nplot =length(eigvals)
+  if(is.null(nplot)) nplot = length(eigvals)
   
   probs = ((p - (1:p) + 1)- 0.5)/p
   mp_quantiles = RMTstat::qmp(p = probs, svr = gamma)
   
   if(cor) mp_quantiles = p * mp_quantiles/sum(mp_quantiles)
-  
+#  browser()
   df = data.frame(expected = mp_quantiles[1:nplot], observed = eigvals[1:nplot])
   pl = ggplot(df, aes(x = expected, y = observed)) + geom_point(size = 2) + theme_pca()
   
-  if ((is.numeric(nfit_line)) && (nfit_line != 0)){
-    if (nfit_line < 0) nfit_line = nplot + nfit_line 
-    pl = pl + geom_smooth(data = df[(nplot - nfit_line + 1):nplot, ], se = F, method = "lm")
+  if ((is.numeric(n_fitline)) && (n_fitline != 0)){
+    if (n_fitline < 0) n_fitline = nplot + n_fitline 
+    
+    lmcoef = lm(observed ~ expected, data = df[(nplot - n_fitline + 1):nplot, ])$coefficient
+    
+    pl = pl + geom_abline(intercept = lmcoef[1], slope = lmcoef[2] , 
+                          color = "blue")
+    # pl = pl + geom_smooth(data = df[(nplot - n_fitline + 1):nplot, ], se = F, method = "lm")
   }
   if(addtitle)
     pl = pl + labs(title = "wachter qq-plot") + 
@@ -237,7 +244,7 @@ wachter_qqplot = function(eigvals, p = NULL, n, gamma, cor = T, nplot, nfit_line
 #' @family pca
 #' @export
 spca_screeplot = function(eigvals, nplot = NULL, ylab = "eigenvalues", 
-                     addtitle = T, prn = TRUE, rtn = FALSE){
+                     addtitle = TRUE, prn = TRUE, rtn = FALSE){
   if (!is.vector(eigvals) || any(is.na(eigvals)))     
       stop("eigvals must be a vector of eigenvalues and missing values are not allowed")
   
@@ -249,7 +256,7 @@ spca_screeplot = function(eigvals, nplot = NULL, ylab = "eigenvalues",
   scree_pl = ggplot(df, aes(x = order, y = eigenvalue)) + geom_point(size = 2) +
     geom_line() + labs(y = ylab) + theme_pca()
 
-  if(addtitle) scree_pl = scree_pl + labs(title = "spca_screeplot") +
+  if(addtitle) scree_pl = scree_pl + labs(title = "screeplot") +
     theme(plot.title = element_text(hjust = 0.5))
   
   if(prn)

@@ -11,16 +11,15 @@ spca(
   ncomp_byvexp = 0.99,
   method = "c",
   var_selection = c("fwd", "bkw", "step"),
-  stop_criterion = c("r2", "cvexp"),
+  stop_criterion = c("cvexp", "r2"),
   intensive = FALSE,
   fat_matrix = NULL,
-  singleprecision = FALSE,
   fixedindex_list = list(),
   centerdata = FALSE,
   scaledata = FALSE,
-  PMC = FALSE,
-  epsPMC = 1e-05,
-  maxiterPMC = 100,
+  PML = FALSE,
+  epsPML = 1e-05,
+  maxiterPML = 100,
   PMVS = FALSE,
   epsPMVS = 1e-05,
   maxiterPMVS = 200
@@ -59,9 +58,6 @@ other inputs use the thin backend. If \code{TRUE}, request the fat-matrix
 backend. If \code{FALSE}, use the thin backend, allowing users to force the thin
 path for mildly fat matrices.}
 
-\item{singleprecision}{Logical. Kept for interface compatibility. The current
-C++ engines use double precision only.}
-
 \item{fixedindex_list}{List of predetermined indices for components.
 Each list element is a vector of 1-based indices. Use \code{NULL} or
 \code{integer(0)} for a component with no fixed indices. If the list is
@@ -74,12 +70,12 @@ Used only when a data matrix is passed.}
 \item{scaledata}{Logical. Scale the columns of \code{M}? Used only when a
 data matrix is passed.}
 
-\item{PMC}{Logical. Use the power method for PCs and sparse-component
+\item{PML}{Logical. Use the power method for PCs and sparse-component
 eigenvectors.}
 
-\item{epsPMC}{Numeric. Tolerance for the PMC group.}
+\item{epsPML}{Numeric. Tolerance for the PML group.}
 
-\item{maxiterPMC}{Integer. Maximum iterations for the PMC group.}
+\item{maxiterPML}{Integer. Maximum iterations for the PML group.}
 
 \item{PMVS}{Logical. Use the power method in variable selection.}
 

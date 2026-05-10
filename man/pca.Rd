@@ -40,7 +40,7 @@ matrix. If not available, the Wachter QQ-plot cannot be produced.}
 plots. If \code{NULL}, all eigenvalues are shown.}
 }
 \value{
-An  \link{spca_object}.
+An  \link{spca_object} with the addition of the vector \code{eigenvalues} which contains all the eigenvalues of $S$, useful for future plots or computations.
 }
 \description{
 Creates PCA output as an \code{spca} object, so the result can be used with

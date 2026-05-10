@@ -8,7 +8,7 @@ spca_screeplot(
   eigvals,
   nplot = NULL,
   ylab = "eigenvalues",
-  addtitle = T,
+  addtitle = TRUE,
   prn = TRUE,
   rtn = FALSE
 )
