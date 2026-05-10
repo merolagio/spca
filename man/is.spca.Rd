@@ -4,7 +4,7 @@
 \alias{is.spca}
 \title{#' Test for spca objects}
 \usage{
-is.spca(x, ...)
+is.spca(x)
 }
 \arguments{
 \item{x}{Any object suspected of being of class spca.}
