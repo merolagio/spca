@@ -619,6 +619,7 @@ if (is.null(controls)) {
 #'     variable names. If the length is different it is switched to \code{NULL}.
 #'   }
 #'  }
+#'  @note When variable groups are present, `legend_position is set to "bottom".`
 #'   
 #' @return If `return_plot = TRUE`, the `ggplot2` object; otherwise `NULL`
 #'   (invisibly).
@@ -748,6 +749,10 @@ plot.spca = function(
         variable_groups = NULL
       }
     }
+    if (is.null(legend_position) || (legend_position == "none")){
+      warning("legend is necessary to identify the variable groups, changed its position to bottom")
+      legend_position = "bottom"
+    } 
   }
   
 # Legend for circular plots must be on the right or plot breaks  

@@ -19,7 +19,7 @@
 #'   contributions.
 #' @param plot_type Character scalar. Values starting with \code{"b"} use bars;
 #'   values starting with \code{"p"} use points. Other values default to bars.
-#' @param object_names Optional character vector with one label per object. If
+#' @param methods_names Optional character vector with one label per object. If
 #'   \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
 #' @param col_grouplines Character scalar. Color of the vertical group lines.
 #' @param color_scale Character scalar. Color palette for bar plots. Accepted
@@ -27,22 +27,22 @@
 #'   \code{"bw"}.
 #' @param equal_sign Logical. If \code{TRUE}, adjust loading signs to agree with
 #'   the first object. See Details.
-#' @param shortnamescomp Logical. If \code{TRUE}, use short component names
+#' @param col_short_names Logical. If \code{TRUE}, use short component names
 #'   such as \code{C1.M1}; otherwise use \code{C1.object_name}.
-#' @param prn_loadings Logical. If \code{TRUE}, print the loadings or
+#' @param print_loadings Logical. If \code{TRUE}, print the loadings or
 #'   contributions table.
-#' @param rtnTables Logical. If \code{TRUE}, return the loadings/contributions
+#' @param return_tables Logical. If \code{TRUE}, return the loadings/contributions
 #'   matrix and the raw summary matrix.
-#' @param prnTables Logical. If \code{FALSE}, suppress table printing. Takes
-#'   priority over \code{prn_loadings}.
-#' @param rtn_plot Logical. If \code{TRUE}, return the loadings plot.
-#' @param prn_plot Logical. If \code{TRUE}, print the loadings plot.
+#' @param print_tables Logical. If \code{FALSE}, suppress table printing. Takes
+#'   priority over \code{print_loadings}.
+#' @param return_plot Logical. If \code{TRUE}, return the loadings plot.
+#' @param produce_plot Logical. If \code{TRUE}, print the loadings plot.
 #' @details When \code{equal_sign = TRUE}, signs are aligned using score
 #'   correlations if scores are available for all objects. Otherwise signs are
 #'   aligned using correlations between the loading matrices.
-#' @return Invisibly returns \code{NULL} by default. If \code{rtnTables = TRUE},
+#' @return Invisibly returns \code{NULL} by default. If \code{return_tables = TRUE},
 #'   returns a list containing the comparison matrix and summary matrix. If
-#'   \code{rtn_plot = TRUE}, the returned object also includes the loadings plot.
+#'   \code{return_plot = TRUE}, the returned object also includes the loadings plot.
 #' @seealso Examples in \code{\link{plot.spca}}.
 #' @family spca
 #' @export
@@ -54,16 +54,16 @@ compare_spca = function(
     variable_groups = NULL,
     plot_loadings = TRUE,
     plot_type = c("bars", "points"),
-    object_names = NULL,
+    methods_names = NULL,
     col_grouplines = "red",
     color_scale = c("ggplot", "cbb", "printsafe", "bw"), 
     equal_sign = FALSE,
-    shortnamescomp = TRUE,
-    prn_loadings = TRUE,
-    rtnTables = FALSE,
-    prnTables = TRUE,
-    rtn_plot = FALSE,
-    prn_plot = TRUE) {
+    col_short_names = TRUE,
+    print_loadings = TRUE,
+    return_tables = FALSE,
+    print_tables = TRUE,
+    return_plot = FALSE,
+    produce_plot = TRUE) {
   tryCatch({
   ## -------------------------------------------------------#
   ## obj_list two or more spca objects
@@ -74,12 +74,12 @@ compare_spca = function(
     only_nonzero = only_nonzero,
     plot_loadings = plot_loadings,
     equal_sign = equal_sign,
-    shortnamescomp = shortnamescomp,
-    prn_loadings = prn_loadings,
-    rtnTables = rtnTables,
-    prnTables = prnTables,
-    rtn_plot = rtn_plot,
-    prn_plot = prn_plot
+    col_short_names = col_short_names,
+    print_loadings = print_loadings,
+    return_tables = return_tables,
+    print_tables = print_tables,
+    return_plot = return_plot,
+    produce_plot = produce_plot
   )
   logical_ok = vapply(logical_args, is.boolean, logical(1))
   if(!all(logical_ok))
@@ -110,11 +110,11 @@ compare_spca = function(
 # n_objects is number of spca objects
   n_objects = length(obj_list)
   
-  if(!is.null(object_names)){
-    if(!is.character(object_names) || anyNA(object_names))
-      stop("object_names must be NULL or a character vector without missing values")
-    if(length(object_names) != n_objects)
-      stop("object_names must have one name per spca object")
+  if(!is.null(methods_names)){
+    if(!is.character(methods_names) || anyNA(methods_names))
+      stop("methods_names must be NULL or a character vector without missing values")
+    if(length(methods_names) != n_objects)
+      stop("methods_names must have one name per spca object")
   }
   
   if(!is.character(plot_type) || length(plot_type) < 1 || anyNA(plot_type))
@@ -137,8 +137,8 @@ compare_spca = function(
     ncomps = as.integer(ncomps)
   }
   
-  if (prnTables == FALSE){
-    prn_loadings = FALSE
+  if (print_tables == FALSE){
+    print_loadings = FALSE
   }
   
 ## A is list of loadings of all objects--------------
@@ -156,8 +156,8 @@ compare_spca = function(
   
   ##methods names  NEEDS FIX this ==========================
 #browser() 
-  if(is.null(object_names)){
-    object_names = c(paste0("M", 1:n_objects))  
+  if(is.null(methods_names)){
+    methods_names = c(paste0("M", 1:n_objects))  
   }
 
   
@@ -215,7 +215,7 @@ compare_spca = function(
       loadings = loadings_vec, 
       variable = factor(rep(1:p, nplot * n_objects), labels = variables_name), 
       method = factor(rep(1:n_objects, each = p * nplot), 
-                      labels = object_names), 
+                      labels = methods_names), 
       Comp = factor(rep(rep(1:nplot, each = p), n_objects), 
                     labels = paste("sPC", 1:nplot))
       )
@@ -279,7 +279,7 @@ compare_spca = function(
         labels = function(x)  paste0(round(x*100,1),"%")
         ) 
       }
-      if(prn_plot)
+      if(produce_plot)
         hw = withCallingHandlers(
           {
             plot(pl)
@@ -300,9 +300,9 @@ compare_spca = function(
 # loadings of each object, grouped by their rank  
   
   loadings_matrix = matrix(0, nrow = p, ncol = n_objects *ncomps) 
-  if (shortnamescomp == FALSE)
+  if (col_short_names == FALSE)
     col_names = paste(rep(paste0("C",1:ncomps), each = n_objects), 
-                  rep(object_names, times = ncomps), sep = "."
+                  rep(methods_names, times = ncomps), sep = "."
                   )
   else
     col_names = paste(rep(paste0("C",1:ncomps), each = n_objects), 
@@ -341,8 +341,8 @@ compare_spca = function(
   rownames(sum_matrix)[n_summat] = ifelse(contributions, "Min cont", "Min load")
 
 ## printing----------------------------  
-  if(prnTables == TRUE){
-    if (prn_loadings){
+  if(print_tables == TRUE){
+    if (print_loadings){
       if (only_nonzero == TRUE)
         which_rows = which(ind_nonzero)
       else
@@ -365,15 +365,15 @@ compare_spca = function(
     print(sum_matrix_fmt, quote = FALSE, justify = "right")
   }  
     ## out list------------------------  
-    if(rtnTables){
+    if(return_tables){
       out = list(loadings = loadings_matrix, summary = sum_matrix)
       if(contributions) names(out)[1] = "contributions"
     
-      if(rtn_plot)
+      if(return_plot)
         out$loadings_plot = pl
       return(out)  
     } else{
-      if(rtn_plot)
+      if(return_plot)
         return(pl)
       else
         invisible()

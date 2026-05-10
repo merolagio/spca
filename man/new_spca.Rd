@@ -4,7 +4,7 @@
 \alias{new_spca}
 \title{Constructs an object of class spca from a set of loadings}
 \usage{
-new_spca(A, S, X = NULL, method = NULL)
+new_spca(A, S, X = NULL, method_name = NULL)
 }
 \arguments{
 \item{A}{real matrix, a matrix of loadings.}
@@ -13,7 +13,7 @@ new_spca(A, S, X = NULL, method = NULL)
 
 \item{X}{real matrix, the data matrix from which the loadings where computed, optional}
 
-\item{method}{string, the name of the method used to compute the loadings, optional.}
+\item{method_name}{string, the name of the method_name used to compute the loadings, optional.}
 }
 \value{
 An object is of class spca with several added components,
@@ -39,7 +39,7 @@ corresponding PCs.}
 \item{loadlist}{a list with only the nonzero loadings.}
 \item{scores}{the components' scores, if X is passed.}
 \item{corComp}{A matrix of the correlations between components.}
-\item{method}{the string passed as such, if method is passed.}
+\item{method_name}{the string passed as such, if method_name is passed.}
 }
 }
 \seealso{
@@ -49,6 +49,7 @@ Other spca:
 \code{\link{is.spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

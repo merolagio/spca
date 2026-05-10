@@ -507,7 +507,7 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 #' @param A real matrix, a matrix of loadings.
 #' @param S the variance or correlation matrix from which the loadings where computed.
 #' @param X real matrix, the data matrix from which the loadings where computed, optional
-#' @param method string, the name of the method used to compute the loadings, optional.
+#' @param method_name string, the name of the method_name used to compute the loadings, optional.
 #' @return An object is of class spca with several added components, 
 #' FALSE otherwise.
 #' @details The \code{spca} object can be used as argument for spca methods.
@@ -526,13 +526,13 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 #'  \item{loadlist}{a list with only the nonzero loadings.}
 #'  \item{scores}{the components' scores, if X is passed.} 
 #'  \item{corComp}{A matrix of the correlations between components.}
-#'  \item{method}{the string passed as such, if method is passed.}
+#'  \item{method_name}{the string passed as such, if method_name is passed.}
 #' }
 #' @family spca
 #' @export 
-new_spca = function(A, S, X = NULL, method = NULL){
+new_spca = function(A, S, X = NULL, method_name = NULL){
   
-  fun_inp = as.list(match.call(expand.dots = FALSE))
+  fun_inp = list(A = A, S = S, X = X, method_name = method_name)
   validate_no_na(arg_list = fun_inp)  
   
   # validation   ==============P
@@ -559,37 +559,38 @@ new_spca = function(A, S, X = NULL, method = NULL){
   obj$ncomps = ncol(A)
   obj$cardinality = colSums(A != 0)
   
-  obj$ind = list()
-  loadlist = list()
-  for(i in 1:obj$ncomps){
-    obj$ind[[i]] = which(A[, i] != 0)
-    loadlist[[i]] = A[obj$ind[[i]], i]
     
-    names(obj$ind[[i]]) = rownames(A)[obj$ind[[i]]]
-    names(loadlist[[i]]) = rownames(A)[obj$ind[[i]]]
-  }
-  
   
   tmp_vexp = make_vexpSC(obj$loadings, S)  
   s_ee = eigen(S)
   totv = sum(s_ee$values)
   obj$vexp = tmp_vexp$vexp/totv
-  obj$cvexp = tmp_vexp$cvexp/totv
-  
   obj$vexpPC = s_ee$values[1:obj$ncomps]/totv
+  obj$cvexp = tmp_vexp$cvexp/totv
+  obj$rvexp = obj$vexp/obj$vexpPC
   obj$rcvexp = obj$cvexp/cumsum(obj$vexpPC)
-  obj$loadlist = loadlist
+  obj$cor_with_PC = var2corC(atdbC(A, S, s_ee$vectors[, seq_len(obj$ncomps)]))
+  obj$total_variance = totv
+  
+  obj$indices = list()
+  obj$loadlist = list()
+  for(i in 1:obj$ncomps){
+    obj$indices[[i]] = which(A[, i] != 0)
+    obj$loadlist[[i]] = A[obj$indices[[i]], i]
+      names(obj$indices[[i]]) = rownames(A)[obj$indices[[i]]]
+    names(obj$loadlist[[i]]) = rownames(A)[obj$indices[[i]]]
+  }
   
   if(!is.null(X)){
     obj$scores = abC(X, A)
     obj$corComp = makeCorScoresC(obj$scores)
   }
-  else
-    obj$corComp = makeCorComp(A, S)
-  
-  
-  if(!is.null(method))  
-    obj$method = method
+  else{
+    obj$corComp = make_corComp_S(A, S)
+  }
+    
+  if(!is.null(method_name))  
+    obj$method_name = method_name
   
   class(obj) = c("list", "spca")
   
@@ -764,87 +765,39 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 }
 
 
-## showload ==================
-#' Shows the non-zero loadings separately for each component.
+## show_contributions_spca ==================
+#' Shows the non-zero contributions separately for each component.
 #' 
-#' Useful for large matrices to see the loadings at the same 
-#' time or to assign long descriptive names.
+#' It just turns an spca object loadlist into a list of loadings 
 #' 
-#' @param spca_obj A list of spca objects, typically from SPCA.  It
-#' can also be a simple matrix of loadings.
-#' @param cols A vector containg the indices of the loadings to be shown.  Can be a single value. if missing all loadings are shown: If an integer is
-#' passed, only that dimension will be returned.
-#' @param perc Logical: should the loodings be standardised to unit \eqn{L_1} norm (and printed as percentage contributions).
-#' @param digits Number of decimal digits to show.
-#' @param  variablesnames Hybrid: if not FALSE, need to pass a vector of varaiable names.
-#' @param thresh Loadings with absolute value below this are considered zero.
-#' @param rtn Logical: should the text table of loadings and the matrix of summaries be returneded?
-#' @details variablesnames must have the names of the p variables in the first p
-#' positions.  
-#' @return If rtn = TRUE, it returns a list with the loadings.
-#' @seealso \link{spca-package}.
+#' @param spca_obj An spca object
+#' 
+#' @param cols A vector containg the indices of the loadings to be shown.  Can
+#'  be a single value. if missing all loadings are shown: If an integer is
+#'  passed, only that dimension will be returned.
+#' @param return_list Logical: if `TRUE` the list is returned
+#' @family spca
 #' @export 
-showload = function(spca_obj, cols, perc = TRUE, digits = 3,  variablesnames = FALSE, 
-                    thresh = 0.001, rtn = FALSE){
+show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
+{
+  test = validate_spca(spca_obj)
+  if (!test)
+    stop("show_loadings requires an spca object as first argument")
   
-## function that prints nonzero loadings one component 
-  #at the time from an spca object
+  if(is.null(cols)){
+    cols = seq_along(spca_obj$vexp)
+  }
   
-  if(missing(cols)){
-    cols = 1:ncol(spca_obj$loadings)
-  }
-  if (!any(class(spca_obj) == "spca")){
-    if (is.matrix(spca_obj) | is.vector(spca_obj))
-      A = as.matrix(spca_obj)[,cols]
-    else
-      stop("need an spca object or an array of loadings")
-  }
-  else{
-    A = as.matrix(spca_obj$loadings[,cols])
-    if (length(cols) == 1)
-      rownames(A) =  rownames(spca_obj$loadings)
-  }
-  if (perc == TRUE){
-    dimna = dimnames(A)
-    A = scaleColsC(A, 1, rep(1, ncol(A)))
-    dimnames(A) = dimna
-  }
-  loads = list()
-  if (! is.null(rownames(A)))
-    variablesnames = rownames(A)
-  if (is.factor(variablesnames))
-    variablesnames = as.character(variablesnames)
-  if (is.vector( variablesnames) ){ 
-    if (length( variablesnames) < nrow(A))
-      stop(" variablesnames must be a vector of length equal to number of loadings")
-    else
-      rownames(A) =  variablesnames[1:nrow(A)]
-  }
-  if (perc == TRUE)
-    message("Percent Contributions")
-  else
-    message("Norm 1 Loadings")
-  for(i in seq_along(cols)){
-    loads[[i]] = A[abs(A[,i])> thresh,i]
-    print(paste("Component", cols[i]))
-    if (perc == TRUE){
-      a = paste(round(100 * loads[[i]], max(0,digits-2)), "%", sep = "")
-      names(a) = names(loads[[i]])
-      print(a, quote = FALSE, justify = "left")
-      writeLines(" ")#paste(, quote = FALSE)
-    }
-    else{
-      print(loads[[i]], digits = digits, justify = "left")
-      writeLines(" ")
-    }
-  }
-  if (rtn == TRUE)
-    return(loadings)
-  else
-    invisible()
+  message("Percentage Contributions")
   
+  print(lapply(spca_obj$loadlist, function(x) x/ sum(abs(x))))
+  
+  
+  if (return_list == TRUE)
+    return(loads)
+  
+  invisible()
 }
-
 
 #aggregate_by_group========
 #' Aggregate loadings or contributions by group
@@ -853,7 +806,7 @@ showload = function(spca_obj, cols, perc = TRUE, digits = 3,  variablesnames = F
 #' input matrix/data.frame according to a grouping index (e.g., group membership
 #' of variables).
 #'
-#' @param x A numeric vector, or a numeric matrix/data.frame containing loadings
+#' @param X An `spca` object or a numeric vector, or a numeric matrix/data.frame containing loadings
 #'  or contributions. It is tolerated x as an spca object.
 #' @param groups A vector or factor of length equal to `length(x)` 
 #'   (if `x` is a vector) or `nrow(x)` (if `x` is a matrix/data.frame), 
@@ -871,19 +824,19 @@ showload = function(spca_obj, cols, perc = TRUE, digits = 3,  variablesnames = F
 #' The aggregated sums are likely not to respect the unit norm property of the
 #'  individual loadings or contributions 
 #' 
-#' @return A numeric vector (if `x` is a vector) or numeric matrix  of sums
+#' @return A numeric vector (if `X` is a vector) or numeric matrix  of sums
 #'   aggregated by group. Rows correspond to groups
-#'   and columns correspond to columns of `x`.
+#'   and columns correspond to columns of `X`.
 #'
 #' @export
-aggregate_by_group = function(x, groups, 
+aggregate_by_group = function(X, groups, 
                               only_nonzero = TRUE, 
                               contributions = TRUE, 
                               digits = ifelse(contributions, 1, 3),
-                              prn = TRUE,
-                              rtn = FALSE) 
+                              print_table = TRUE,
+                              return_table = FALSE) 
 {
-# validation ===========  
+  # validation ===========  
   
   # chcking an spca object requires too much stack
   fun_inp = as.list(match.call(expand.dots = FALSE))[-(1:2)]
@@ -895,26 +848,26 @@ aggregate_by_group = function(x, groups,
       stop("X cannot contain missing values")
   
   validate_booleans(only_nonzero= only_nonzero, contributions = 
-                      contributions, prn = prn, rtn = rtn)
-
-  if(is.spca(x)){
+                      contributions, print_table = print_table, return_table = return_table)
+  
+  if(is.spca(X)){
     if(contributions){
-        x = x$contributions
-      } else
-      x = x$loadings
+      X = X$contributions
+    } else
+      X = X$loadings
   } else {
-    if (((!is.vector(x) && (!is.factor(x))) ||  (!is.matrix(x))))
-      stop("x must be an spca object or a matrix or a vector")
+    if (((!is.vector(X) && (!is.factor(X))) ||  (!is.matrix(X))))
+      stop("X must be an spca object or a matrix or a vector")
   }
-  n = ifelse((is.vector(x) || (is.factor(x))), length(x), nrow(x))
+  n = ifelse((is.vector(X) || (is.factor(X))), length(X), nrow(X))
   
   if ((!is.vector(groups)) && (!is.factor(groups))){
     stop("groups must be a vector or a factor")
   } else {
-    if(length(groups) != ifelse(is.vector(x), length(x), nrow(x)))
+    if(length(groups) != ifelse(is.vector(X), length(X), nrow(X)))
       stop("contributions and groups must have the same length")
   } 
-
+  
   if(is.factor(groups))
     nams = levels(groups)
   else {
@@ -925,9 +878,9 @@ aggregate_by_group = function(x, groups,
   }
   
   #vector
-  if ((is.vector(x)) || (is.factor(x))) {
-    out = tapply(x, groups, sum)
-    if ((abs(sum(abs(x)) - 1) > 10e-3) && contributions == TRUE){
+  if ((is.vector(X)) || (is.factor(X))) {
+    out = tapply(X, groups, sum)
+    if ((abs(sum(abs(X)) - 1) > 10e-3) && contributions == TRUE){
       warning("The sum of values is not 1. Setting contributions = FALSE")
       contributions = FALSE
       digits = 3
@@ -938,17 +891,17 @@ aggregate_by_group = function(x, groups,
   } 
   # matrix
   else {
-    if (any(abs(colSums(abs(x)) - 1) > 10e-3) && (contributions == T)){
+    if (any(abs(colSums(abs(X)) - 1) > 10e-3) && (contributions == T)){
       warning("The sum of values is not 1. Setting contributions = FALSE")
       contributions = FALSE
       digits = 3
     }
-    out = apply(x, 2, function(y, ii) tapply(y, ii, sum), ii = groups)
+    out = apply(X, 2, function(y, ii) tapply(y, ii, sum), ii = groups)
     rownames(out) = nams
     if (only_nonzero)
       out = out[rowSums(abs(out)) > 10e-4, ]
   }
-  if(prn){
+  if(print_table){
     if(contributions){
       print("percentage contributions")
       outp = out
@@ -963,7 +916,7 @@ aggregate_by_group = function(x, groups,
       print("loadings")
       print(out, digits = 3)}
   } 
-  if (rtn){
+  if (return_table){
     return(out)
   }
   invisible(out)

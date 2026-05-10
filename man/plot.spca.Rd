@@ -140,6 +140,7 @@ This option is not recommended for large matrices.
 variable names. If the length is different it is switched to \code{NULL}.
 }
 }
+@note When variable groups are present, \verb{legend_position is set to "bottom".}
 }
 }
 \examples{
@@ -167,6 +168,7 @@ Other spca:
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}
@@ -177,6 +179,7 @@ Other spca:
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

@@ -45,17 +45,11 @@ make_contributions = function(x){
 
 
 
-#transforms a variance matrix to a correlation marix S variance matrix
+#transforms a variance matrix to a correlation matrix S variance matrix
 var2cor = function(S){
   if ((!is.matrix(S)) || (!isSymmetric(S)) || any(diag(S) < 1e-4))
     stop(("S must be a symmetric matrix with non zero diagonal values"))
-  if (exists("var2corC", mode = "function"))
-    return(var2corC(M))
-  else {
-    d = as.vector(diag(diag(S)^-0.5))
-    return(vtauC(d, S, d))
-  }
-  invisible()
+    return(var2corC(S))
 }
 
 ## computes correlation between pairs of sPCs

@@ -454,6 +454,11 @@ spca = function(M,
   names(spout$loadlist) = colnames(contributions)
   names(spout$ind) = colnames(contributions)
 
+  for(i in seq_along(spout$loadlist)){
+    names(spout$loadlist[[i]]) = var_names[spout$ind[[i]]]
+  }
+ 
+  
   ncomps = spout$ncomps
   
   ## gathering values from lsspcaC 
@@ -476,8 +481,7 @@ spca = function(M,
   )
 
   # OUTPUT =================
-  
-  
+   
   out = list(loadings = spout$loadings,
              contributions = contributions,
              ncomps = spout$ncomps,

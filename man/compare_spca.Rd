@@ -12,16 +12,16 @@ compare_spca(
   variable_groups = NULL,
   plot_loadings = TRUE,
   plot_type = c("bars", "points"),
-  object_names = NULL,
+  methods_names = NULL,
   col_grouplines = "red",
   color_scale = c("ggplot", "cbb", "printsafe", "bw"),
   equal_sign = FALSE,
-  shortnamescomp = TRUE,
-  prn_loadings = TRUE,
-  rtnTables = FALSE,
-  prnTables = TRUE,
-  rtn_plot = FALSE,
-  prn_plot = TRUE
+  col_short_names = TRUE,
+  print_loadings = TRUE,
+  return_tables = FALSE,
+  print_tables = TRUE,
+  return_plot = FALSE,
+  produce_plot = TRUE
 )
 }
 \arguments{
@@ -47,7 +47,7 @@ contributions.}
 \item{plot_type}{Character scalar. Values starting with \code{"b"} use bars;
 values starting with \code{"p"} use points. Other values default to bars.}
 
-\item{object_names}{Optional character vector with one label per object. If
+\item{methods_names}{Optional character vector with one label per object. If
 \code{NULL}, labels are \code{M1}, ..., \code{Mk}.}
 
 \item{col_grouplines}{Character scalar. Color of the vertical group lines.}
@@ -59,26 +59,26 @@ values are \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and
 \item{equal_sign}{Logical. If \code{TRUE}, adjust loading signs to agree with
 the first object. See Details.}
 
-\item{shortnamescomp}{Logical. If \code{TRUE}, use short component names
+\item{col_short_names}{Logical. If \code{TRUE}, use short component names
 such as \code{C1.M1}; otherwise use \code{C1.object_name}.}
 
-\item{prn_loadings}{Logical. If \code{TRUE}, print the loadings or
+\item{print_loadings}{Logical. If \code{TRUE}, print the loadings or
 contributions table.}
 
-\item{rtnTables}{Logical. If \code{TRUE}, return the loadings/contributions
+\item{return_tables}{Logical. If \code{TRUE}, return the loadings/contributions
 matrix and the raw summary matrix.}
 
-\item{prnTables}{Logical. If \code{FALSE}, suppress table printing. Takes
-priority over \code{prn_loadings}.}
+\item{print_tables}{Logical. If \code{FALSE}, suppress table printing. Takes
+priority over \code{print_loadings}.}
 
-\item{rtn_plot}{Logical. If \code{TRUE}, return the loadings plot.}
+\item{return_plot}{Logical. If \code{TRUE}, return the loadings plot.}
 
-\item{prn_plot}{Logical. If \code{TRUE}, print the loadings plot.}
+\item{produce_plot}{Logical. If \code{TRUE}, print the loadings plot.}
 }
 \value{
-Invisibly returns \code{NULL} by default. If \code{rtnTables = TRUE},
+Invisibly returns \code{NULL} by default. If \code{return_tables = TRUE},
 returns a list containing the comparison matrix and summary matrix. If
-\code{rtn_plot = TRUE}, the returned object also includes the loadings plot.
+\code{return_plot = TRUE}, the returned object also includes the loadings plot.
 }
 \description{
 Plot loadings and print summary statistics for several \code{spca} objects
@@ -99,6 +99,7 @@ Other spca:
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

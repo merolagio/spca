@@ -5,17 +5,17 @@
 \title{Aggregate loadings or contributions by group}
 \usage{
 aggregate_by_group(
-  x,
+  X,
   groups,
   only_nonzero = TRUE,
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
-  prn = TRUE,
-  rtn = FALSE
+  print_table = TRUE,
+  return_table = FALSE
 )
 }
 \arguments{
-\item{x}{A numeric vector, or a numeric matrix/data.frame containing loadings
+\item{X}{An \code{spca} object or a numeric vector, or a numeric matrix/data.frame containing loadings
 or contributions. It is tolerated x as an spca object.}
 
 \item{groups}{A vector or factor of length equal to \code{length(x)}
@@ -32,9 +32,9 @@ percentages.}
 aggregated values. If FALSE no rounding is done.}
 }
 \value{
-A numeric vector (if \code{x} is a vector) or numeric matrix  of sums
+A numeric vector (if \code{X} is a vector) or numeric matrix  of sums
 aggregated by group. Rows correspond to groups
-and columns correspond to columns of \code{x}.
+and columns correspond to columns of \code{X}.
 }
 \description{
 Computes group-level sums by aggregating an input vector or the columns of an
