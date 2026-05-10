@@ -16,9 +16,9 @@
 #' @param fixedindex_list List of integer vectors, one per component.
 #' @param centerdata Logical scalar.
 #' @param scaledata Logical scalar.
-#' @param PMC Logical scalar.
-#' @param epsPMC Numeric scalar.
-#' @param maxiterPMC Integer scalar.
+#' @param PML Logical scalar.
+#' @param epsPML Numeric scalar.
+#' @param maxiterPML Integer scalar.
 #' @param PMVS Logical scalar.
 #' @param epsPMVS Numeric scalar.
 #' @param maxiterPMVS Integer scalar.
@@ -38,9 +38,9 @@ validate_spca_inputs = function(M,
                                   fixedindex_list,
                                   centerdata,
                                   scaledata,
-                                  PMC,
-                                  epsPMC,
-                                  maxiterPMC,
+                                  PML,
+                                  epsPML,
+                                  maxiterPML,
                                   PMVS,
                                   epsPMVS,
                                   maxiterPMVS) {
@@ -124,14 +124,14 @@ validate_spca_inputs = function(M,
   if (!is.boolean(scaledata))
     stop("scaledata must be TRUE or FALSE", call. = FALSE)
 
-  if (!is.boolean(PMC))
-    stop("PMC must be TRUE or FALSE", call. = FALSE)
+  if (!is.boolean(PML))
+    stop("PML must be TRUE or FALSE", call. = FALSE)
 
-  if (!is.numeric(epsPMC) || length(epsPMC) != 1 || is.na(epsPMC) || (epsPMC <= 0))
-    stop("epsPMC must be a positive scalar", call. = FALSE)
+  if (!is.numeric(epsPML) || length(epsPML) != 1 || is.na(epsPML) || (epsPML <= 0))
+    stop("epsPML must be a positive scalar", call. = FALSE)
 
-  if (!is.numeric(maxiterPMC) || length(maxiterPMC) != 1 || is.na(maxiterPMC) || (maxiterPMC < 1))
-    stop("maxiterPMC must be a positive scalar", call. = FALSE)
+  if (!is.numeric(maxiterPML) || length(maxiterPML) != 1 || is.na(maxiterPML) || (maxiterPML < 1))
+    stop("maxiterPML must be a positive scalar", call. = FALSE)
 
   if (!is.boolean(PMVS))
     stop("PMVS must be TRUE or FALSE", call. = FALSE)
@@ -188,10 +188,10 @@ validate_spca_inputs = function(M,
 #'   Used only when a data matrix is passed.
 #' @param scaledata Logical. Scale the columns of \code{M}? Used only when a
 #'   data matrix is passed.
-#' @param PMC Logical. Use the power method for PCs and sparse-component
+#' @param PML Logical. Use the power method for PCs and sparse-component
 #'   eigenvectors.
-#' @param epsPMC Numeric. Tolerance for the PMC group.
-#' @param maxiterPMC Integer. Maximum iterations for the PMC group.
+#' @param epsPML Numeric. Tolerance for the PML group.
+#' @param maxiterPML Integer. Maximum iterations for the PML group.
 #' @param PMVS Logical. Use the power method in variable selection.
 #' @param epsPMVS Numeric. Tolerance for the PMVS group.
 #' @param maxiterPMVS Integer. Maximum iterations for the PMVS group.
@@ -209,15 +209,15 @@ spca = function(M,
                   ncomp_byvexp = 0.99,
                   method = "c",
                   var_selection = c("fwd", "bkw", "step"),
-                  stop_criterion = c("r2", "cvexp"),
+                  stop_criterion = c("cvexp", "r2"),
                   intensive = FALSE,
                   fat_matrix = NULL,
                   fixedindex_list = list(),
                   centerdata = FALSE,
                   scaledata = FALSE,
-                  PMC = FALSE,
-                  epsPMC = 1e-5,
-                  maxiterPMC = 100,
+                  PML = FALSE,
+                  epsPML = 1e-5,
+                  maxiterPML = 100,
                   PMVS = FALSE,
                   epsPMVS = 1e-5,
                   maxiterPMVS = 200) {
@@ -234,9 +234,9 @@ spca = function(M,
                          fixedindex_list = fixedindex_list,
                          centerdata = centerdata,
                          scaledata = scaledata,
-                         PMC = PMC,
-                         epsPMC = epsPMC,
-                         maxiterPMC = maxiterPMC,
+                         PML = PML,
+                         epsPML = epsPML,
+                         maxiterPML = maxiterPML,
                          PMVS = PMVS,
                          epsPMVS = epsPMVS,
                          maxiterPMVS = maxiterPMVS)
@@ -351,7 +351,6 @@ spca = function(M,
     warning("intensive search requires stop_criterion = cvexp. Switching to that.", call. = FALSE)
     stop_criterion_cpp = 1
     }
-
 ##  X = M
   if (is_datamatrix_M) {
       if (any(abs(colMeans(M)) > 1e-4)) {
@@ -378,11 +377,11 @@ spca = function(M,
                      method = method_cpp,
                      indvec_in = indvec_in,
                      cardvec_in = cardvec_in,
-                     PMPC = PMC,
+                     PMPC = PML,
                      PMS = PMVS,
-                     epsPMPC = epsPMC,
+                     epsPMPC = epsPML,
                      epsPMS = epsPMVS,
-                     maxiterPMPC = maxiterPMC,
+                     maxiterPMPC = maxiterPML,
                      maxiterPMS = maxiterPMVS,
                      rank_tol = 0.0)
   } else {
@@ -401,11 +400,11 @@ spca = function(M,
                       method = method_cpp,
                       indvec_in = indvec_in,
                       cardvec_in = cardvec_in,
-                      PMPC = PMC,
+                      PMPC = PML,
                       PMS = PMVS,
-                      epsPMPC = epsPMC,
+                      epsPMPC = epsPML,
                       epsPMS = epsPMVS,
-                      maxiterPMPC = maxiterPMC,
+                      maxiterPMPC = maxiterPML,
                       maxiterPMS = maxiterPMVS,
                       rank_tol = 0.0)
   }

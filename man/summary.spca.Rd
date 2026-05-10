@@ -61,9 +61,6 @@ Rvexp \tab The variance explained relative to the corresponding PC.\cr
 Rcvexp \tab The cumulative variance explained relative to the
 corresponding PCs.\cr
 Card \tab The cardinality, that is the number of non zero loadings.\cr
-min load/Min cont \tab Minimum absolute value of the non-zero
-loadings or contributions.\cr
-R2\tab Squared correlation between SPC and corresponding PC.
 }
 }
 \seealso{
