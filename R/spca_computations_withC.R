@@ -1,6 +1,6 @@
 # returns the non-zero loading with the smallest absolute value for each column
 # input a matrix of loadings or contributions
-get_minload = function(smpc){
+get_minload = function(smpc, eps = 1e-4){
   if(!is.matrix(smpc))
     stop("get.minload: a matrix of loadings or an spca object is needed") 
   gl = function(x)
