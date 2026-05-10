@@ -13,7 +13,7 @@
 \usepackage{amsthm}
 
 %% another package (only for this demo article)
-\usepackage{framed}
+%\usepackage{framed}
 
 %% new custom commands
 \newcommand{\class}[1]{`\code{#1}'}
@@ -21,7 +21,8 @@
 
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
-\SweaveOpts{engine=R, eps=FALSE, keep.source = TRUE}
+\SweaveOpts{engine = R, pdf = TRUE, eps = FALSE, keep.source = TRUE}
+
 <<preliminaries, echo=FALSE, results=hide>>=
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 library("MASS")
@@ -103,7 +104,7 @@ $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p$. The same convention is us
 
 The sparse loadings are the vectors $a_j = (a_{i1}, \ldots, a_{r}, r\le p$ with unit norm $a\traspj a_j = 1$, each of which has only $c_j \leq p$ non-zero elements. The quantity $c_j$ is called the \emph{cardinality} of $a_j$. The sPCs are then equal to $t_j = X a_j$.
 
-A dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to a set of indices, $ind_j$. In \proglang{R} syntax, we write $\daj = a_j[ind_j]$ to indicate the vector containing only the $c_j$ non-zero loadings in $\a_j$, so that $t_j = \dXj\da_j$.
+A dot above a symbol denote the operation of retaining the elements of a vector or the columns of a matrix corresponding to a set of indices, $ind_j$. In \proglang{R} syntax, we write $\daj = a_j[ind_j]$ to indicate the vector containing only the $c_j$ non-zero loadings in $a_j$, so that $t_j = \dXj\da_j$.
 
 There exist there variants of LS-SPCA, optimizing two different objectives
 LS-SPCA solutions are derived using two different objectives.
@@ -134,7 +135,7 @@ Q_j = \left(I_p - \frac{t_{j-1} t\trasps{j-1}}{t\trasps{j-1} t_{j-1}}\right) Q_{
 \end{equation}
 with $Q_1 = X$. In SPCA literature the residual matrices $Q_j$ are called \emph{deflated} matrices. Note that the use of the deflated matrices is a direct consequence of the Courant--Fischer min--max theorem and is typically used in the power method for computing the eigen-decomposition. Then, the cSPCA solution loadings are obtained as the generalized eigenvectors corresponding to the largest eigenvalue:
 \begin{equation}
-\dXtj Q_j\QjT\dXj \daj = \mu_j \dXjT\dXj \daj.
+\dXjT Q_j\QjT\dXj \daj = \mu_j \dXjT\dXj \daj.
 \end{equation}
 The first cSPCA solution is equal to the first uSPCA solution but, in general, the following solutions are not equal to the corresponding uSPCA solutions and,  typically show very mild correlation with one another, with increasing values for sPCs of higher order. However, their cardinality is not constrained by the uncorrelatedness requirements and, in most cases, it is lower than their order.
 
@@ -182,7 +183,174 @@ Similar considerations are valid for the fat back-end engine.
 
 % These algorithms use the approximate VEXP in Equation~\ref{eq:apprvexp} to determine the variables to select or eliminate and are computationally very expensive. The forward selection is approximately $O(pk^4)$ for selecting $k$ variables, even when VEXP is computed with the power method to save computation time. However, a dramatic reduction in computational complexity can be achieved by selecting the variables using one of the algorithms implemented for pSPCA and computing the CVEXP at each iteration, which is then used as the stopping rule. While the exact cSPCA-based algorithm may yield more efficient solutions, in many cases there is little difference from the results obtained using the regression variable selection algorithms.
 
+\section{Application and illustrations}
+The \pkg{spca} UI provides the following functions:
+\begin{description}
+\item{fitting functions:}{\fct{spca}, \fct{pca}}
+\item{methods:}{\fct{print}, \fct{plot}, \fct{summary}}
+\item{helper functions:}{
+\item \fct{showload}, \code{compare_spca()}, \code{aggregate_by_group()},
+\item \code{new_spca()}, \code{change_loadings_sign_spca()}, 
+\code{spca_screeplot()}, \code{wachter_qqplot()}
+}
+%prints the loadings or percentage contributions (loadings scaled to unit $L_1$ norm)
+\end{description}
+\subsection{An example of LS-SPC Analysis}
+To illustrate a typical SPCA work-flow we use the `holzinger` dataset included in the package. This is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables.
+Data are loaded as usual as
+<<preliminaries, echo=FALSE, results=hide>>=
+options(prompt = "> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+devtools::load_all("C:/Users/merol/Dropbox/Papers/spca_revamp/spca")
+@
+<<load_data, message = FALSE, warning = FALSE>>= %, results=hide
+data(holzinger)
+dim(holzinger)
+@
 
+\subsection{Decide the number of components using pca()}
+We usally begin the analysis by inspecting PCA results. This can be done by using the function
+
+\begin{Code}
+pca(M, ncomps = NULL, centerdata = FALSE, scaledata = FALSE, 
+    screeplot = TRUE, wachter = TRUE, nrow_data = NULL, neigen_toplot = NULL), 
+\end{Code}    
+which returns an object of class \class{spca}.
+\code{M} can be either the data matrix or the covariance or correlation matrix (from now on, we use covariance matrix for both cases). In the former case PC scores will not be computed.
+
+A classic screeplot or a Wachter qq-plot (which uses the quantiles of the Marchenko-Pastur distribution) can be produced. Since the latter plot considers the data aspect-ratio, \code{nrow_data} is needed if \code{M} is a covariance matrix. 
+The commands below, produce the PCA output with all components (`ncomps = NULL`).
+% width = 4, height = 4
+<<pca, fig = TRUE, message = FALSE, warning = FALSE>>=
+ho_pca = pca(holzinger, screeplot = TRUE, wachter = TRUE)
+@
+
+The screeplot suggests to retain 4 components whereas the qq-plot indicates 3. We can check this by fitting a line to the first (p - 4) eigenvalues in the plot.
+
+%, fig=TRUE, width=4, height=4
+
+%fig.show="hold", out.width="47%"
+<<r qq-plot, fig = TRUE, message = FALSE, warning = FALSE,  width = 3, height= 3>>=
+wachter_qqplot(ho_pca$vexpPC*12, p = ncol(holzinger), 
+               n = nrow(holzinger), n_fitline = -3)
+@
+We settle for 4 components for caution.  
+
+\subsection{cSPCA fit}
+We start with the default values: \code{M} is the data matrix, \code{alpha} is the proportion of objective to reach, CVEXP in this case, as \code{stop_criterion} will take the first element of the vector. \code{method = "c"} indicates that the  loadings will be computed with cSPCA and \code{var_selection = c("fwd", "bkw", "step")} that the variables will be selected with forward selection based on $R^2$, as indicated by \code{intensive = FALSE}.
+%, fig.show="hold", out.width="47%", fig.width=4, fig.height=4>>=
+<<r spca_first>>=
+ho_spcadef = spca(M = holzinger,
+                  alpha = 0.95,
+                  ncomps = 4,
+                  method = "c",
+                  var_selection = c("fwd", "bkw", "step"),
+                  stop_criterion = c("cvexp", "r2")
+                  )
+@
+\subsection{print}
+\fnt{print} is the default method. By default it shows the percentage contribution (when the parameter \code{contributions = TRUE}) with the variables that do not load any sPC removed (when \code{only_nonzero = TRUE}).
+<<r print>>=
+ho_spcadef
+@
+The \code{print()} function takes the following arguments
+\begin{Code}
+print.spca = function (x, cols = NULL, only.nonzero = TRUE, 
+contributions = TRUE, 
+    digits = 3, thresh = 0.001, rtn = FALSE, components = NULL, 
+    ...) 
+\end{Code}
+\code{cols} which columns to print; by default all columns are shown. If an integer is passed, the columns \code{1:cols} are shown.  
+
+\subsection{summary}
+Summaries of the spca output can be produced by calling \code{summary}
+<<r summary>>=
+summary(ho_spcadef)
+@
+The table shows the following metrics
+\begin{itemize}
+\item Vexp The percentage variance explained.
+\item Cvexp The percentage cumulative variance explained.
+\item Rvexp The variance explained relative to the corresponding PC.
+\item Rcvexp The cumulative variance explained relative to the 
+corresponding PCs.
+\item Card  The number of non zero loadings.
+\end{itemize}
+The cardinality of the sPCs is significantly smaller than the number of features (12) and all sPCs explain more than 95\% of the VEXP of the corresponding PC. The same is true for CVEXP, as required.
+
+Even though the sPCs were computed with cSPCA, so allowing for correlation, these correlations are quite small (note how sPC4 shows higher correlation).
+<<r cor_comps>>=
+ round(ho_spcadef$corComp, 2)
+@
+
+The correlations between sPCs and PCs, shown below, indicates that while the first three sPCs are highly correlated with the corresponding PCs, the fourth is not. Thus confirming that number of important PCs is three, while the fourth is explaining a substancial portion of noise.
+
+<<r cor_pcs>>=
+ round(diag(cor(ho_spcadef$scores, ho_pca$scores[, 1:4])), 2)
+@
+sPC4 is negatively correlated with PC4. The sign of the loadings can be easily changed (all internally stored elements are changed)
+<<r change_sign>>=
+ho_spcadef = change_loadings_sign_spca(ho_spcadef, 4)
+round(diag(cor(ho_spcadef$scores, ho_pca$scores[, 1:4])), 2)
+@
+\subsection{plots}
+The function \code{plot} has several arguments. the arguments grouped in \code{controls} are \pkg{ggplot2} parameters included for convenience. The plots can be changed manually on the plot saved enforcing \code{return_plot =TRUE}. 
+\begin{Code}
+plot.spca = function (
+ x,
+ nplot = NULL,
+ plot_type = c("bars", "circular", "heatmap"),
+ contributions = TRUE,
+ only_nonzero = TRUE,
+ pc_loadings = NULL,
+ variable_groups = NULL,
+ plot_title = NULL,
+ return_plot = FALSE,
+ produce_plot = TRUE,
+ controls = list(
+ color_scale = c("ggplot", "cbb", "printsafe", "bw"),
+ variable_names = NULL,
+ legend_position = c("none", "bottom", "right", "top", "left"),
+ grid_type = c("horizontal", "full", "none"),
+ facet_labels = NULL,
+ legend_title = NULL,
+ x_axis_lab = "variables",
+ adjust_labels_circ = NULL,
+ flip_heatmap = FALSE,
+ heatmap_color_range = c("values", "unit")),
+ ...) 
+\end{Code}
+Most arguments' name should be self-explanatory. If a set of PC loadings is passed to \code{PCloadings}, the plots will compare them to the sPCs loadings (not implemented for circular barplots). If a vector or factor indicating groups of variables is passed to \code{variable_groups}, the plots will show these groups.
+\fct{plot} produces three types of plots; the default settings produce a classic barplot
+<<r barplot, fig = TRUE, message = FALSE, warning = FALSE,  width = 5, height= 5>>=
+plot(ho_spcadef)
+@
+A more compact circular plot is produced by selecting \code{plot_type = "c"}
+
+<<r circplot, fig = TRUE, message = FALSE, warning = FALSE,  width = 5, height= 5>>=
+plot(ho_spcadef, nplot = 3, plot_type = "c")
+@
+
+SPCA contributions can be compared with the PCA contributions with barplots or heat maps, for example as
+
+<<r heatmap_compare, fig = TRUE, message = FALSE, warning = FALSE,  width = 5, height= 5>>=
+plot(ho_spcadef, pc_loadings = ho_pca$contributions, plot_type= "h")
+@
+\subsection{utilities}
+There are other utilities available.
+\subsubsection{compare solutions}
+We fit a pSPCA thet produce sPCs that have at least 0.95 correlation with the PCs, using pSPCA and backward elimination to select the variables.
+<<r pspca>>=
+ho_pspca = spca(holzinger, ncomps = 4, alpha = 0.95,  method = "p",
+                stop_criterion = "r2", var_selection = "b")
+summary(ho_pspca)
+@
+Numerical and visual comparisons with `ho_spcadef` can be obtained calling \fct{compare_spca}
+<<r compare, fig = true, >>=
+compare_spca(list(ho_spcadef, ho_pspca), plot_loadings = TRUE)
+@
+
+with \code{alpha = 0.95}, objective \code{"r2}
+stop_criterion
 
 
 \bibliography{JSS}
@@ -514,63 +682,4 @@ information such as relative contributions of the authors may be added here
 \bibliography{JSS.bib}
 
 \end{document}
-
-%% -- Appendix (if any) --------------------------------------------------------
-%% - After the bibliography with page break.
-%% - With proper section titles and _not_ just "Appendix".
-
-\newpage
-
-\begin{appendix}
-
-\section{More technical details} \label{app:technical}
-
-\begin{leftbar}
-Appendices can be included after the bibliography (with a page break). Each
-section within the appendix should have a proper section title (rather than
-just \emph{Appendix}).
-
-For more technical style details, please check out JSS's style FAQ at
-\url{https://www.jstatsoft.org/pages/view/style#frequently-asked-questions}
-which includes the following topics:
-\begin{itemize}
-  \item Title vs.\ sentence case.
-  \item Graphics formatting.
-  \item Naming conventions.
-  \item Turning JSS manuscripts into \proglang{R} package vignettes.
-  \item Trouble shooting.
-  \item Many other potentially helpful details\dots
-\end{itemize}
-\end{leftbar}
-
-
-\section[Using BibTeX]{Using \textsc{Bib}{\TeX}} \label{app:bibtex}
-
-\begin{leftbar}
-References need to be provided in a \textsc{Bib}{\TeX} file (\code{.bib}). All
-references should be made with \verb|\cite|, \verb|\citet|, \verb|\citep|,
-\verb|\citealp| etc.\ (and never hard-coded). This commands yield different
-formats of author-year citations and allow to include additional details (e.g.,
-pages, chapters, \dots) in brackets. In case you are not familiar with these
-commands see the JSS style FAQ for details.
-
-Cleaning up \textsc{Bib}{\TeX} files is a somewhat tedious task -- especially
-when acquiring the entries automatically from mixed online sources. However,
-it is important that informations are complete and presented in a consistent
-style to avoid confusions. JSS requires the following format.
-\begin{itemize}
-  \item JSS-specific markup (\verb|\proglang|, \verb|\pkg|, \verb|\code|) should
-    be used in the references.
-  \item Titles should be in title case.
-  \item Journal titles should not be abbreviated and in title case.
-  \item DOIs should be included where available.
-  \item Software should be properly cited as well. For \proglang{R} packages
-    \code{citation("pkgname")} typically provides a good starting point.
-\end{itemize}
-\end{leftbar}
-
-\end{appendix}
-
-%% -----------------------------------------------------------------------------
-
 
