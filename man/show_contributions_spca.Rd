@@ -16,7 +16,7 @@ passed, only that dimension will be returned.}
 \item{return_list}{Logical: if \code{TRUE} the list is returned}
 }
 \description{
-It just turns an spca object loadlist into a list of loadings
+It just turns an spca object loadings_list into a list of loadings
 }
 \seealso{
 Other spca: 
@@ -27,7 +27,7 @@ Other spca:
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
 \code{\link{spca}()},
-\code{\link{spca_object}},
+\code{\link{spca-object}},
 \code{\link{summary.spca}()}
 }
 \concept{spca}

@@ -322,7 +322,7 @@ compare_spca = function(
   ## summary table ---------------
   ## sum_list is list of summaries for all objects
 #browser()
-  sum_list = lapply(obj_list, summary, prn = FALSE, rtn = TRUE, 
+  sum_list = lapply(obj_list, summary, print_table = FALSE, return_table = TRUE, 
                     min_load = TRUE)
   
   sum_matrix = matrix(0, nrow = nrow(sum_list[[1]]), ncol = n_objects *ncomps) 
