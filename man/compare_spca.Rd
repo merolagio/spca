@@ -101,7 +101,7 @@ Other spca:
 \code{\link{print.spca}()},
 \code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
-\code{\link{spca_object}},
+\code{\link{spca-object}},
 \code{\link{summary.spca}()}
 }
 \concept{spca}
