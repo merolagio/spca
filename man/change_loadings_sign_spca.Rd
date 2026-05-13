@@ -16,7 +16,7 @@ be flipped.}
 The modified \code{spca_obj}, with the selected components sign-flipped.
 }
 \description{
-Multiplies by \eqn{-1} the loadings (including in loadlist), contributions,
+Multiplies by \eqn{-1} the loadings (including in loadings_list), contributions,
 and, when present the scores and component-correlation entries
 for the components listed in \code{index_to_change}.
 This is useful because (sparse) principal components are defined up to sign
@@ -31,7 +31,7 @@ Other spca:
 \code{\link{print.spca}()},
 \code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
-\code{\link{spca_object}},
+\code{\link{spca-object}},
 \code{\link{summary.spca}()}
 }
 \concept{spca}

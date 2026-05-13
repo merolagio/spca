@@ -28,14 +28,14 @@ is.spca <- function(x) {
   !is.null(x$rcvexp) &&
   !is.null(x$ncomps) &&
   !is.null(x$cardinality) &&
-  !is.null(x$loadlist) &&
+  !is.null(x$loadings_list) &&
   !is.null(x$indices) 
 }
 # validate_spca==========================
 #' Validate the existence and correctness of core spca elements
 #'
 #' Checks loadings first, then explained-variance summaries, component counts,
-#' cardinality, loadlist, indices, and, if present, `r2` and `scores`.
+#' cardinality, loadings_list, indices, and, if present, `r2` and `scores`.
 #' 
 #' @param x an`spca` object
 #' @param quiet if `FALSE` warnings are printed
@@ -55,7 +55,7 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 
   needed = c(
     "loadings", "vexpPC", "vexp", "cvexp", "rvexp", "rcvexp", "ncomps",
-    "cardinality", "loadlist", "indices", "corComp"
+    "cardinality", "loadings_list", "indices", "spc_cor"
   )
   
   msg = list()
@@ -337,19 +337,19 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
   
   # validate_loadlist ================
   
-  if (is.null(x$loadlist)) {
-    add_msg("loadlist is missing")
+  if (is.null(x$loadings_list)) {
+    add_msg("loadings_list is missing")
   } else {
-    if (!is.list(x$loadlist)) {
-      add_msg("loadlist must be a list")
+    if (!is.list(x$loadings_list)) {
+      add_msg("loadings_list must be a list")
     } else {
-      if (length(x$loadlist) != ncomp) {
-        add_msg("loadlist must have length ncol(loadings)")
+      if (length(x$loadings_list) != ncomp) {
+        add_msg("loadings_list must have length ncol(loadings)")
       }
       
-      for (i in seq_along(x$loadlist)) {
-        xi = x$loadlist[[i]]
-        nm = paste0("loadlist[[", i, "]]")
+      for (i in seq_along(x$loadings_list)) {
+        xi = x$loadings_list[[i]]
+        nm = paste0("loadings_list[[", i, "]]")
         
         if (!is_num_vector(xi)) {
           add_msg(nm, "must be a numeric vector")
@@ -429,26 +429,26 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
     }
   }
   if (ncol(x$loadings) > 1){
-    if (is.null(x$corComp)) {
-      add_msg("corComp is missing")
+    if (is.null(x$spc_cor)) {
+      add_msg("spc_cor is missing")
     } else {
-      if (is.vector(x$corComp)) {
-        add_msg("corComp must be a matrix, not a vector")
-      } else if (!is.matrix(x$corComp)) {
-        add_msg("corComp must be a matrix")
-      } else if (!is.numeric(x$corComp)) {
-        add_msg("corComp must be numeric")
+      if (is.vector(x$spc_cor)) {
+        add_msg("spc_cor must be a matrix, not a vector")
+      } else if (!is.matrix(x$spc_cor)) {
+        add_msg("spc_cor must be a matrix")
+      } else if (!is.numeric(x$spc_cor)) {
+        add_msg("spc_cor must be numeric")
       } else {
-        if (any(dim(x$corComp) == 0)) {
-          add_msg("corComp cannot have zero dimensions")
+        if (any(dim(x$spc_cor) == 0)) {
+          add_msg("spc_cor cannot have zero dimensions")
         }
         
-        if (anyNA(x$corComp)) {
-          add_msg("corComp cannot contain missing values")
+        if (anyNA(x$spc_cor)) {
+          add_msg("spc_cor cannot contain missing values")
         }
         
-        if ((nrow(x$corComp) != ncomp) || (ncol(x$corComp) != ncomp)) {
-          add_msg("corComp must have dimensions ncol(loadings) x ncol(loadings)")
+        if ((nrow(x$spc_cor) != ncomp) || (ncol(x$spc_cor) != ncomp)) {
+          add_msg("spc_cor must have dimensions ncol(loadings) x ncol(loadings)")
         }
       }
     }
@@ -523,9 +523,9 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 #'  \item{vexpPC}{a vector of variance explained by the PCs.}
 #'  \item{rvexp}{a vector of proportion of cumulative variance explained over that explained by the 
 #'  corresponding PCs.}
-#'  \item{loadlist}{a list with only the nonzero loadings.}
+#'  \item{loadings_list}{a list with only the nonzero loadings.}
 #'  \item{scores}{the components' scores, if X is passed.} 
-#'  \item{corComp}{A matrix of the correlations between components.}
+#'  \item{spc_cor}{A matrix of the correlations between components.}
 #'  \item{method_name}{the string passed as such, if method_name is passed.}
 #' }
 #' @family spca
@@ -569,24 +569,24 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
   obj$cvexp = tmp_vexp$cvexp/totv
   obj$rvexp = obj$vexp/obj$vexpPC
   obj$rcvexp = obj$cvexp/cumsum(obj$vexpPC)
-  obj$cor_with_PC = var2corC(atdbC(A, S, s_ee$vectors[, seq_len(obj$ncomps)]))
-  obj$total_variance = totv
+  obj$sq_cor_with_PC = var2corC(atdbC(A, S, s_ee$vectors[, seq_len(obj$ncomps)]))
+  obj$tot_var = totv
   
   obj$indices = list()
-  obj$loadlist = list()
+  obj$loadings_list = list()
   for(i in 1:obj$ncomps){
     obj$indices[[i]] = which(A[, i] != 0)
-    obj$loadlist[[i]] = A[obj$indices[[i]], i]
+    obj$loadings_list[[i]] = A[obj$indices[[i]], i]
       names(obj$indices[[i]]) = rownames(A)[obj$indices[[i]]]
-    names(obj$loadlist[[i]]) = rownames(A)[obj$indices[[i]]]
+    names(obj$loadings_list[[i]]) = rownames(A)[obj$indices[[i]]]
   }
   
   if(!is.null(X)){
     obj$scores = abC(X, A)
-    obj$corComp = makeCorScoresC(obj$scores)
+    obj$spc_cor = makeCorScoresC(obj$scores)
   }
   else{
-    obj$corComp = make_corComp_S(A, S)
+    obj$spc_cor = make_corComp_S(A, S)
   }
     
   if(!is.null(method_name))  
@@ -615,16 +615,16 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
 #' @param digits Integer: number of decimal figures.
 #' @param thresh Value below which loadings are considered zero and not
 #' printed.
-#' @param rtn Logical: should the formatted (text) table be returned?
+#' @param return_table Logical: should the formatted (text) table be returned?
 #' @param components_names A vector of names for the components. If NULL assigned 
 #'   as#' "sPCj"
 #' @param ... Further arguments; currently ignored.
-#' @return If rtn = TRUE, it returns a formatted text table. 
+#' @return If return_table = TRUE, it returns a formatted text table. 
 #' so that only exact (or partial) prescribed arguments can be entered. 
 #' @family spca
 #' @export
 #' @method print spca
-print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-03, rtn = FALSE, components_names = NULL, ...)
+print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-07, return_table = FALSE, components_names = NULL, ...)
   {
   
   # Validation
@@ -644,7 +644,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
   validate_booleans(
     only.nonzero = only.nonzero,
     contributions = contributions,
-    rtn = rtn
+    return_table = return_table
   )
   
   if (contributions == TRUE){
@@ -662,16 +662,21 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
     A  = A[!rows, , drop = FALSE]
   }  
   
-  ## assigns names to loadings
-  if ((!is.null(components_names)) && (length(components_names) >= length(cols))){
-    colnames(A) = components_names[cols]
-  }
-  else{
-    if (!(is.null(components_names)) && (length(components_names) < length(cols)))
-      message("the length of components_names is incorrect, automatic names assigned")
-    colnames(A) = paste0("sPC", cols)
-  }
+  A = A[, cols]
   
+  ## assigns names to loadings
+  if(is.null(components_names)){
+    if(is.null(colnames(A)))
+      components_names = paste0("sPC", ncol(A))
+    else
+      components_names = colnames(A)
+  }
+  else
+    if ((length(components_names) < length(cols))){
+      message("Too few components_names, default names assigned")
+      components_names = paste0("sPC", ncol(A))
+    }
+  colnames(A) = components_names[cols]
   # # -----  formatting -
   
   # needed because sprintf reduces to vector but preserves trailing zeroes
@@ -711,7 +716,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
     print(fx, quote = FALSE, right = TRUE)
     cat(paste(" "))
   }
-  if(rtn == TRUE){   
+  if(return_table == TRUE){   
     return(fx)    
   }  
   else 
@@ -720,7 +725,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
 
 #' Change the sign of selected loadings in an `spca` object 
 #' 
-#' Multiplies by \eqn{-1} the loadings (including in loadlist), contributions, 
+#' Multiplies by \eqn{-1} the loadings (including in loadings_list), contributions, 
 #'   and, when present the scores and component-correlation entries 
 #'   for the components listed in `index_to_change`.  
 #' This is useful because (sparse) principal components are defined up to sign
@@ -754,11 +759,11 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
       spca_obj$scores[, index_to_change[i]] =
       - spca_obj$scores[,index_to_change[i]]
     
-    if (!is.null(spca_obj$corComp)) {
-      spca_obj$corComp[index_to_change[i], ] =
-        - spca_obj$corComp[index_to_change[i], ]
-      spca_obj$corComp[, index_to_change[i]] = 
-        - spca_obj$corComp[, index_to_change[i]]
+    if (!is.null(spca_obj$spc_cor)) {
+      spca_obj$spc_cor[index_to_change[i], ] =
+        - spca_obj$spc_cor[index_to_change[i], ]
+      spca_obj$spc_cor[, index_to_change[i]] = 
+        - spca_obj$spc_cor[, index_to_change[i]]
     }
   }
   return(spca_obj)
@@ -768,7 +773,7 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 ## show_contributions_spca ==================
 #' Shows the non-zero contributions separately for each component.
 #' 
-#' It just turns an spca object loadlist into a list of loadings 
+#' It just turns an spca object loadings_list into a list of loadings 
 #' 
 #' @param spca_obj An spca object
 #' 
@@ -790,7 +795,7 @@ show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
   
   message("Percentage Contributions")
   
-  print(lapply(spca_obj$loadlist, function(x) x/ sum(abs(x))))
+  print(lapply(spca_obj$loadings_list, function(x) x/ sum(abs(x))))
   
   
   if (return_list == TRUE)
@@ -928,7 +933,7 @@ aggregate_by_group = function(X, groups,
 #' Prints and optionally returns a table with summary statistics for evaluation 
 #' and comparisons with the full PCA solutions.
 #' 
-#' The summaries are printed as formatted text, if rtn = TRUE, the value
+#' The summaries are printed as formatted text, if return_table = TRUE, the value
 #' returned is a numerical matrix.
 #' 
 #' For each component the following summaries are computed: 
@@ -954,13 +959,13 @@ aggregate_by_group = function(X, groups,
 #' Options: "relative" (RVEXP), "cumulative_relative" (RCVEXP), "both", or "none".
 #' Default is "cumulative_relative".
 #' @param min_load Logical: should minimum loading or contributions be included?
-#' @param rtn Logical: should the raw summary matrix be returned?
-#' @param prn Logical: should the table be printed?
+#' @param return_table Logical: should the raw summary matrix be returned?
+#' @param print_table Logical: should the table be printed?
 #' @param thrsehhold_cardinality Value below which \emph{loadings} 
 #'   are considered to be zero.  Default 0.001. 
 #' @param ... Further arguments; currently ignored.
 #' 
-#' @return If rtn = TRUE, a numerical matrix with the summaries.
+#' @return If return_table = TRUE, a numerical matrix with the summaries.
 #' @seealso Examples in \code{\link{aggregate_by_group}}.
 #' @family spca
 #' @export
@@ -973,8 +978,8 @@ summary.spca = function(
                                               "relative", "none"),
     min_load = FALSE, 
     r_squared = FALSE,
-    rtn = FALSE, 
-    prn = TRUE, 
+    return_table = FALSE, 
+    print_table = TRUE, 
     thresh = 1e-4, 
     ...) 
 {
@@ -1004,7 +1009,7 @@ summary.spca = function(
     stop("cols cannot contain values larger than the number of components available")
   
   validate_booleans(contributions = contributions, min_load = min_load,
-                    r_squared = r_squared, rtn = rtn , prn = prn)
+                    r_squared = r_squared, return_table = return_table , print_table = print_table)
   
   if(is.vector(variance_metrics))
     variance_metrics = variance_metrics[1]
@@ -1042,9 +1047,9 @@ summary.spca = function(
     rownames(out)[nrow(out)] = min_label
   }
   
-  if (isTRUE(r_squared)){
-    if ((!is.null(x$r2)))
-      out = rbind(out, R2 = x$cor_with_PC)
+  if (r_squared){
+    if ((!is.null(x$sq_cor_with_PC)))
+      out = rbind(out, R2 = x$sq_cor_with_PC)
     else
       warning("R squared coefficients are not available")
   }
@@ -1053,13 +1058,13 @@ summary.spca = function(
   out = as.matrix(out[, cols, drop = FALSE])
   colnames(out) = paste0("sPC", cols)
   
-  if (prn) {
+  if (print_table) {
     out_formatted = format_summary_matrix(out, contributions)
     print(out_formatted, quote = FALSE, right = TRUE)
   }
   
   # Return if requested
-  if (rtn) {
+  if (return_table) {
     return(out)
   } else {
     invisible()
