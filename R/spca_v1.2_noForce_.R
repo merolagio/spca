@@ -358,7 +358,7 @@ spca = function(M,
       centerdata = TRUE
     }
     if (centerdata || scaledata) {
-        M = scaleC(M, centerdata, scaledata)
+        M = scaleR(M, centerdata, scaledata)
 
       }
     S = ataC(M)
@@ -491,18 +491,18 @@ spca = function(M,
              cvexp = spout$cvexp,
              rvexp = rvexp,
              rcvexp = rcvexp,
-             cor_with_PC = spout$r2,
-             total_variance = spout$totvar,
-             loadlist = spout$loadlist,
+             sq_cor_with_PC = spout$r2,
+             tot_var = spout$totvar,
+             loadings_list = spout$loadlist,
              indices = spout$ind
              )
   ## FIX TIME NAMES
   if (use_fat_backend) {
     out$scores = spout$scores
     if (ncomps > 1){
-      out$corComp = cor(spout$scores)
-      colnames(out$corComp) = paste0("sPC", seq_len(spout$ncomps))
-      rownames(out$corComp) = paste0("sPC", seq_len(spout$ncomps))
+      out$spc_cor = cor(spout$scores)
+      colnames(out$spc_cor) = paste0("sPC", seq_len(spout$ncomps))
+      rownames(out$spc_cor) = paste0("sPC", seq_len(spout$ncomps))
     }
     out$parameters = parameters
     out$time_wall = spout$Time_wall
@@ -512,7 +512,7 @@ spca = function(M,
     out$time_unit_raw = spout$time_unit_raw
   }
   else {
-# check if exist both scores and corComp add to cpp (done in thin but not checked) add to docs
+# check if exist both scores and spc_cor add to cpp (done in thin but not checked) add to docs
 
     if ((is_datamatrix_M)) {
       out$scores = abC(M, spout$loadings[, seq_len(spout$ncomps), 
@@ -520,18 +520,18 @@ spca = function(M,
       
       colnames(out$scores) = paste0("sPC", seq_len(spout$ncomps))
       if (ncomps > 1){
-      out$corComp = cor(out$scores)
-      colnames(out$corComp) = paste0("sPC", seq_len(spout$ncomps))
-      rownames(out$corComp) = paste0("sPC", seq_len(spout$ncomps))
+      out$spc_cor = cor(out$scores)
+      colnames(out$spc_cor) = paste0("sPC", seq_len(spout$ncomps))
+      rownames(out$spc_cor) = paste0("sPC", seq_len(spout$ncomps))
       }
     }
     else{
       out$scores = NULL
       if (ncomps > 1){
-        out$corComp = make_corComp_S(spout$loadings, S)
+        out$spc_cor = make_spc_cor_S(spout$loadings, S)
       }
       else 
-        out$corComp = NULL
+        out$spc_cor = NULL
     }
     colnames(spout$Time) = spout$Time_colnames
     out$parameters = parameters

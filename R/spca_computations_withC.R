@@ -28,14 +28,15 @@ get_card = function(A, thresh = 1e-4){
 # matrix called loadings
 make_contributions = function(x){
   
-  if(is.list(x) && (!is.null(x$loadings)) && (is.matrix(x$loadings))){
-    return(scaleColsC(A = x$loadings, normtype = 1, 
-                      sig = rep(1, ncol(x$loadings))))
+  if (is.spca(x) && (validate.spca(x)))
+    {
+    return(scaleColsR(x$loadings, normtype = 1, sig = NULL))
   }
-  else{
-      return(scaleColsC(A = x, normtype = 1, 
-                        sig = rep(1, ncol(x))))
-  }
+  if (is.data.frame(x))
+    x = as.matrix(x)
+  if (is.matrix(x))
+    return(scaleColsR(x, normtype = 1, sig = NULL))
+  
   if (is.vector(x))
     return(x/sum(abs(x)))
   
@@ -61,7 +62,12 @@ make_corComp_S = function(A, S){
  if ((is.vector(A)) || (ncol(A) == 1)){
     warning("A must be a matrix with at least two columns")
     return(NULL)
-  } 
+ } 
+  if (is.data.frame(A))
+    A = as.matrix(A)
+    if (nrow(A) != nrow(S))
+      stop("A must have the same number of columns as the number of rows of S")
+  
   if ((!is.matrix(S)) || (!isSymmetric(S)) || any(diag(S) < 1e-4)){
     warning(("S must be a symmetric matrix with non zero diagonal values"))
     return(NULL)
@@ -140,5 +146,27 @@ if ((!is.matrix(A)) || (!is.matrix(S)))
   
     return(make_vexpSC(A, S))
 
+}
+
+scaleColsR = function(M, normtype = 2, sig = NULL){
+  if(is.data.frame(M))
+    M = as.matrix(M)
+  if(!is.matrix(M))
+    stop("M must be a matrix or a data.frame")
+  if (!(normtype[1] %in% (1:2)))
+    stop("normtype must be 1 or 2")
+  if (is.null(sig))
+    sig = rep(1, ncol(M))
+  
+  scaleColsC(M, normtype, sig)
+}
+
+
+scaleR = function(M, center = FALSE, scale = TRUE){
+  if(is.data.frame(M))
+    M = as.matrix(M)
+  if(!is.matrix(M))
+    stop("M must be a matrix or a data.frame")
+  scaleC(glb, center, scale)
 }
 
