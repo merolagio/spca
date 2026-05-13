@@ -3,7 +3,7 @@
 \docType{package}
 \name{spca-package}
 \alias{spca-package}
-\title{spca: Least Squares Sparse PCA}
+\title{spca: Least Squares Sparse PCA package}
 \description{
 Tools to compute LSSPCA solutions.
 }

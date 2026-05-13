@@ -36,9 +36,9 @@ each each component.}
 \item{vexpPC}{a vector of variance explained by the PCs.}
 \item{rvexp}{a vector of proportion of cumulative variance explained over that explained by the
 corresponding PCs.}
-\item{loadlist}{a list with only the nonzero loadings.}
+\item{loadings_list}{a list with only the nonzero loadings.}
 \item{scores}{the components' scores, if X is passed.}
-\item{corComp}{A matrix of the correlations between components.}
+\item{spc_cor}{A matrix of the correlations between components.}
 \item{method_name}{the string passed as such, if method_name is passed.}
 }
 }
@@ -51,7 +51,7 @@ Other spca:
 \code{\link{print.spca}()},
 \code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
-\code{\link{spca_object}},
+\code{\link{spca-object}},
 \code{\link{summary.spca}()}
 }
 \concept{spca}

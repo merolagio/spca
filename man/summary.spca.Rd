@@ -11,8 +11,8 @@
   variance_metrics = c("both", "cumulative_relative", "relative", "none"),
   min_load = FALSE,
   r_squared = FALSE,
-  rtn = FALSE,
-  prn = TRUE,
+  return_table = FALSE,
+  print_table = TRUE,
   thresh = 1e-04,
   ...
 )
@@ -33,9 +33,9 @@ Default is "cumulative_relative".}
 
 \item{min_load}{Logical: should minimum loading or contributions be included?}
 
-\item{rtn}{Logical: should the raw summary matrix be returned?}
+\item{return_table}{Logical: should the raw summary matrix be returned?}
 
-\item{prn}{Logical: should the table be printed?}
+\item{print_table}{Logical: should the table be printed?}
 
 \item{...}{Further arguments; currently ignored.}
 
@@ -43,14 +43,14 @@ Default is "cumulative_relative".}
 are considered to be zero.  Default 0.001.}
 }
 \value{
-If rtn = TRUE, a numerical matrix with the summaries.
+If return_table = TRUE, a numerical matrix with the summaries.
 }
 \description{
 Prints and optionally returns a table with summary statistics for evaluation
 and comparisons with the full PCA solutions.
 }
 \details{
-The summaries are printed as formatted text, if rtn = TRUE, the value
+The summaries are printed as formatted text, if return_table = TRUE, the value
 returned is a numerical matrix.
 
 For each component the following summaries are computed:
@@ -75,6 +75,6 @@ Other spca:
 \code{\link{print.spca}()},
 \code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
-\code{\link{spca_object}}
+\code{\link{spca-object}}
 }
 \concept{spca}

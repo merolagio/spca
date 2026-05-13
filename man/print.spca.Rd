@@ -10,8 +10,8 @@
   only.nonzero = TRUE,
   contributions = TRUE,
   digits = 3,
-  thresh = 0.001,
-  rtn = FALSE,
+  thresh = 1e-07,
+  return_table = FALSE,
   components_names = NULL,
   ...
 )
@@ -30,7 +30,7 @@ printed. Otherwise all loadings are printed.}
 \item{thresh}{Value below which loadings are considered zero and not
 printed.}
 
-\item{rtn}{Logical: should the formatted (text) table be returned?}
+\item{return_table}{Logical: should the formatted (text) table be returned?}
 
 \item{components_names}{A vector of names for the components. If NULL assigned
 as#' "sPCj"}
@@ -41,7 +41,7 @@ as#' "sPCj"}
 \eqn{L_1} norm (and printed as percentage contributions)?}
 }
 \value{
-If rtn = TRUE, it returns a formatted text table.
+If return_table = TRUE, it returns a formatted text table.
 so that only exact (or partial) prescribed arguments can be entered.
 }
 \description{
@@ -57,7 +57,7 @@ Other spca:
 \code{\link{plot.spca}()},
 \code{\link{show_contributions_spca}()},
 \code{\link{spca}()},
-\code{\link{spca_object}},
+\code{\link{spca-object}},
 \code{\link{summary.spca}()}
 }
 \concept{spca}
