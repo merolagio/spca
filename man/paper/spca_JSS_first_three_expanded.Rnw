@@ -1,0 +1,227 @@
+\documentclass[article]{jss}
+
+%% -- LaTeX packages and custom commands ---------------------------------------
+\usepackage{orcidlink,thumbpdf,lmodern}
+\usepackage[american]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{amsbsy}
+\usepackage{amsthm}
+\usepackage{float}
+
+%% new custom commands
+\newcommand{\class}[1]{`\code{#1}'}
+\newcommand{\fct}[1]{\code{#1()}}
+
+<<preliminaries, echo=FALSE, results=hide>>=
+options(prompt = "R> ", continue = "+  ", width = 70,
+        useFancyQuotes = FALSE, prefix.string = "spca_JSS_first_three_expanded")
+@
+
+\author{Giovanni Maria Merola~\orcidlink{0000-0003-2539-9225}\\
+British University Vietnam}
+\Plainauthor{Giovanni Maria Merola}
+
+\title{An R Package to Compute Least Squares Sparse Principal Components}
+\Plaintitle{An R package to compute Least Squares Sparse Principal Components}
+\Shorttitle{An \proglang{R} package to compute LS-SPCA components}
+
+\Abstract{
+This article presents the \pkg{spca} package for computing least-squares sparse principal components (LS-SPCA) in \proglang{R}. LS-SPCA differs from conventional sparse PCA methods because it imposes sparsity on the data-approximation formulation of PCA, rather than on Hotelling's maximum-variance formulation. The package computes uncorrelated, correlated, and projection LS-SPCA components, implements several variable-selection strategies, and provides methods for printing, plotting, summarizing, and comparing \class{spca} objects. This draft contains only the expanded introduction, methodology, and computational sections.
+}
+
+\Keywords{SPCA, least squares, sparse PCA, projection, \proglang{R}}
+\Plainkeywords{SPCA, least squares, sparse PCA, projection, R}
+
+\Address{
+  Giovanni Merola\\
+  British University Vietnam\\
+  Ecopark, Hung Yen\\
+  Vietnam\\
+  E-mail: \email{merolagio@gmail.com}\\
+}
+
+\input{spca_JSS_macros.TeX}
+
+\begin{document}
+\SweaveOpts{concordance = FALSE}
+
+\section{Introduction}
+
+Principal components analysis (PCA) is a standard method for reducing the dimensionality of multivariate data. PCA replaces the original variables with linear combinations, the principal components (PCs), ordered by decreasing variance explained. The first few PCs often summarize a substantial proportion of the variation in the data. This is obtained by requiring that the PCs best approximate the data, in a least-squares (LS) sense.
+
+The PCs are difficult to interpret when the number of variables is large, because all the variables contribute to each component. Sparse principal components analysis (SPCA) addresses this problem by computing \emph{sparse} principal components (sPCs) that are linear combinations of a few of the variables. Hence, several coefficients of these linear combinations, called \emph{loadings}, are zero, which makes it easier to identify the important variables that define the sPCs. 
+
+The first SPCA method was proposed by \citet{tre}. Many other methods followed. The review articles in the series \emph{All sparse PCA models are wrong, but some are useful} \citep{camI, camII, camIII} discuss a large part of this literature. Most conventional SPCA methods start from Hotelling's maximum-variance formulation of PCA \citep{hot} and add sparsity constraints or penalties to the loadings. The methods differ in the constraint, penalty, approximation, and algorithm used. As a result, different SPCA methods often give different solutions on the same data.
+
+Least-squares sparse principal components analysis (LS-SPCA), proposed by \citet{mer15} and extended in projection form by \citet{mer19}, starts from a different PCA criterion. It imposes sparsity on Pearson's least-squares data-approximation formulation of PCA \citep{pea}. In ordinary PCA, Pearson's and Hotelling's formulations give the same components. With sparsity constraints, they define different problems. LS-SPCA therefore computes sparse components that approximate the data well in a least-squares sense, not sparse components that approximate the maximum-variance PCA problem.
+
+The \pkg{spca} package implements LS-SPCA in \proglang{R}. The main fitting function, \fct{spca}, computes sPCs from a data matrix or from a covariance or correlation matrix. The function \fct{pca} computes ordinary PCA and returns the same object class, so PCA and SPCA results can be printed, plotted, summarized, and compared by the same methods. The constructor \fct{new_spca} creates an \class{spca} object from loadings computed outside the package and a covariance or correlation matrix.
+
+The package implements three LS-SPCA variants. Uncorrelated LS-SPCA (uSPCA) imposes zero correlations among sPCs. Correlated LS-SPCA (cSPCA), the default method, uses deflated matrices and usually gives sPCs with small mutual correlations, without the cardinality restrictions required by uSPCA. Projection SPCA (pSPCA) computes sparse loadings by projecting residual PCs onto subsets of variables. The package also provides forward, backward, and stepwise variable selection, fixed-index constraints, separate algorithms for thin and fat data matrices, and optional power-method computations for leading eigenvectors.
+
+This article gives a short account of the methodology and illustrates the package workflow. Section~\ref{sec:methodology} defines the LS-SPCA objective and the three implemented variants. Section~\ref{sec:computational} describes the main computational choices in the current implementation. The rest of the full article uses the Holzinger--Swineford data distributed with the package.
+
+\section{LS-SPCA Methodology}\label{sec:methodology}
+
+This section summarizes the LS-SPCA approach implemented in the package. The presentation follows \citet{mer15} and \citet{mer19}; proofs and full derivations are given there. Here the aim is to define the quantities used by the software and to separate the three implemented methods.
+
+Let $X$ be an $n \times p$ data matrix with centered columns. Let $S \propto X\trasp X$ denote the covariance matrix; here covariance matrix also includes the correlation matrix case. The eigenvectors of $S$ are denoted by $v_1,\ldots,v_p$ and are ordered by decreasing eigenvalues,
+\[
+\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p.
+\]
+These eigenvectors are the PC loadings. The PC scores are the corresponding linear combinations of the columns of $X$.
+
+For LS-SPCA, $a_j$ denotes the sparse loading vector for component $j$, $j = 1,\ldots,r$, with $r \leq p$. The loading vector has unit norm, $a\traspj a_j = 1$, and has $c_j$ nonzero elements. The number $c_j$ is the cardinality of the $j$th sPC. The score vector of the $j$th sPC is
+\[
+t_j = Xa_j.
+\]
+The package reports cardinality, variance explained, cumulative variance explained, ratios relative to the corresponding PCs, squared correlations with the corresponding PCs, and the correlation matrix among sPCs when it is available.
+
+A dot above a symbol denotes restriction to the variables selected for the component. If $ind_j$ is the index set of the nonzero loadings in $a_j$, then $\daj$ contains the retained loadings and $\dXj$ is $X$ restricted to the corresponding columns. In \proglang{R} notation, $\daj$ is \code{a_j[ind_j]} and $\dXj$ is \code{X[, ind_j]}. Thus,
+\[
+t_j = \dXj\da_j.
+\]
+
+\subsection{The LS-SPCA Objective}
+
+LS-SPCA imposes sparsity on the least-squares data-approximation formulation of PCA. In ordinary PCA, the least-squares and maximum-variance formulations give the same solution. With sparsity constraints, they do not.
+
+For the $j$th component, the objective can be written recursively as
+\begin{equation}\label{eq:lsscpca_obj}
+\min_{a_j} \|X - t_j b\trasp\|^2,
+\quad \text{subject to}\quad
+\operatorname{card}(a_j) < p,
+\quad a\traspj S a_i = 0,\ i < j;\ j = 1, \ldots, r.
+\end{equation}
+Here $t_j = Xa_j$ is the score vector of the sparse component, and $b$ is the vector used to reconstruct the data from $t_j$. The condition $a\traspj S a_i = 0$ makes the $j$th sPC uncorrelated with the previous sPCs.
+
+HERE EXPLAIN WHETHER $b$ IS OPTIMIZED OUT, HOW IT IS DEFINED IN MEROLA (2015), AND WHETHER THIS DISPLAY SHOULD SHOW THE PROFILLED OBJECTIVE USED IN THE CODE.
+
+The variance explained by an sPC is the reduction in least-squares reconstruction error due to that component. The package reports this quantity as \code{vexp}, scaled by the total variance. It also reports \code{cvexp}, the cumulative variance explained, and \code{rvexp} and \code{rcvexp}, the corresponding ratios relative to ordinary PCA.
+
+\subsection{Uncorrelated LS-SPCA}
+
+Uncorrelated LS-SPCA (uSPCA) keeps the uncorrelatedness constraint in Equation~\ref{eq:lsscpca_obj}. For a fixed set of selected variables, the restricted loading vector $\daj$ solves the generalized eigenproblem
+\begin{equation}\label{eq:uspca_sol}
+C_j \dST \dS \daj = \lambda_j \dXjT \dXj \daj,
+\end{equation}
+where $\dS = S[, ind_j]$. The matrices $C_j$ impose the constraints that make the current sPC uncorrelated with the previous sPCs, with $C_1 = I$ for the first component.
+
+HERE EXPLAIN THE EXACT DEFINITION OF $C_j$, INCLUDING ITS DIMENSIONS AND HOW IT IS BUILT FROM PREVIOUS LOADINGS OR SCORES.
+
+The cardinality of the $j$th uSPCA loading cannot be smaller than $j$, because the loading must satisfy $j - 1$ uncorrelatedness constraints. The package checks this condition when fixed indices are supplied for uSPCA.
+
+uSPCA gives the constrained LS-SPCA solution, but it is also the most restrictive method implemented in the package. The constraints increase the computational cost and can force later components to include more variables than desired.
+
+\subsection{Correlated LS-SPCA}
+
+Correlated LS-SPCA (cSPCA) is the default method in \pkg{spca}. It avoids explicit uncorrelatedness constraints by computing later components from deflated matrices. Let $Q_1 = X$. For $j \geq 2$, the residual matrix is updated as
+\begin{equation}\label{eq:defX_def}
+Q_j =
+\left(I_p -
+\frac{t_{j-1}t\trasps{j-1}}{t\trasps{j-1}t_{j-1}}
+\right)Q_{j-1}.
+\end{equation}
+Thus $Q_j$ is the part of the previous residual matrix orthogonal to the preceding sPC. In the SPCA literature, these matrices are called deflated matrices.
+
+HERE CHECK THE DIMENSION OF THE IDENTITY MATRIX IN EQUATION~\ref{eq:defX_def}. WITH $Q_j$ AS AN $n \times p$ MATRIX AND $t_j$ AS AN $n$-VECTOR, THE IDENTITY SHOULD PROBABLY BE $I_n$, NOT $I_p$.
+
+For a fixed set of selected variables, the cSPCA loading vector solves
+\begin{equation}\label{eq:cspca_sol}
+\dXjT Q_j\QjT\dXj \daj = \mu_j \dXjT\dXj \daj.
+\end{equation}
+The first cSPCA solution is the same as the first uSPCA solution. Later cSPCA solutions are not required to be exactly uncorrelated with previous sPCs, but the deflation step usually keeps their correlations small. The package reports these correlations in \code{spc_cor}.
+
+cSPCA is less restrictive than uSPCA because component order does not impose a minimum cardinality. A later cSPCA component can have few nonzero loadings if those variables give a good approximation. This is why cSPCA is the default exploratory method.
+
+\subsection{Projection SPCA}
+
+Projection SPCA (pSPCA) is the simplest LS-SPCA variant computationally. It computes sparse loadings by approximating residual PCs instead of solving the generalized eigenproblem for the LS-SPCA objective. Let $z_j$ be the $j$th residual PC. The pSPCA objective is
+\begin{equation}\label{eq:pscpca_obj}
+\max_{a_j} \operatorname{cor}(t_j, z_j)^2,
+\quad \text{subject to}\quad \operatorname{card}(a_j) < p.
+\end{equation}
+Since $t_j = \dXj\da_j$, this is the squared multiple correlation from the regression of the residual PC on the selected variables. For a fixed subset, the loading vector is proportional to the least-squares regression coefficients,
+\begin{equation}\label{eq:pspca_sol}
+\daj \propto (\dXjT\dXj)^{-1}\dXjTz_j,
+\end{equation}
+and is then standardized to unit norm.
+
+The package reports the squared correlation with the corresponding PC as \code{sq_cor_with_PC}. For pSPCA, this quantity is directly tied to the objective above. For cSPCA and uSPCA, it is a diagnostic comparing each sPC with the corresponding PC.
+
+HERE EXPLAIN PRECISELY WHETHER $z_j$ IS THE FIRST PC OF $Q_j$, THE $j$TH PC OF A DEFLATION SEQUENCE, OR ANOTHER RESIDUAL PC DEFINITION IN THE ORIGINAL PAPERS.
+
+pSPCA is useful as a fitting method and as the basis for fast variable selection. Its loadings are often close to cSPCA loadings, but later pSPCA components can be more correlated with each other.
+
+\subsection{Variable Selection}
+
+Variable selection is the main computational difficulty in SPCA. Exhaustive subset search is not feasible except for very small $p$, so the package uses greedy search.
+
+The argument \code{var_selection} selects forward, backward, or stepwise search. Character values are parsed by their first letter: \code{"f"}, \code{"b"}, or \code{"s"}. In the current implementation, only the first element of \code{var_selection} is used.
+
+The argument \code{stop_criterion} selects the stopping rule. Values beginning with \code{"r"} use the squared-correlation criterion. Values beginning with \code{"c"} use the cumulative-variance-explained criterion. The default call uses
+\[
+\code{var_selection = c("fwd", "bkw", "step")}
+\quad\text{and}\quad
+\code{stop_criterion = c("cvexp", "r2")},
+\]
+which currently means forward selection with the cumulative-variance-explained stopping criterion.
+
+The argument \code{alpha} sets the target proportion of the selected objective. Its default is \code{0.95}. The argument \code{ncomps} sets the number of sPCs. If \code{ncomps = 0}, the package computes components until the cumulative variance explained reaches \code{ncomp_byvexp}, whose default is \code{0.99}. The argument \code{ncomps} has priority over \code{ncomp_byvexp}.
+
+For thin matrices, \code{intensive = TRUE} requests intensive forward selection based on cumulative variance explained. Intensive selection is currently available only for the thin backend and requires \code{stop_criterion = "cvexp"}. If another stopping criterion is supplied, the wrapper switches to \code{"cvexp"} and issues a warning.
+
+The argument \code{fixedindex_list} forces selected variables into specified components. It is a list with one element per component, each containing 1-based variable indices. If the list is shorter than the number of requested components, the remaining components are unconstrained. For uSPCA, the package checks that the fixed-index cardinalities are not smaller than the component order.
+
+HERE EXPLAIN THE EXACT GREEDY SEARCH STEPS FOR FORWARD, BACKWARD, AND STEPWISE SELECTION, INCLUDING WHAT IS ADDED OR REMOVED AT EACH ITERATION AND HOW TIES ARE HANDLED.
+
+\section{Computational Details}\label{sec:computational}
+
+The \pkg{spca} package uses \proglang{R} wrappers and compiled \proglang{C++} code. The \proglang{R} wrappers check the input, parse arguments, and choose the backend. The \proglang{C++} code, through \pkg{Rcpp} and \pkg{RcppEigen}, performs the matrix computations.
+
+\subsection{Input Handling}
+
+The fitting functions accept a data matrix or a covariance/correlation matrix. In \fct{spca}, a square symmetric matrix is treated as a covariance or correlation matrix. All other inputs are treated as data matrices. Data frames are converted to matrices. If a data matrix has nonzero column means, the wrapper centers the columns. The argument \code{scaledata} requests column scaling.
+
+When a data matrix is supplied, the package computes sPC scores and correlations among sPCs from the scores. When a covariance or correlation matrix is supplied, scores are not available. The package still computes quantities that depend only on the loadings and the covariance structure, including variance explained and, for more than one component, \code{spc_cor}.
+
+The function \fct{pca} uses the same object structure. It computes the eigendecomposition of the covariance or correlation matrix, stores PC loadings and variance-explained quantities, and returns an object of class \class{spca}. This makes PCA and SPCA results compatible with the same package methods.
+
+HERE CHECK WHETHER \fct{pca} SHOULD REPORT \code{sq_cor_with_PC} RATHER THAN \code{cor_with_pc}; THE CURRENT CODE APPEARS TO USE \code{cor_with_pc} FOR PCA OUTPUT.
+
+\subsection{Thin and Fat Backends}
+
+The main fitting function uses different backends for thin and fat data matrices. A data matrix is fat when $n < p$. If \code{fat_matrix = NULL}, the wrapper selects the fat backend for fat data matrices and the thin backend otherwise. If the input is a covariance or correlation matrix, the thin backend is used. Users can force \code{fat_matrix = FALSE}; in that case the wrapper warns when a fat data matrix is sent to the thin backend because $X\trasp X$ may be singular.
+
+The thin backend operates on the covariance or correlation matrix $S$. When the input is a data matrix, the wrapper computes $S = X\trasp X$ and passes it to the compiled routine. The fat backend operates from the data matrix and uses a row-space representation. In the current wrapper, the fat backend only supports forward variable selection. If backward or stepwise selection is requested, the wrapper switches to forward selection and issues a warning. Intensive selection is also unavailable in the fat backend.
+
+HERE EXPLAIN THE REVERSE-SVD ROW-SPACE COMPUTATION USED BY THE FAT BACKEND. THE CURRENT PAPER SAYS IT USES A REVERSE-SVD APPROACH, BUT THE AVAILABLE R WRAPPER DOES NOT DEFINE THE ALGORITHM.
+
+\subsection{Stored Quantities in Fitted Objects}
+
+The output of \fct{spca} is a list of class \class{spca}. Its main elements are \code{loadings}, \code{contributions}, \code{ncomps}, \code{cardinality}, \code{vexp}, \code{vexpPC}, \code{cvexp}, \code{rvexp}, \code{rcvexp}, \code{sq_cor_with_PC}, \code{tot_var}, \code{loadings_list}, and \code{indices}.
+
+The matrix \code{contributions} rescales each loading vector to unit $L_1$ norm, preserving signs. The package methods use this representation to show the relative contribution of each selected variable within an sPC. The matrix \code{loadings} stores the unit-norm loading vectors.
+
+When scores are available, they are stored in \code{scores}. When at least two components are fitted, the correlations among sPCs are stored in \code{spc_cor}. The object also stores \code{parameters}, the matched call \code{Call}, and backend timing information. The timing fields differ between the thin and fat backends.
+
+\subsection{Power-Method Options}
+
+After setup, LS-SPCA computations often require only leading eigenvectors. The wrapper exposes two power-method options. The argument \code{PML} requests the power method for PC and sparse-loading eigenvectors. The argument \code{PMVS} requests the power method inside variable selection. The corresponding tolerances and iteration limits are \code{epsPML}, \code{maxiterPML}, \code{epsPMVS}, and \code{maxiterPMVS}.
+
+For a $p \times p$ matrix, computing only the leading eigenpair can replace a full eigendecomposition. The saving depends on the number of power iterations and on how often the eigenproblem is solved during variable selection.
+
+HERE EXPLAIN WHICH SPECIFIC EIGENPROBLEMS USE \code{PML} AND WHICH USE \code{PMVS} IN THE C++ CODE, AND WHETHER BOTH OPTIONS ARE AVAILABLE IN BOTH BACKENDS.
+
+\subsection{Computational Strategy}
+
+The implementation avoids repeated expensive matrix products. In the thin backend, the covariance or correlation matrix is computed once when a data matrix is supplied. Later computations use matrix updates and compiled linear algebra instead of repeatedly rebuilding deflated data matrices in \proglang{R}.
+
+The package keeps the object structure consistent across fitting routes. Results computed from a data matrix, a covariance matrix, the thin backend, the fat backend, or the PCA wrapper are all intended to work with the same print, summary, plot, and comparison methods. This structure lets users fit several methods, compare sparsity and variance explained, inspect loadings and contributions, and then work with the selected variables.
+
+HERE ADD A SHORT COMPLEXITY TABLE AFTER CONFIRMING THE COSTS OF THE THIN BACKEND, FAT BACKEND, INTENSIVE SELECTION, AND REGRESSION-BASED SELECTION FROM THE C++ IMPLEMENTATION.
+
+\bibliography{JSS}
+\end{document}

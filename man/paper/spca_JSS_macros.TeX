@@ -1,12 +1,27 @@
 
-\usepackage{amsmath}
+
+%% \codo allows to use of underscores ========================
+\makeatletter
+\newcommand\codo{%
+  \begingroup
+  \@makeother\_\@makeother\~\@makeother\$\@codox
+}
+\def\@codox#1{%
+  {\normalfont\ttfamily\hyphenchar\font=-1 \detokenize{#1}}%
+  \endgroup
+}
+\makeatother
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\trasp}{^{\scriptstyle{\intercal}}}
 \newcommand{\traspj}{^{\scriptstyle{\intercal}}_j}
 \newcommand{\trasps}[1]{^{\raisebox{\depth}{$\scriptstyle{\intercal}$}}_{#1}} %use without overset symbol
 \newcommand{\traspd}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{#1}} %use with overset symbol
-\newcommand{\traspdb}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{[#1]}} %use with overset symbol and subscript in []
+\newcommand{\traspdb}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{[#1]}}
+%use with overset symbol and subscript in []
+\newcommand{\traspdr}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{(#1)}}
+%use with overset symbol and subscript in ()
 
 \newcommand{\Xj}{{{X}_j}}
 \newcommand{\XjT}{{{X}\trasps{j}}}
@@ -18,24 +33,26 @@
 \newcommand{\bXj}{{\mathbf{X}_j}}
 \newcommand{\bXjT}{{\mathbf{X}\trasps{j}}}
 \newcommand{\bX}{{\mathbf{X}}}
-\newcommand{\dajT}{{\overset{\boldsymbol{.}}{\mathbf{a}}\traspd{j}}}
-\newcommand{\daj}{{\overset{\boldsymbol{.}}{\mathbf{a}}_j}}
+\newcommand{\dajT}{{\overset{\boldsymbol{.}}{a}\traspd{j}}}
+\newcommand{\daj}{{\overset{\boldsymbol{.}}{a}_j}}
 
 
 \newcommand{\dA}{{\overset{\boldsymbol{.}}{A}}}
+\newcommand{\dAj}{{\overset{\boldsymbol{.}}{A}_j}}
+\newcommand{\dAjT}{{\overset{\boldsymbol{.}}{{A}}\traspd{j}}}
 \newcommand{\da}{{\overset{\boldsymbol{.}}{a}}}
 % \newcommand{\daj}{{\overset{\boldsymbol{.}}{a}_j}}
 % \newcommand{\dajT}{{\overset{\boldsymbol{.}}{{a}}\traspd{j}}}
 \newcommand{\dX}{{\overset{\boldsymbol{.}}{X}}}
 \newcommand{\dXj}{{\overset{\boldsymbol{.}}{X}_j}}
 \newcommand{\dXjT}{{\overset{\boldsymbol{.}}{{X}}\traspd{j}}}
-\newcommand{\dQ}{{\overset{\boldsymbol{.}}{\mathbf{Q}}}}
-\newcommand{\dQj}{{\overset{\boldsymbol{.}}{\mathbf{Q}}_j}}
-\newcommand{\dQjT}{{\overset{\boldsymbol{.}}{\mathbf{Q}}\traspd{j}}}
-\newcommand{\dS}{{\overset{\boldsymbol{.}}{\mathbf{S}}}}
-\newcommand{\dST}{{\overset{\boldsymbol{.}}{\mathbf{S}}\trasp}}
-\newcommand{\dSj}{{\overset{\boldsymbol{.}}{\mathbf{S}}_j}}
-\newcommand{\dSjT}{{\overset{\boldsymbol{.}}{\mathbf{S}}\traspd{j}}}
+\newcommand{\dQ}{{\overset{\boldsymbol{.}}{Q}}}
+\newcommand{\dQj}{{\overset{\boldsymbol{.}}{Q}_j}}
+\newcommand{\dQjT}{{\overset{\boldsymbol{.}}{Q}\traspd{j}}}
+\newcommand{\dS}{{\overset{\boldsymbol{.}}{S}}}
+\newcommand{\dST}{{\overset{\boldsymbol{.}}{S}\trasp}}
+\newcommand{\dSj}{{\overset{\boldsymbol{.}}{S}_j}}
+\newcommand{\dSjT}{{\overset{\boldsymbol{.}}{S}\traspd{j}}}
 
 
 \newcommand{\vexp}{\emph{vexp}}

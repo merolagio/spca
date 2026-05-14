@@ -1,0 +1,36 @@
+The Golub Leukemia dataset, often cited in Trevor Hastie’s work (such as Computer Age Statistical Inference or The Elements of Statistical Learning), is a landmark gene expression dataset from a 1999 Science paper by Golub et al. 
+
+It is commonly used for classification tasks distinguishing between two types of acute leukemia: Acute Lymphoblastic Leukemia (ALL) and Acute Myeloid Leukemia (AML).
+
+Here are the key details regarding the dataset:
+Dataset OverviewSource: Golub et al. (1999), "Molecular Classification of Cancer: Class Discovery and Class Prediction by Gene Expression Monitoring".
+
+Purpose: Classifying tumor samples into AML or ALL based on gene expression levels.Structure: The dataset generally consists of 72 samples (patients) from bone marrow or peripheral blood.
+Features: It contains 7,129 gene expression levels, measured using Affymetrix high-density oligonucleotide microarrays.
+
+Commonly Used VersionsFull Dataset (often used in textbooks): 
+Includes 7,129 genes and 72 samples.
+Smaller Subset (CASIdata): A common subset used in Hastie's Computer Age Statistical Inference (Section 19.1) 
+includes 3,571 genes and 72 samples.
+Training/Test Split: The original study divided the data into a training set (38 samples) and an independent test set (34 samples).
+
+Key CharacteristicsClasses: 
+47 cases of Acute Lymphoblastic Leukemia (ALL) and 25 cases of Acute Myeloid Leukemia (AML).
+Dimensions: It is a high-dimensional dataset (\(p \gg n\)), meaning there are far more features (genes) than observations (patients), 
+making it ideal for feature selection and classification techniques like 
+SVM or logistic regression.
+Normalization: The data is usually provided normalized, with expression values scaled to allow comparison across microarrays.
+
+How to Access the DataR/CRAN: 
+Available in the CASIdata package (as leukemia) or 
+the golubEsets Bioconductor package.Kaggle: 
+
+Available as Leukemia Gene Expression Data by Golub et al..
+The dataset is highly popular for demonstrating supervised learning methods and sparse regression techniques.
+
+Kaggle full 
+quell'altro reduced
+
+ALL	Acute Lymphoblastic Leukemia 
+AML	Acute Myeloid Leukemia .
+
