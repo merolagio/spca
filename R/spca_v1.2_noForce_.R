@@ -7,21 +7,21 @@
 #' @param M Real matrix or data.frame. Data matrix or covariance/correlation matrix.
 #' @param alpha Real in (0, 1]. Target retained proportion.
 #' @param ncomps Integer scalar. Maximum number of components. Use 0 for automatic stopping.
-#' @param ncomp_byvexp Real in (0, 1].
+#' @param ncomp_by_cvexp Real in (0, 1].
 #' @param method Character vector. Only the first letter of each entry is relevant later.
 #' @param var_selection Character vector. Only the first letter of the first entry is relevant later.
 #' @param stop_criterion Character vector. Only the first letter of the first entry is relevant later.
 #' @param intensive Logical scalar.
 #' @param fat_matrix Logical scalar or `NULL`.
-#' @param fixedindex_list List of integer vectors, one per component.
-#' @param centerdata Logical scalar.
-#' @param scaledata Logical scalar.
-#' @param PML Logical scalar.
-#' @param epsPML Numeric scalar.
-#' @param maxiterPML Integer scalar.
-#' @param PMVS Logical scalar.
-#' @param epsPMVS Numeric scalar.
-#' @param maxiterPMVS Integer scalar.
+#' @param fixed_index_list List of integer vectors, one per component.
+#' @param center_data Logical scalar.
+#' @param scale_data Logical scalar.
+#' @param pm_loading Logical scalar.
+#' @param epspm_loading Numeric scalar.
+#' @param maxiterpm_loading Integer scalar.
+#' @param pm_varsel Logical scalar.
+#' @param epspm_varsel Numeric scalar.
+#' @param maxiterpm_varsel Integer scalar.
 #' 
 #' @return Invisible TRUE.
 #' @noRd
@@ -29,21 +29,21 @@
 validate_spca_inputs = function(M,
                                   alpha,
                                   ncomps,
-                                  ncomp_byvexp,
+                                  ncomp_by_cvexp,
                                   method,
                                   var_selection,
                                   stop_criterion,
                                   intensive,
                                   fat_matrix,
-                                  fixedindex_list,
-                                  centerdata,
-                                  scaledata,
-                                  PML,
-                                  epsPML,
-                                  maxiterPML,
-                                  PMVS,
-                                  epsPMVS,
-                                  maxiterPMVS) {
+                                  fixed_index_list,
+                                  center_data,
+                                  scale_data,
+                                  pm_loading,
+                                  epspm_loading,
+                                  maxiterpm_loading,
+                                  pm_varsel,
+                                  epspm_varsel,
+                                  maxiterpm_varsel) {
   
   fun_inp = mget(names(formals()), envir = environment(), inherits = FALSE)
   validate_no_na(arg_list = fun_inp)  
@@ -69,10 +69,10 @@ validate_spca_inputs = function(M,
   if (!is.numeric(ncomps) || length(ncomps) != 1 || is.na(ncomps) || (ncomps < 0))
     stop("ncomps must be a nonnegative scalar", call. = FALSE)
 
-    if (!(identical(ncomp_byvexp, FALSE) ||
-          (is.numeric(ncomp_byvexp) && length(ncomp_byvexp) == 1 &&
-           !is.na(ncomp_byvexp) && (ncomp_byvexp > 0) && (ncomp_byvexp <= 1))))
-      stop("ncomp_byvexp must be FALSE or a number in (0, 1]", call. = FALSE)
+    if (!(identical(ncomp_by_cvexp, FALSE) ||
+          (is.numeric(ncomp_by_cvexp) && length(ncomp_by_cvexp) == 1 &&
+           !is.na(ncomp_by_cvexp) && (ncomp_by_cvexp > 0) && (ncomp_by_cvexp <= 1))))
+      stop("ncomp_by_cvexp must be FALSE or a number in (0, 1]", call. = FALSE)
 
   if (!is.character(method) || (length(method) < 1))
     stop("method must be a character vector", call. = FALSE)
@@ -101,46 +101,46 @@ validate_spca_inputs = function(M,
   if (!is.null(fat_matrix) && !is.boolean(fat_matrix))
     stop("fat_matrix must be TRUE, FALSE, or NULL", call. = FALSE)
 
-  if (!is.list(fixedindex_list))
-    stop("fixedindex_list must be a list", call. = FALSE)
+  if (!is.list(fixed_index_list))
+    stop("fixed_index_list must be a list", call. = FALSE)
 
-  if (length(fixedindex_list) > 0) {
-    ok_list = vapply(fixedindex_list,
+  if (length(fixed_index_list) > 0) {
+    ok_list = vapply(fixed_index_list,
                      function(x) is.null(x) || is.numeric(x) || is.integer(x),
                      logical(1))
     if (!all(ok_list))
-      stop("each element of fixedindex_list must be NULL or a numeric/integer vector", call. = FALSE)
+      stop("each element of fixed_index_list must be NULL or a numeric/integer vector", call. = FALSE)
 
-    null_ok = vapply(fixedindex_list,
+    null_ok = vapply(fixed_index_list,
                      function(x) if (is.null(x)) FALSE else anyNA(x),
                      logical(1))
     if (any(null_ok))
-      stop("fixedindex_list cannot contain missing indices", call. = FALSE)
+      stop("fixed_index_list cannot contain missing indices", call. = FALSE)
   }
 
-  if (!is.boolean(centerdata))
-    stop("centerdata must be TRUE or FALSE", call. = FALSE)
+  if (!is.boolean(center_data))
+    stop("center_data must be TRUE or FALSE", call. = FALSE)
 
-  if (!is.boolean(scaledata))
-    stop("scaledata must be TRUE or FALSE", call. = FALSE)
+  if (!is.boolean(scale_data))
+    stop("scale_data must be TRUE or FALSE", call. = FALSE)
 
-  if (!is.boolean(PML))
-    stop("PML must be TRUE or FALSE", call. = FALSE)
+  if (!is.boolean(pm_loading))
+    stop("pm_loading must be TRUE or FALSE", call. = FALSE)
 
-  if (!is.numeric(epsPML) || length(epsPML) != 1 || is.na(epsPML) || (epsPML <= 0))
-    stop("epsPML must be a positive scalar", call. = FALSE)
+  if (!is.numeric(epspm_loading) || length(epspm_loading) != 1 || is.na(epspm_loading) || (epspm_loading <= 0))
+    stop("epspm_loading must be a positive scalar", call. = FALSE)
 
-  if (!is.numeric(maxiterPML) || length(maxiterPML) != 1 || is.na(maxiterPML) || (maxiterPML < 1))
-    stop("maxiterPML must be a positive scalar", call. = FALSE)
+  if (!is.numeric(maxiterpm_loading) || length(maxiterpm_loading) != 1 || is.na(maxiterpm_loading) || (maxiterpm_loading < 1))
+    stop("maxiterpm_loading must be a positive scalar", call. = FALSE)
 
-  if (!is.boolean(PMVS))
-    stop("PMVS must be TRUE or FALSE", call. = FALSE)
+  if (!is.boolean(pm_varsel))
+    stop("pm_varsel must be TRUE or FALSE", call. = FALSE)
 
-  if (!is.numeric(epsPMVS) || length(epsPMVS) != 1 || is.na(epsPMVS) || (epsPMVS <= 0))
-    stop("epsPMVS must be a positive scalar", call. = FALSE)
+  if (!is.numeric(epspm_varsel) || length(epspm_varsel) != 1 || is.na(epspm_varsel) || (epspm_varsel <= 0))
+    stop("epspm_varsel must be a positive scalar", call. = FALSE)
 
-  if (!is.numeric(maxiterPMVS) || length(maxiterPMVS) != 1 || is.na(maxiterPMVS) || (maxiterPMVS < 1))
-    stop("maxiterPMVS must be a positive scalar", call. = FALSE)
+  if (!is.numeric(maxiterpm_varsel) || length(maxiterpm_varsel) != 1 || is.na(maxiterpm_varsel) || (maxiterpm_varsel < 1))
+    stop("maxiterpm_varsel must be a positive scalar", call. = FALSE)
 
   invisible(TRUE)
 }
@@ -152,7 +152,7 @@ validate_spca_inputs = function(M,
 #' covariance/correlation matrix. The wrapper routes the computation to the thin or the fat-matrix C++ engine.
 #'
 #' Character inputs are parsed transparently by their first letter inside the
-#' main function. Fixed indices are passed through \code{fixedindex_list}, one
+#' main function. Fixed indices are passed through \code{fixed_index_list}, one
 #' list element per component. Different variable selection approaches can be
 #' selected, as explained in the `Deatails` section.
 #'
@@ -161,8 +161,8 @@ validate_spca_inputs = function(M,
 #' @param alpha Real in (0,1]. Percentage of variance of the PCs explained by
 #'   the sparse component.
 #' @param ncomps Number of components to compute (default 0, automatic).
-#'   Has priority over `ncomp_byvexp`.
-#' @param ncomp_byvexp Real in (0,1]. Stops computating sPCs when the cumulative
+#'   Has priority over `ncomp_by_cvexp`.
+#' @param ncomp_by_cvexp Real in (0,1]. Stops computating sPCs when the cumulative
 #'  vexp reaches this value.
 #' @param method Character vector. Partial matching enabled.
 #'   Allowed values are `uSPCA`, `cSPCA`, and `pSPCA`.
@@ -179,22 +179,22 @@ validate_spca_inputs = function(M,
 #'   other inputs use the thin backend. If `TRUE`, request the fat-matrix
 #'   backend. If `FALSE`, use the thin backend, allowing users to force the thin
 #'   path for mildly fat matrices.
-#' @param fixedindex_list List of predetermined indices for components.
+#' @param fixed_index_list List of predetermined indices for components.
 #'   Each list element is a vector of 1-based indices. Use \code{NULL} or
 #'   \code{integer(0)} for a component with no fixed indices. If the list is
 #'   shorter than the number of components to be computed, the remaining
 #'   components are treated as unconstrained.
-#' @param centerdata Logical. Center the columns of \code{M} to zero mean?
+#' @param center_data Logical. Center the columns of \code{M} to zero mean?
 #'   Used only when a data matrix is passed.
-#' @param scaledata Logical. Scale the columns of \code{M}? Used only when a
+#' @param scale_data Logical. Scale the columns of \code{M}? Used only when a
 #'   data matrix is passed.
-#' @param PML Logical. Use the power method for PCs and sparse-component
+#' @param pm_loading Logical. Use the power method for PCs and sparse-component
 #'   eigenvectors.
-#' @param epsPML Numeric. Tolerance for the PML group.
-#' @param maxiterPML Integer. Maximum iterations for the PML group.
-#' @param PMVS Logical. Use the power method in variable selection.
-#' @param epsPMVS Numeric. Tolerance for the PMVS group.
-#' @param maxiterPMVS Integer. Maximum iterations for the PMVS group.
+#' @param epspm_loading Numeric. Tolerance for the pm_loading group.
+#' @param maxiterpm_loading Integer. Maximum iterations for the pm_loading group.
+#' @param pm_varsel Logical. Use the power method in variable selection.
+#' @param epspm_varsel Numeric. Tolerance for the pm_varsel group.
+#' @param maxiterpm_varsel Integer. Maximum iterations for the pm_varsel group.
 #'
 #' @details
 #' For thin matrices, either the covariance/correlation matrix can be passed. In the former case, the covariance will be computed and assigned to a new matrix.  
@@ -206,40 +206,40 @@ validate_spca_inputs = function(M,
 spca = function(M,
                   alpha = 0.95,
                   ncomps = 0,
-                  ncomp_byvexp = 0.99,
+                  ncomp_by_cvexp = 0.99,
                   method = "c",
                   var_selection = c("fwd", "bkw", "step"),
                   stop_criterion = c("cvexp", "r2"),
                   intensive = FALSE,
                   fat_matrix = NULL,
-                  fixedindex_list = list(),
-                  centerdata = FALSE,
-                  scaledata = FALSE,
-                  PML = FALSE,
-                  epsPML = 1e-5,
-                  maxiterPML = 100,
-                  PMVS = FALSE,
-                  epsPMVS = 1e-5,
-                  maxiterPMVS = 200) {
+                  fixed_index_list = list(),
+                  center_data = FALSE,
+                  scale_data = FALSE,
+                  pm_loading = FALSE,
+                  epspm_loading = 1e-5,
+                  maxiterpm_loading = 100,
+                  pm_varsel = FALSE,
+                  epspm_varsel = 1e-5,
+                  maxiterpm_varsel = 200) {
 
   validate_spca_inputs(M = M,
                          alpha = alpha,
                          ncomps = ncomps,
-                         ncomp_byvexp = ncomp_byvexp,
+                         ncomp_by_cvexp = ncomp_by_cvexp,
                          method = method,
                          var_selection = var_selection,
                          stop_criterion = stop_criterion,
                          intensive = intensive,
                          fat_matrix = fat_matrix,
-                         fixedindex_list = fixedindex_list,
-                         centerdata = centerdata,
-                         scaledata = scaledata,
-                         PML = PML,
-                         epsPML = epsPML,
-                         maxiterPML = maxiterPML,
-                         PMVS = PMVS,
-                         epsPMVS = epsPMVS,
-                         maxiterPMVS = maxiterPMVS)
+                         fixed_index_list = fixed_index_list,
+                         center_data = center_data,
+                         scale_data = scale_data,
+                         pm_loading = pm_loading,
+                         epspm_loading = epspm_loading,
+                         maxiterpm_loading = maxiterpm_loading,
+                         pm_varsel = pm_varsel,
+                         epspm_varsel = epspm_varsel,
+                         maxiterpm_varsel = maxiterpm_varsel)
 
   if (is.data.frame(M))
     M = as.matrix(M)
@@ -290,7 +290,7 @@ spca = function(M,
 
   if (ncomps > 0) {
     ncomps_cpp = ncomps
-  } else if (!identical(ncomp_byvexp, FALSE) && (ncomp_byvexp > 0) && (ncomp_byvexp < 1)) {
+  } else if (!identical(ncomp_by_cvexp, FALSE) && (ncomp_by_cvexp > 0) && (ncomp_by_cvexp < 1)) {
     ncomps_cpp = if (use_fat_backend) n else p
   } else {
     ncomps_cpp = 0L
@@ -302,26 +302,26 @@ spca = function(M,
   if ((ncomps_cpp > 0) && (length(method_cpp) > ncomps_cpp))
     method_cpp = method_cpp[seq_len(ncomps_cpp)]
 
-  if (length(fixedindex_list) > 0) {
+  if (length(fixed_index_list) > 0) {
     if (ncomps_cpp == 0)
-      stop("when fixedindex_list is used, ncomps must be positive or ncomp_byvexp must be in (0, 1)", call. = FALSE)
+      stop("when fixed_index_list is used, ncomps must be positive or ncomp_by_cvexp must be in (0, 1)", call. = FALSE)
 
-    if (length(fixedindex_list) > ncomps_cpp)
-      stop("fixedindex_list cannot be longer than the number of components to be computed", call. = FALSE)
+    if (length(fixed_index_list) > ncomps_cpp)
+      stop("fixed_index_list cannot be longer than the number of components to be computed", call. = FALSE)
 
-    if (length(fixedindex_list) < ncomps_cpp)
-      fixedindex_list = c(fixedindex_list, rep(list(NULL), ncomps_cpp - length(fixedindex_list)))
+    if (length(fixed_index_list) < ncomps_cpp)
+      fixed_index_list = c(fixed_index_list, rep(list(NULL), ncomps_cpp - length(fixed_index_list)))
 
-    index_lengths = vapply(fixedindex_list,
+    index_lengths = vapply(fixed_index_list,
                            function(x) if (is.null(x)) 0L else length(x),
                            integer(1))
     
-    fixedindex_list_num = lapply(fixedindex_list,
+    fixed_index_list_num = lapply(fixed_index_list,
                                  function(x) if (is.null(x)) integer(0) 
                                  else as.integer(x))
     
     
-    indvec_in = as.integer(unlist(fixedindex_list_num)) - 1L
+    indvec_in = as.integer(unlist(fixed_index_list_num)) - 1L
     cardvec_in = as.integer(index_lengths)
 
     bad_fixed_u = (method_cpp == "u") &
@@ -355,10 +355,10 @@ spca = function(M,
   if (is_datamatrix_M) {
       if (any(abs(colMeans(M)) > 1e-4)) {
       warning("Centering column means to zero")
-      centerdata = TRUE
+      center_data = TRUE
     }
-    if (centerdata || scaledata) {
-        M = scaleR(M, centerdata, scaledata)
+    if (center_data || scale_data) {
+        M = scaleR(M, center_data, scale_data)
 
       }
     S = ataC(M)
@@ -373,16 +373,16 @@ spca = function(M,
                      stop_criterion = stop_criterion_cpp,
                      exact_cvexp = FALSE,
                      alpha = alpha,
-                     ncompbycvexp = ncomp_byvexp,
+                     ncompbycvexp = ncomp_by_cvexp,
                      method = method_cpp,
                      indvec_in = indvec_in,
                      cardvec_in = cardvec_in,
-                     PMPC = PML,
-                     PMS = PMVS,
-                     epsPMPC = epsPML,
-                     epsPMS = epsPMVS,
-                     maxiterPMPC = maxiterPML,
-                     maxiterPMS = maxiterPMVS,
+                     PMPC = pm_loading,
+                     PMS = pm_varsel,
+                     epsPMPC = epspm_loading,
+                     epsPMS = epspm_varsel,
+                     maxiterPMPC = maxiterpm_loading,
+                     maxiterPMS = maxiterpm_varsel,
                      rank_tol = 0.0)
   } else {
 ## THIN_MATRIX BACKEND    
@@ -396,16 +396,16 @@ spca = function(M,
                       stop_criterion = stop_criterion_cpp,
                       exact_cvexp = FALSE,
                       alpha = alpha,
-                      ncompbycvexp = ncomp_byvexp,
+                      ncompbycvexp = ncomp_by_cvexp,
                       method = method_cpp,
                       indvec_in = indvec_in,
                       cardvec_in = cardvec_in,
-                      PMPC = PML,
-                      PMS = PMVS,
-                      epsPMPC = epsPML,
-                      epsPMS = epsPMVS,
-                      maxiterPMPC = maxiterPML,
-                      maxiterPMS = maxiterPMVS,
+                      PMPC = pm_loading,
+                      PMS = pm_varsel,
+                      epsPMPC = epspm_loading,
+                      epsPMS = epspm_varsel,
+                      maxiterPMPC = maxiterpm_loading,
+                      maxiterPMS = maxiterpm_varsel,
                       rank_tol = 0.0)
   }
 

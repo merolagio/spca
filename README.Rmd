@@ -65,7 +65,7 @@ wachter_qqplot(ho_ee$values, p = ncol(holzinger), n = nrow(holzinger), nfit_line
 
 ### Compute PCA
 ```{r run_pca, message = FALSE, warning = FALSE}
-ho_pca = pca(holzinger, ncomp = 4, screeplot = FALSE, wachter = FALSE)
+ho_pca = pca(holzinger, ncomp = 4, screeplot = FALSE, qq_plot = FALSE)
 summary(ho_pca)
 ```
 

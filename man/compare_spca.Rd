@@ -21,7 +21,7 @@ compare_spca(
   return_tables = FALSE,
   print_tables = TRUE,
   return_plot = FALSE,
-  produce_plot = TRUE
+  show_plot = TRUE
 )
 }
 \arguments{
@@ -73,7 +73,7 @@ priority over \code{print_loadings}.}
 
 \item{return_plot}{Logical. If \code{TRUE}, return the loadings plot.}
 
-\item{produce_plot}{Logical. If \code{TRUE}, print the loadings plot.}
+\item{show_plot}{Logical. If \code{TRUE}, print the loadings plot.}
 }
 \value{
 Invisibly returns \code{NULL} by default. If \code{return_tables = TRUE},

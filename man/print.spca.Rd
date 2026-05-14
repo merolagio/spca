@@ -7,12 +7,12 @@
 \method{print}{spca}(
   x,
   cols = NULL,
-  only.nonzero = TRUE,
+  only_nonzero = TRUE,
   contributions = TRUE,
   digits = 3,
   thresh = 1e-07,
   return_table = FALSE,
-  components_names = NULL,
+  component_names = NULL,
   ...
 )
 }
@@ -22,7 +22,7 @@
 \item{cols}{A vector indicating which components should be printed.
 Default all. If an integer is passed, it is set to 1:cols.}
 
-\item{only.nonzero}{Logical: if = TRUE only the nonzero loadings are
+\item{only_nonzero}{Logical: if = TRUE only the nonzero loadings are
 printed. Otherwise all loadings are printed.}
 
 \item{digits}{Integer: number of decimal figures.}
@@ -32,7 +32,7 @@ printed.}
 
 \item{return_table}{Logical: should the formatted (text) table be returned?}
 
-\item{components_names}{A vector of names for the components. If NULL assigned
+\item{component_names}{A vector of names for the components. If NULL assigned
 as#' "sPCj"}
 
 \item{...}{Further arguments; currently ignored.}

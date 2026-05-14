@@ -1,5 +1,5 @@
 
-#' spca: Least Squares Sparse PCA 
+#' spca: Least Squares Sparse PCA package
 #'
 #' Tools to compute LSSPCA solutions.
 #'
@@ -35,33 +35,43 @@ NULL
 
 #spca object=================
 
-#' Sparse principal components object
+# spca object =================
+
+#' Sparse principal component analysis object
 #'
-#' Objects of class `spca` returned by the [lsspca()] and [pca()] functions
-#'  store sparse loadings, scores, and other values needed to run the methods.
+#' Objects of class `spca` are returned by the fitting functions
+#' \code{spca()}, \code{pca()} and by #the function code{new-spca()}.
 #'
 #' @section Components:
 #' An object of class `spca` is a list with the following elements:
-#'  
-#' Essential
-#' \describe{
-#' \item{\emph{loadings}}{Numeric matrix \eqn{p \times r} of sparse loadings.}
-#' \item{\code{contributions}}{Numeric matrix \eqn{p \times r} of contributions (sign convention as stored).}
-#' \item{\emph{vexp}}{Vector of variance explained by each sparse component.}
-#' \item{\emph{vexpPC}}{a vector of variance explained by the PCs named.} 
-#' \item{\emph{ncomps}}{Integer the number of components to compute. If `NULL` all components are computed.}
-#' \item{\code{cvvexp}}{a vector of cumulative variance explained.}
-#' \item{\code{rpcvexp}}{a vector of recovered variance relative to the corresponding PC.}
-#' \item{\code{card}}{integer vector of component cardinalities (number of nonzeros).}
-#' \item{\code{loadingslist}}{ list of per-component sparse loading vectors.}
-#' \item{\code{corComp}}{Optional \eqn{r \times r} correlation matrix among sparse components.}
-#' }
-#' Optional
-#' \describe{
-#' \item{\code{scores}}{Numeric matrix of component scores. Returned only if the data matrix is passed.}
-#' }
 #'
-
+#' \describe{
+#' \item{loadings}{\eqn{p \times r} matrix of sparse loadings.}
+#' \item{contributions}{\eqn{p \times r} matrix of loadings scaled to unit
+#'   \eqn{L_1} norm within each sPC.}
+#' \item{ncomps}{Number of sPCs.}
+#' \item{cardinality}{Number of nonzero loadings in each sPC.}
+#' \item{vexp}{Variance explained by each sPC.}
+#' \item{vexpPC}{Variance explained by the corresponding PCs.}
+#' \item{cvexp}{Cumulative variance explained by the sPCs.}
+#' \item{rvexp}{Ratio of \code{vexp} to the variance explained by the
+#'   corresponding PC.}
+#' \item{rcvexp}{Ratio of \code{cvexp} to the cumulative variance explained by
+#'   the corresponding PCs.}
+#' \item{sq_cor_with_PC}{Squared correlation between each sPC and the
+#'   corresponding PC.}
+#' \item{tot_var}{Total variance of the data.}
+#' \item{loadings_list}{List of nonzero loading vectors, one per sPC.}
+#' \item{spc_cor}{\eqn{ncomps \times ncomps} correlation matrix among sPCs.}
+#' \item{indices}{List of variable indices with nonzero loadings, one per sPC.}
+#' \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
+#'   is supplied.}
+#' \item{parameters}{List of parameters used to compute the fit.}
+#' \item{Call}{Matched call used to compute the fit.}
+#' }
+#' @name spca-object
+#' @aliases spca_object spca-class
 #' @family spca
-#' @name spca_object
 NULL
+
+

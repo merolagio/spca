@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{spca}(
   x,
-  nplot = NULL,
+  n_plot = NULL,
   plot_type = c("bars", "circular", "heatmap"),
   contributions = TRUE,
   only_nonzero = TRUE,
@@ -14,7 +14,7 @@
   variable_groups = NULL,
   plot_title = NULL,
   return_plot = FALSE,
-  produce_plot = TRUE,
+  show_plot = TRUE,
   controls = list(color_scale = c("ggplot", "cbb", "printsafe", "bw"), variable_names =
     NULL, legend_position = c("none", "bottom", "right", "top", "left"), grid_type =
     c("horizontal", "full", "none"), facet_labels = NULL, legend_title = NULL, x_axis_lab
@@ -26,7 +26,7 @@
 \arguments{
 \item{x}{An object of class \code{spca}.}
 
-\item{nplot}{Integer. Number of components to plot. Defaults to
+\item{n_plot}{Integer. Number of components to plot. Defaults to
 the object's \code{ncomps} value.}
 
 \item{plot_type}{Character. Plot type: \code{"bars"}, \code{"circular"}, or
@@ -52,7 +52,7 @@ by group instead of by component.}
 
 \item{return_plot}{Logical. If \code{TRUE}, returns the \code{ggplot2} object.}
 
-\item{produce_plot}{Logical. If \code{TRUE}, prints the plot. Useful to set
+\item{show_plot}{Logical. If \code{TRUE}, prints the plot. Useful to set
 \code{FALSE} when only returning the \code{ggplot2} object.}
 
 \item{...}{Further arguments; currently ignored.}
@@ -76,13 +76,13 @@ background grid. If \code{"horizontal"}, keeps only horizontal grid lines.
 If \code{full}, uses the default grid.}
 
 \item{facet_labels}{Optional character vector of facet strip labels
-for components. Defaults to \code{"sPC k"}, `for k = 1:nplot.}
+for components. Defaults to \code{"sPC k"}, `for k = 1:n_plot.}
 
 \item{legend_title}{Optional character. Legend title for the fill aesthetic.}
 
 \item{x_axis_lab}{label for x axis. default is "variables"}
 
-\item{adjust_labels_circ}{numeric vector of length \code{nplot}.
+\item{adjust_labels_circ}{numeric vector of length \code{n_plot}.
 Additive adjustment (in degrees) to the component label angles in
 circular bar plots.}
 

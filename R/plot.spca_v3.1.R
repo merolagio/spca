@@ -152,7 +152,7 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
 
 # CREATE PLOTS =============================
 
-create_data = function(x, nplot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels){
+create_data = function(x, n_plot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels){
   p = nrow(x$loadings)
   
   # common part, PCloadings binded later if needed
@@ -160,30 +160,30 @@ create_data = function(x, nplot, contributions, only_nonzero,  variable_groups, 
   #browser()
   
   if(!is.null(pc_loadings))
-    facet_labels = paste("Comp", 1:nplot)
+    facet_labels = paste("Comp", 1:n_plot)
   
   data_df = data.frame(
-    variable = factor(rep(1:p, nplot), labels = lbl),
-    component = factor(rep(1:nplot, each = p), 
+    variable = factor(rep(1:p, n_plot), labels = lbl),
+    component = factor(rep(1:n_plot, each = p), 
                        labels = facet_labels
                        )
     )
   if (contributions) 
-    data_df$value = c(x$contributions[, 1:nplot])
+    data_df$value = c(x$contributions[, 1:n_plot])
   else
-    data_df$value = c(x$loadings[, 1:nplot])
+    data_df$value = c(x$loadings[, 1:n_plot])
   if (!is.null(variable_groups))
-    data_df$variable_groups = rep(variable_groups, nplot)
+    data_df$variable_groups = rep(variable_groups, n_plot)
   
   if (!is.null(pc_loadings)){
     df = data_df
     if (contributions) 
-      df$value = c(make_contributions(pc_loadings[, 1:nplot]))
+      df$value = c(make_contributions(pc_loadings[, 1:n_plot]))
     else
-      df$value = c(pc_loadings[, 1:nplot])
+      df$value = c(pc_loadings[, 1:n_plot])
     
     data_df = rbind(data_df, df)
-    data_df$method = factor(c(rep(1:2, each = p * nplot)),
+    data_df$method = factor(c(rep(1:2, each = p * n_plot)),
                             labels = c("SPCA", "PCA")
     )
   } else{
@@ -198,7 +198,7 @@ create_data = function(x, nplot, contributions, only_nonzero,  variable_groups, 
 }
 
 # Helper: Create circular barplot
-plot_spca_circular = function(data_df, nplot, plotlab, lbl, 
+plot_spca_circular = function(data_df, n_plot, plotlab, lbl, 
                               legend_position, grid_type, 
                               legend_title, variable_groups, color_scale,
                               adjust_labels_circ) {
@@ -260,17 +260,17 @@ plot_spca_circular = function(data_df, nplot, plotlab, lbl,
   anglela[((anglela > 90) | (anglela < -90))] = 
     anglela[((anglela > 90) | (anglela < -90))] + 180
   if (!is.null(adjust_labels_circ)) {
-    if (length(adjust_labels_circ) == nplot)
+    if (length(adjust_labels_circ) == n_plot)
       anglela = anglela + adjust_labels_circ
     else
       warning(paste("need to pass as many values to adjustLabelCirc",
-                    "as nplot"))
+                    "as n_plot"))
   }
   
   pl = pl +
     ggplot2::annotate(
       "text", x = medloads, y = rep(lia, nlevels(data_df$component)),
-      label = paste("comp", 1:nplot), hjust = 0.5, size = 4,
+      label = paste("comp", 1:n_plot), hjust = 0.5, size = 4,
       angle = anglela, fontface = "bold"
     ) +
     ggplot2::coord_polar()
@@ -291,7 +291,7 @@ plot_spca_circular = function(data_df, nplot, plotlab, lbl,
 
 # Helper: Create standard barplot (handles both SPCA-only and with PCs)
 plot_spca_bars = function(data_df, 
-                          nplot, 
+                          n_plot, 
                           contributions,
                           variable_groups,
                           has_pc_loadings, 
@@ -303,8 +303,8 @@ plot_spca_bars = function(data_df,
                           x_axis_lab) {
   
   # Create plot (same code for both cases)
-  nrows = ceiling(nplot / 3)
-  ncols = ceiling(nplot / nrows)
+  nrows = ceiling(n_plot / 3)
+  ncols = ceiling(n_plot / nrows)
 #  browser()
   #variable groups
   if (!is.null(variable_groups) && (!has_pc_loadings))
@@ -358,7 +358,7 @@ plot_spca_bars = function(data_df,
 # Helper: Create heatmap (handles both SPCA-only and with PCs)
 plot_spca_heatmap = function(
     data_df,
-    nplot,
+    n_plot,
     contributions, 
     has_pc_loadings,
     indices,
@@ -389,7 +389,7 @@ plot_spca_heatmap = function(
       ggplot2::theme(legend.position = legend_position)
  
     pl = pl +
-      ggplot2::geom_abline(intercept = (1:nplot) + 0.5, slope = 0, 
+      ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0, 
                            colour = "grey75") +
       ggplot2::geom_vline(xintercept = 
                             (seq_along(unique(data_df$variable))) + 0.5, 
@@ -406,13 +406,13 @@ plot_spca_heatmap = function(
     if(has_pc_loadings){
       #browser() 
       
-      data_df$varNum = rep(rep(seq_along(lbl), nplot), 2)
-      data_df$compNum = c(rep(1:nplot, each = length(lbl)), 
-                          rep(1:nplot, each = length(lbl)) + 0.5)
+      data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
+      data_df$compNum = c(rep(1:n_plot, each = length(lbl)), 
+                          rep(1:n_plot, each = length(lbl)) + 0.5)
       
-      lab_y = factor(1:(2 * nplot), 
+      lab_y = factor(1:(2 * n_plot), 
                      labels = paste0(c("sPC", "PC"), 
-                                    rep(1:nplot, each = 2)))
+                                    rep(1:n_plot, each = 2)))
       
       pl = ggplot2::ggplot(
         data_df,
@@ -432,9 +432,9 @@ plot_spca_heatmap = function(
           breaks = seq(1.25, (length(lab_y) / 2) + 1, 0.5),
           labels = lab_y, expand = c(0, 0)
         ) +
-        ggplot2::geom_abline(intercept = (1:nplot) + 1, slope = 0, 
+        ggplot2::geom_abline(intercept = (1:n_plot) + 1, slope = 0, 
                              colour = "black", linewidth = 1.5) +
-        ggplot2::geom_abline(intercept = (1:nplot) + 0.5, slope = 0, 
+        ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0, 
                              colour = "gray75", linewidth = 1) +
         ggplot2::geom_vline(xintercept = (seq_along(lbl)) + 1, 
                             colour = "grey75") +
@@ -473,7 +473,7 @@ validate_plot_inputs = function(inputs, controls, fun_formals) {
   validate_booleans(contributions = inputs$contributions,
                     only_nonzero = inputs$only_nonzero,
                     return_plot = inputs$return_plot,
-                    produce_plot = inputs$produce_plot
+                    show_plot = inputs$show_plot
                     )
   
   if (!is.null(inputs$pc_loadings)) 
@@ -543,7 +543,7 @@ if (is.null(controls)) {
 #'   corresponding option.
 #' 
 #' @param x An object of class `spca`.
-#' @param nplot Integer. Number of components to plot. Defaults to
+#' @param n_plot Integer. Number of components to plot. Defaults to
 #'   the object's `ncomps` value.
 #' @param plot_type Character. Plot type: `"bars"`, `"circular"`, or
 #'   `"heatmap"`. Partial matching is supported (e.g.,`"b").
@@ -561,7 +561,7 @@ if (is.null(controls)) {
 #' @param plot_title Optional character. Plot title (added with
 #'   `labs(title = ...)`).
 #' @param return_plot Logical. If `TRUE`, returns the `ggplot2` object.
-#' @param produce_plot Logical. If `TRUE`, prints the plot. Useful to set
+#' @param show_plot Logical. If `TRUE`, prints the plot. Useful to set
 #'   `FALSE` when only returning the `ggplot2` object.
 #'   
 #' @param "" \strong{controls}
@@ -578,10 +578,10 @@ if (is.null(controls)) {
 #'   background grid. If `"horizontal"`, keeps only horizontal grid lines.
 #'   If `full`, uses the default grid.
 #' @param facet_labels Optional character vector of facet strip labels 
-#'   for components. Defaults to `"sPC k"`, `for k = 1:nplot.
+#'   for components. Defaults to `"sPC k"`, `for k = 1:n_plot.
 #' @param legend_title Optional character. Legend title for the fill aesthetic.
 #' @param x_axis_lab label for x axis. default is "variables"
-#' @param adjust_labels_circ numeric vector of length `nplot`.
+#' @param adjust_labels_circ numeric vector of length `n_plot`.
 #'   Additive adjustment (in degrees) to the component label angles in
 #'   circular bar plots.
 #' @param flip_heatmap logical. If `TRUE`, flips axes for tile plots.
@@ -645,7 +645,7 @@ if (is.null(controls)) {
 #' @method plot spca
 plot.spca = function(
     x,
-    nplot = NULL,
+    n_plot = NULL,
     plot_type = c("bars", "circular", "heatmap"),
     contributions = TRUE,
     only_nonzero = TRUE,
@@ -653,7 +653,7 @@ plot.spca = function(
     variable_groups = NULL,
     plot_title = NULL,
     return_plot = FALSE,
-    produce_plot = TRUE,
+    show_plot = TRUE,
     controls = list(
       color_scale = c("ggplot", "cbb", "printsafe", "bw"),
       variable_names = NULL,
@@ -701,8 +701,8 @@ plot.spca = function(
   names(validated)[1] = "inputs"
 
   #acquire noncontrol input======
-  if (is.null(nplot))
-    nplot = ncol(x$loadings)
+  if (is.null(n_plot))
+    n_plot = ncol(x$loadings)
   plot_type = validated$inputs$plot_type
   contributions = validated$inputs$contributions
   only_nonzero = validated$inputs$only_nonzero
@@ -710,7 +710,7 @@ plot.spca = function(
   variable_groups = validated$inputs$variable_groups
   plot_title = validated$inputs$plot_title
   return_plot = validated$inputs$return_plot
-  produce_plot = validated$inputs$produce_plot
+  show_plot = validated$inputs$show_plot
 
   #acquire control input======
   color_scale = validated$controls$color_scale
@@ -731,7 +731,7 @@ plot.spca = function(
 
   ## Contributions are not in minimal spca object
   if (contributions && is.null(x$contributions)) {
-    x$contributions = make_contributions(x$loadings[, 1:nplot])
+    x$contributions = make_contributions(x$loadings[, 1:n_plot])
   }
   
   if (!is.null(variable_groups)){
@@ -798,12 +798,12 @@ plot.spca = function(
   }
   
   if (is.null(facet_labels)) {
-    facet_labels = paste0("sPC", 1:nplot)
+    facet_labels = paste0("sPC", 1:n_plot)
   } else {
-    if (length(facet_labels) < nplot) {
+    if (length(facet_labels) < n_plot) {
       warning(paste("length of stripname must be equal to the number",
                     "of plots. Using default."))
-      facet_labels = paste0("sPC", 1:nplot)
+      facet_labels = paste0("sPC", 1:n_plot)
     }
   }
   
@@ -811,7 +811,7 @@ plot.spca = function(
   if(!is.null(pc_loadings))
     only_nonzero = FALSE
 #browser()  
-  data_df = create_data(x, nplot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels)
+  data_df = create_data(x, n_plot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels)
 
 #circular plot ==============
   if (plot_type == "circular") {
@@ -819,7 +819,7 @@ plot.spca = function(
     
     pl = plot_spca_circular(
       data_df = data_df,
-      nplot = nplot,
+      n_plot = n_plot,
       plotlab = plotlab,
       lbl = lbl,
       legend_position = legend_position,
@@ -834,7 +834,7 @@ plot.spca = function(
     
     pl = plot_spca_bars(
       data_df,
-      nplot = nplot,
+      n_plot = n_plot,
       contributions = contributions,
       variable_groups = variable_groups,
       has_pc_loadings = (!is.null(pc_loadings)),
@@ -852,7 +852,7 @@ plot.spca = function(
       legend_position = "bottom"
     pl = plot_spca_heatmap(
     data_df,
-    nplot = nplot,
+    n_plot = n_plot,
     contributions = contributions,
     has_pc_loadings = (!is.null(pc_loadings)),
     indices = idx,
@@ -877,7 +877,7 @@ plot.spca = function(
   if (!is.null(plot_title))
     pl = pl + ggplot2::labs(title = plot_title)
   
-  if (produce_plot == TRUE)
+  if (show_plot == TRUE)
     print(pl)
   
   if (return_plot == TRUE)

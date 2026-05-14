@@ -2,7 +2,7 @@
 % Please edit documentation in R/Methods_For_Class_v3.R
 \name{is.spca}
 \alias{is.spca}
-\title{#' Test for spca objects}
+\title{Test for spca objects}
 \usage{
 is.spca(x)
 }
@@ -16,7 +16,7 @@ Logical: TRUE if object is of class spca and contains the minimal configuration,
 FALSE otherwise.
 }
 \description{
-#' Test for spca objects
+Verifies whether all elements required for an \code{spca} object are present.
 }
 \details{
 The function carries out checks for the minimal components of an

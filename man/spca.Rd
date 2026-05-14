@@ -8,21 +8,21 @@ spca(
   M,
   alpha = 0.95,
   ncomps = 0,
-  ncomp_byvexp = 0.99,
+  ncomp_by_cvexp = 0.99,
   method = "c",
   var_selection = c("fwd", "bkw", "step"),
   stop_criterion = c("cvexp", "r2"),
   intensive = FALSE,
   fat_matrix = NULL,
-  fixedindex_list = list(),
-  centerdata = FALSE,
-  scaledata = FALSE,
-  PML = FALSE,
-  epsPML = 1e-05,
-  maxiterPML = 100,
-  PMVS = FALSE,
-  epsPMVS = 1e-05,
-  maxiterPMVS = 200
+  fixed_index_list = list(),
+  center_data = FALSE,
+  scale_data = FALSE,
+  pm_loading = FALSE,
+  epspm_loading = 1e-05,
+  maxiterpm_loading = 100,
+  pm_varsel = FALSE,
+  epspm_varsel = 1e-05,
+  maxiterpm_varsel = 200
 )
 }
 \arguments{
@@ -33,9 +33,9 @@ spca(
 the sparse component.}
 
 \item{ncomps}{Number of components to compute (default 0, automatic).
-Has priority over \code{ncomp_byvexp}.}
+Has priority over \code{ncomp_by_cvexp}.}
 
-\item{ncomp_byvexp}{Real in (0,1]. Stops computating sPCs when the cumulative
+\item{ncomp_by_cvexp}{Real in (0,1]. Stops computating sPCs when the cumulative
 vexp reaches this value.}
 
 \item{method}{Character vector. Partial matching enabled.
@@ -58,30 +58,30 @@ other inputs use the thin backend. If \code{TRUE}, request the fat-matrix
 backend. If \code{FALSE}, use the thin backend, allowing users to force the thin
 path for mildly fat matrices.}
 
-\item{fixedindex_list}{List of predetermined indices for components.
+\item{fixed_index_list}{List of predetermined indices for components.
 Each list element is a vector of 1-based indices. Use \code{NULL} or
 \code{integer(0)} for a component with no fixed indices. If the list is
 shorter than the number of components to be computed, the remaining
 components are treated as unconstrained.}
 
-\item{centerdata}{Logical. Center the columns of \code{M} to zero mean?
+\item{center_data}{Logical. Center the columns of \code{M} to zero mean?
 Used only when a data matrix is passed.}
 
-\item{scaledata}{Logical. Scale the columns of \code{M}? Used only when a
+\item{scale_data}{Logical. Scale the columns of \code{M}? Used only when a
 data matrix is passed.}
 
-\item{PML}{Logical. Use the power method for PCs and sparse-component
+\item{pm_loading}{Logical. Use the power method for PCs and sparse-component
 eigenvectors.}
 
-\item{epsPML}{Numeric. Tolerance for the PML group.}
+\item{epspm_loading}{Numeric. Tolerance for the pm_loading group.}
 
-\item{maxiterPML}{Integer. Maximum iterations for the PML group.}
+\item{maxiterpm_loading}{Integer. Maximum iterations for the pm_loading group.}
 
-\item{PMVS}{Logical. Use the power method in variable selection.}
+\item{pm_varsel}{Logical. Use the power method in variable selection.}
 
-\item{epsPMVS}{Numeric. Tolerance for the PMVS group.}
+\item{epspm_varsel}{Numeric. Tolerance for the pm_varsel group.}
 
-\item{maxiterPMVS}{Integer. Maximum iterations for the PMVS group.}
+\item{maxiterpm_varsel}{Integer. Maximum iterations for the pm_varsel group.}
 }
 \value{
 An object of class \code{spca}.
@@ -92,7 +92,7 @@ covariance/correlation matrix. The wrapper routes the computation to the thin or
 }
 \details{
 Character inputs are parsed transparently by their first letter inside the
-main function. Fixed indices are passed through \code{fixedindex_list}, one
+main function. Fixed indices are passed through \code{fixed_index_list}, one
 list element per component. Different variable selection approaches can be
 selected, as explained in the \code{Deatails} section.
 

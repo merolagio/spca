@@ -36,7 +36,7 @@
 #' @param print_tables Logical. If \code{FALSE}, suppress table printing. Takes
 #'   priority over \code{print_loadings}.
 #' @param return_plot Logical. If \code{TRUE}, return the loadings plot.
-#' @param produce_plot Logical. If \code{TRUE}, print the loadings plot.
+#' @param show_plot Logical. If \code{TRUE}, print the loadings plot.
 #' @details When \code{equal_sign = TRUE}, signs are aligned using score
 #'   correlations if scores are available for all objects. Otherwise signs are
 #'   aligned using correlations between the loading matrices.
@@ -63,7 +63,7 @@ compare_spca = function(
     return_tables = FALSE,
     print_tables = TRUE,
     return_plot = FALSE,
-    produce_plot = TRUE) {
+    show_plot = TRUE) {
   tryCatch({
   ## -------------------------------------------------------#
   ## obj_list two or more spca objects
@@ -79,7 +79,7 @@ compare_spca = function(
     return_tables = return_tables,
     print_tables = print_tables,
     return_plot = return_plot,
-    produce_plot = produce_plot
+    show_plot = show_plot
   )
   logical_ok = vapply(logical_args, is.boolean, logical(1))
   if(!all(logical_ok))
@@ -164,12 +164,12 @@ compare_spca = function(
 # graphic parameters  
   pchlist = c(15:20,7:14)
   
-# nplot is number of loadings to plot
+# n_plot is number of loadings to plot
 
   if (isTRUE(plot_loadings)){
-    nplot = ncomps
-  facets_nrows <- ceiling(nplot/3)
-  facets_ncols <- ceiling(nplot/facets_nrows)
+    n_plot = ncomps
+  facets_nrows <- ceiling(n_plot/3)
+  facets_ncols <- ceiling(n_plot/facets_nrows)
   if(grepl("^p", plot_type[1]))
     plot_type = "points"
    else
@@ -203,7 +203,7 @@ compare_spca = function(
     color_pal = spca_fill_palette(color_scale, pc_loadings = NULL)
  #browser()   
     loadings_vec = c(sapply(A, function(L, np) c(L[,1:(np)]),
-                      np = nplot))
+                      np = n_plot))
     if(!is.null(variable_groups)){
       if (is.list(variable_groups)) variable_groups = list2fac(variable_groups)
       if (is.vector(variable_groups)) variable_groups = vec2fac(variable_groups)
@@ -213,15 +213,15 @@ compare_spca = function(
     
     df = data.frame(
       loadings = loadings_vec, 
-      variable = factor(rep(1:p, nplot * n_objects), labels = variables_name), 
-      method = factor(rep(1:n_objects, each = p * nplot), 
+      variable = factor(rep(1:p, n_plot * n_objects), labels = variables_name), 
+      method = factor(rep(1:n_objects, each = p * n_plot), 
                       labels = methods_names), 
-      Comp = factor(rep(rep(1:nplot, each = p), n_objects), 
-                    labels = paste("sPC", 1:nplot))
+      Comp = factor(rep(rep(1:n_plot, each = p), n_objects), 
+                    labels = paste("sPC", 1:n_plot))
       )
     
     if(only_nonzero){
-      df = droplevels(df[rep(ind_nonzero, nplot*n_objects), ])
+      df = droplevels(df[rep(ind_nonzero, n_plot*n_objects), ])
       df$loadings[df$loadings == 0] = NA
     }
       ra = range(na.omit(loadings_vec))*(1.05)
@@ -279,7 +279,7 @@ compare_spca = function(
         labels = function(x)  paste0(round(x*100,1),"%")
         ) 
       }
-      if(produce_plot)
+      if(show_plot)
         hw = withCallingHandlers(
           {
             plot(pl)

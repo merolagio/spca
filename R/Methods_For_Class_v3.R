@@ -1,6 +1,8 @@
 
-#is.spca==============
-#' #' Test for spca objects
+# is.spca==============
+#' Test for spca objects
+#' 
+#' Verifies whether all elements required for an `spca` object are present.
 #' 
 #' @param x Any object suspected of being of class spca.
 #' @param ... Unused.
@@ -608,7 +610,7 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
 #' @param x An spca object.
 #' @param cols A vector indicating which components should be printed.
 #'    Default all. If an integer is passed, it is set to 1:cols.
-#' @param only.nonzero  Logical: if = TRUE only the nonzero loadings are
+#' @param only_nonzero  Logical: if = TRUE only the nonzero loadings are
 #'  printed. Otherwise all loadings are printed.
 #' @param perc Logical: should the loadings be standardised to unit
 #'  \eqn{L_1} norm (and printed as percentage contributions)?
@@ -616,7 +618,7 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
 #' @param thresh Value below which loadings are considered zero and not
 #' printed.
 #' @param return_table Logical: should the formatted (text) table be returned?
-#' @param components_names A vector of names for the components. If NULL assigned 
+#' @param component_names A vector of names for the components. If NULL assigned 
 #'   as#' "sPCj"
 #' @param ... Further arguments; currently ignored.
 #' @return If return_table = TRUE, it returns a formatted text table. 
@@ -624,7 +626,7 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
 #' @family spca
 #' @export
 #' @method print spca
-print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-07, return_table = FALSE, components_names = NULL, ...)
+print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-07, return_table = FALSE, component_names = NULL, ...)
   {
   
   # Validation
@@ -642,7 +644,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
     stop("plot.spca requires an spca object as first argument")
   
   validate_booleans(
-    only.nonzero = only.nonzero,
+    only_nonzero = only_nonzero,
     contributions = contributions,
     return_table = return_table
   )
@@ -657,7 +659,7 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
     if (length(cols) == 1L)
       cols = 1:cols
   
-  if (only.nonzero){
+  if (only_nonzero){
     rows = apply(A, 1, function(x) all(abs(x) < thresh))
     A  = A[!rows, , drop = FALSE]
   }  
@@ -665,18 +667,18 @@ print.spca = function(x, cols = NULL, only.nonzero = TRUE, contributions = TRUE,
   A = A[, cols]
   
   ## assigns names to loadings
-  if(is.null(components_names)){
+  if(is.null(component_names)){
     if(is.null(colnames(A)))
-      components_names = paste0("sPC", ncol(A))
+      component_names = paste0("sPC", ncol(A))
     else
-      components_names = colnames(A)
+      component_names = colnames(A)
   }
   else
-    if ((length(components_names) < length(cols))){
-      message("Too few components_names, default names assigned")
-      components_names = paste0("sPC", ncol(A))
+    if ((length(component_names) < length(cols))){
+      message("Too few component_names, default names assigned")
+      component_names = paste0("sPC", ncol(A))
     }
-  colnames(A) = components_names[cols]
+  colnames(A) = component_names[cols]
   # # -----  formatting -
   
   # needed because sprintf reduces to vector but preserves trailing zeroes
