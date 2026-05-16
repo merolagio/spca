@@ -25,6 +25,6 @@ if (getRversion() >= "2.15.1") {
     "pos", "hjust",
     "varNum", "compNum",
     "loadings",
-    "ncomps"
+    "n_comps"
   ))
 }

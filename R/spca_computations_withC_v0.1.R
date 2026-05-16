@@ -2,7 +2,7 @@
 # input a matrix of loadings or contributions
 get_minload = function(smpc, eps = 1e-4){
   if(!is.matrix(smpc))
-    stop("get.minload: a matrix of loadings or an spca object is needed") 
+    stop("get_minload: a matrix of loadings or contributions is needed") 
   gl = function(x)
     min(abs(x[abs(x)> eps]))
   apply(smpc, 2, gl)
@@ -28,7 +28,7 @@ get_card = function(A, thresh = 1e-4){
 # matrix called loadings
 make_contributions = function(x){
   
-  if (is.spca(x) && (validate.spca(x)))
+  if (is.spca(x) && validate_spca(x))
     {
     return(scaleColsR(x$loadings, normtype = 1, sig = NULL))
   }
@@ -40,8 +40,7 @@ make_contributions = function(x){
   if (is.vector(x))
     return(x/sum(abs(x)))
   
-  stop("X must be a matrix or vector of loadings or list
-         containing the sam with the name loadings")
+  stop("x must be an spca object, or a matrix or vector of loadings")
   }
 
 
@@ -58,7 +57,7 @@ var2cor = function(S){
 # inputs
 # @param Matrix of loadings
 # @param Covariance matrix
-make_corComp_S = function(A, S){
+make_spc_cor_S = function(A, S){
  if ((is.vector(A)) || (ncol(A) == 1)){
     warning("A must be a matrix with at least two columns")
     return(NULL)
@@ -136,13 +135,13 @@ make_vexp =  function (A, S) {
   ## computes vexp for uncorrelated components
 }
 if ((!is.matrix(A)) || (!is.matrix(S)))
-  stop("A ns S must be matrices")
+  stop("A and S must be matrices")
   
   if((!isSymmetric(S)))
     stop("S must be a covariance or correlation matrix")
   
   if (nrow(A) != nrow(S))
-    stop("A must have the same nummber of rows as S")
+    stop("A must have the same number of rows as S")
   
     return(make_vexpSC(A, S))
 
@@ -167,6 +166,6 @@ scaleR = function(M, center = FALSE, scale = TRUE){
     M = as.matrix(M)
   if(!is.matrix(M))
     stop("M must be a matrix or a data.frame")
-  scaleC(glb, center, scale)
+  scaleC(M, center, scale)
 }
 

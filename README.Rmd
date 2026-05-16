@@ -65,16 +65,16 @@ wachter_qqplot(ho_ee$values, p = ncol(holzinger), n = nrow(holzinger), nfit_line
 
 ### Compute PCA
 ```{r run_pca, message = FALSE, warning = FALSE}
-ho_pca = pca(holzinger, ncomp = 4, screeplot = FALSE, qq_plot = FALSE)
+ho_pca = pca(holzinger, n_comps = 4, screeplot = FALSE, qq_plot = FALSE)
 summary(ho_pca)
 ```
 
 ### Compute the sparse loadings
-Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *ncomp* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated and "p" for projection [default]); and *var_selection* ("stepwise" [default], "backward",  or "forward"). see the help for these parameters and more.
+Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated and "p" for projection [default]); and *var_selection* ("stepwise" [default], "backward",  or "forward"). see the help for these parameters and more.
 
 The following command computes four sPCs using forward variable selection with the cSPCA method so that each sPC as at least 0.95 squared correlation with the corresponding PC ($r > 0.9$).
 ```{r run_spca, message = FALSE, warning = FALSE}
-myspca = spca(holzinger, alpha = 0.95, ncomps = 4)
+myspca = spca(holzinger, alpha = 0.95, n_compss = 4)
 ```
 
 ### Inspect spca results
@@ -92,7 +92,7 @@ Other types of plots are available.
 
 Circular, 
 ```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(myspca, plot_type = "circular") # "c" is enough to call "heatmap" type
+plot(myspca, plot_type = "circular") # "c" would be enough
 ```
 
 Heatmap

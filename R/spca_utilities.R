@@ -1,6 +1,6 @@
 
 
-
+#R helpers that do not depend on spca UI objects
 
 
 list2vec = function(li, uniq = T, sorted = F) {

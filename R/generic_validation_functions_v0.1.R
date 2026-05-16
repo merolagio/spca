@@ -1,8 +1,18 @@
 
 
-#' fails if any arguemnt is NA
-#' ... are standard input, args takes a list, typically
-#' one or the other, args takes precedence
+#' fails if a vector is not all integers 
+#' @noRd
+is_int = function(x) {
+  is.numeric(x) &&
+    !anyNA(x) &&
+    all(is.finite(x)) &&
+    all(x == floor(x))
+}
+
+
+#' Fails if any argument is NA
+#' @param ... Arguments to check.
+#' @param arg_list Optional named list of arguments to check; if supplied, it takes precedence over `...`.
 #' @noRd
 validate_no_na = function(..., arg_list = NULL) {
   
@@ -28,7 +38,7 @@ validate_no_na = function(..., arg_list = NULL) {
 }
 
 
-#' needed because is.logical returns TRUE also for NAs wtf
+#' Test for a non-missing logical scalar
 #' is.logical(NA) returns TRUE
 #' is.boolean(NA) returns FALSE
 #' @noRd
@@ -37,11 +47,11 @@ is.boolean = function(x) {
 }
 
 
-#' fails if any argument is not boolean
-#' @param ... are standard input, 
-#' @param args takes a list, typically one or the other, args takes precedence
+#' Fails if any argument is not a non-missing logical scalar
+#' @param ... Arguments to check.
+#' @param arg_list Optional named list of arguments to check; if supplied, it takes precedence over `...`.
 #' 
-#' @details A warning is issued upon failure.
+#' @details An error is thrown upon failure.
 #' 
 #' @returns TRUE or FALSE.
 #' @noRd
@@ -67,9 +77,9 @@ validate_booleans = function(..., arg_list = NULL) {
 }
 
 
-#' fails if x is not a vector of indices with maximum = max_val 
+#' Fails if x is not a vector of indices with maximum = max_val
 #' @param x a vector of positive integers
-#' @param maxval the value beyond wich the indices are invalid.
+#' @param max_val Maximum allowed index value.
 #' @details A warning is issued upon failure.
 #' 
 #' @returns TRUE or FALSE.

@@ -198,10 +198,11 @@ create_data = function(x, n_plot, contributions, only_nonzero,  variable_groups,
 }
 
 # Helper: Create circular barplot
-plot_spca_circular = function(data_df, n_plot, plotlab, lbl, 
-                              legend_position, grid_type, 
-                              legend_title, variable_groups, color_scale,
-                              adjust_labels_circ) {
+plot_spca_circular = function(
+    data_df, n_plot, plotlab, lbl, 
+    legend_position, grid_type, 
+    legend_title, variable_groups, color_scale,
+    adjust_labels_circ) {
   # Set a number of 'empty bar' to add at the end of each component
   empty_bar = 4
   to_add = 
@@ -373,8 +374,11 @@ plot_spca_heatmap = function(
     
     if (heatmap_color_range == "values"){
     col_lims = range(data_df$value)
-    col_lims[1] = floor(col_lims[1]*10)/10
-    col_lims[2] = ceiling(col_lims[2]*10)/10
+    maxlim =   ceiling( (max(abs(col_lims)*10)))/10
+    col_lims[1] = -ceiling(maxlim*10)/10
+    col_lims[2] = ceiling(maxlim*10)/10
+    # col_lims[1] = -ceiling(col_lims*10)/10
+    # col_lims[2] = ceiling(col_lims*10)/10
     } else
       col_lims = c(-1, 1)
       

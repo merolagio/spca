@@ -1,14 +1,19 @@
-#ifndef SUPPORT_FAT_H
-#define SUPPORT_FAT_H
+#ifndef SUPPORT_FAT_V2_H
+#define SUPPORT_FAT_V2_H
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include "support_shared.h"
+#include "support_shared_v2.h"
 
 double compute_r2_subset_T(const Eigen::Ref<const Eigen::MatrixXd>& X,
                            const Eigen::VectorXd& u,
                            const Eigen::VectorXi& indj,
                            int cardt);
+
+Rcpp::List PMAllEigen_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
+                          int ncomps,
+                          double epsPM,
+                          int maxiterPM);
 
 double compute_cvexp_T(const Eigen::MatrixXd& scores_all,
                        int ncomps,

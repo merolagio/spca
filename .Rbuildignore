@@ -3,3 +3,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^Ignore$
+^R\Remove$
+Document_output.txt$
+Compile_output.txt$

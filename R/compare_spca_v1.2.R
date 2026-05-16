@@ -5,7 +5,7 @@
 #' \code{\link{summary.spca}}. Tables and plots can optionally be returned.
 #'
 #' @param obj_list A list of two or more \code{spca} objects.
-#' @param ncomps Integer scalar. Number of components to compare. If
+#' @param n_comps Integer scalar. Number of components to compare. If
 #'   \code{NULL}, the minimum number of available components across objects is
 #'   used.
 #' @param contributions Logical. If \code{TRUE}, compare percentage
@@ -48,7 +48,7 @@
 #' @export
 compare_spca = function(
     obj_list,
-    ncomps = NULL,
+    n_comps = NULL,
     contributions = TRUE, # change to contributions if safe 
     only_nonzero = TRUE,
     variable_groups = NULL,
@@ -124,17 +124,17 @@ compare_spca = function(
   if(!is.character(col_grouplines) || length(col_grouplines) != 1 || anyNA(col_grouplines))
     stop("col_grouplines must be a non-missing character scalar")
   
-# if ncomps not specified sets equal to minimum dim
-  max_ncomps = min(sapply(obj_list,function(x) length(x$vexpPC)))
-  if (is.null(ncomps)){
-    ncomps = max_ncomps
+# if n_comps not specified sets equal to minimum dim
+  max_n_comps = min(sapply(obj_list,function(x) length(x$vexp_pc)))
+  if (is.null(n_comps)){
+    n_comps = max_n_comps
   }
   else{
-    if(!is.numeric(ncomps) || length(ncomps) != 1 || is.na(ncomps))
-      stop("ncomps must be NULL or a non-missing numeric scalar")
-    if(ncomps < 1 || ncomps > max_ncomps)
-      stop(paste("ncomps must be between 1 and", max_ncomps))
-    ncomps = as.integer(ncomps)
+    if(!is.numeric(n_comps) || length(n_comps) != 1 || is.na(n_comps))
+      stop("n_comps must be NULL or a non-missing numeric scalar")
+    if(n_comps < 1 || n_comps > max_n_comps)
+      stop(paste("n_comps must be between 1 and", max_n_comps))
+    n_comps = as.integer(n_comps)
   }
   
   if (print_tables == FALSE){
@@ -143,16 +143,16 @@ compare_spca = function(
   
 ## A is list of loadings of all objects--------------
   if(contributions)
-    A = lapply(obj_list, function(x) x$contributions[, 1:ncomps])
+    A = lapply(obj_list, function(x) x$contributions[, 1:n_comps])
   else
-    A = lapply(obj_list, function(x) x$loadings[, 1:ncomps])
+    A = lapply(obj_list, function(x) x$loadings[, 1:n_comps])
   
   ## needed to make loadings of similar sign, if required 
   #if scores not available acts on loadings directly
   
   
   if (equal_sign == TRUE)
-    A = make_samesign(obj_list, A, ncomps = ncomps, quiet = FALSE)
+    A = make_samesign(obj_list, A, n_comps = n_comps, quiet = FALSE)
   
   ##methods names  NEEDS FIX this ==========================
 #browser() 
@@ -167,9 +167,9 @@ compare_spca = function(
 # n_plot is number of loadings to plot
 
   if (isTRUE(plot_loadings)){
-    n_plot = ncomps
-  facets_nrows <- ceiling(n_plot/3)
-  facets_ncols <- ceiling(n_plot/facets_nrows)
+    n_plot = n_comps
+  facets_nrows = ceiling(n_plot/3)
+  facets_ncols = ceiling(n_plot/facets_nrows)
   if(grepl("^p", plot_type[1]))
     plot_type = "points"
    else
@@ -299,17 +299,17 @@ compare_spca = function(
 ##loadings_matrix======== 
 # loadings of each object, grouped by their rank  
   
-  loadings_matrix = matrix(0, nrow = p, ncol = n_objects *ncomps) 
+  loadings_matrix = matrix(0, nrow = p, ncol = n_objects *n_comps) 
   if (col_short_names == FALSE)
-    col_names = paste(rep(paste0("C",1:ncomps), each = n_objects), 
-                  rep(methods_names, times = ncomps), sep = "."
+    col_names = paste(rep(paste0("C",1:n_comps), each = n_objects), 
+                  rep(methods_names, times = n_comps), sep = "."
                   )
   else
-    col_names = paste(rep(paste0("C",1:ncomps), each = n_objects), 
-                  paste0("M", rep(1:n_objects, times = ncomps)), sep = "."
+    col_names = paste(rep(paste0("C",1:n_comps), each = n_objects), 
+                  paste0("M", rep(1:n_objects, times = n_comps)), sep = "."
                   ) 
   k = 0
-  for (i in 1:ncomps){
+  for (i in 1:n_comps){
     for (j in 1:n_objects){
       k = k + 1
       loadings_matrix[,k] = A[[j]][,i]
@@ -325,9 +325,9 @@ compare_spca = function(
   sum_list = lapply(obj_list, summary, print_table = FALSE, return_table = TRUE, 
                     min_load = TRUE)
   
-  sum_matrix = matrix(0, nrow = nrow(sum_list[[1]]), ncol = n_objects *ncomps) 
+  sum_matrix = matrix(0, nrow = nrow(sum_list[[1]]), ncol = n_objects *n_comps) 
   k = 0
-  for (i in 1:ncomps){
+  for (i in 1:n_comps){
     for (j in 1:n_objects){
       k = k +1
       sum_matrix[,k] =  sum_list[[j]][,i]
@@ -349,7 +349,7 @@ compare_spca = function(
         which_rows = 1:p
 #browser()      
       loadings_matrix_fmt = 
-        format_loadings(loadings_matrix, cols = 1:(ncomps*n_objects), 
+        format_loadings(loadings_matrix, cols = 1:(n_comps*n_objects), 
                         namescomp = col_names, contributions = contributions, 
                         rows = which_rows
                         )
@@ -385,20 +385,20 @@ compare_spca = function(
 
 #' changes the sign of the loadings
 #' @noRd
-make_samesign = function(obj_list = NULL, loadings_list, ncomps = NULL, quiet = FALSE){
+make_samesign = function(obj_list = NULL, loadings_list, n_comps = NULL, quiet = FALSE){
   # browser() 
   if(missing(loadings_list))
     stop("loadings_list is required")
   if(!is.list(loadings_list))
     stop("loadings_list must be a list of matrices")
-  if(is.null(ncomps))
-    ncomps = min(sapply(loadings_list, ncol))
+  if(is.null(n_comps))
+    n_comps = min(sapply(loadings_list, ncol))
   
   if(!is.null(obj_list)) {
     if (all(sapply(obj_list, function(x) !is.null(x$scores)))){
       for (i in 2:length(obj_list)){
-        co = diag(atbC(obj_list[[1]]$scores[, 1:ncomps], 
-                       obj_list[[i]]$scores[, 1:ncomps]))
+        co = diag(atbC(obj_list[[1]]$scores[, 1:n_comps], 
+                       obj_list[[i]]$scores[, 1:n_comps]))
         if(any(co < 0)){
           loadings_list[[i]] = t(t(loadings_list[[i]]) * sign(co))
           if(!quiet)
@@ -492,4 +492,5 @@ format_summaries = function(sum_matrix, contributions)
   sum_matrix_fmt = format(sum_matrix_fmt, justify = "right")
   sum_matrix_fmt
 }
+
 

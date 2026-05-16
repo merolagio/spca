@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include "support_shared.h"
-#include "support_fat.h"
+#include "support_shared_v2.h"
+#include "support_fat_v2.h"
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -18,6 +18,53 @@ using Eigen::VectorXd;
 using Eigen::VectorXi;
 using Eigen::SelfAdjointEigenSolver;
 using Eigen::GeneralizedSelfAdjointEigenSolver;
+
+// Compute the first ncomps PCA eigenpairs for a fat data matrix.
+// The power method is applied in row space and loadings are mapped back to columns.
+Rcpp::List PMAllEigen_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
+                          int ncomps,
+                          double epsPM,
+                          int maxiterPM)
+{
+  const int n = X.rows();
+  const int p = X.cols();
+  Eigen::MatrixXd K = X * X.transpose();
+  Eigen::MatrixXd loadings(p, ncomps);
+  Eigen::MatrixXd scores(n, ncomps);
+  Eigen::VectorXd eigval(ncomps);
+
+  for (int j = 0; j < ncomps; ++j) {
+    double val = 0.0;
+    Eigen::VectorXd u_scaled = eigvecPMC(K, val, epsPM, maxiterPM);
+    if (!std::isfinite(val) || val <= 0.0)
+      Rcpp::stop("PMAllEigen: non-positive eigenvalue in fat backend");
+
+    Eigen::VectorXd u = u_scaled / std::sqrt(val);
+    Eigen::VectorXd a = X.transpose() * u / std::sqrt(val);
+    const double anrm = a.norm();
+    if (!std::isfinite(anrm) || anrm <= 0.0)
+      Rcpp::stop("PMAllEigen: zero or non-finite loading norm in fat backend");
+    a /= anrm;
+
+    if (a(0) < 0.0) {
+      a = -a;
+      u = -u;
+    }
+
+    double defl_vexp = 0.0;
+    deflT_rank1(u, K, defl_vexp);
+
+    loadings.col(j) = a;
+    scores.col(j) = std::sqrt(val) * u;
+    eigval(j) = val;
+  }
+
+  return Rcpp::List::create(
+    Rcpp::Named("vec") = loadings,
+    Rcpp::Named("scores") = scores,
+    Rcpp::Named("val") = eigval
+  );
+}
 
 // deflT_rank1
 //

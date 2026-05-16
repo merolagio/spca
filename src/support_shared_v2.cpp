@@ -3,7 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "support_shared.h"
+#include "support_shared_v2.h"
 
 using namespace Rcpp;
 using namespace std;
@@ -154,11 +154,10 @@ Eigen::VectorXd eigvecPMC(
     k++;
     if (k % 200 == 0) // in case maxiter increased
       Rcpp::checkUserInterrupt();
-    if (k > maxiter){
-      //   Rf_warning("Powermethod: not converged in 100 iterations. Error is", k);
-      break;//here should use try-catch  
+    Rcpp::warning("power method did not converge; returning last iterate");
+    break;
     }  
-  }
+
   //  Rcout << "k = " << k << "; stp = " << stp << endl;
   return (v.array() * sqrt(val));  
 }
@@ -215,7 +214,8 @@ Eigen::VectorXd GeigvecPMC(const Eigen::MatrixXd& A,
       Rcpp::checkUserInterrupt();
     
     if (k > maxiter)
-      throw std::runtime_error("power method did not converge in GeigvecPMC");
+      Rcpp::warning("power method did not converge; returning last iterate");
+    break;
   }
   
   v = L.transpose() * v;

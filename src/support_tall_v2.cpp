@@ -6,8 +6,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "support_shared.h"
-#include "support_tall_noForce_.h"
+#include "support_shared_v2.h"
+#include "support_tall_v2.h"
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -21,6 +21,49 @@ using Eigen::VectorXi;
 using Eigen::SelfAdjointEigenSolver;
 using Rcpp::List;
 using std::string;
+
+static void orient_first_positive(Eigen::VectorXd& x)
+{
+  if (x.size() > 0 && x(0) < 0.0)
+    x = -x;
+}
+
+// Compute the first ncomps eigenpairs of a covariance/correlation matrix.
+// Uses power method followed by covariance deflation at each step.
+Rcpp::List PMAllEigen_tall(const Eigen::Ref<const Eigen::MatrixXd>& S,
+                           int ncomps,
+                           double epsPM,
+                           int maxiterPM)
+{
+  const int p = S.cols();
+  Eigen::MatrixXd G = S;
+  Eigen::MatrixXd eigvec(p, ncomps);
+  Eigen::VectorXd eigval(ncomps);
+  Eigen::VectorXi ind = Eigen::VectorXi::LinSpaced(p, 0, p - 1);
+
+  for (int j = 0; j < ncomps; ++j) {
+    double val = 0.0;
+    Eigen::VectorXd a_scaled = eigvecPMC(G, val, epsPM, maxiterPM);
+    if (!std::isfinite(val) || val <= 0.0)
+      Rcpp::stop("PMAllEigen: non-positive eigenvalue in tall backend");
+
+    Eigen::VectorXd a = a_scaled / std::sqrt(val);
+    orient_first_positive(a);
+
+    double defl_vexp = 0.0;
+    const double failed = deflSC(a, G, ind, defl_vexp, epsPM);
+    if (failed != 0.0)
+      Rcpp::stop("PMAllEigen: deflation failed in tall backend");
+
+    eigvec.col(j) = a;
+    eigval(j) = val;
+  }
+
+  return Rcpp::List::create(
+    Rcpp::Named("vec") = eigvec,
+    Rcpp::Named("val") = eigval
+  );
+}
 
 // ==============================================
 // # Rank-1 deflates of the covariance matrix G of a new component with loadings a

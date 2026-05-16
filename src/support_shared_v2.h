@@ -1,5 +1,5 @@
-#ifndef SUPPORT_SHARED_H
-#define SUPPORT_SHARED_H
+#ifndef SUPPORT_SHARED_V2_H
+#define SUPPORT_SHARED_V2_H
 
 #include <RcppEigen.h>
 

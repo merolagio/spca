@@ -5,29 +5,38 @@
 #'
 #' The package provides functions to compute Least Squares Sparse Principal
 #'  Components Analysis (LSSPCA) solutions, where sparsity is imposed while
-#'  targeting PCA’s least-squares reconstruction objective. This release
+#'  targeting PCA's least-squares reconstruction objective. This release
 #'  accompanies the related article and is intended  to support full
 #'  reproduction of the results reported therein.
 #'
 #' Computation relies on efficient C++ routines and includes multiple options
 #'  for variable selection and sparse loading estimation.
 #'
+#' Fitting functions
+#' * [spca()] Computes LSSPCA solutions from a data or covariance/correlation
+#'   matrix. Returns an  \link{spca_object} of class `spca`.
+#' * [pca()] Computes PCA solutions from a data or covariance/correlation
+#'   matrix. Returns an  \link{spca_object} of class `spca`.
+#'      
 #' S3 methods for objects of class `spca` include:
 #' [pca()] returns PCA results as an `spca` object.
 #' \strong{methods}
 #' * [print()]
 #' * [plot()]
 #' * [summary()]
-#' * [is.spca()]
 #' 
-#' \strong{helpers}
-#' * [new_spca()] creates an `spca` object from a set of loadings and the
-#'   covariance matrix of the data.
-#' * [aggregate_by_group()] computes the sums of the loadings or contributions 
-#'     by variable groups.
-#' * [showload()] prints, the nonzero loadings or contributions
-#'     separately for each sPC.
-#'
+#' \strong{Utilities}
+#' * [is.spca()] Verifies if an object inherits from class `spca`.
+#' * [compare_spca()] Compares two or more LSSPCA solutions numerically 
+#'   and visually.
+#' * [new_spca()] Creates an `spca` object from a set of loadings.
+#' * [aggregate_by_group()] Sums loadings or contributions wrt an index vector.
+#' * [show_contributions_spca()] Prints the nonzero contributions 
+#'   separately for each sPC.
+#' * [change_loadings_sign_spca()] Changes the sign of the loadings and all
+#'      related elements in an 'spca` object`.
+#' * [spca_screeplot()] and  [wachter_qqplot()] Diagnostic plots usefull to 
+#'   determine the number of components to retain in PCA.  
 #' @useDynLib spca, .registration = TRUE
 #' @importFrom Rcpp evalCpp
 "_PACKAGE"
@@ -35,12 +44,10 @@ NULL
 
 #spca object=================
 
-# spca object =================
-
 #' Sparse principal component analysis object
 #'
 #' Objects of class `spca` are returned by the fitting functions
-#' \code{spca()}, \code{pca()} and by #the function code{new-spca()}.
+#' \code{spca()}, \code{pca()} and by \code{new_spca()}..
 #'
 #' @section Components:
 #' An object of class `spca` is a list with the following elements:
@@ -49,28 +56,29 @@ NULL
 #' \item{loadings}{\eqn{p \times r} matrix of sparse loadings.}
 #' \item{contributions}{\eqn{p \times r} matrix of loadings scaled to unit
 #'   \eqn{L_1} norm within each sPC.}
-#' \item{ncomps}{Number of sPCs.}
+#' \item{n_comps}{Number of sPCs.}
 #' \item{cardinality}{Number of nonzero loadings in each sPC.}
 #' \item{vexp}{Variance explained by each sPC.}
-#' \item{vexpPC}{Variance explained by the corresponding PCs.}
+#' \item{vexp_pc}{Variance explained by the corresponding PCs.}
 #' \item{cvexp}{Cumulative variance explained by the sPCs.}
 #' \item{rvexp}{Ratio of \code{vexp} to the variance explained by the
 #'   corresponding PC.}
 #' \item{rcvexp}{Ratio of \code{cvexp} to the cumulative variance explained by
 #'   the corresponding PCs.}
-#' \item{sq_cor_with_PC}{Squared correlation between each sPC and the
+#' \item{cor_with_pc}{Correlation between each sPC and the
 #'   corresponding PC.}
 #' \item{tot_var}{Total variance of the data.}
 #' \item{loadings_list}{List of nonzero loading vectors, one per sPC.}
-#' \item{spc_cor}{\eqn{ncomps \times ncomps} correlation matrix among sPCs.}
+#' \item{spc_cor}{\eqn{n_comps \times n_comps} correlation matrix of the 
+#'   sPC scores.}
 #' \item{indices}{List of variable indices with nonzero loadings, one per sPC.}
 #' \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
 #'   is supplied.}
 #' \item{parameters}{List of parameters used to compute the fit.}
-#' \item{Call}{Matched call used to compute the fit.}
+#' \item{call}{Matched call used to compute the fit.}
 #' }
-#' @name spca-object
-#' @aliases spca_object spca-class
+#' @name spca_object
+#' @aliases spca-object spca_class
 #' @family spca
 NULL
 

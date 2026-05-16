@@ -1,9 +1,9 @@
-#ifndef SUPPORT_TALL_H
-#define SUPPORT_TALL_H
+#ifndef SUPPORT_TALL_V2_H
+#define SUPPORT_TALL_V2_H
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include "support_shared.h"
+#include "support_shared_v2.h"
 
 double deflSC(const Eigen::Ref<const Eigen::VectorXd>& a,
               Eigen::MatrixXd& G,
@@ -19,6 +19,11 @@ double deflSandDC(const Eigen::Ref<const Eigen::VectorXd>& a,
 
 Rcpp::List makeVexpSC(const Eigen::Ref<const Eigen::MatrixXd>& A,
                       const Eigen::Ref<const Eigen::MatrixXd>& S);
+
+Rcpp::List PMAllEigen_tall(const Eigen::Ref<const Eigen::MatrixXd>& S,
+                           int ncomps,
+                           double epsPM,
+                           int maxiterPM);
 
 double makeCvexpOneCompSC_int(const Eigen::Ref<const Eigen::MatrixXd>& A,
                               const Eigen::Ref<const Eigen::MatrixXd>& S,

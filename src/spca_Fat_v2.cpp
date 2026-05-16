@@ -1,9 +1,9 @@
 
 // spca_Fat_main Forward variable selection only LS-SPCA for fat matrices (p > n).
 //
-// The T-functions work in row space, using the leading PC of 
+// The T-functions work in row space, using the leading PC of
 // Xdef Xdef' (n x n), rather than
-// eigendecomposing Xdef' Xdef (p x p). 
+// eigendecomposing Xdef' Xdef (p x p).
 // This "reverse svd" approach is more efficient and lighter in
 // RAM when p >> n.
 //
@@ -20,8 +20,8 @@
 #include <chrono>
 #include <ctime>
 
-#include "support_shared.h"
-#include "support_fat.h"
+#include "support_shared_v2.h"
+#include "support_fat_v2.h"
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -76,71 +76,51 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
   (void)exact_cvexp;
 }
 
-// @title Least-Squares Sparse Principal Component Analysis for Fat Matrices
+
+// Least-Squares Sparse Principal Component Analysis, fat backend
 //
-// @description Computes sparse principal components for fat matrices
-//   (\eqn{p > n}) using row-space / inverse-SVD algorithms. In contrast to
-//   the tall-matrix wrapper, which works with \eqn{X_{\mathrm{def}}'
-//   X_{\mathrm{def}}} (\eqn{p \times p}), this wrapper works with the PC of
-//   \eqn{X_{\mathrm{def}} X_{\mathrm{def}}'} (\eqn{n \times n}), which is
-//   more efficient and uses less memory when \eqn{p \gg n}. Fat-matrix
-//   variable selection is forward only.
+// Computes LS-SPCA components for a centered data matrix with p > n. The
+// backend works in row space, using X X' instead of X' X, and maps results back
+// to column-space loading vectors.
 //
-// @param X Numeric \eqn{n \times p} centered data matrix with \eqn{p > n}.
-// @param ncomps Integer. Maximum number of components (default 0). If 0, the
-//   number of components is determined by \code{ncompbycvexp}.
-// @param stop_criterion Integer. Stopping rule for variable selection:
-//   \code{0} = \eqn{R^2}, \code{1} = cumulative variance explained (CVEXP).
-// @param exact_cvexp Logical. If TRUE, exact cumulative explained variance is
-//   used during CVEXP-based selection. In forward cvexp mode, the current
-//   subset cvexp is checked after each step. Returned \code{vexp} and
-//   \code{cvexp} are recomputed exactly from the final score matrix before
-//   return.
-// @param alpha Numeric in (0, 1]. Target retained proportion during variable
-//   selection (default 0.95).
-// @param ncompbycvexp Numeric in (0, 1]. Target cumulative proportion of total
-//   variance for automatic component stopping (default 0.95).
-// @param method Character vector. SPCA type per component: \code{"c"},
-//   \code{"u"}, or \code{"p"}. Recycled if shorter than \code{ncomps}.
-// @param indvec_in Nullable integer vector. 0-based variable indices for fixed
-//   components (unlisted). Use with \code{cardvec_in}.
-// @param cardvec_in Nullable integer vector. Cardinalities for each fixed
-//   component. Bypasses variable selection.
-// @param PMPC Logical. Use the power method for PCs of the row-space matrix
-//   \eqn{X_{\mathrm{def}} X_{\mathrm{def}}'} (default FALSE).
-// @param PMS Logical. Use the power method in variable selection 
-// (default FALSE).
-// @param epsPMPC Numeric. Convergence tolerance for the PC power method.
-// @param epsPMS Numeric. Convergence tolerance for the power method 
-// in variable selection. 
-// @param maxiterPMPC Integer. Max iterations for the power method 
-//   in variable selection (default 1000). 
-//   For component \eqn{j > 0} the effective limit is
-//   \code{maxiterPMPC + j * 50} to handle slower convergence when the
-//   deflated matrix is more likely to have nearly equal leading eigenvalues.
-// @param maxiterPMS Integer. Max iterations for the sparse-component 
-// power method.
-// @param rank_tol Numeric. Accepted for interface consistency; currently not
-//   used by the T-based selectors.
+// Parameters
+// X: Numeric n x p centered data matrix with p > n.
+// ncomps: Maximum number of components. If zero and ncompbycvexp < 1, the
+//   backend computes components until the CVEXP target is reached or the
+//   maximum possible number is reached.
+// stop_criterion: Variable-selection stopping rule. 0 = squared correlation,
+//   1 = cumulative variance explained.
+// exact_cvexp: Accepted for consistency with the tall backend. Returned VEXP
+//   and CVEXP are recomputed from the final score matrix.
+// alpha: Target proportion used by variable selection.
+// ncompbycvexp: Target cumulative variance explained for automatic component
+//   stopping.
+// method: Character vector of component methods. Entries must be "c", "u", or
+//   "p" for cSPCA, uSPCA, and pSPCA.
+// indvec_in: Optional 0-based fixed variable indices, concatenated across
+//   components.
+// cardvec_in: Optional cardinalities for fixed variable indices.
+// PMPC: Use the power method for PCs of the row-space matrix.
+// PMS: Use the power method for sparse-loading eigenvectors.
+// epsPMPC: Convergence tolerance for row-space PC power-method iterations.
+// epsPMS: Convergence tolerance for sparse-loading power-method iterations.
+// maxiterPMPC: Maximum number of row-space PC power-method iterations.
+// maxiterPMS: Maximum number of sparse-loading power-method iterations.
+// rank_tol: Accepted for interface consistency; currently not used by the
+//   fat variable-selection backend.
 //
-// @return A list with components:
-//   \describe{
-//     \item{loadings}{Numeric matrix (p x ncomps). Sparse loading vectors.}
-//     \item{loadlist}{List. Nonzero loadings per component.}
-//     \item{ncomps}{Integer. Number of components computed.}
-//     \item{ind}{List. Selected variable indices (1-based) per component.}
-//     \item{card}{Integer vector. Cardinality per component.}
-//     \item{vexp}{Numeric vector. Variance explained per component.}
-//     \item{cvexp}{Numeric vector. Cumulative variance explained.}
-//     \item{vexpPC} Numeric vector. Variance explained per principal
-//      component.
-//     \item{r2}{Numeric vector with the squared correlations PCs, sPCs.}
-//     \item{scores}{A matrix with components scores.}
-//     \item{method}{Character vector. Actual method used per component.}
-//     \item{varSelection}{Character. Description of the selection method used.}
-// }
-// @details This functionis called from the R wrapper 
-// @noRd
+// Variable-selection combinations
+// stop_criterion  Algorithm
+// 0               Forward selection with squared-correlation stopping
+// 1               Forward selection with CVEXP stopping
+//
+// Returns
+// A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC,
+// scores, r, totvar, method, varSelection, Time_wall, Time_cpu, Time_colnames,
+// setup_wall, setup_cpu, and time_unit_raw. The element r contains signed
+// correlations between each sPC and the corresponding original PC.
+// This function is called from the R wrapper spca()
+
 // [[Rcpp::export]]
 List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
               int ncomps = 0,
@@ -201,19 +181,25 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
       Rcpp::stop("fixed cardinality for uSPCA cannot be smaller than the component order");
   }
 
-  // expensive O(n^2p) done just once 
+  // expensive O(n^2p) done just once
   MatrixXd D_orig = X * X.transpose();
   MatrixXd D = D_orig;
   MatrixXd scores = MatrixXd::Zero(n, ncomps);
   MatrixXd A = MatrixXd::Zero(p, ncomps);
   List indout(ncomps), loadlist(ncomps);
   VectorXi card = VectorXi::Zero(ncomps);
-  VectorXd r2vec = VectorXd::Zero(ncomps);
+  VectorXd rvec = VectorXd::Zero(ncomps);
 
   MatrixXd TimeWall = MatrixXd::Zero(ncomps, 4);
   MatrixXd TimeCPU = MatrixXd::Zero(ncomps, 4);
 
   VectorXd PCvexp(n);
+  MatrixXd PCscores = MatrixXd::Zero(n, ncomps);
+  VectorXd pc_score_current = VectorXd::Zero(n);
+  MatrixXd D_pc;
+  int pc_computed = 0;
+  if (PMPC)
+    D_pc = D_orig;
   double totvexp = D_orig.trace();
   double target_cvexp_j = 0.0;
 
@@ -240,16 +226,54 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
         r_scaled = u.array() * std::sqrt(maxvexp);
         if (j == 0) {
           PCvexp = es.eigenvalues().reverse();
+          MatrixXd row_pc = es.eigenvectors().rowwise().reverse().leftCols(ncomps);
+          for (int k = 0; k < ncomps; k++) {
+            if (PCvexp(k) <= 0.0) {
+              PCscores.col(k).setZero();
+              continue;
+            }
+            VectorXd loading_k = X.transpose() * row_pc.col(k) / std::sqrt(PCvexp(k));
+            double nrm_pc = loading_k.norm();
+            if (nrm_pc > 0.0) loading_k /= nrm_pc;
+            if (loading_k(0) < 0.0) {
+              row_pc.col(k) = -row_pc.col(k);
+            }
+            PCscores.col(k) = std::sqrt(PCvexp(k)) * row_pc.col(k);
+          }
+          u = row_pc.col(0);
+          r_scaled = PCscores.col(0);
           totvexp = PCvexp.sum();
         }
+        pc_score_current = PCscores.col(j);
       } else {
+        while (pc_computed <= j) {
+          double pc_val = 0.0;
+          VectorXd u_scaled = eigvecPMC(D_pc, pc_val, epsPMPC, maxiterPMPC);
+          if (!std::isfinite(pc_val) || pc_val <= 0.0)
+            Rcpp::stop("lsspcaTC: non-positive original row-space PC eigenvalue");
+          VectorXd u_pc = u_scaled / std::sqrt(pc_val);
+          VectorXd loading_k = X.transpose() * u_pc / std::sqrt(pc_val);
+          double nrm_pc = loading_k.norm();
+          if (!std::isfinite(nrm_pc) || nrm_pc <= 0.0)
+            Rcpp::stop("lsspcaTC: zero or non-finite original PC loading norm");
+          loading_k /= nrm_pc;
+          if (loading_k(0) < 0.0)
+            u_pc = -u_pc;
+          PCvexp(pc_computed) = pc_val;
+          PCscores.col(pc_computed) = std::sqrt(pc_val) * u_pc;
+          if (pc_computed == j)
+            pc_score_current = PCscores.col(pc_computed);
+          double pc_defl_vexp = 0.0;
+          deflT_rank1(u_pc, D_pc, pc_defl_vexp);
+          pc_computed++;
+        }
         if (j == 0) {
-          SelfAdjointEigenSolver<MatrixXd> es(D);
-          maxvexp = es.eigenvalues()(n - 1);
-          u = es.eigenvectors().col(n - 1);
-          PCvexp = es.eigenvalues().reverse();
-          totvexp = PCvexp.sum();
-          r_scaled = u.array() * std::sqrt(maxvexp);
+          maxvexp = PCvexp(0);
+          if (maxvexp <= 0.0)
+            Rcpp::stop("lsspcaTC: non-positive leading eigenvalue in original row-space PC");
+          u = pc_score_current / std::sqrt(maxvexp);
+          r_scaled = pc_score_current;
+          totvexp = D_orig.trace();
         } else {
           int maxiterPMPC_j = maxiterPMPC + j * 50;
           r_scaled = eigvecPMC(D, maxvexp, epsPMPC, maxiterPMPC_j);
@@ -328,7 +352,13 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
       indout[j] = indt.array() + 1;
       loadlist[j] = a.head(cardt);
       card(j) = cardt;
-      r2vec(j) = compute_r2_subset_T(X, u, indt, cardt);
+      double den_r = scores.col(j).squaredNorm() * PCvexp(j);
+      if (den_r > 0.0)
+        rvec(j) = scores.col(j).dot(pc_score_current) / std::sqrt(den_r);
+      else
+        rvec(j) = 0.0;
+      if (rvec(j) < -1.0) rvec(j) = -1.0;
+      if (rvec(j) > 1.0) rvec(j) = 1.0;
 
       TimeWall(j, 2) = static_cast<double>(wall_now_ns() - t_phase2_wall);
       TimeCPU(j, 2) = cpu_now_ns() - t_phase2_cpu;
@@ -381,8 +411,8 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
     Named("cvexp") = cvexp_final.head(nc),
     Named("vexpPC") =  PCvexp.head(nc),
     Named("scores") = scores.leftCols(nc),
-    Named("r2") = r2vec.head(nc),
-    Named("totvar") = PCvexp.sum(),
+    Named("r") = rvec.head(nc),
+    Named("totvar") = totvexp,
     Named("Time_wall") = TimeWall.topRows(nc),
     Named("Time_cpu") = TimeCPU.topRows(nc),
     Named("Time_colnames") = Time_colnames,

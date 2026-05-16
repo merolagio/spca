@@ -189,7 +189,7 @@ The main function \code{spca()} computes LS-SPCA solutions of all types. Differe
 
 The main computational expedient is to compute the potentially demanding $O(np^2)$ covariance matrix $S = X\trasp X$ and the $O(p^3)$ product $SS$ only once, at the beginning. Deflations are then performed with cheap rank-1 updates, instead of recomputing the matrices as products of the deflated data matrix. The savings can be substantial when $p$ is large, reducing the cost, roughly, from $O(p^3)$ to $O(p^2)$.
 
-Apart from the initial eigen-decomposition, only the leading eigen-pair of a matrix is needed. This can optionally be computed with the power method, triggered by setting \code{PML = TRUE} for loading computation and \code{PMVS = TRUE} for intensive variable selection. For a $p \times p$ matrix, the power method reduces the cost from approximately $O(p^3)$ to approximately $O(Kp^2)$, where $K$ is the number of iterations required for convergence. Convergence is controlled by the \code{maxiterPM...} and \code{epsPM...} arguments for each set of computations.
+Apart from the initial eigen-decomposition, only the leading eigen-pair of a matrix is needed. This can optionally be computed with the power method, triggered by setting \code{PML = TRUE} for loading computation and \code{PMVS = TRUE} for intensive variable selection. For a $p \times p$ matrix, the power method reduces the cost from approximately $O(p^3)$ to approximately $O(Kp^2)$, where $K$ is the number of iterations required for convergence. Convergence is controlled by the \code{maxiter_pm...} and \code{eps_PM...} arguments for each set of computations.
 
 The regression-based variable selection algorithm is simplified by exploiting that the regressed variable is an singular-vector of the regressor matrix and by using rank-1 updates to compute the current values of the selected stopping criterion. Similar considerations apply to the fat back-end.
 
@@ -251,20 +251,28 @@ We usually begin the analysis by inspecting PCA results. This is useful to under
 
 The function \fct{pca} takes the following arguments
 \begin{Code}
-pca(M, ncomps = NULL, center_data = FALSE, scaledata = FALSE, 
-    screeplot = TRUE, qq_plot = TRUE, nrow_data = NULL, neigen_toplot = NULL), 
+pca(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE, 
+    fat_matrix = NULL, screeplot = FALSE, qq_plot = TRUE, nrow_data = NULL, 
+    neigen_toplot = NULL, pm = FALSE, eps_pm = 1e-05, maxiter_pm = 100)  
 \end{Code}
-\code{M} is either a datamatrix or a covariance matrix, scaledat
-which returns an \class{spca} object.
-It is possible to produce a classic screeplot or a Wachter qq-plot (this diagnostic plot uses the quantiles of the Marchenko-Pastur distribution). Since the latter plot considers the data aspect-ratio, \code{nrow_data} is needed if \code{M} is a covariance matrix.
+\code{M} is either a datamatrix or a covariance matrix. 
+If it is a covariance matrix, the PC scores will not be computed.
+The default (`n_comps = NULL`) means that all possible components will be computed.
 
+If \code{pm = TRUE}, \code{n_comps} are computed with the power method, controlled by the convergence tolerance \code{eps_pm} and maximum iterations allowed \code{maxiter_pm}. The function  returns an \class{spca} object.
 
-The input to \code{M} can be either the data matrix or the covariance or correlation matrix (from now on, we use covariance matrix for both cases). In the latter case PC scores will not be computed.
+It is possible to produce a classic screeplot or a Wachter qq-plot.
+The latter diagnostic plot compares the observed eigenvalues with the
+quantiles of the Marchenko--Pastur distribution, the limiting distribution
+of eigenvalues of high-dimensional random covariance matrices under a
+noise model with independent variables and common variance. The plot is briefly discussed in \citet{joh01}; a simple introduction is given by \cite{win}. 
 
-
-Calling \fct{pca} with the default (`ncomps = NULL`) produces all PCA components with all components.
+Therefore, if the data matrix, covariance matrix, or correlation matrix was obtained from variables that are not on a common variance scale, the qq-plot is not valid. By default the function expects a covariance matrix. Since the Marchenko--Pastur distribution depends on the data aspect-ratio, \code{nrow_data} is needed when \code{M} is a covariance matrix. 
+ The \fct{screeplot} and \fct{wachter_qqplot} functions can be used to customize these plots.
+ 
+Next we compute the PCA solutions will all components and plots.
 <<pca, fig = FALSE, message = FALSE, warning = FALSE>>=
-ho_pca = pca(holzinger, screeplot = TRUE, qq_plot = FALSE)
+ho_pca = pca(holzinger, screeplot = TRUE, qq_plot = TRUE)
 @
 \begin{figure}[H]
 \centering
@@ -283,7 +291,7 @@ The screeplot in Figure \ref{fig:screeplot} suggests to retain 4 components wher
 \begin{figure}[H]
 \centering
 <<qq-plot, fig = TRUE, echo = TRUE, message = FALSE, warning = FALSE,  width = 5, height= 5, include = FALSE>>=
-wachter_qqplot(ho_pca$vexpPC*12, p = ncol(holzinger), 
+wachter_qqplot(ho_pca$vexp_pc*12, p = ncol(holzinger), 
                n = nrow(holzinger), n_fitline = -3)
 @
 \includegraphics[width = 0.6\textwidth]{spca_JSS-qq-plot.pdf}
@@ -293,19 +301,33 @@ wachter_qqplot(ho_pca$vexpPC*12, p = ncol(holzinger),
 We settle for 4 components for caution.  
 
 \subsection{cSPCA fit}
-We fit an LSSPCA model with four components,(\code{ncomps = 4}), using the data matrix \code{M} with the default values: \code{alpha = 0.95} is the proportion of objective to reach, CVEXP in this case, note that the function (as all others when a character vector is passed) considers the initial of the first element of the vector in \code{stop_criterion}; \code{method = "c"} indicates that the loadings will be computed with cSPCA; and \code{var_selection = c("fwd", "bkw", "step")} that the variables will be selected with forward selection based on $R^2$, as indicated by \code{intensive = FALSE}.
+The package's workhorse is the function \fcn(spca):
+\begin{Code}
+(M, alpha = 0.95, n_comps = NULL, ncomp_by_cvexp = NULL, 
+    method = c("cspca", "uspca", "pspca"), 
+    var_selection = c("fwd", "bkw", "step"), 
+    stop_criterion = c("cvexp", "r2"),
+    intensive = FALSE, 
+    fat_matrix = NULL, fixed_index_list = list(), 
+    center_data = FALSE, scale_data = FALSE, 
+    pm_loading = FALSE, eps_pm_loading = 1e-05, maxiter_pm_loading = 100, pm_varsel = FALSE, eps_pm_varsel = 1e-05, maxiter_pm_varsel = 200) 
+\end{Code}
+
+
+
+We fit an LSSPCA model with four components,(\code{n_comps = 4}), using the data matrix \code{M} with the default values: \code{alpha = 0.95} is the proportion of objective to reach, CVEXP in this case, note that the function (as all others when a character vector is passed) considers the initial of the first element of the vector in \code{stop_criterion}; \code{method = "c"} indicates that the loadings will be computed with cSPCA; and \code{var_selection = c("fwd", "bkw", "step")} that the variables will be selected with forward selection based on $R^2$, as indicated by \code{intensive = FALSE}.
 <<spca_first>>=
 ho_spcadef = spca(M = holzinger,
                   alpha = 0.95,
-                  ncomps = 4,
+                  n_comps = 4,
                   method = "c",
-                  var_selection = c("fwd", "bkw", "step"),
-                  stop_criterion = c("cvexp", "r2"),
+                  var_selection = "fwd",
+                  stop_criterion = "cvexp",
                   intensive = FALSE
                   )
 @
 
-The same result could have been produced with \code{ho_spcadef = spca(M = holzinger, ncomps = 4)}.
+The same result could have been produced with \code{ho_spcadef = spca(M = holzinger, n_comps = 4)}.
 
 \subsection{print()}
 \fct{print} is the default method and takes the following arguments
@@ -325,7 +347,7 @@ The argument \code{cols} indicates which columns to print; by default all column
 \subsection{summary()}
 Summaries of the \code{spca} output can be produced by calling \code{summary}.
 <<summary>>=
-summary(ho_spcadef)
+summary(ho_spcadef, cor_with_pc = TRUE)
 @
 
 The table shows the following metrics
@@ -344,18 +366,22 @@ Even though the sPCs were computed with cSPCA, so allowing for correlated sPCs, 
  round(ho_spcadef$spc_cor, 2)
 @
 
-The correlations between sPCs and PCs, shown below, indicates that while the first three sPCs are highly correlated with the corresponding PCs, the fourth is not. Thus confirming that number of important PCs is three, while the fourth is explaining a substancial portion of noise.
+The correlations between sPCs and the corresponding PCs, shown below, indicates that while the first three sPCs are highly correlated with the corresponding PCs, the fourth is not. Thus confirming that number of important PCs is three, while the fourth is explaining a substantial portion of noise.
 
 <<cor_pcs>>=
  round(diag(cor(ho_spcadef$scores, ho_pca$scores[, 1:4])), 2)
 @
-sPC4 is negatively correlated with PC4. The sign of the loadings can be easily changed (together with all other internally stored elements) as 
+
+sPC2 is negatively correlated with the corresponding PC. The signs of loadings and all related elements in  the object can be easily changed with the function
+\begin{Code}
+change_loadings_sign_spca(spca_obj, index_to_change). For example 
+\end{Code}
 <<change_sign>>=
-ho_spcadef = change_loadings_sign_spca(ho_spcadef, 4)
+ho_spcadef = change_loadings_sign_spca(ho_spcadef, 2)
 round(diag(cor(ho_spcadef$scores, ho_pca$scores[, 1:4])), 2)
 @
 \subsection{plot()}
-The function \code{plot} has several arguments. The arguments grouped in \code{controls} are \pkg{ggplot2} parameters and are included for convenience. The plots can be changed manually after saving the it with \code{return_plot =TRUE}. 
+The function \code{plot} has several arguments. The arguments grouped in \code{controls} are \pkg{ggplot2} parameters and are included for convenience. The plots can be changed manually after saving the it with \code{return_plot  = TRUE}. 
 \begin{Code}
 plot.spca = function (
  x,
@@ -393,18 +419,18 @@ plot(ho_spcadef)
 \caption{Bar plots of the contributions of each sPC.}
 \label{fig:barplot} 
 \end{figure}
-A more compact circular plot, shown in Figure \ref{fig:circplot} is produced by selecting \code{plot_type = "c"}
+A more compact circular plot, shown in Figure \ref{fig:circplot} is produced by selecting \code{plot_type = "c"}. Theselected `color_scale = "printsafe` produces distinguishable tones if printed in gray tones.  
 \begin{figure}[H]
 \centering
 <<circplot, fig = TRUE, message = FALSE, warning = FALSE,  width = 5, height= 5, include = FALSE>>=
-plot(ho_spcadef, nplot = 3, plot_type = "c")
+plot(ho_spcadef, n_plot = 3, plot_type = "c", controls = list(color_scale = "p"))
 @
 \includegraphics[width = 0.6\textwidth]{spca_JSS-circplot.pdf}
 \caption{Circular bar plots of the contributions of each sPC.}
 \label{fig:circplot} 
 \end{figure}
 
-SPCA contributions can be compared with the PCA contributions with barplots or heat maps, for example using a heat map with both contribution sets depicted.We left the default color range to vary  within the values range (\code{heatmap_color_range = "values"}), rather than between -1 and 1, because in that case colors usually become undistinguishable.
+SPCA contributions can be compared with the PCA contributions with barplots or heat maps, for example using a heat map with both contribution sets depicted.We left the default color range to vary  within the values range (\code{heatmap_color_range = "values"}), rather than between -1 and 1, because usually the plotted values range a smaller interval and colors become undistinguishable.
 
 \begin{figure}[H]
 \centering
@@ -427,27 +453,27 @@ show_contributions_spca(ho_spcadef, cols = 1:2)
 We fit a new model requiring that the sPCs have at least 0.95 correlation with the  residual PCs, using pSPCA to compute the loadings and backward elimination to select the variables.
 
 <<pspca>>=
-ho_pspca = spca(holzinger, ncomps = 4, alpha = 0.95,  method = "p",
+ho_pspca = spca(holzinger, n_comps = 4, alpha = 0.95,  method = "p",
                 stop_criterion = "r2", var_selection = "b")
 round(diag(cor(ho_pspca$scores, ho_pca$scores[, 1:4])), 2)
-ho_psppca = change_loadings_sign_spca(ho_pspca, 4)
+ho_psppca = change_loadings_sign_spca(ho_pspca, 2)
 @
 
 Numerical and visual comparisons with \code{ho_spcadef} 
-can be obtained calling \code{compare_spca()}. We add methods names to be used in the plot but keep the default argument \code{col_short_names = TRUE} to keep the tables compact.
+can be obtained calling \code{compare_spca()}. We add methods names to be used in the plot but keep the default argument \code{col_short_names = TRUE} to keep the tables compact.`color_scale = "ccb` uses color-blind friendly colors.
 <<compare, fig = TRUE, width = 5, height= 5>>=
-ho_compare = compare_spca(list(ho_spcadef, ho_pspca), plot_loadings = TRUE, 
+compare_spca(list(ho_spcadef, ho_pspca), plot_loadings = TRUE, 
              print_loadings = TRUE, color_scale = "c", 
              methods_names = c("cSPCA", "pSPCA")
              )
 round(cor(ho_spcadef$scores, ho_pspca$scores), 2)
 @
 
-The pSPCA loadings have from the second sPC have larger cardinality and larger VEXP. This is to be expected because VEXP cannot be lower than the $R^2$ optimized. The contributions for the first three sets of loadings are not very dissimilar, considering the the different methods used. The sPCs scores are also are also highly mutually correlated. As noted before, the fourth sPC is unstable.
+The pSPCA loadings have from the second sPC have larger cardinality and larger VEXP. This is to be expected because VEXP cannot be lower than the $R^2$ optimized. The contributions for the first three sets of loadings are not very dissimilar, considering the the different methods used, and these sPCs  are also highly mutually correlated. As noted before, sPC4 is unstable.
 \subsubsection{Feature groups}
 In some cases, typically for questionnaire data, features belong to different groups. For our data the 12 features are grouped in 4 scales. 
 
-The function \code{aggregate_by_group} uses the index vector to sum the loadings or contributions in each scale; adding the vector to \fct{plot} returns plots with scales filled with different colors
+The function \fct{aggregate_by_group} uses the index vector to sum the loadings or contributions in each scale; passing this vector to the argument \code{pc_loadings} in \fct{plot} returns plots with scales filled with different colors
 <<aggregate, fig = TRUE, width = 5, height= 5, warning = FALSE>>=
 aggregate_by_group(ho_spcadef, groups = holzinger_scales)
 plot(ho_spcadef, variable_groups = holzinger_scales)
@@ -457,7 +483,7 @@ plot(ho_spcadef, variable_groups = holzinger_scales)
 <<new_spca>>=
 A = cbind(ho_spcadef$loadings[, 1], ho_pspca$loadings[, 2])
 ho_r = cor(holzinger)
-ho_spcahyb = new_spca(A, ho_r, method_name = "hybrid")
+ho_spcahyb = new_spca(A, ho_r, methods_names = "hybrid")
 is.spca(ho_spcahyb)
 ho_spcahyb
 @

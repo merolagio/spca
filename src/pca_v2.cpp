@@ -4,22 +4,15 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "support_shared.h"
-#include "support_tall_noForce_.h"
-#include "support_fat.h"
+#include "support_shared_v2.h"
+#include "support_tall_v2.h"
+#include "support_fat_v2.h"
 
 // [[Rcpp::depends(RcppEigen)]]
 
 using namespace Rcpp;
 using namespace Eigen;
 using namespace std;
-
-// Flip a vector so that its first element is positive.
-static void orient_first_positive(Eigen::VectorXd& x)
-{
-  if (x.size() > 0 && x(0) < 0.0)
-    x = -x;
-}
 
 // Basic validation shared by the full-eigen and power-method PCA paths.
 // More detailed data handling is done by the R wrapper.
@@ -57,96 +50,6 @@ static void validate_pcaC_inputs(const Eigen::Ref<const Eigen::MatrixXd>& M,
   const int max_comps = fat_matrix ? n : p;
   if (ncomps < 1 || ncomps > max_comps)
     Rcpp::stop("ncomps is outside the allowed range for this backend");
-}
-
-// Compute the first ncomps eigenpairs of a covariance/correlation matrix.
-// Uses power method followed by covariance deflation at each step.
-static Rcpp::List PMAllEigen_tall(const Eigen::Ref<const Eigen::MatrixXd>& S,
-                                  int ncomps,
-                                  double epsPM,
-                                  int maxiterPM)
-{
-  const int p = S.cols();
-  Eigen::MatrixXd G = S;
-  Eigen::MatrixXd eigvec(p, ncomps);
-  Eigen::VectorXd eigval(ncomps);
-  Eigen::VectorXi ind = Eigen::VectorXi::LinSpaced(p, 0, p - 1);
-
-  // Repeatedly extract the leading eigenpair and deflate the covariance matrix.
-  for (int j = 0; j < ncomps; ++j) {
-    double val = 0.0;
-    Eigen::VectorXd a_scaled = eigvecPMC(G, val, epsPM, maxiterPM);
-    if (!std::isfinite(val) || val <= 0.0)
-      Rcpp::stop("PMAllEigen: non-positive eigenvalue in tall backend");
-
-    Eigen::VectorXd a = a_scaled / std::sqrt(val);
-    orient_first_positive(a);
-
-    // Remove the variance explained by the current component before the next step.
-    double defl_vexp = 0.0;
-    const double failed = deflSC(a, G, ind, defl_vexp, epsPM);
-    if (failed != 0.0)
-      Rcpp::stop("PMAllEigen: deflation failed in tall backend");
-
-    eigvec.col(j) = a;
-    eigval(j) = val;
-  }
-
-  return Rcpp::List::create(
-    Rcpp::Named("vec") = eigvec,
-    Rcpp::Named("val") = eigval
-  );
-}
-
-// Compute the first ncomps PCA eigenpairs for a fat data matrix.
-// The power method is applied in row space and loadings are mapped back to columns.
-static Rcpp::List PMAllEigen_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
-                                 int ncomps,
-                                 double epsPM,
-                                 int maxiterPM)
-{
-  const int n = X.rows();
-  const int p = X.cols();
-  Eigen::MatrixXd K = X * X.transpose();
-  Eigen::MatrixXd loadings(p, ncomps);
-  Eigen::MatrixXd scores(n, ncomps);
-  Eigen::VectorXd eigval(ncomps);
-
-  // Work on K = X X' and deflate it after each row-space component.
-  for (int j = 0; j < ncomps; ++j) {
-    double val = 0.0;
-    Eigen::VectorXd u_scaled = eigvecPMC(K, val, epsPM, maxiterPM);
-    if (!std::isfinite(val) || val <= 0.0)
-      Rcpp::stop("PMAllEigen: non-positive eigenvalue in fat backend");
-
-    // Convert the row-space eigenvector to a unit L2 loading vector.
-    Eigen::VectorXd u = u_scaled / std::sqrt(val);
-    Eigen::VectorXd a = X.transpose() * u / std::sqrt(val);
-    const double anrm = a.norm();
-    if (!std::isfinite(anrm) || anrm <= 0.0)
-      Rcpp::stop("PMAllEigen: zero or non-finite loading norm in fat backend");
-    a /= anrm;
-
-    // Set the sign from the column-space loading and apply it to scores too.
-    if (a(0) < 0.0) {
-      a = -a;
-      u = -u;
-    }
-
-    // Deflate row space and store scores as sqrt(lambda) times the row vector.
-    double defl_vexp = 0.0;
-    deflT_rank1(u, K, defl_vexp);
-
-    loadings.col(j) = a;
-    scores.col(j) = std::sqrt(val) * u;
-    eigval(j) = val;
-  }
-
-  return Rcpp::List::create(
-    Rcpp::Named("vec") = loadings,
-    Rcpp::Named("scores") = scores,
-    Rcpp::Named("val") = eigval
-  );
 }
 
 // Exported low-level helper for computing leading eigenpairs by power method.

@@ -4,8 +4,8 @@
 #include <set>
 #include <Rcpp/Benchmark/Timer.h>
 
-#include "support_shared.h"
-#include "support_tall_noForce_.h"
+#include "support_shared_v2.h"
+#include "support_tall_v2.h"
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -13,6 +13,7 @@ using namespace std;
 
 
 /*
+May removed force_in/force_out, improved loop, and more
  New March 2026 rewritten variable selection, includes stop R2 and cvexp.
  Numerical failures in generalized-eigen steps are handled locally via the
  singular flag returned by the SPCA helpers.
@@ -31,7 +32,7 @@ using std::string;
 // =========================================================================
 // SPCA ALL TYPES: UNC, COR AND PROJ
 // POWER METHOD AND EIGEN
-// D = Q Q' COMPUTED ON THE FLY 
+// D = Q Q' COMPUTED ON THE FLY
 // TIMER
 // COMPUTE COR SPC/PC
 
@@ -88,118 +89,77 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
 
 // ================                   ================
-//                     MAIN FUNCTION  
+//                     MAIN FUNCTION
 // ================                   ================
 
-// @title Least-Squares Sparse Principal Component Analysis
+// Least-Squares Sparse Principal Component Analysis, tall backend
 //
-// @description Computes sparse principal components using LS-SPCA formulations.
-//   Supports correlated (c), uncorrelated (u), and projection (p) variants.
-//   Variable selection uses the unified \code{varsel_fbsC} dispatcher, which
-//   supports fast regression-based forward/backward/stepwise methods (R^2
-//   stopping), or more precise (but slower) intensive forward CVEXP-based search.
+// Computes LS-SPCA components from a covariance/correlation matrix. The backend
+// supports cSPCA, uSPCA, and pSPCA loadings, fixed component supports, several
+// variable-selection algorithms, and optional power-method eigensolvers.
 //
-// @param S Numeric p x p covariance or correlation matrix.
-// @param ncomps Integer. Maximum number of components (default 0). If 0, the
-//   number of components is determined by \code{ncompbycvexp}.
-// @param selection_method Integer. Variable selection method:
-//   \code{0} = forward, \code{1} = backward, \code{2} = forward-stepwise,
-//   \code{3} = intensive forward CVEXP (eigensolve at every candidate step).
-// @param stop_criterion Integer. Stopping rule for variable selection:
-//   \code{0} = R^2, \code{1} = cumulative variance explained (CVEXP).
-// @param exact_cvexp Logical. If TRUE and component number > 1, compute exact
-//   cumulative explained variance during CVEXP-based variable selection using
-//   the current loading matrix (default FALSE). When FALSE, the returned
-//   \code{vexp} and \code{cvexp} are recomputed exactly from the final loading
-//   matrix before returning.
-// @param alpha Numeric in (0, 1]. Target proportion of variance to retain
-//   during variable selection (default 0.95).
-// @param ncompbycvexp Numeric in (0, 1]. Target cumulative proportion of total
-//   variance for automatic component stopping (default 0.95).
-// @param method Character vector. SPCA type per component: \code{"c"}
-//   (correlated), \code{"u"} (uncorrelated), \code{"p"} (projection). Recycled
-//   if shorter than \code{ncomps}.
-// @param indvec_in Nullable integer vector. 0-based variable indices for fixed
-//   components (unlisted). Use with \code{cardvec_in}.
-// @param cardvec_in Nullable integer vector. Cardinalities for each fixed
-//   component. Bypasses variable selection.
-// @param PMPC Logical. Use power method for PC eigenvectors (default FALSE).
-// @param PMS Logical. Use power method for generalized eigenvectors in
-//   variable selection (default FALSE).
-// @param epsPMPC Numeric. Convergence tolerance for PC power method (default 1e-5).
-// @param epsPMS Numeric. Convergence tolerance for variable selection power
-//   method (default 1e-7).
-// @param maxiterPMPC Integer. Max iterations for PC power method (default 100).
-// @param maxiterPMS Integer. Max iterations for variable selection power method
-//   (default 200).
-// @param rank_tol Numeric. Singularity tolerance for deflated diagonals
-//   (default 0).
+// Parameters
+// S: Numeric p x p covariance or correlation matrix.
+// ncomps: Maximum number of components. If zero and ncompbycvexp < 1, the
+//   backend computes components until the CVEXP target is reached or the
+//   maximum possible number is reached.
+// selection_method: Variable-selection code. 0 = forward, 1 = backward,
+//   2 = forward-stepwise, 3 = intensive forward CVEXP.
+// stop_criterion: Variable-selection stopping rule. 0 = squared correlation,
+//   1 = cumulative variance explained.
+// exact_cvexp: If true, use CVEXP values accumulated during the component loop.
+//   If false, recompute VEXP and CVEXP from the final loading matrix before
+//   returning.
+// alpha: Target proportion used by variable selection.
+// ncompbycvexp: Target cumulative variance explained for automatic component
+//   stopping.
+// method: Character vector of component methods. Entries must be "c", "u", or
+//   "p" for cSPCA, uSPCA, and pSPCA.
+// indvec_in: Optional 0-based fixed variable indices, concatenated across
+//   components.
+// cardvec_in: Optional cardinalities for fixed variable indices.
+// PMPC: Use the power method for PC eigenvectors.
+// PMS: Use the power method for sparse-loading eigenvectors in variable
+//   selection and loading computation.
+// epsPMPC: Convergence tolerance for PC power-method iterations.
+// epsPMS: Convergence tolerance for sparse-loading power-method iterations.
+// maxiterPMPC: Maximum number of PC power-method iterations.
+// maxiterPMS: Maximum number of sparse-loading power-method iterations.
+// rank_tol: Singularity tolerance for deflated covariance diagonals.
 //
-// @details
-//   Variable selection is controlled by \code{selection_method} and
-//   \code{stop_criterion}. The following table summarises all valid
-//   combinations:
+// Variable-selection combinations
+// selection_method  stop_criterion  Algorithm
+// 0   0   Forward selection with squared-correlation stopping
+// 1   0   Backward elimination with squared-correlation stopping
+// 2   0   Forward-stepwise selection with squared-correlation stopping
+// 0   1   Forward selection with CVEXP stopping
+// 1   1   Backward elimination with CVEXP stopping
+// 2   1   Forward-stepwise selection with CVEXP stopping
+// 3   1   Intensive forward CVEXP selection
+// 3   0   Not allowed
 //
-//   \tabular{lll}{
-//     \code{selection_method} \tab \code{stop_criterion} \tab Algorithm \cr
-//     0 \tab 0 \tab Forward selection, R^2 stopping \cr
-//     1 \tab 0 \tab Backward elimination, R^2 stopping \cr
-//     2 \tab 0 \tab Forward-stepwise, R^2 stopping \cr
-//     0 \tab 1 \tab Forward selection (R^2 ranking), CVEXP stopping \cr
-//     1 \tab 1 \tab Backward elimination (R^2 ranking), CVEXP stopping \cr
-//     2 \tab 1 \tab Forward-stepwise (R^2 ranking), CVEXP stopping \cr
-//     3 \tab 1 \tab Intensive forward CVEXP (eigensolve per step) \cr
-//     3 \tab 0 \tab \strong{Not allowed} \cr
-//   }
-//
-//   If \code{exact_cvexp = FALSE}, the returned \code{vexp} and \code{cvexp}
-//   are recomputed exactly from the final loading matrix before the result is
-//   returned. If \code{exact_cvexp = TRUE}, the values accumulated during the
-//   fitting loop are returned directly.
-//
-//   \code{method} determines how loadings are computed (u, c, or p) and can
-//   differ across components. If uSPCA fails numerically, the method falls
-//   back to cSPCA for that component.
-//
-//   \code{PMPC} and \code{PMS} should be set to TRUE for large matrices
-//   where full eigendecomposition is too slow. The power method computes only
-//   the leading eigenvector and is less accurate. Accuracy can be increased
-//   by lowering the tolerance and increasing the maximum iterations.
-//
-// @details this function is called by the R wrapper
-//
-// @return A list with components:
-//   \describe{
-//     \item{loadings}{Numeric matrix (p x ncomps). Sparse loading vectors.}
-//     \item{loadlist}{List. Nonzero loadings per component.}
-//     \item{ncomps}{Integer. Number of components computed.}
-//     \item{ind}{List. Selected variable indices (1-based) per component.}
-//     \item{card}{Integer vector. Cardinality per component.}
-//     \item{vexp}{Numeric vector. Variance explained per component.}
-//     \item{cvexp}{Numeric vector. Cumulative variance explained.}
-//     \item{vexpPC} Numeric vector. Variance explained per principal component.
-//     \item{r2}{Numeric vector with the squared correlations PCs, sPCs.}
-//     \item{method}{Character vector. Actual method used per component.}
-//     \item{varSelection}{Character. Description of the selection method used.}    
-//   }
-// @noRd
+// Returns
+// A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC, r,
+// totvar, method, varSelection, Time, Time_colnames, timevec, and timecomp.
+// The element r contains signed correlations between each sPC and the
+// corresponding original PC.
 // [[Rcpp::export]]
  List lsspcaC(const Eigen::Map<Eigen::MatrixXd>& S,
               int ncomps = 0,
               int selection_method = 0,
               int stop_criterion = 0,
               bool exact_cvexp = false,
-              double alpha = 0.95, 
+              double alpha = 0.95,
               double ncompbycvexp = 0.95,
               Rcpp::CharacterVector method = Rcpp::CharacterVector::create("c"),
               Rcpp::Nullable<Rcpp::IntegerVector> indvec_in  = R_NilValue,
               Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in = R_NilValue,
               bool PMPC = false, bool PMS = false,
-              double epsPMPC = 1E-5, double epsPMS = 1E-7,  
-              int maxiterPMPC = 100, int maxiterPMS = 200, 
+              double epsPMPC = 1E-5, double epsPMS = 1E-7,
+              int maxiterPMPC = 100, int maxiterPMS = 200,
               double rank_tol = 0.0){
    int p = S.cols();
-   
+
    // =====================================================================
    // PARSE NULLABLE ARGUMENTS (before validation, so we can check them)
    // =====================================================================
@@ -207,7 +167,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
    // =====================================================================
    // INPUT VALIDATION (all checks before any computation)
    // =====================================================================
-   
+
    validate_lsspca_inputs(S, p, selection_method, stop_criterion,
                           exact_cvexp, alpha,
                           ncompbycvexp, rank_tol);
@@ -219,21 +179,21 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
      Rcpp::stop("ncomps must be between 1 and p-1");
    else
      ncompbycvexp = 1;
-   
+
    bool fixedind = false;
    int startind = 0;
    VectorXi indvec(0), cardvec(0);
-   
+
    // fixed indices
    if (indvec_in.isNotNull() && cardvec_in.isNotNull()) {
      indvec = Rcpp::as<VectorXi>(indvec_in.get());
      cardvec = Rcpp::as<VectorXi>(cardvec_in.get());
      fixedind = true;
-     
+
      if (indvec.size() != cardvec.sum())
        Rcpp::stop("length of indvec_in must be equal to sum cardvec_in");
    }
-   
+
    // expand method vector to length ncomps
    if (method.size() < ncomps) {
      int oldsize = method.size();
@@ -244,7 +204,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        newmethod[i] = method[oldsize - 1];
      method = newmethod;
    }
-   
+
    // validate method entries and build mincard_vec; check fixedind cardinalities
    VectorXi mincard_vec(ncomps);
    for (int i = 0; i < ncomps; i++) {
@@ -264,46 +224,55 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
    // =====================================================================
    // ALLOCATE WORKING OBJECTS
    // =====================================================================
-   
+
    Timer timer;
    Timer timecomp;
-   
+
    Eigen::MatrixXd G = S; //deflated S matrix
-   
+
    Eigen::VectorXd a(p);
    Eigen::MatrixXd A = Eigen::MatrixXd::Zero(p, ncomps);
    Rcpp::List indout(ncomps), loadlist(ncomps);
-   
+
    Eigen::VectorXd vexp = Eigen::VectorXd::Zero(ncomps);
    Eigen::VectorXd cvexp = vexp;
-   Eigen::VectorXd r2 = Eigen::VectorXd::Zero(ncomps);
+   Eigen::VectorXd r = Eigen::VectorXd::Zero(ncomps);
    double cvt, donedefl = 0;
    double prev_cvexp_j = 0;       // previous cvexp, needed for stop_criterion == 1
    double target_cvexp_j = 0.0;   // cumulative PC variance, needed for stop_criterion == 1
    Eigen::VectorXi indj(p), indjm1(p);
-   
+
    Eigen::MatrixXd R(p, p);
-   // computes eigevcs S
+   // stores the original PC eigenvalues and, for full eigensolve, eigenvectors
    Eigen::VectorXd PCvexp(p), vec(p);
+   Eigen::MatrixXd PCvec;
+   Eigen::VectorXd pc_current = Eigen::VectorXd::Zero(p);
+   Eigen::MatrixXd G_pc;
+   Eigen::VectorXi ind_pc;
+   int pc_computed = 0;
+   if (PMPC) {
+     G_pc = S;
+     ind_pc = Eigen::VectorXi::LinSpaced(p, 0, p - 1);
+   }
    std::string stringa;
-   
+
    double totvexp = 0.0, maxvexp = 0.0,  eigval = 0.0;// total variance S
    // maxvexp this is vexp by first PC for fwd_select
    Eigen::VectorXd si(p);
-   
+
    int cardt = 0;
-   Eigen::VectorXi card(p); 
-   
+   Eigen::VectorXi card(p);
+
    int cardtm1 = 0;
    int nc = 0;
    bool stopComp = false;
-   
+
    // varsel_fbsC output variables
    double criterion_value = 0.0;
    Eigen::VectorXd loadings_out = Eigen::VectorXd::Zero(p);
    double vexp_out = 0.0;
    int varsel_reached = 0;
-   
+
    // M = G'G matrix for CVEXP-based selection
    // When stop_criterion == 1, M is initialized to S*S and then deflated
    // incrementally via deflSandDC (avoids recomputing G*G every component)
@@ -312,7 +281,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
      M_varsel = S * S;
    // B = loading matrix for exact_cvexp
    Eigen::MatrixXd B_varsel = Eigen::MatrixXd::Zero(p, ncomps);
-   
+
    timer.step("start") ;   // START TIMING COMPONENTS ====================
    timecomp.step("start") ; // ---------------- START TIMER ==================
    int j = 0;
@@ -325,35 +294,57 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
         si = es.eigenvectors().col(p - 1).array() * sqrt(maxvexp);
          if (j == 0){
            PCvexp = es.eigenvalues().reverse();
+           PCvec = es.eigenvectors().rowwise().reverse().leftCols(ncomps);
+           for (int k = 0; k < ncomps; k++) {
+             if (PCvec(0, k) < 0.0)
+               PCvec.col(k) = -PCvec.col(k);
+           }
+           si = PCvec.col(0).array() * sqrt(maxvexp);
            totvexp = PCvexp.sum();// total variance S
          }
+         pc_current = PCvec.col(j);
          target_cvexp_j += PCvexp(j);
-         
-       }  
+
+       }
        else{
+         while (pc_computed <= j) {
+           double pc_val = 0.0;
+           Eigen::VectorXd pc_scaled = eigvecPMC(G_pc, pc_val, epsPMPC, maxiterPMPC);
+           if (!std::isfinite(pc_val) || pc_val <= 0.0)
+             Rcpp::stop("lsspcaC: non-positive original PC eigenvalue");
+           Eigen::VectorXd pc_vec = pc_scaled / sqrt(pc_val);
+           if (pc_vec(0) < 0.0)
+             pc_vec = -pc_vec;
+           PCvexp(pc_computed) = pc_val;
+           if (pc_computed == j)
+             pc_current = pc_vec;
+           double pc_defl_vexp = 0.0;
+           const double pc_failed = deflSC(pc_vec, G_pc, ind_pc, pc_defl_vexp, epsPMPC);
+           if (pc_failed != 0.0)
+             Rcpp::stop("lsspcaC: original PC deflation failed");
+           pc_computed++;
+         }
          if (j == 0){
-           SelfAdjointEigenSolver<Eigen::MatrixXd> es(G);
-           maxvexp =  es.eigenvalues()(p - 1);
-           si = es.eigenvectors().col(p - 1).array() * sqrt(maxvexp);
-             PCvexp = es.eigenvalues().reverse();
-             totvexp = PCvexp.sum();// total variance S
+           maxvexp = PCvexp(0);
+           si = pc_current.array() * sqrt(maxvexp);
+           totvexp = S.trace();// total variance S
          }
          else{
-           si = eigvecPMC(G,  maxvexp, epsPMPC, maxiterPMPC); 
+           si = eigvecPMC(G,  maxvexp, epsPMPC, maxiterPMPC);
            si = si.array();
          }
          target_cvexp_j += PCvexp(j);
-         
+
       }
-       
+
        stringa = "comp " +  std::to_string(j + 1);
        timer.step(stringa + ":  PC"); // ======================TIMER PC =======================
-       
+
        //    Rcout << "comp " << j << " card " << cardt << endl;
        //==============================================
-       // VARIABLE SELECTION 
+       // VARIABLE SELECTION
        //==============================================
-       
+
        // fixedind NO VARIABLE SELECTION==
        if (fixedind == true && cardvec(j) > 0){
          indj = indvec.segment(startind, cardvec(j));
@@ -363,19 +354,19 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        // VARIABLE SELECTION VIA varsel_fbsC =======================
        else {
          prev_cvexp_j = (j > 0) ? cvexp(j - 1) : 0.0;
-         
+
          // M_varsel is initialized once before the loop and deflated
          // incrementally via deflSandDC after each component
-         
+
          // reset outputs
          criterion_value = 0.0;
          loadings_out.setZero();
          vexp_out = 0.0;
-         
+
          // translate selection_method == 3 to intensive forward for varsel_fbsC
          bool varsel_intensive = (selection_method == 3);
          int varsel_method = varsel_intensive ? 0 : selection_method;
-         
+
          varsel_reached = varsel_fbsC(
            S, si,
            // outputs
@@ -388,7 +379,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
            M_varsel, prev_cvexp_j, j, B_varsel,
            1, -1,  // ntrim, reducetrim (unused, kept for varsel_fbsC signature)
            rank_tol, PMS, epsPMS, maxiterPMS);
-         
+
          // when selection_method == 3 (intensive forward CVEXP),
          // loadings and eigval are computed during selection
          if (selection_method == 3 && cardt > 0) {
@@ -396,16 +387,16 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
            eigval = vexp_out;
          }
        }// end variable selection
-       
+
        timer.step(stringa + "variable_selection") ; // ---------------- TIMER ==================
-       
+
        if (Rcpp::as<std::string>(method[j]) == "u" && cardt < mincard_vec(j)){
          Rf_warning("Cannot reach desired cardinality for uSPCA, switching to cSPCA");
          method[j] = "c";
        }
-     
+
        card(j) = cardt;
-       
+
        // create submatrices for computing loadings
        // when selection_method == 3 (intensive forward CVEXP), loadings (a) and
        // eigval are already computed by varsel_fbsC via cspca_varsel
@@ -420,65 +411,65 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
                method[j] = "c";
              }
          }
-         
+
        if (Rcpp::as<std::string>(method[j]) == "c"){
-           cspcaC(S, G, eigval, p, j, indj, cardt, 
+           cspcaC(S, G, eigval, p, j, indj, cardt,
                  a, singular, PMS, epsPMS, maxiterPMS);
          if (singular){
            string stringa = "singular submatrix for component " +  std::to_string(j + 1);
            Rcout << stringa << endl;
-           Rcpp::stop("error in CSPCA");  
+           Rcpp::stop("error in CSPCA");
          }
        }
        else if (Rcpp::as<std::string>(method[j]) == "p"){
          pspcaC(S, si, indj, cardt, a, singular);
          if (singular){
-           string stringa = "singular submatrix for component " +  
+           string stringa = "singular submatrix for component " +
              std::to_string(j + 1);
            Rcout << stringa << endl;
-           Rcpp::stop("error in PSPCA");  
+           Rcpp::stop("error in PSPCA");
          }
        }
        } // end loading computation (not intensive cvexp)
-         
+
          timer.step(stringa + "Component") ; // ---------------- TIMER ==================
-         
+
          //    Rcout << "fatte " << ncomps << " components" << endl;
          // save loadings in column j
          a.head(cardt) = a.head(cardt).array()/a.head(cardt).norm();
          for (int i = 0; i < cardt; i++){
            A(indj(i), j) = a(i);
          }
-//  change sign to loadings if needed, Uses max loading but avoids 
+//  change sign to loadings if needed, Uses max loading but avoids
 // matrix multiplication. Not perfect can be fixed in R
 
 
-// compute R2 using a'Sv = a'v lambda
+// compute signed correlation with the corresponding original PC
          VectorXi indt_sub = indj.head(cardt);
          MatrixXd Sdd(cardt, cardt);
          Sdd = makeSubS(S, indt_sub);
-         VectorXd sid(cardt);
-         for (int h = 0; h < cardt; h++) sid(h) = si(indj(h));
-         double num_r2 = a.head(cardt).dot(sid);
-         double den_r2 = (a.head(cardt).transpose() * Sdd * a.head(cardt))(0, 0);
-         if (den_r2 > 0.0)
-           r2(j) = (num_r2 * num_r2) / den_r2;
+         VectorXd pc_sub(cardt);
+         for (int h = 0; h < cardt; h++) pc_sub(h) = pc_current(indj(h));
+         double dot_av = a.head(cardt).dot(pc_sub);
+         double den_r = (a.head(cardt).transpose() * Sdd * a.head(cardt))(0, 0);
+         if (den_r > 0.0 && PCvexp(j) > 0.0)
+           r(j) = sqrt(PCvexp(j)) * dot_av / sqrt(den_r);
          else
-           r2(j) = 0.0;
-         if (r2(j) < 0.0) r2(j) = 0.0;
-         if (r2(j) > 1.0) r2(j) = 1.0;
+           r(j) = 0.0;
+         if (r(j) < -1.0) r(j) = -1.0;
+         if (r(j) > 1.0) r(j) = 1.0;
 
          // save loadings in list
-         
+
          Eigen::VectorXi indt(indj);
          std::sort(indt.data(),indt.data() + cardt);
          indout[j] = indt.head(cardt).array() + 1;
-         
-         loadlist[j] = a.head(cardt); 
+
+         loadlist[j] = a.head(cardt);
          indjm1.head(cardt) = indj.head(cardt);
          cardtm1 = cardt;
          nc = nc + 1;
-         
+
          // deflate G (and M_varsel when stop_criterion == 1)
          VectorXd a_defl = a.head(cardt);
          VectorXi ind_defl = indj.head(cardt);
@@ -486,35 +477,35 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
            donedefl = deflSandDC(a_defl, G, M_varsel, ind_defl, cvt);
          else
            donedefl = deflSC(a_defl, G, ind_defl, cvt);
-         
+
          timer.step(stringa + "Deflation") ; // ---------------- TIMER ==================
          if(donedefl == 1){
-           Rcout << "variance matrix exhausted. Computed " << j << endl; 
+           Rcout << "variance matrix exhausted. Computed " << j << endl;
            vexp(j) = nan("1");
            cvexp(j) = nan("1");
-           if (ncomps == p)  
+           if (ncomps == p)
              nc = j - 1;
            else{
              for(int i = j; i < ncomps; i++){
                vexp(i) = nan("1");
                cvexp(i) = nan("1");
              }
-             nc = ncomps;  
+             nc = ncomps;
            }
            break;
          }
-         
-         
+
+
          vexp(j) = cvt;
          if (j > 0)
            cvexp(j) = vexp(j) + cvexp(j-1);
          else
            cvexp(j) = vexp(j);
-         
+
          // update column j of B_varsel with current loadings for exact_cvexp
          if (exact_cvexp)
            B_varsel.col(j) = A.col(j);
-         
+
          // checks if stopComp met
          if ((cvexp(j) > ncompbycvexp * totvexp) || ((j + 1) == ncomps)){
            stopComp = true;
@@ -529,12 +520,12 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
    } catch (const std::exception& e) {
      Rcpp::stop(std::string("lsspcaC component loop: ") + e.what());
    }
-   
+
    timer.step("end") ;
    try {
      NumericVector res(timer);
      NumericVector rescomp(timecomp);
-     
+
      // timer differences: columns are PC, variable_selection, Component, Deflation
      Eigen::MatrixXd Ti(ncomps, 4);
      NumericVector tt = diff(res);
@@ -543,7 +534,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
          Ti(i, j) =  tt(i*4 + j);
      Rcpp::CharacterVector Ti_colnames = Rcpp::CharacterVector::create(
        "PC", "varsel", "loadings", "deflation");
-     
+
      // returned vexp/cvexp come directly from the fitting loop when
      // exact_cvexp = TRUE; otherwise recompute them exactly from the final
      // loading matrix before returning.
@@ -567,7 +558,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        if (Rcpp::as<std::string>(method[j]) == "p")
          meth[j] = "pSPCA";
      }
-    
+
      std::string varselection;
      if (stop_criterion == 0) {
        if (selection_method == 0) varselection = "forward R2";
@@ -580,28 +571,28 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        else if (selection_method == 3) varselection = "forward cvexp intensive";
      }
 
-       return  
+       return
        List::create(
-         Named("loadings")= A.topLeftCorner(p,nc), 
-         Named("loadlist") = loadlist[idx], 
-         Named("ncomps") = nc, 
-         Named("ind") = indout[idx], 
-         Named("card") = card.head(nc), 
-         Named("vexp") = vexp_final.head(nc), 
-         Named("cvexp") = cvexp_final.head(nc), 
+         Named("loadings")= A.topLeftCorner(p,nc),
+         Named("loadlist") = loadlist[idx],
+         Named("ncomps") = nc,
+         Named("ind") = indout[idx],
+         Named("card") = card.head(nc),
+         Named("vexp") = vexp_final.head(nc),
+         Named("cvexp") = cvexp_final.head(nc),
          Named("vexpPC") =  PCvexp.head(nc),
-         Named("r2") = r2.head(nc),
-         Named("totvar") = PCvexp.sum(),
+         Named("r") = r.head(nc),
+         Named("totvar") = totvexp,
          Named("method") = meth,
          Named("varSelection") = varselection,
-         Named("Time") = Ti, 
+         Named("Time") = Ti,
          Named("Time_colnames") = Ti_colnames,
-         Named("timevec") = res, 
+         Named("timevec") = res,
          Named("timecomp") = timecomp
        );
-       
+
    } catch (const std::exception& e) {
      Rcpp::stop(std::string("lsspcaC output: ") + e.what());
    }
    return List();
- } 
+ }
