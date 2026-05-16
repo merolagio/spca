@@ -1,10 +1,26 @@
 citHeader("To cite PMlsspca in publications use:")
 
 bibentry(
-  bibtype = "Manual",
-  title   = "PMlsspca: Least-Squares Sparse PCA and Companion Tools",
-  author  = person("Giovanni M.", "Merola"),
-  year    = "2026",
-  note    = "R package version 1.0.5",
-  url     = "https://github.com/merolagio/PMlsspca"
+  bibtype = "Article",
+  title = "Least Squares Sparse Principal Component Analysis: a Backward Elimination approach to attain large loadings",
+  author = person("Giovanni Maria", "Merola"),
+  journal = "Australia & New Zealand Journal of Statistics",
+  year = "2015",
+  volume = "57",
+  pages = "391--429",
+  doi = "10.1111/anzs.12128"
+)
+
+bibentry(
+  bibtype = "Article",
+  title = "Projection sparse principal component analysis: An efficient least squares method",
+  author = c(
+    person("Giovanni Maria", "Merola"),
+    person("Gemai", "Chen")
+  ),
+  journal = "Journal of Multivariate Analysis",
+  year = "2019",
+  volume = "173",
+  pages = "366--382",
+  doi = "10.1016/j.jmva.2019.04.001"
 )
