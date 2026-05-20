@@ -8,8 +8,6 @@ is.spca(x)
 }
 \arguments{
 \item{x}{Any object suspected of being of class spca.}
-
-\item{...}{Unused.}
 }
 \value{
 Logical: TRUE if object is of class spca and contains the minimal configuration,

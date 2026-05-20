@@ -188,14 +188,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compute_eigenvaluesC
-Eigen::VectorXd compute_eigenvaluesC(const Eigen::Map<Eigen::MatrixXd>& S);
-RcppExport SEXP _spca_compute_eigenvaluesC(SEXP SSEXP) {
+// comp_eigvalC
+Eigen::VectorXd comp_eigvalC(const Eigen::Map<Eigen::MatrixXd>& S);
+RcppExport SEXP _spca_comp_eigvalC(SEXP SSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type S(SSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_eigenvaluesC(S));
+    rcpp_result_gen = Rcpp::wrap(comp_eigvalC(S));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -261,44 +261,44 @@ BEGIN_RCPP
 END_RCPP
 }
 // var2corC
-Eigen::MatrixXd var2corC(Eigen::Map<Eigen::MatrixXd > S);
+Eigen::MatrixXd var2corC(const Eigen::Map<Eigen::MatrixXd>& S);
 RcppExport SEXP _spca_var2corC(SEXP SSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd > >::type S(SSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type S(SSEXP);
     rcpp_result_gen = Rcpp::wrap(var2corC(S));
     return rcpp_result_gen;
 END_RCPP
 }
 // makeCorCompC
-Eigen::MatrixXd makeCorCompC(const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::MatrixXd>& S, int d);
-RcppExport SEXP _spca_makeCorCompC(SEXP ASEXP, SEXP SSEXP, SEXP dSEXP) {
+Eigen::MatrixXd makeCorCompC(const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::MatrixXd>& S, int ncomps);
+RcppExport SEXP _spca_makeCorCompC(SEXP ASEXP, SEXP SSEXP, SEXP ncompsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type S(SSEXP);
-    Rcpp::traits::input_parameter< int >::type d(dSEXP);
-    rcpp_result_gen = Rcpp::wrap(makeCorCompC(A, S, d));
+    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
+    rcpp_result_gen = Rcpp::wrap(makeCorCompC(A, S, ncomps));
     return rcpp_result_gen;
 END_RCPP
 }
 // makeCorScoresC
-Eigen::MatrixXd makeCorScoresC(const Eigen::Map<Eigen::MatrixXd>& T, int d);
-RcppExport SEXP _spca_makeCorScoresC(SEXP TSEXP, SEXP dSEXP) {
+Eigen::MatrixXd makeCorScoresC(const Eigen::Map<Eigen::MatrixXd>& T, int ncomps);
+RcppExport SEXP _spca_makeCorScoresC(SEXP TSEXP, SEXP ncompsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type T(TSEXP);
-    Rcpp::traits::input_parameter< int >::type d(dSEXP);
-    rcpp_result_gen = Rcpp::wrap(makeCorScoresC(T, d));
+    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
+    rcpp_result_gen = Rcpp::wrap(makeCorScoresC(T, ncomps));
     return rcpp_result_gen;
 END_RCPP
 }
-// PMAllEigen
-Rcpp::List PMAllEigen(const Eigen::Map<Eigen::MatrixXd>& M, int ncomps, bool fat_matrix, double epsPM, int maxiterPM);
-RcppExport SEXP _spca_PMAllEigen(SEXP MSEXP, SEXP ncompsSEXP, SEXP fat_matrixSEXP, SEXP epsPMSEXP, SEXP maxiterPMSEXP) {
+// PMnEigenpairs
+Rcpp::List PMnEigenpairs(const Eigen::Map<Eigen::MatrixXd>& M, int ncomps, bool fat_matrix, double epsPM, int maxiterPM);
+RcppExport SEXP _spca_PMnEigenpairs(SEXP MSEXP, SEXP ncompsSEXP, SEXP fat_matrixSEXP, SEXP epsPMSEXP, SEXP maxiterPMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -307,7 +307,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type fat_matrix(fat_matrixSEXP);
     Rcpp::traits::input_parameter< double >::type epsPM(epsPMSEXP);
     Rcpp::traits::input_parameter< int >::type maxiterPM(maxiterPMSEXP);
-    rcpp_result_gen = Rcpp::wrap(PMAllEigen(M, ncomps, fat_matrix, epsPM, maxiterPM));
+    rcpp_result_gen = Rcpp::wrap(PMnEigenpairs(M, ncomps, fat_matrix, epsPM, maxiterPM));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -398,7 +398,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_vtuC", (DL_FUNC) &_spca_vtuC, 2},
     {"_spca_traceC", (DL_FUNC) &_spca_traceC, 1},
     {"_spca_EigenC", (DL_FUNC) &_spca_EigenC, 1},
-    {"_spca_compute_eigenvaluesC", (DL_FUNC) &_spca_compute_eigenvaluesC, 1},
+    {"_spca_comp_eigvalC", (DL_FUNC) &_spca_comp_eigvalC, 1},
     {"_spca_GenEigenC", (DL_FUNC) &_spca_GenEigenC, 2},
     {"_spca_solveC", (DL_FUNC) &_spca_solveC, 1},
     {"_spca_scaleC", (DL_FUNC) &_spca_scaleC, 3},
@@ -407,7 +407,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_var2corC", (DL_FUNC) &_spca_var2corC, 1},
     {"_spca_makeCorCompC", (DL_FUNC) &_spca_makeCorCompC, 3},
     {"_spca_makeCorScoresC", (DL_FUNC) &_spca_makeCorScoresC, 2},
-    {"_spca_PMAllEigen", (DL_FUNC) &_spca_PMAllEigen, 5},
+    {"_spca_PMnEigenpairs", (DL_FUNC) &_spca_PMnEigenpairs, 5},
     {"_spca_pcaC", (DL_FUNC) &_spca_pcaC, 7},
     {"_spca_lsspcaTC", (DL_FUNC) &_spca_lsspcaTC, 16},
     {"_spca_lsspcaC", (DL_FUNC) &_spca_lsspcaC, 17},

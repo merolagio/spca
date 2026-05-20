@@ -26,71 +26,38 @@
 \arguments{
 \item{x}{An object of class \code{spca}.}
 
-\item{n_plot}{Integer. Number of components to plot. Defaults to
-the object's \code{ncomps} value.}
+\item{n_plot}{\link{NULL} Integer. Number of components to plot. If \code{NULL}, all
+components in \code{x} are plotted.}
 
-\item{plot_type}{Character. Plot type: \code{"bars"}, \code{"circular"}, or
-\code{"heatmap"}. Partial matching is supported (e.g.,`"b").}
+\item{plot_type}{\link{c("bars", "circular", "heatmap")} Character. Plot type:
+\code{"bars"}, \code{"circular"}, or \code{"heatmap"}. The first character is enough.}
 
-\item{contributions}{Logical. If \code{TRUE}, plots contributions
-(loadings scaled to sum to 100\\% within each component); otherwise
-plots L2 unit loadings.}
+\item{contributions}{\link{TRUE} Logical. If \code{TRUE}, plot contributions
+(loadings scaled to sum to 100\\% within each component); otherwise plot
+L2 unit loadings.}
 
-\item{only_nonzero}{Logical. If \code{TRUE}, plots only nonzero entries.}
+\item{only_nonzero}{\link{TRUE} Logical. If \code{TRUE}, plot only nonzero entries.}
 
-\item{pc_loadings}{Optional numeric matrix of PCA loadings (or PCA
-contributions) with the same dimensions as \code{x$loadings}. If supplied,
-SPCA and PCA values are plotted together for comparison
-(not available for \code{plot_type = "circular"}).}
+\item{pc_loadings}{\link{NULL} Optional numeric matrix of PCA loadings or PCA
+contributions with the same dimensions as \code{x$loadings}. If supplied, SPCA
+and PCA values are plotted together for comparison.}
 
-\item{variable_groups}{Optional factor/character vector of length \code{p}
-defining groups of variables. If provided, bars/tiles are colored
-by group instead of by component.}
+\item{variable_groups}{\link{NULL} Optional factor or character vector of length
+\eqn{p} defining groups of variables. If provided, bars or tiles are
+colored by group instead of by component.}
 
-\item{plot_title}{Optional character. Plot title (added with
-\code{labs(title = ...)}).}
+\item{plot_title}{\link{NULL} Optional character. Plot title.}
 
-\item{return_plot}{Logical. If \code{TRUE}, returns the \code{ggplot2} object.}
+\item{return_plot}{\link{FALSE} Logical. If \code{TRUE}, return the \code{ggplot2} object.}
 
-\item{show_plot}{Logical. If \code{TRUE}, prints the plot. Useful to set
-\code{FALSE} when only returning the \code{ggplot2} object.}
+\item{show_plot}{\link{TRUE} Logical. If \code{TRUE}, print the plot.}
+
+\item{controls}{\code{\link[=list]{list()}} List of graphical controls. Supported entries are
+\code{color_scale}, \code{variable_names}, \code{legend_position}, \code{grid_type},
+\code{facet_labels}, \code{legend_title}, \code{x_axis_lab}, \code{adjust_labels_circ},
+\code{flip_heatmap}, and \code{heatmap_color_range}.}
 
 \item{...}{Further arguments; currently ignored.}
-
-\item{""}{\strong{controls}}
-
-\item{color_scale}{Character or character vector. One of \code{"cbb"},
-\code{"printsafe"}, \code{"bw"}, \code{"ggplot"}, or a vector of hex color codes.
-If \code{variable_groups} is provided, the palette is applied to groups;
-otherwise it is applied to the components.}
-
-\item{variable_names}{NULL or "none" or character vector.}
-
-\item{legend_position}{Character or numeric. Legend position. Can be one
-of \code{"bottom"}, \code{"right"}, \code{"top"}, \code{"left"}, or a numeric vector of
-length 2 giving coordinates inside the panel. For circular plots, the
-legend is placed on the right to avoid unpleasant effects..}
-
-\item{grid_type}{character. If \code{"none"}, removes the
-background grid. If \code{"horizontal"}, keeps only horizontal grid lines.
-If \code{full}, uses the default grid.}
-
-\item{facet_labels}{Optional character vector of facet strip labels
-for components. Defaults to \code{"sPC k"}, `for k = 1:n_plot.}
-
-\item{legend_title}{Optional character. Legend title for the fill aesthetic.}
-
-\item{x_axis_lab}{label for x axis. default is "variables"}
-
-\item{adjust_labels_circ}{numeric vector of length \code{n_plot}.
-Additive adjustment (in degrees) to the component label angles in
-circular bar plots.}
-
-\item{flip_heatmap}{logical. If \code{TRUE}, flips axes for tile plots.}
-
-\item{heatmap_color_range}{character. If "values" the colors
-on the heatmap range between minimum and maximum of the values plotted.
-If "unit", these range in (-1, 1).}
 }
 \value{
 If \code{return_plot = TRUE}, the \code{ggplot2} object; otherwise \code{NULL}
@@ -144,14 +111,14 @@ variable names. If the length is different it is switched to \code{NULL}.
 }
 }
 \examples{
-not run
+\dontrun{
 data(holzinger)
 myspca = spca(ho)
 myplot = plot(ho)
 change facetting and legend position
 myplot + facet_wrap(facets = vars(component), ncol = 4, nrow = 1) +
   theme(legend.position = "r")
-
+}
 }
 \references{
 Circular bar plot layouts follow examples from

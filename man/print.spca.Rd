@@ -10,7 +10,7 @@
   only_nonzero = TRUE,
   contributions = TRUE,
   digits = 3,
-  thresh = 1e-07,
+  thresh_card = 1e-07,
   return_table = FALSE,
   component_names = NULL,
   ...
@@ -23,11 +23,13 @@
 Default all. If an integer is passed, it is set to 1:cols.}
 
 \item{only_nonzero}{Logical: if = TRUE only the nonzero loadings are
-printed. Otherwise all loadings are printed.}
+printed. Otherwise all loadings are printed.
+@param contributions Logical \link{TRUE}. If \code{TRUE}, print loadings
+scaled to unit \eqn{L_1} norm as percentage contributions.}
 
 \item{digits}{Integer: number of decimal figures.}
 
-\item{thresh}{Value below which loadings are considered zero and not
+\item{thresh_card}{Value below which loadings are considered zero and not
 printed.}
 
 \item{return_table}{Logical: should the formatted (text) table be returned?}
@@ -36,9 +38,6 @@ printed.}
 as#' "sPCj"}
 
 \item{...}{Further arguments; currently ignored.}
-
-\item{perc}{Logical: should the loadings be standardised to unit
-\eqn{L_1} norm (and printed as percentage contributions)?}
 }
 \value{
 If return_table = TRUE, it returns a formatted text table.

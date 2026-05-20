@@ -61,8 +61,8 @@ EigenC <- function(S) {
     .Call(`_spca_EigenC`, S)
 }
 
-compute_eigenvaluesC <- function(S) {
-    .Call(`_spca_compute_eigenvaluesC`, S)
+comp_eigvalC <- function(S) {
+    .Call(`_spca_comp_eigvalC`, S)
 }
 
 GenEigenC <- function(A, B) {
@@ -89,16 +89,16 @@ var2corC <- function(S) {
     .Call(`_spca_var2corC`, S)
 }
 
-makeCorCompC <- function(A, S, d = 0L) {
-    .Call(`_spca_makeCorCompC`, A, S, d)
+makeCorCompC <- function(A, S, ncomps = 0L) {
+    .Call(`_spca_makeCorCompC`, A, S, ncomps)
 }
 
-makeCorScoresC <- function(T, d = 0L) {
-    .Call(`_spca_makeCorScoresC`, T, d)
+makeCorScoresC <- function(T, ncomps = 0L) {
+    .Call(`_spca_makeCorScoresC`, T, ncomps)
 }
 
-PMAllEigen <- function(M, ncomps, fat_matrix = FALSE, epsPM = 1e-5, maxiterPM = 100L) {
-    .Call(`_spca_PMAllEigen`, M, ncomps, fat_matrix, epsPM, maxiterPM)
+PMnEigenpairs <- function(M, ncomps, fat_matrix = FALSE, epsPM = 1e-5, maxiterPM = 100L) {
+    .Call(`_spca_PMnEigenpairs`, M, ncomps, fat_matrix, epsPM, maxiterPM)
 }
 
 pcaC <- function(M, ncomps, data_matrix = TRUE, fat_matrix = FALSE, PM = FALSE, epsPM = 1e-5, maxiterPM = 100L) {

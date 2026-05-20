@@ -4,16 +4,18 @@
 # save(holzinger, file = "data/holzinger.rda")
 
 
-# load("data/hsp_scalesh_fac.rda", verbose = T)
+# load("data/holzinger_scales.rda", verbose = T)
 # load("data/hsp.rda", verbose = T)
 # 
 # holzinger_scales = hsp_scalesh_fac
 # holzinger = hsp 
 # 
-# holzinger = scaleC(holzinger, center = T, scale = T)
+# holzinger = standardize_data(holzinger, center = T, scale = T)
+
+
 
 # holzinger data=======================
-#' Holzinger--Swineford Student Ability data and lookup
+#' Holzinger--Swineford Student Ability data and scales
 #'
 #' This dataset is based on the classic Holzinger and Swineford (1939) Student
 #'  Ability dataset.
@@ -45,7 +47,11 @@
 #'   \item{hsp_scalesh_fac}{A factor of length 12 giving each variable's scale membership (SPL, VBL, SPD, MTH), with levels in scale order.}
 #' }
 #'
-#' @section Variables:
+#' @format
+#' \describe{
+#' \item{holzinger}{A numeric data frame with 145 rows and 12 variables. 
+#' The variables are:}
+#' }
 #' \describe{
 #'   \item{visual}{Visual perception test (SPL).}
 #'   \item{cubes}{Cubes test (SPL).}
@@ -60,8 +66,15 @@
 #'   \item{numeric}{Numerical puzzles test (MTH).}
 #'   \item{series}{Series completion test (MTH).}
 #' }
-#'
-#' @keywords dataset
+#' \describe{
+#' \item{holzinger_scales}{A factor of length 12 giving each variable's scale
+#'  membership (SPL, VBL, SPD, MTH), with levels in scale order.}
+#' }
+#' @name holzinger & holzinger_scales
+#' @docType data
+#' @keywords datasets
+##' @describeIn destination description
+
 
 # 
 # 

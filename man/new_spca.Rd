@@ -4,7 +4,7 @@
 \alias{new_spca}
 \title{Constructs an object of class spca from a set of loadings}
 \usage{
-new_spca(A, S, X = NULL, methods_names = NULL)
+new_spca(A, S, X = NULL, method_name = NULL)
 }
 \arguments{
 \item{A}{real matrix, a matrix of loadings.}
@@ -13,7 +13,7 @@ new_spca(A, S, X = NULL, methods_names = NULL)
 
 \item{X}{real matrix, the data matrix from which the loadings where computed, optional}
 
-\item{methods_names}{string, the name of the methods_names used to compute the loadings, optional.}
+\item{method_name}{string, the name of the method_name used to compute the loadings, optional.}
 }
 \value{
 An \link{spca_object}.

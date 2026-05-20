@@ -5,7 +5,6 @@
 #' Verifies whether all elements required for an `spca` object are present.
 #' 
 #' @param x Any object suspected of being of class spca.
-#' @param ... Unused.
 #' 
 #' @details The function carries out checks for the minimal components of an
 #' \emph{spca} object. It checks the presence and mode of
@@ -509,20 +508,19 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 #' @param A real matrix, a matrix of loadings.
 #' @param S the variance or correlation matrix from which the loadings where computed.
 #' @param X real matrix, the data matrix from which the loadings where computed, optional
-#' @param methods_names string, the name of the methods_names used to compute the loadings, optional.
+#' @param method_name string, the name of the method_name used to compute the loadings, optional.
 #' @return An [spca_object].
 #' @family spca
 #' @export 
-new_spca = function(A, S, X = NULL, methods_names = NULL){
+new_spca = function(A, S, X = NULL, method_name = NULL){
   
-  fun_inp = list(A = A, S = S, X = X, methods_names = methods_names)
+  fun_inp = list(A = A, S = S, X = X, method_name = method_name)
   validate_no_na(arg_list = fun_inp)  
   
   # validation   ==============P
   
-  fun_inp = as.list(match.call(expand.dots = FALSE))[-1]
-  fun_inp = lapply(fun_inp, eval, envir = environment())
-  validate_no_na(arg_list = eval(fun_inp))  
+  fun_inp = list(A = A, S = S, X = X, method_name = method_name)
+  validate_no_na(arg_list = fun_inp)
   
   if(is.data.frame(A)) 
     A = as.matrix(A)
@@ -533,10 +531,11 @@ new_spca = function(A, S, X = NULL, methods_names = NULL){
   if(!isSymmetric(S))
     stop("S must be a symmetric covariance or correlation matrix")
 
-  if (!all(abs(colSums(A^2)) < 1e-4)){
-    warning("Scaling loadings to unit L2 norm")
-    scaleC(A, center = FALSE, scale = T)
+  if (any((colSums(A^2) - 1) > 1e-5)){
+    message("Scaling loadings to unit L2 norm")
+    A = standardize_data(A, center = FALSE, scale = T)
   }
+#browser() 
   
   n_comps = ncol(A)
 #  browser()
@@ -550,17 +549,24 @@ new_spca = function(A, S, X = NULL, methods_names = NULL){
   
 #cor with PCs
   cor_with_pc = numeric(n_comps)
-
+  loadings_list = vector("list", n_comps)
+  ind_list = vector("list", n_comps)
+  
   for (j in seq_len(n_comps)) {
+    nonzero = (A[, j] != 0)
+    loadings_list[[j]] = A[nonzero, j]
+    ind_list[[j]] = which(nonzero)
+  #cor_with_pc  
     cor_with_pc[j] =
       sum(A[ind_list[[j]], j] *
-            abC(S[ind_list[[j]], , drop = FALSE],
+            ab(S[ind_list[[j]], , drop = FALSE],
                 s_ee$vectors[, j, drop = FALSE])) /
       sqrt(
-        vtauC(A[ind_list[[j]], j], 
+        vtau(A[ind_list[[j]], j], 
               S[ind_list[[j]], ind_list[[j]], drop = FALSE],
               A[ind_list[[j]], j]) *  s_ee$values[j]
       )
+    
   }
 
   
@@ -588,16 +594,16 @@ new_spca = function(A, S, X = NULL, methods_names = NULL){
   obj$tot_var = totv
   
   obj$indices = ind_list
-  obj$loadings_list = apply(A, 2, function(x) x[x!= 0])
+  obj$loadings_list = loadings_list
   if(!is.null(X)){
-    obj$scores = abC(X, A)
+    obj$scores = ab(X, A)
     obj$spc_cor = makeCorScoresC(obj$scores)
   }
   else{
-    obj$spc_cor = make_corComp_S(A, S)
+    obj$spc_cor = make_spc_cor_S(A, S)
   }
     
-  obj$methods_names = methods_names
+  obj$method_name = method_name
   
   class(obj) = c("list", "spca")
   
@@ -617,10 +623,10 @@ new_spca = function(A, S, X = NULL, methods_names = NULL){
 #'    Default all. If an integer is passed, it is set to 1:cols.
 #' @param only_nonzero  Logical: if = TRUE only the nonzero loadings are
 #'  printed. Otherwise all loadings are printed.
-#' @param perc Logical: should the loadings be standardised to unit
-#'  \eqn{L_1} norm (and printed as percentage contributions)?
+#'  @param contributions Logical [TRUE]. If `TRUE`, print loadings 
+#'  scaled to unit \eqn{L_1} norm as percentage contributions.
 #' @param digits Integer: number of decimal figures.
-#' @param thresh Value below which loadings are considered zero and not
+#' @param thresh_card Value below which loadings are considered zero and not
 #' printed.
 #' @param return_table Logical: should the formatted (text) table be returned?
 #' @param component_names A vector of names for the components. If NULL assigned 
@@ -631,7 +637,7 @@ new_spca = function(A, S, X = NULL, methods_names = NULL){
 #' @family spca
 #' @export
 #' @method print spca
-print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE, digits = 3, thresh = 1e-07, return_table = FALSE, component_names = NULL, ...)
+print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE, digits = 3, thresh_card = 1e-07, return_table = FALSE, component_names = NULL, ...)
   {
   
   # Validation
@@ -665,7 +671,7 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
       cols = 1:cols
   
   if (only_nonzero){
-    rows = apply(A, 1, function(x) all(abs(x) < thresh))
+    rows = apply(A, 1, function(x) all(abs(x) < thresh_card))
     A  = A[!rows, , drop = FALSE]
   }  
   
@@ -700,9 +706,9 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
   rownames(fx) = rownames(A)
   
   nc = nchar(fx[1L], type = "c")
-  fx[abs(A) < thresh] = paste(rep(" ", nc), collapse = "")
+  fx[abs(A) < thresh_card] = paste(rep(" ", nc), collapse = "")
   
-  #  ind = (abs(A)> thresh & abs(A) < thresh)
+  #  ind = (abs(A)> thresh_card & abs(A) < thresh_card)
   #  fx[ind] = "--"
   fx = format(fx, justify = "right" )
   if (any(class(x) == "spca")){
@@ -825,11 +831,13 @@ show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
 #'   giving the group label for each variable.
 #' @param only_nonzero Logical. If `TRUE`, groups with zero total (based on
 #'   `rowSums(abs(out))`) are removed from the output.
-#' @param contributions if TRUE the aggregated group contributions are returned as
-#'  percentages.
+#' @param contributions if TRUE the aggregated group contributions are returned
+#'  as percentages.
 #' @param digits If integer, the number of digits to which to round the
 #'  aggregated values. If FALSE no rounding is done.  
-#'
+#' @param print_table Logical [TRUE]. If `TRUE`, print the aggregated table.
+#' @param return_table Logical [FALSE]. If `TRUE`, return the aggregated table.
+#' 
 #' @details
 #' If loadings are passed and contributions == TRUE, contributions is turned to
 #'  FALSE and digits to 3 expressing L2 unit loadings as percentages. 
@@ -957,7 +965,7 @@ aggregate_by_group = function(X, groups,
 # #' r\tab Correlation between sPCs and corresponding PCs.
 #' }
 #'
-#' @param x An spca object.
+#' @param object An spca object.
 #' @param cols A vector indicating which components should be included. 
 #'   Default all. Can be any set of columns (e.g. c(1, 3)). 
 #'   If an integer is passed, it is set to 1:cols.
@@ -972,8 +980,8 @@ aggregate_by_group = function(X, groups,
 #'   corresponding PCs are printed.
 #' @param return_table Logical: If `TRUE` the raw summary matrix is returned.
 #' @param print_table Logical: If `TRUE` the table is printed.
-#' @param thrsehhold_cardinality Value below which \emph{loadings} 
-#'   are considered to be zero.  Default 0.0001. 
+#' @param thresh_card [0.0001] Value below which loadings are treated as zero when computing minimum loadings or contributions.
+
 #' @param ... Further arguments; currently ignored.
 #' 
 #' @return If return_table = TRUE, a numerical matrix with the summaries.
@@ -982,7 +990,7 @@ aggregate_by_group = function(X, groups,
 #' @export
 #' @method summary spca
 summary.spca = function(
-    x, 
+    object, 
     cols, 
     contributions = TRUE, 
     variance_metrics = c("both", "cumulative_relative",
@@ -991,7 +999,7 @@ summary.spca = function(
     cor_with_pc = FALSE,
     return_table = FALSE, 
     print_table = TRUE, 
-    thresh = 1e-4, 
+    thresh_card = 1e-4, 
     ...) 
 {
   # Validation
@@ -1000,7 +1008,7 @@ summary.spca = function(
     stop("Unused arguments: ", paste(names(dots), collapse = ", "))
   }
   
-  test = validate_spca(x)
+  test = validate_spca(object)
   if (!test)
     stop("summary.spca requires an spca object as first argument")
   
@@ -1011,12 +1019,12 @@ summary.spca = function(
   
   # Determine columns
   if (missing(cols)) {
-    cols = 1:min(ncol(x$loadings), length(x$vexp))
+    cols = 1:min(ncol(object$loadings), length(object$vexp))
   } else 
     if (length(cols) == 1L) {
       cols = seq(cols)
     }
-  if (any(cols) > ncol(x$loadings))
+  if (any(cols) > ncol(object$loadings))
     stop("cols cannot contain values larger than the number of components available")
   
   validate_booleans(contributions = contributions, min_load = min_load,
@@ -1032,35 +1040,35 @@ summary.spca = function(
   # build table =====================  
   # essential matrix
   out = rbind(
-    Vexp = x$vexp,
-    Cvexp = cumsum(x$vexp)
+    Vexp = object$vexp,
+    Cvexp = cumsum(object$vexp)
   )
   
   # Add variance comparison metrics based on user choice
   if (variance_metrics %in% c("cumulative_relative", "both")) {
-    out = rbind(out, Rvexp = x$rvexp)
+    out = rbind(out, Rvexp = object$rvexp)
   }
   if (variance_metrics %in% c("cumulative_relative", "both")) {
-    out = rbind(out, Rcvexp = x$rcvexp)
+    out = rbind(out, Rcvexp = object$rcvexp)
   }
   #browser()  
   # Add cardinality
-  out = rbind(out, Card = get_card(x, thresh = thresh))
+  out = rbind(out, Card = get_card(object, thresh_card = thresh_card))
   
   # Add minimum loading/contributions if requested
   if (min_load) {
     if(contributions)
-      min_vals = get_minload(x$contributions)
+      min_vals = get_minload(object$contributions)
     else
-      min_vals = get_minload(x$loadings)
+      min_vals = get_minload(object$loadings)
     out = rbind(out, temp = min_vals)
     min_label = ifelse(contributions, "Min cont", "Min load")
     rownames(out)[nrow(out)] = min_label
   }
   
   if (cor_with_pc){
-    if ((!is.null(x$cor_with_pc)))
-      out = rbind(out, r = x$cor_with_pc)
+    if ((!is.null(object$cor_with_pc)))
+      out = rbind(out, r = object$cor_with_pc)
     else
       warning("correlations with PCs are not available")
   }

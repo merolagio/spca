@@ -14,17 +14,18 @@ spca_screeplot(
 )
 }
 \arguments{
-\item{nplot}{Integer. Number of leading eigenvalues to plot; defaults to length(x) (or length(x$values) if \code{x} is a list).}
+\item{eigenvalues}{Numeric vector of eigenvalues.}
 
-\item{ylab}{Character. Y-axis label.}
+\item{nplot}{\link{NULL} Integer. Number of leading eigenvalues to plot. If
+\code{NULL}, all eigenvalues are plotted.}
 
-\item{addtitle}{Logical. If \code{TRUE}, adds a plot title.}
+\item{ylab}{\link{"eigenvalues"} Character. Y-axis label.}
 
-\item{show_plot}{Logical. If \code{TRUE}, prints the plot.}
+\item{addtitle}{\link{TRUE} Logical. If \code{TRUE}, add a plot title.}
 
-\item{return_plot}{Logical. If \code{TRUE}, returns the ggplot object.}
+\item{show_plot}{\link{TRUE} Logical. If \code{TRUE}, print the plot.}
 
-\item{x}{A numeric vector of eigenvalues, or a list containing a numeric element named \code{values}.}
+\item{return_plot}{\link{FALSE} Logical. If \code{TRUE}, return the ggplot object.}
 }
 \value{
 If \code{return_plot = TRUE}, a \code{ggplot} object; otherwise \code{NULL} (invisibly).

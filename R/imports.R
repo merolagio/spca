@@ -9,10 +9,14 @@
 #' @importFrom ggplot2 scale_colour_manual xlab ylab labs
 #' @importFrom ggplot2 facet_wrap facet_grid vars labs
 #' @importFrom ggplot2 annotate coord_polar coord_flip rel expansion 
-#' @importFrom graphics par
-#' @importFrom stats cor
+#' @importFrom utils modifyList
+#' @importFrom stats cor na.omit lm
 #' @noRd
 NULL
+
+
+  
+  
 
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(c(

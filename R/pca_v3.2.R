@@ -4,30 +4,33 @@
 #' `spca` methods.
 #'
 #' @param M A data matrix, correlation matrix, or covariance matrix.
-#' @param n_comps Integer. Number of components to retain. If `NULL`, all
-#'   components are retained up to the maximum allowed by the selected backend.
-#' @param center_data Logical. If `TRUE`, center variables to zero mean. If `M`
-#'   is detected as a data matrix and any column mean is nonzero, centering is
-#'   performed automatically.
-#' @param scale_data Logical. If `TRUE`, scale variables.
-#' @param fat_matrix Logical or `NULL`. If `NULL`, the backend is selected
-#'   automatically: data matrices with \eqn{n < p} use the fat backend and all
-#'   other inputs use the tall backend. If `TRUE`, request the fat backend. If
-#'   `FALSE`, use the tall backend. Covariance/correlation matrices always use
-#'   the tall backend.
-#' @param screeplot Logical. If `TRUE`, produce a scree plot.
-#' @param qq_plot Logical. If `TRUE`, produce a Wachter QQ-plot with
+#' @param n_comps [NULL] Integer. Number of components to retain. If `NULL`,
+#'   all components are retained up to the maximum allowed by the selected backend.
+#' @param center_data [FALSE] Logical. If `TRUE`, center variables to zero mean.
+#'   If `M` is detected as a data matrix and any column mean is nonzero,
+#'   centering is performed automatically.
+#' @param scale_data [FALSE] Logical. If `TRUE`, scale variables.
+#' @param fat_matrix [NULL] Logical or `NULL`. If `NULL`, the backend is
+#'  selected automatically: data matrices with \eqn{n < p} use the fat backend
+#'  and all other inputs use the tall backend. If `TRUE`, request the fat
+#'  backend. If `FALSE`, use the tall backend. Covariance/correlation matrices
+#'  always use the tall backend.
+#' @param screeplot [FALSE] Logical. If `TRUE`, produce a scree plot.
+#' @param qq_plot [TRUE] Logical. If `TRUE`, produce a Wachter QQ-plot with
 #'   \link{wachter_qqplot}. The fitted line is based on `n_comps`.
-#' @param nrow_data Integer. Number of rows in the original data set.
+#' @param nrow_data [NULL] Integer. Number of rows in the original data set.
 #'   Required when `qq_plot = TRUE` and `M` is a covariance or correlation
 #'   matrix. If not available, the Wachter QQ-plot cannot be produced.
-#' @param neigen_toplot Integer. Number of eigenvalues to show in diagnostic
-#'   plots. If `NULL`, all available eigenvalues are shown.
-#' @param cor Logical. If `TRUE`, rescales MP quantiles to match a correlation
-#' @param pm Logical. If `TRUE`, compute the requested eigenpairs by power
-#'   method and rank-one deflation.
-#' @param eps_pm Numeric. Convergence tolerance for the power method.
-#' @param maxiter_pm Integer. Maximum number of power-method iterations.
+#' @param neigen_toplot [NULL] Integer. Number of eigenvalues to show in
+#'   diagnostic plots. If `NULL`, all available eigenvalues are shown.
+#' @param cor [TRUE] Logical. If `TRUE`, rescales MP quantiles to match a
+#'   correlation matrix.
+#' @param common_var [1] Numeric. Common variance of the variables used for the
+#'   Marchenko--Pastur quantiles in the Wachter QQ-plot.
+#' @param pm [FALSE] Logical. If `TRUE`, compute the requested eigenpairs by
+#'   power method and rank-one deflation.
+#' @param eps_pm [1e-4] Numeric. Convergence tolerance for the power method.
+#' @param maxiter_pm [1000] Integer. Maximum number of power-method iterations.
 #'
 #' @return An \link{spca_object} with the addition of the vector `eigenvalues`
 #'   containing the eigenvalues up to the rank used by the selected backend.
@@ -51,7 +54,7 @@
 pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                fat_matrix = NULL, screeplot = FALSE, qq_plot = TRUE, 
                nrow_data = NULL, neigen_toplot = NULL, cor = TRUE, 
-               common_var = 1, pm = FALSE, eps_pm = 1e-5, maxiter_pm = 100){
+               common_var = 1, pm = FALSE, eps_pm = 1e-4, maxiter_pm = 1000){
 
 # validation ==========
 
@@ -143,7 +146,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     n_comps = max_comps
   }
 
-  if (!is.numeric(nrow_data)){
+  if (!is.numeric(nrow_data) && qq_plot){
     warning("qq-plot cannot be produced because nrow_data is not available")
     qq_plot = FALSE
   }
@@ -153,7 +156,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     if (any(abs(colMeans(M)) > 1e-6))
       center_data = TRUE
     if (center_data || scale_data){
-      M = scaleC(M, center_data, scale_data)
+      M = standardize_data(M, center_data, scale_data)
     }
   }
 
@@ -172,7 +175,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   rownames(loadings) = var_names
   colnames(loadings) = paste0("PC", seq_len(ncol(loadings)))
 
-  contributions = scaleColsC(loadings[, 1:n_comps, drop = FALSE],
+  contributions = scale_columns(loadings[, 1:n_comps, drop = FALSE],
                              1, rep(1, n_comps))
   rownames(contributions) = var_names
   colnames(contributions) = paste0("PC", seq_len(ncol(contributions)))
@@ -324,12 +327,14 @@ wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE, common_va
 #'
 #' Plots the first `nplot` eigenvalues (or their proportions) against component order.
 #'
-#' @param x A numeric vector of eigenvalues, or a list containing a numeric element named `values`.
-#' @param nplot Integer. Number of leading eigenvalues to plot; defaults to length(x) (or length(x$values) if `x` is a list).
-#' @param ylab Character. Y-axis label.
-#' @param addtitle Logical. If `TRUE`, adds a plot title.
-#' @param show_plot Logical. If `TRUE`, prints the plot.
-#' @param return_plot Logical. If `TRUE`, returns the ggplot object.
+#' @param eigenvalues Numeric vector of eigenvalues.
+#' @param nplot [NULL] Integer. Number of leading eigenvalues to plot. If
+#'   `NULL`, all eigenvalues are plotted.
+#' @param ylab ["eigenvalues"] Character. Y-axis label.
+#' @param addtitle [TRUE] Logical. If `TRUE`, add a plot title.
+#' @param show_plot [TRUE] Logical. If `TRUE`, print the plot.
+#' @param return_plot [FALSE] Logical. If `TRUE`, return the ggplot object.
+
 #'
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL` (invisibly).
 #' @family pca

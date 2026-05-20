@@ -547,51 +547,27 @@ if (is.null(controls)) {
 #'   corresponding option.
 #' 
 #' @param x An object of class `spca`.
-#' @param n_plot Integer. Number of components to plot. Defaults to
-#'   the object's `ncomps` value.
-#' @param plot_type Character. Plot type: `"bars"`, `"circular"`, or
-#'   `"heatmap"`. Partial matching is supported (e.g.,`"b").
-#' @param contributions Logical. If `TRUE`, plots contributions
-#'   (loadings scaled to sum to 100\% within each component); otherwise
-#'   plots L2 unit loadings.
-#' @param only_nonzero Logical. If `TRUE`, plots only nonzero entries.
-#' @param pc_loadings Optional numeric matrix of PCA loadings (or PCA
-#'   contributions) with the same dimensions as `x$loadings`. If supplied,
-#'   SPCA and PCA values are plotted together for comparison 
-#'   (not available for `plot_type = "circular"`).
-#' @param variable_groups Optional factor/character vector of length `p`
-#'   defining groups of variables. If provided, bars/tiles are colored 
-#'   by group instead of by component.
-#' @param plot_title Optional character. Plot title (added with
-#'   `labs(title = ...)`).
-#' @param return_plot Logical. If `TRUE`, returns the `ggplot2` object.
-#' @param show_plot Logical. If `TRUE`, prints the plot. Useful to set
-#'   `FALSE` when only returning the `ggplot2` object.
-#'   
-#' @param "" \strong{controls}
-#' @param color_scale Character or character vector. One of `"cbb"`,
-#'   `"printsafe"`, `"bw"`, `"ggplot"`, or a vector of hex color codes. 
-#'   If `variable_groups` is provided, the palette is applied to groups; 
-#'   otherwise it is applied to the components.
-#' @param variable_names NULL or "none" or character vector. 
-#' @param legend_position Character or numeric. Legend position. Can be one
-#'   of `"bottom"`, `"right"`, `"top"`, `"left"`, or a numeric vector of
-#'   length 2 giving coordinates inside the panel. For circular plots, the
-#'   legend is placed on the right to avoid unpleasant effects.. 
-#' @param grid_type character. If `"none"`, removes the
-#'   background grid. If `"horizontal"`, keeps only horizontal grid lines.
-#'   If `full`, uses the default grid.
-#' @param facet_labels Optional character vector of facet strip labels 
-#'   for components. Defaults to `"sPC k"`, `for k = 1:n_plot.
-#' @param legend_title Optional character. Legend title for the fill aesthetic.
-#' @param x_axis_lab label for x axis. default is "variables"
-#' @param adjust_labels_circ numeric vector of length `n_plot`.
-#'   Additive adjustment (in degrees) to the component label angles in
-#'   circular bar plots.
-#' @param flip_heatmap logical. If `TRUE`, flips axes for tile plots.
-#' @param heatmap_color_range character. If "values" the colors 
-#'   on the heatmap range between minimum and maximum of the values plotted. 
-#'   If "unit", these range in (-1, 1).
+#' @param n_plot [NULL] Integer. Number of components to plot. If `NULL`, all
+#'   components in `x` are plotted.
+#' @param plot_type [c("bars", "circular", "heatmap")] Character. Plot type:
+#'   `"bars"`, `"circular"`, or `"heatmap"`. The first character is enough.
+#' @param contributions [TRUE] Logical. If `TRUE`, plot contributions
+#'   (loadings scaled to sum to 100\% within each component); otherwise plot
+#'   L2 unit loadings.
+#' @param only_nonzero [TRUE] Logical. If `TRUE`, plot only nonzero entries.
+#' @param pc_loadings [NULL] Optional numeric matrix of PCA loadings or PCA
+#'   contributions with the same dimensions as `x$loadings`. If supplied, SPCA
+#'   and PCA values are plotted together for comparison.
+#' @param variable_groups [NULL] Optional factor or character vector of length
+#'   \eqn{p} defining groups of variables. If provided, bars or tiles are
+#'   colored by group instead of by component.
+#' @param plot_title [NULL] Optional character. Plot title.
+#' @param return_plot [FALSE] Logical. If `TRUE`, return the `ggplot2` object.
+#' @param show_plot [TRUE] Logical. If `TRUE`, print the plot.
+#' @param controls [list()] List of graphical controls. Supported entries are
+#'   `color_scale`, `variable_names`, `legend_position`, `grid_type`,
+#'   `facet_labels`, `legend_title`, `x_axis_lab`, `adjust_labels_circ`,
+#'   `flip_heatmap`, and `heatmap_color_range`.
 #' @param ... Further arguments; currently ignored.
 #' 
 #' @details
@@ -636,14 +612,14 @@ if (is.null(controls)) {
 #' The `printsafe` palette corresponds to `OrRd` from
 #' \url{http://colorbrewer2.org/}.
 #' @examples
-#' not run
+#' \dontrun{
 #' data(holzinger)
 #' myspca = spca(ho)
 #' myplot = plot(ho)
 #' change facetting and legend position
 #' myplot + facet_wrap(facets = vars(component), ncol = 4, nrow = 1) +
 #'   theme(legend.position = "r")
-#' 
+#' }
 #' @family spca
 #' @export
 #' @method plot spca

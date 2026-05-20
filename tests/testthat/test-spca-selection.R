@@ -1,49 +1,65 @@
 test_that("thin backend supports selection methods and stop criteria", {
-  m <- spca_test_matrices()
+  m = spca_test_matrices()
 
   for (selection in c("fwd", "bkw", "step")) {
-    fit <- spca(m$X_tall, ncomps = 2, method = "c",
+    fit = spca(m$X_tall, n_comps = 2, method = "c",
                 var_selection = selection, stop_criterion = "r2",
                 fat_matrix = FALSE)
-    expect_valid_spca(fit, p = ncol(m$X_tall), ncomps = 2)
+    expect_spca_object(fit, n_comps = 2, has_scores = TRUE)
   }
 
-  fit_cvexp <- spca(m$X_tall, ncomps = 2, method = "c",
+  fit_cvexp = spca(m$X_tall, n_comps = 2, method = "c",
                     var_selection = "fwd", stop_criterion = "cvexp",
                     fat_matrix = FALSE)
-  expect_valid_spca(fit_cvexp, p = ncol(m$X_tall), ncomps = 2)
+  expect_spca_object(fit_cvexp, n_comps = 2, has_scores = TRUE)
 
-  fit_intensive <- spca(m$X_tall, ncomps = 2, method = "c",
+  fit_intensive = spca(m$X_tall, n_comps = 2, method = "c",
                         var_selection = "fwd", stop_criterion = "cvexp",
                         intensive = TRUE, fat_matrix = FALSE)
-  expect_valid_spca(fit_intensive, p = ncol(m$X_tall), ncomps = 2)
+  expect_spca_object(fit_intensive, n_comps = 2, has_scores = TRUE)
 })
 
 test_that("loading methods produce valid fits", {
-  m <- spca_test_matrices()
+  m = spca_test_matrices()
 
   for (method in c("c", "u", "p")) {
-    fit <- spca(m$S_diag, ncomps = 2, method = method,
+    fit = spca(m$S_diag, n_comps = 2, method = method,
                 var_selection = "fwd", stop_criterion = "r2")
-    expect_valid_spca(fit, p = ncol(m$S_diag), ncomps = 2)
+    expect_spca_object(fit, n_comps = 2, has_scores = FALSE)
   }
 
-  fit_recycled <- spca(m$S_diag, ncomps = 3, method = c("c", "p"),
+  fit_recycled = spca(m$S_diag, n_comps = 3, method = c("c", "p"),
                        var_selection = "fwd", stop_criterion = "r2")
-  expect_valid_spca(fit_recycled, p = ncol(m$S_diag), ncomps = 3)
+  expect_spca_object(fit_recycled, n_comps = 3, has_scores = FALSE)
 })
 
-test_that("fat backend switches unsupported selection options", {
-  m <- spca_test_matrices()
+test_that("fat backend runs with supported selection options", {
+  m = spca_test_matrices()
+  
+  fit = spca(m$X_fat, n_comps = 2, method = "c",
+               var_selection = "fwd", stop_criterion = "r2",
+               fat_matrix = TRUE)
+  expect_spca_object(fit, n_comps = 2, has_scores = TRUE)
+  expect_true(fit$parameters$fat_matrix)
+})
 
-  fit <- NULL
-  expect_warning(
-    fit <- spca(m$X_fat, ncomps = 2, method = "c",
+
+test_that("fat backend issue eror unsupported selection options", {
+  m = spca_test_matrices()
+
+
+  fit = expect_error(
+    spca(m$X_fat, n_comps = 2, method = "c",
                 var_selection = "bkw", stop_criterion = "r2",
                 fat_matrix = TRUE),
-    "Only forward variable selection for fat matrices is available"
+    "var_selection bkw is not implemented for fat matrices"
   )
-
-  expect_valid_spca(fit, p = ncol(m$X_fat), ncomps = 2)
-  expect_true(fit$parameters$fat_matrix)
+ 
+  fit = expect_error(
+    spca(m$X_fat, n_comps = 2, method = "c",
+               var_selection = "fwd", intensive = TRUE, 
+               fat_matrix = TRUE),
+    "Intensive variable selection not implemented for fat matrices."
+  )
+  
 })

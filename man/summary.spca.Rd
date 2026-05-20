@@ -5,7 +5,7 @@
 \title{Prints summaries from an spca object}
 \usage{
 \method{summary}{spca}(
-  x,
+  object,
   cols,
   contributions = TRUE,
   variance_metrics = c("both", "cumulative_relative", "relative", "none"),
@@ -13,12 +13,12 @@
   cor_with_pc = FALSE,
   return_table = FALSE,
   print_table = TRUE,
-  thresh = 1e-04,
+  thresh_card = 1e-04,
   ...
 )
 }
 \arguments{
-\item{x}{An spca object.}
+\item{object}{An spca object.}
 
 \item{cols}{A vector indicating which components should be included.
 Default all. Can be any set of columns (e.g. c(1, 3)).
@@ -41,10 +41,9 @@ corresponding PCs are printed.}
 
 \item{print_table}{Logical: If \code{TRUE} the table is printed.}
 
-\item{...}{Further arguments; currently ignored.}
+\item{thresh_card}{\link{0.0001} Value below which loadings are treated as zero when computing minimum loadings or contributions.}
 
-\item{thrsehhold_cardinality}{Value below which \emph{loadings}
-are considered to be zero.  Default 0.0001.}
+\item{...}{Further arguments; currently ignored.}
 }
 \value{
 If return_table = TRUE, a numerical matrix with the summaries.

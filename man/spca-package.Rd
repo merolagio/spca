@@ -3,15 +3,16 @@
 \docType{package}
 \name{spca-package}
 \alias{spca-package}
-\title{spca: Least Squares Sparse PCA package}
+\title{Least Squares Sparse Principal Components Analysis}
 \description{
-Tools to compute LSSPCA solutions.
+The package provides functions to compute LSSPCA solutions, where sparsity is
+imposed to Pearson's PCA's least-squares reconstruction objective.
 }
 \details{
-The package provides functions to compute Least Squares Sparse Principal
-Components Analysis (LSSPCA) solutions, where sparsity is imposed while
-targeting PCA's least-squares reconstruction objective. This release
-accompanies the related article and is intended  to support full
+LSSPCA is different for other SPCA methods that compute sparse PCs with
+maximal variance. Details about LSSPCA can be found in the articles cited below and in the extended vignette.
+
+This release  accompanies the related article and is intended  to support full
 reproduction of the results reported therein.
 
 Computation relies on efficient C++ routines and includes multiple options
@@ -48,6 +49,16 @@ related elements in an 'spca\code{ object}.
 \item \code{\link[=spca_screeplot]{spca_screeplot()}} and  \code{\link[=wachter_qqplot]{wachter_qqplot()}} Diagnostic plots usefull to
 determine the number of components to retain in PCA.
 }
+}
+\references{
+Merola, G. M. (2015). Least Squares Sparse Principal Component Analysis:
+a Backward Elimination approach to attain large loadings.
+\emph{Australia & New Zealand Journal of Statistics}, 57, 391--429.
+\doi{10.1111/anzs.12128}
+
+Merola, G. M. and Chen, G. (2019). Projection sparse principal component
+analysis: An efficient least squares method. \emph{Journal of Multivariate
+Analysis}, 173, 366--382. \doi{10.1016/j.jmva.2019.04.001}
 }
 \seealso{
 Useful links:

@@ -2,8 +2,6 @@
 % Please edit documentation in R/spca-package_v0.1.R
 \name{spca_object}
 \alias{spca_object}
-\alias{spca-object}
-\alias{spca_class}
 \title{Sparse principal component analysis object}
 \description{
 Objects of class \code{spca} are returned by the fitting functions

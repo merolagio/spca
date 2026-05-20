@@ -81,7 +81,7 @@ compare_spca = function(
     return_plot = return_plot,
     show_plot = show_plot
   )
-  logical_ok = vapply(logical_args, is.boolean, logical(1))
+  logical_ok = vapply(logical_args, is_boolean, logical(1))
   if(!all(logical_ok))
     stop(paste(names(logical_ok)[!logical_ok],
                "must be TRUE or FALSE", collapse = "; "))
@@ -397,7 +397,7 @@ make_samesign = function(obj_list = NULL, loadings_list, n_comps = NULL, quiet =
   if(!is.null(obj_list)) {
     if (all(sapply(obj_list, function(x) !is.null(x$scores)))){
       for (i in 2:length(obj_list)){
-        co = diag(atbC(obj_list[[1]]$scores[, 1:n_comps], 
+        co = diag(atb(obj_list[[1]]$scores[, 1:n_comps], 
                        obj_list[[i]]$scores[, 1:n_comps]))
         if(any(co < 0)){
           loadings_list[[i]] = t(t(loadings_list[[i]]) * sign(co))
@@ -409,7 +409,7 @@ make_samesign = function(obj_list = NULL, loadings_list, n_comps = NULL, quiet =
     }
   }
   for (i in 2:length(loadings_list)){
-    co = diag(atbC(loadings_list[[1]], loadings_list[[i]]))
+    co = diag(atb(loadings_list[[1]], loadings_list[[i]]))
     if(any(co < 0)){
       loadings_list[[i]] = t(t(loadings_list[[i]]) * sign(co))
       if(!quiet)

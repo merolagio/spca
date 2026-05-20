@@ -21,8 +21,18 @@ validate_no_na = function(..., arg_list = NULL) {
   }
   else 
     args = arg_list
-#browser()
-  bad = vapply(args, anyNA, logical(1))
+  
+  has_na = function(x) {
+    if (is.null(x))
+      return(FALSE)
+    
+    if (is.list(x))
+      return(any(vapply(x, has_na, logical(1))))
+    
+    anyNA(x)
+  }
+  
+  bad = vapply(args, has_na, logical(1))
   
   if (any(bad)) {
     stop(
@@ -37,15 +47,13 @@ validate_no_na = function(..., arg_list = NULL) {
   TRUE
 }
 
-
 #' Test for a non-missing logical scalar
 #' is.logical(NA) returns TRUE
-#' is.boolean(NA) returns FALSE
+#' is_boolean(NA) returns FALSE
 #' @noRd
-is.boolean = function(x) {
+is_boolean = function(x) {
   isTRUE(x) || isFALSE(x)
 }
-
 
 #' Fails if any argument is not a non-missing logical scalar
 #' @param ... Arguments to check.
@@ -61,7 +69,7 @@ validate_booleans = function(..., arg_list = NULL) {
     args = list(...)
   else
     args = arg_list
-  bad = !vapply(args, is.boolean, logical(1))
+  bad = !vapply(args, is_boolean, logical(1))
   
   if (!any(bad))
     return(TRUE)
@@ -69,6 +77,45 @@ validate_booleans = function(..., arg_list = NULL) {
     paste(
       paste(names(args)[bad], collapse = " and "),
       "must be TRUE or FALSE"
+    ),
+    call. = FALSE
+  )
+  
+  FALSE
+}
+
+#' Test for a non-missing logical or NULL scalar
+#' is.logical(NA) returns TRUE
+#' is_boolean(NA) returns FALSE
+#' @noRd
+is_boolean_or_null = function(x) {
+  is.null(x) || is_boolean(x)
+}
+
+#' Fails if any argument is not a non-missing boolean or NULL scalar
+#' @param ... Arguments to check.
+#' @param arg_list Optional named list of arguments to check; if supplied, it takes precedence over `...`.
+#'
+#' @details An error is thrown upon failure.
+#'
+#' @returns TRUE or FALSE.
+#' @noRd
+validate_booleans_or_null = function(..., arg_list = NULL) {
+  
+  if (is.null(arg_list))
+    args = list(...)
+  else
+    args = arg_list
+  
+  bad = !vapply(args, is_boolean_or_null, logical(1))
+  
+  if (!any(bad))
+    return(TRUE)
+  
+  stop(
+    paste(
+      paste(names(args)[bad], collapse = " and "),
+      "must be NULL, TRUE, or FALSE"
     ),
     call. = FALSE
   )

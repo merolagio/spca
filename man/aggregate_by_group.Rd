@@ -25,11 +25,15 @@ giving the group label for each variable.}
 \item{only_nonzero}{Logical. If \code{TRUE}, groups with zero total (based on
 \code{rowSums(abs(out))}) are removed from the output.}
 
-\item{contributions}{if TRUE the aggregated group contributions are returned as
-percentages.}
+\item{contributions}{if TRUE the aggregated group contributions are returned
+as percentages.}
 
 \item{digits}{If integer, the number of digits to which to round the
 aggregated values. If FALSE no rounding is done.}
+
+\item{print_table}{Logical \link{TRUE}. If \code{TRUE}, print the aggregated table.}
+
+\item{return_table}{Logical \link{FALSE}. If \code{TRUE}, return the aggregated table.}
 }
 \value{
 A numeric vector (if \code{X} is a vector) or numeric matrix  of sums
