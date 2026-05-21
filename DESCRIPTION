@@ -19,7 +19,10 @@ Imports:
   RMTstat (>= 0.3.1),
   scales
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    peakRAM (>= 1.0.2),
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.3.2
