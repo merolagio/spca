@@ -4,7 +4,7 @@ dim(m$S_diag)
 
   fit = spca(m$S_diag, n_comps = 2, method = "c",
               fixed_index_list = list(c(1, 2), c(3, 4)),
-              var_selection = "fwd", stop_criterion = "r2")
+              var_selection = "fwd", objective = "r2")
 
   expect_spca_object(fit, n_comps = 2, has_scores = FALSE)
   expect_equal(fit$indices[[1]], c(1L, 2L))

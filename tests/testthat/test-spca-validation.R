@@ -18,8 +18,8 @@ X[1,1] = NA
                "method must start with one of c, p or u")
   expect_error(spca(m$X_tall, n_comps = 2, var_selection = "xxx"),
                "var_selection must start with one of f, b, or s")
-  expect_error(spca(m$X_tall, n_comps = 2, stop_criterion = "bad"),
-               "stop_criterion must start with one of r or c")
+  expect_error(spca(m$X_tall, n_comps = 2, objective = "bad"),
+               "objective must start with one of r or c")
 
   expect_error(spca(m$X_tall, intensive = NA))
   
