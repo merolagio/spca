@@ -506,13 +506,16 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 #' Constructs an object of class spca from a set of loadings
 #' 
 #' @param A real matrix, a matrix of loadings.
-#' @param S the variance or correlation matrix from which the loadings where computed.
-#' @param X real matrix, the data matrix from which the loadings where computed, optional
-#' @param method_name string, the name of the method_name used to compute the loadings, optional.
+#' @param S the variance or correlation matrix from which the loadings where
+#'  computed.
+#' @param X real matrix, the data matrix from which the loadings where computed,
+#'   optional. One of S or X must be valid inputs.
+#' @param method_name string, the name of the method_name used to compute the
+#'  loadings, optional.
 #' @return An [spca_object].
 #' @family spca
 #' @export 
-new_spca = function(A, S, X = NULL, method_name = NULL){
+new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   
   fun_inp = list(A = A, S = S, X = X, method_name = method_name)
   validate_no_na(arg_list = fun_inp)  
@@ -528,12 +531,40 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
     stop("A must be a matrix of loadings")
   }
   
+  if (is.null(S)) {
+    if (is.null(X))
+      stop("S and X cannot both be NULL", call. = FALSE)
+    
+    if (is.data.frame(X))
+      X = as.matrix(X)
+    
+    if (any(abs(colMeans(X)) > 1e-4))
+      X = standardize_data(X, TRUE, FALSE)
+    
+    S = ata(X) / (nrow(X) - 1)
+  }
+  
+  if (!is.null(X) && !is.null(S)) {
+    if (is.data.frame(X))
+      X = as.matrix(X)
+    
+    if (ncol(X) != ncol(S))
+      stop("X and S have incompatible dimensions", call. = FALSE)
+    
+# avoids multiplication that could be expensive
+    x_var = colSums(X^2) / (nrow(X) - 1)
+    
+    if (!isTRUE(all.equal(x_var, diag(S), check.attributes = FALSE, tolerance = 1e-6)))
+      stop("diag(S) is not compatible with X", call. = FALSE)
+  }
+  
+  
   if(!isSymmetric(S))
     stop("S must be a symmetric covariance or correlation matrix")
 
   if (any((colSums(A^2) - 1) > 1e-5)){
     message("Scaling loadings to unit L2 norm")
-    A = standardize_data(A, center = FALSE, scale = T)
+    A = standardize_data(A, center = FALSE, scale = TRUE)
   }
 #browser() 
   
@@ -588,7 +619,7 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
   obj$vexp_pc = s_ee$values[1:obj$n_comps]/totv
   obj$cvexp = vexp$cvexp/totv
   obj$rvexp = vexp$vexp/s_ee$val[1:n_comps]
-  obj$rcvexp = vexp$cvexp/cumsum(s_ee$val[1:n_comps])
+  obj$rcvexp = vexp$cvexp/cumsum(s_ee$val[seq_len(n_comps)])
   
   obj$cor_with_pc = cor_with_pc
   obj$tot_var = totv
@@ -602,7 +633,8 @@ new_spca = function(A, S, X = NULL, method_name = NULL){
   else{
     obj$spc_cor = make_spc_cor_S(A, S)
   }
-    
+  dimnames(obj$spc_cor) = list(paste0("sPC", seq_len(n_comps)),
+                               paste0("sPC", seq_len(n_comps)))
   obj$method_name = method_name
   
   class(obj) = c("list", "spca")
@@ -911,7 +943,7 @@ aggregate_by_group = function(X, groups,
   } 
   # matrix
   else {
-    if (any(abs(colSums(abs(X)) - 1) > 10e-3) && (contributions == T)){
+    if (any(abs(colSums(abs(X)) - 1) > 10e-3) && (contributions == TRUE)){
       warning("The sum of values is not 1. Setting contributions = FALSE")
       contributions = FALSE
       digits = 3
@@ -931,7 +963,7 @@ aggregate_by_group = function(X, groups,
       }
       
       #trim = TRUE,
-      print(outp, quote = F, right = TRUE)
+      print(outp, quote = FALSE, right = TRUE)
     } else {
       print("loadings")
       print(out, digits = 3)}
