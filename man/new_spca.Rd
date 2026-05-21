@@ -4,16 +4,19 @@
 \alias{new_spca}
 \title{Constructs an object of class spca from a set of loadings}
 \usage{
-new_spca(A, S, X = NULL, method_name = NULL)
+new_spca(A, S = NULL, X = NULL, method_name = NULL)
 }
 \arguments{
 \item{A}{real matrix, a matrix of loadings.}
 
-\item{S}{the variance or correlation matrix from which the loadings where computed.}
+\item{S}{the variance or correlation matrix from which the loadings where
+computed.}
 
-\item{X}{real matrix, the data matrix from which the loadings where computed, optional}
+\item{X}{real matrix, the data matrix from which the loadings where computed,
+optional. One of S or X must be valid inputs.}
 
-\item{method_name}{string, the name of the method_name used to compute the loadings, optional.}
+\item{method_name}{string, the name of the method_name used to compute the
+loadings, optional.}
 }
 \value{
 An \link{spca_object}.
