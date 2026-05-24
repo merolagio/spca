@@ -908,14 +908,14 @@ aggregate_by_group = function(X, groups,
   
   validate_booleans(only_nonzero= only_nonzero, contributions = 
                       contributions, print_table = print_table, return_table = return_table)
-  
+ 
   if(is.spca(X)){
     if(contributions){
       X = X$contributions
     } else
       X = X$loadings
   } else {
-    if (((!is.vector(X) && (!is.factor(X))) ||  (!is.matrix(X))))
+    if (((!is.vector(X) && (!is.factor(X))) &&  (!is.matrix(X))))
       stop("X must be an spca object or a matrix or a vector")
   }
   n = ifelse((is.vector(X) || (is.factor(X))), length(X), nrow(X))

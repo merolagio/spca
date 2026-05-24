@@ -1,17 +1,16 @@
 # R wrappers for exported C++ utilities
 # Draft plan saved 2026-05-18
 #
-# Naming decision:
-# - Keep exported C++ helpers with C suffix: ataC(), abC(), etc.
-# - Add user/internal R wrappers without C suffix where safe:
+# Naming convention:
+# - Internal R wrappers to exported C++ helpers with C suffix: 
+# ataC(), abC(), etc.
+# are named:
 #     aat(), ata(), atb(), ab(), abt(), atda(), atdb()
 #     av(), atv(), vta(), vtau(), vtv(), vtu()
-# - Avoid conflicts/ambiguous base-like names:
-#     trace_mat() instead of trace()
-#     eigen_sym() instead of eigen()
-#     eigenvalues_sym() instead of comp_eigvalC()
-#     gen_eigen_sym() instead of GenEigenC()
-#     solve_spd() instead of solve()
+#     eigen_sym() for eigenC()
+#     eigenvalues_sym() for eigvalC(eigenvalues.only = true)
+#     gen_eigen_sym() for GenEigenC()
+#     solve_spd() for solveC()
 #
 # R wrapper responsibilities:
 # - data.frame -> matrix
@@ -26,16 +25,17 @@
 # - LLT/solver/eigen failure guards
 # - try/catch wrappers
 #
-# Existing wrappers needing added guards:
+# More functions not calling C++ raw code:
 # - var2cor()
 # - make_spc_cor_S()
 # - make_vexp()
 # - scale_columns()
 # - standardize_data()
-#
-# Important: do not define an R function named ataC() that calls ataC().
-# That would recurse. Use ata() as the R wrapper and leave ataC() as C++ export.
+# - get_minload
+# - get_card
+# - make_contributions
 
+#validation helper for matrices
 as_numeric_matrix_no_na = function(x, name) {
   if (is.data.frame(x))
     x = as.matrix(x)
@@ -49,6 +49,7 @@ as_numeric_matrix_no_na = function(x, name) {
   x
 }
 
+#validation helper for vectors
 as_numeric_vector_no_na = function(x, name) {
   if (!is.vector(x) || is.list(x))
     stop(name, " must be a numeric vector")
@@ -151,14 +152,17 @@ trace_mat = function(S) {
 #returns the eigendecomposition of S
 eigen_sym = function(S) {
   S = as_numeric_matrix_no_na(S, "S")
-  EigenC(S)
-  
+  out = EigenC(S)
+  names(out) = c("values", "vectors")
+  out
 }
 
 #returns only the eigenvalues of S
 eigenvalues_sym = function(S) {
   S = as_numeric_matrix_no_na(S, "S")
-  comp_eigvalC(S)
+  out = comp_eigvalC(S)
+  names(out) = "values"
+  out
 }
 
 ## returns the generalized eigendecomposition of Av = l Bv
