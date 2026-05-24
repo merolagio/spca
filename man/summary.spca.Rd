@@ -13,7 +13,7 @@
   cor_with_pc = FALSE,
   return_table = FALSE,
   print_table = TRUE,
-  thresh_card = 1e-04,
+  thresh_card = 1e-08,
   ...
 )
 }
