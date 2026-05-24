@@ -152,6 +152,7 @@ trace_mat = function(S) {
 eigen_sym = function(S) {
   S = as_numeric_matrix_no_na(S, "S")
   EigenC(S)
+  
 }
 
 #returns only the eigenvalues of S
@@ -283,3 +284,50 @@ standardize_data = function(M, center = TRUE, scale = TRUE){
     stop("M must be a matrix or a data.frame")
   scaleC(M, center, scale)
 }
+
+##Other utilities ====================
+# returns the non-zero loading with the smallest absolute value for each column
+# input a matrix of loadings or contributions
+get_minload = function(smpc, eps = 1e-4){
+  if(!is.matrix(smpc))
+    stop("get_minload: a matrix of loadings or contributions is needed") 
+  gl = function(x)
+    min(abs(x[abs(x)> eps]))
+  apply(smpc, 2, gl)
+}
+
+# returns the cardinality of the columns of a matrix of loadings  
+get_card = function(A, thresh_card = 1e-4){
+  if (is.spca(A) )
+    A = A$loadings
+  if(is.vector(A))
+    sum(abs(A) > thresh_card)
+  else
+    if(is.matrix(A))
+      colSums(abs(A)> thresh_card)
+  else
+    stop("A must be an spca object or a matrix or a vector")
+  
+}
+
+
+# computes the unit L1 norm contributions from a matrix of loadings
+# x can be either the matrix or vector of loadings or list containing a 
+# matrix called loadings
+make_contributions = function(x){
+  
+  if (is.spca(x) && validate_spca(x))
+  {
+    return(scale_columns(x$loadings, normtype = 1, sig = NULL))
+  }
+  if (is.data.frame(x))
+    x = as.matrix(x)
+  if (is.matrix(x))
+    return(scale_columns(x, normtype = 1, sig = NULL))
+  
+  if (is.vector(x))
+    return(x/sum(abs(x)))
+  
+  stop("x must be an spca object, or a matrix or vector of loadings")
+}
+
