@@ -21,29 +21,27 @@
 #'   values starting with \code{"p"} use points. Other values default to bars.
 #' @param methods_names Optional character vector with one label per object. If
 #'   \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
+#' @param x_axis_var_names Logical. If \code{TRUE}, show variable names on 
+#'   the x axis of the loadings plot.
 #' @param col_grouplines Character scalar. Color of the vertical group lines.
 #' @param color_scale Character scalar. Color palette for bar plots. Accepted
 #'   values are \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and
 #'   \code{"bw"}.
-#' @param equal_sign Logical. If \code{TRUE}, adjust loading signs to agree with
-#'   the first object. See Details.
 #' @param col_short_names Logical. If \code{TRUE}, use short component names
 #'   such as \code{C1.M1}; otherwise use \code{C1.object_name}.
 #' @param print_loadings Logical. If \code{TRUE}, print the loadings or
 #'   contributions table.
-#' @param return_tables Logical. If \code{TRUE}, return the loadings/contributions
-#'   matrix and the raw summary matrix.
+#' @param return_tables Logical. If \code{TRUE}, return the loadings
+#'  contributions matrix and the raw summary matrix.
 #' @param print_tables Logical. If \code{FALSE}, suppress table printing. Takes
 #'   priority over \code{print_loadings}.
 #' @param return_plot Logical. If \code{TRUE}, return the loadings plot.
 #' @param show_plot Logical. If \code{TRUE}, print the loadings plot.
-#' @details When \code{equal_sign = TRUE}, signs are aligned using score
-#'   correlations if scores are available for all objects. Otherwise signs are
-#'   aligned using correlations between the loading matrices.
-#' @return Invisibly returns \code{NULL} by default. If \code{return_tables = TRUE},
-#'   returns a list containing the comparison matrix and summary matrix. If
-#'   \code{return_plot = TRUE}, the returned object also includes the loadings plot.
-#' @seealso Examples in \code{\link{plot.spca}}.
+#' @return Invisibly returns \code{NULL} by default. 
+#'   If \code{return_tables = TRUE}, returns a list containing the comparison
+#'   matrix and summary matrix. If
+#' \code{return_plot = TRUE}, the returned object also includes the 
+#'   loadings plot.
 #' @family spca
 #' @export
 compare_spca = function(
@@ -55,15 +53,15 @@ compare_spca = function(
     plot_loadings = TRUE,
     plot_type = c("bars", "points"),
     methods_names = NULL,
+    x_axis_var_names = TRUE,
     col_grouplines = "red",
     color_scale = c("ggplot", "cbb", "printsafe", "bw"), 
-    equal_sign = FALSE,
     col_short_names = TRUE,
-    print_loadings = TRUE,
-    return_tables = FALSE,
     print_tables = TRUE,
-    return_plot = FALSE,
-    show_plot = TRUE) {
+    print_loadings = TRUE,
+    show_plot = TRUE,
+    return_tables = FALSE,
+    return_plot = FALSE) {
   tryCatch({
   ## -------------------------------------------------------#
   ## obj_list two or more spca objects
@@ -73,7 +71,6 @@ compare_spca = function(
     contributions = contributions,
     only_nonzero = only_nonzero,
     plot_loadings = plot_loadings,
-    equal_sign = equal_sign,
     col_short_names = col_short_names,
     print_loadings = print_loadings,
     return_tables = return_tables,
@@ -147,14 +144,8 @@ compare_spca = function(
   else
     A = lapply(obj_list, function(x) x$loadings[, 1:n_comps])
   
-  ## needed to make loadings of similar sign, if required 
-  #if scores not available acts on loadings directly
-  
-  
-  if (equal_sign == TRUE)
-    A = make_samesign(obj_list, A, n_comps = n_comps, quiet = FALSE)
-  
-  ##methods names  NEEDS FIX this ==========================
+
+  ##methods names==========================
 #browser() 
   if(is.null(methods_names)){
     methods_names = c(paste0("M", 1:n_objects))  
@@ -242,25 +233,25 @@ compare_spca = function(
           legend.position = "bottom", 
           panel.grid.major.y = element_line(color = "grey85")) + 
         geom_abline(intercept = 0, slope = 0) +
-# chck why capitalized        
-#        ggplot2::scale_colour_manual(values = c("black", "red", "blue")) +
         ggplot2::xlab("variables") + 
         ggplot2::ylab(ifelse(contributions == TRUE, "contributions", "loadings"))
-#browser()     
+     
       if (plot_type == "points"){
         pl = pl + aes(colour = method, shape = method) + 
           geom_point(size = 2, alpha = 0.75) 
       
-      } #end plot points
+      } 
       else{#plots bars
-#browser()
+
         pl = pl + aes(fill = method, group = method) + 
           ggplot2::geom_col(position = "dodge", color = 
                      ifelse(color_scale == "printsafe", "black", NA)
                    )
         
         if((!is.null(color_scale[1])) && (color_scale[1] != "ggplot"))
-          pl = pl + scale_fill_manual(values = color_pal)
+          pl = pl + scale_fill_manual(values = color_pal) 
+        if (!isTRUE(x_axis_var_names)) 
+          pl = pl + theme(axis.text.x = element_blank())
       }#end plot_loadings   
       
 # adds vertical lines to separate groups----------------------      
@@ -295,7 +286,7 @@ compare_spca = function(
   }#end plot_loadings  
  
 
-#tables to return ===========
+#TABLES ===========
 ##loadings_matrix======== 
 # loadings of each object, grouped by their rank  
   
@@ -322,10 +313,11 @@ compare_spca = function(
   ## summary table ---------------
   ## sum_list is list of summaries for all objects
 #browser()
-  sum_list = lapply(obj_list, summary, print_table = FALSE, return_table = TRUE, 
-                    min_load = TRUE)
+  sum_list = lapply(obj_list, summary, print_table = FALSE, return_table = TRUE,
+                    cor_with_pc = TRUE) 
   
   sum_matrix = matrix(0, nrow = nrow(sum_list[[1]]), ncol = n_objects *n_comps) 
+  
   k = 0
   for (i in 1:n_comps){
     for (j in 1:n_objects){
@@ -336,19 +328,22 @@ compare_spca = function(
   colnames(sum_matrix) = col_names
   rownames(sum_matrix) = rownames(sum_list[[1]])  
   n_summat = nrow(sum_matrix)
-#browser()
-
-  rownames(sum_matrix)[n_summat] = ifelse(contributions, "Min cont", "Min load")
+  #browser()
+  
+# table shows absolute correlation
+    sum_matrix[n_summat, ] =  abs(sum_matrix[n_summat, ])
+  
+  rownames(sum_matrix)[n_summat] = "abs_r"
 
 ## printing----------------------------  
+#  browser()
   if(print_tables == TRUE){
     if (print_loadings){
       if (only_nonzero == TRUE)
         which_rows = which(ind_nonzero)
       else
         which_rows = 1:p
-#browser()      
-      loadings_matrix_fmt = 
+        loadings_matrix_fmt = 
         format_loadings(loadings_matrix, cols = 1:(n_comps*n_objects), 
                         namescomp = col_names, contributions = contributions, 
                         rows = which_rows
@@ -383,40 +378,6 @@ compare_spca = function(
   })
 }
 
-#' changes the sign of the loadings
-#' @noRd
-make_samesign = function(obj_list = NULL, loadings_list, n_comps = NULL, quiet = FALSE){
-  # browser() 
-  if(missing(loadings_list))
-    stop("loadings_list is required")
-  if(!is.list(loadings_list))
-    stop("loadings_list must be a list of matrices")
-  if(is.null(n_comps))
-    n_comps = min(sapply(loadings_list, ncol))
-  
-  if(!is.null(obj_list)) {
-    if (all(sapply(obj_list, function(x) !is.null(x$scores)))){
-      for (i in 2:length(obj_list)){
-        co = diag(atb(obj_list[[1]]$scores[, 1:n_comps], 
-                       obj_list[[i]]$scores[, 1:n_comps]))
-        if(any(co < 0)){
-          loadings_list[[i]] = t(t(loadings_list[[i]]) * sign(co))
-          if(!quiet)
-            print(paste("changed sign to loadings", which(co < 0), "in object", i))
-        }
-      }
-      return(loadings_list)
-    }
-  }
-  for (i in 2:length(loadings_list)){
-    co = diag(atb(loadings_list[[1]], loadings_list[[i]]))
-    if(any(co < 0)){
-      loadings_list[[i]] = t(t(loadings_list[[i]]) * sign(co))
-      if(!quiet)
-        print(paste("changed sign to loadings", which(co < 0), "in object", i))      }
-  }
-  return(loadings_list)
-}
 
 #' internal formats the joint loadings/contribititons matrix for printing
 #' @noRd
@@ -481,13 +442,9 @@ format_summaries = function(sum_matrix, contributions)
   for(i in 1:4) sum_matrix_fmt[i, ] = paste0(sum_matrix_fmt[i, ],"%")
   
   n_summat = nrow(sum_matrix)
-  if (contributions)
     sum_matrix_fmt[n_summat, ] = 
-    paste0(round(sum_matrix[n_summat, ]*100, 1), "%")
-  else
-    sum_matrix_fmt[n_summat, ] = 
-    format(round(sum_matrix[n_summat, ],3), digits = 4, drop0trailing = FALSE,
-           justify = "right", nsmall = 3, scientific = FALSE
+    format(round(sum_matrix[n_summat, ],2), digits = 4, drop0trailing = FALSE,
+           justify = "right", nsmall = 2, scientific = FALSE
            )
   sum_matrix_fmt = format(sum_matrix_fmt, justify = "right")
   sum_matrix_fmt

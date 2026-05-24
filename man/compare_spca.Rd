@@ -13,15 +13,16 @@ compare_spca(
   plot_loadings = TRUE,
   plot_type = c("bars", "points"),
   methods_names = NULL,
+  x_axis_var_names = TRUE,
   col_grouplines = "red",
   color_scale = c("ggplot", "cbb", "printsafe", "bw"),
   equal_sign = FALSE,
   col_short_names = TRUE,
-  print_loadings = TRUE,
-  return_tables = FALSE,
   print_tables = TRUE,
-  return_plot = FALSE,
-  show_plot = TRUE
+  print_loadings = TRUE,
+  show_plot = TRUE,
+  return_tables = FALSE,
+  return_plot = FALSE
 )
 }
 \arguments{
@@ -50,6 +51,9 @@ values starting with \code{"p"} use points. Other values default to bars.}
 \item{methods_names}{Optional character vector with one label per object. If
 \code{NULL}, labels are \code{M1}, ..., \code{Mk}.}
 
+\item{x_axis_var_names}{Logical. If \code{TRUE}, show variable names on
+the x axis of the loadings plot.}
+
 \item{col_grouplines}{Character scalar. Color of the vertical group lines.}
 
 \item{color_scale}{Character scalar. Color palette for bar plots. Accepted
@@ -62,18 +66,18 @@ the first object. See Details.}
 \item{col_short_names}{Logical. If \code{TRUE}, use short component names
 such as \code{C1.M1}; otherwise use \code{C1.object_name}.}
 
+\item{print_tables}{Logical. If \code{FALSE}, suppress table printing. Takes
+priority over \code{print_loadings}.}
+
 \item{print_loadings}{Logical. If \code{TRUE}, print the loadings or
 contributions table.}
+
+\item{show_plot}{Logical. If \code{TRUE}, print the loadings plot.}
 
 \item{return_tables}{Logical. If \code{TRUE}, return the loadings/contributions
 matrix and the raw summary matrix.}
 
-\item{print_tables}{Logical. If \code{FALSE}, suppress table printing. Takes
-priority over \code{print_loadings}.}
-
 \item{return_plot}{Logical. If \code{TRUE}, return the loadings plot.}
-
-\item{show_plot}{Logical. If \code{TRUE}, print the loadings plot.}
 }
 \value{
 Invisibly returns \code{NULL} by default. If \code{return_tables = TRUE},
