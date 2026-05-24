@@ -4,7 +4,12 @@
 \alias{show_contributions_spca}
 \title{Shows the non-zero contributions separately for each component.}
 \usage{
-show_contributions_spca(spca_obj, cols = NULL, return_list = FALSE)
+show_contributions_spca(
+  spca_obj,
+  cols = NULL,
+  print_list = TRUE,
+  return_list = FALSE
+)
 }
 \arguments{
 \item{spca_obj}{An spca object}
