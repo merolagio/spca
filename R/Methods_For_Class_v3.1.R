@@ -591,11 +591,11 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
     cor_with_pc[j] =
       sum(A[ind_list[[j]], j] *
             ab(S[ind_list[[j]], ,drop = FALSE],
-                s_ee$vec[, j, drop = FALSE])) /
+                s_ee$vectors[, j, drop = FALSE])) /
       sqrt(
         vtau(A[ind_list[[j]], j], 
               S[ind_list[[j]], ind_list[[j]], drop = FALSE],
-              A[ind_list[[j]], j]) *  s_ee$val[j]
+              A[ind_list[[j]], j]) *  s_ee$values[j]
       )
     
   }
@@ -612,14 +612,14 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   obj$n_comps = n_comps
   obj$cardinality = colSums(A != 0)
   
-  totv = sum(s_ee$val)
+  totv = sum(s_ee$values)
   
   vexp = make_vexp(A, S)
   obj$vexp = vexp$vexp/totv
-  obj$vexp_pc = s_ee$val[1:obj$n_comps]/totv
+  obj$vexp_pc = s_ee$values[1:obj$n_comps]/totv
   obj$cvexp = vexp$cvexp/totv
-  obj$rvexp = vexp$vexp/s_ee$val[1:n_comps]
-  obj$rcvexp = vexp$cvexp/cumsum(s_ee$val[seq_len(n_comps)])
+  obj$rvexp = vexp$vexp/s_ee$values[1:n_comps]
+  obj$rcvexp = vexp$cvexp/cumsum(s_ee$values[seq_len(n_comps)])
   
   obj$cor_with_pc = cor_with_pc
   obj$tot_var = totv
