@@ -273,7 +273,7 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
     lower = 0
   )
   
-  # validate_ncomps and cardinality ==========
+  # validate_n_comps and cardinality ==========
   
   if (is.null(x$n_comps)) {
     add_msg("n_comps is missing")
@@ -517,7 +517,8 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
 #' @export 
 new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   
-  fun_inp = list(A = A, S = S, X = X, method_name = method_name)
+# browser()
+   fun_inp = list(A = A, S = S, X = X, method_name = method_name)
   validate_no_na(arg_list = fun_inp)  
   
   # validation   ==============P
@@ -530,10 +531,9 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   if (!is.matrix(A)){
     stop("A must be a matrix of loadings")
   }
-  
   if (is.null(S)) {
     if (is.null(X))
-      stop("S and X cannot both be NULL", call. = FALSE)
+      stop("S and X cannot be both NULL", call. = FALSE)
     
     if (is.data.frame(X))
       X = as.matrix(X)
@@ -554,10 +554,10 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
 # avoids multiplication that could be expensive
     x_var = colSums(X^2) / (nrow(X) - 1)
     
-    if (!isTRUE(all.equal(x_var, diag(S), check.attributes = FALSE, tolerance = 1e-6)))
+    if (!isTRUE(all.equal(x_var, diag(S), check.attributes = FALSE, 
+                          tolerance = 1e-6)))
       stop("diag(S) is not compatible with X", call. = FALSE)
   }
-  
   
   if(!isSymmetric(S))
     stop("S must be a symmetric covariance or correlation matrix")
@@ -569,11 +569,11 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
 #browser() 
   
   n_comps = ncol(A)
-#  browser()
+
 # compute vexp and eigen(S)
   vexp = make_vexpSC(A, S)
   
-  s_ee = eigen(S)
+  s_ee = eigen_sym(S)
   
   
   ind_list = apply(A, 2, function(x) which(x != 0))
@@ -590,12 +590,12 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   #cor_with_pc  
     cor_with_pc[j] =
       sum(A[ind_list[[j]], j] *
-            ab(S[ind_list[[j]], , drop = FALSE],
-                s_ee$vectors[, j, drop = FALSE])) /
+            ab(S[ind_list[[j]], ,drop = FALSE],
+                s_ee$vec[, j, drop = FALSE])) /
       sqrt(
         vtau(A[ind_list[[j]], j], 
               S[ind_list[[j]], ind_list[[j]], drop = FALSE],
-              A[ind_list[[j]], j]) *  s_ee$values[j]
+              A[ind_list[[j]], j]) *  s_ee$val[j]
       )
     
   }
@@ -612,11 +612,11 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   obj$n_comps = n_comps
   obj$cardinality = colSums(A != 0)
   
-  totv = sum(s_ee$values)
+  totv = sum(s_ee$val)
   
   vexp = make_vexp(A, S)
   obj$vexp = vexp$vexp/totv
-  obj$vexp_pc = s_ee$values[1:obj$n_comps]/totv
+  obj$vexp_pc = s_ee$val[1:obj$n_comps]/totv
   obj$cvexp = vexp$cvexp/totv
   obj$rvexp = vexp$vexp/s_ee$val[1:n_comps]
   obj$rcvexp = vexp$cvexp/cumsum(s_ee$val[seq_len(n_comps)])
@@ -829,21 +829,28 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 #' @param return_list Logical: if `TRUE` the list is returned
 #' @family spca
 #' @export 
-show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
+show_contributions_spca = function(spca_obj, cols = NULL, print_list = TRUE, 
+                                   return_list = FALSE)
 {
   test = validate_spca(spca_obj)
   if (!test)
     stop("show_loadings requires an spca object as first argument")
-  
+#browser()  
   if(is.null(cols)){
     cols = seq_along(spca_obj$vexp)
   }
-  
-  contributions = lapply(spca_obj$loadings_list, function(x) x/ sum(abs(x)))
+  if(length(cols) > 1){
+    contributions = lapply(spca_obj$loadings_list[cols], 
+                           function(x) x/ sum(abs(x)))
+  } else {
+    contributions = spca_obj$loadings_list[[cols]]/ 
+      sum(abs(spca_obj$loadings_list[[cols]]))
+  }
 
-  message("Percentage Contributions")
-  print(contributions)
-  
+  if(print_list){
+    message("Percentage Contributions")
+    print(contributions)
+  }  
   if (return_list == TRUE)
     return(contributions)
   
@@ -953,21 +960,27 @@ aggregate_by_group = function(X, groups,
     if (only_nonzero)
       out = out[rowSums(abs(out)) > 10e-4, ]
   }
+  #browser()
   if(print_table){
     if(contributions){
       print("percentage contributions")
-      outp = out
-      for (i in 1:nrow(out)){
-        outp[i, ] =  format(paste0(sprintf("%.1f", round(out[i, ]*100, 1)), "%"),
-                            nsmall = 1, drop0trailing = FALSE, justify = "right")
-      }
       
-      #trim = TRUE,
+      outp = matrix(
+        sprintf("%.1f%%", round(out * 100, 1)),
+        nrow = nrow(out),
+        dimnames = dimnames(out)
+      )
+      outp[out == 0] = ""
+      
       print(outp, quote = FALSE, right = TRUE)
-    } else {
-      print("loadings")
-      print(out, digits = 3)}
-  } 
+     } else {
+         print("loadings")
+         outp = format(out, digits = 3, justify = "right")
+         outp[out == 0] = ""
+       
+         print(outp, quote = FALSE, right = TRUE)
+     }
+    }
   if (return_table){
     return(out)
   }
@@ -1031,7 +1044,7 @@ summary.spca = function(
     cor_with_pc = FALSE,
     return_table = FALSE, 
     print_table = TRUE, 
-    thresh_card = 1e-4, 
+    thresh_card = 1e-8, 
     ...) 
 {
   # Validation
