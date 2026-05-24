@@ -10,7 +10,6 @@ Document_output.txt
 Compile_output.txt
 Ignore
 R/remove
-R/Toadd
 .Rhistory
 .httr-oauth
 .DS_Store
