@@ -153,7 +153,7 @@ trace_mat = function(S) {
 eigen_sym = function(S) {
   S = as_numeric_matrix_no_na(S, "S")
   out = EigenC(S)
-  names(out) = c("values", "vectors")
+  names(out) = c("vectors", "values")
   out
 }
 
@@ -169,7 +169,9 @@ eigenvalues_sym = function(S) {
 gen_eigen_sym = function(A, B) {
   A = as_numeric_matrix_no_na(A, "A")
   B = as_numeric_matrix_no_na(B, "B")
-  GenEigenC(A, B)
+  out = GenEigenC(A, B)
+  names(out) = c("vectors", "values")
+  out
 }
 
 ## inverts a symmetric positive definite matrix
