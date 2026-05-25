@@ -461,6 +461,7 @@ static void cspcaTQ(const Eigen::Ref<const Eigen::MatrixXd>& X,
 //   D_orig = X X'       = original row-space matrix,
 //   u      = leading unit-norm eigenvector of D.
 //
+// Details
 // The inputs X, D, and D_orig are not modified. The function creates local
 // working copies only when they are needed.
 //
