@@ -17,7 +17,7 @@ Imports:
   Rcpp (>= 1.0.14),
   ggplot2 (>= 4.0.0), 
   RMTstat (>= 0.3.1),
-  scales
+  scales 
 Suggests: 
     testthat (>= 3.0.0),
     peakRAM (>= 1.0.2),
