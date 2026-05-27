@@ -44,13 +44,24 @@ make_contributions = function(x){
   }
 
 
-# 
-# #transforms a variance matrix to a correlation matrix S variance matrix
-# var2cor = function(S){
-#   if ((!is.matrix(S)) || (!isSymmetric(S)) || any(diag(S) < 1e-4))
-#     stop(("S must be a symmetric matrix with non zero diagonal values"))
-#     return(var2corC(S))
-# }
+make_scores = function(X, A){
+  
+  if (is.data.frame(A))
+    A = as.matrix(A)
+  if ( is.vector(A))
+    A = matrix(A, 1)
+  if (!is.matrix(A))
+    stop("A must be a matrix of loadings")
+  
+  if (is.data.frame(X))
+    X = as.matrix(X)
+  if (!is.matrix(X))
+    stop("X must be a matrix of loadings")
+  
+# C++ efficient computation of X*A when A is sparse  
+  make_scoresC(X, A)
+}
+
 # 
 # ## computes correlation between pairs of sPCs
 # # wrapper for the C++ function

@@ -85,8 +85,16 @@ make_vexpSC <- function(A, S) {
     .Call(`_spca_make_vexpSC`, A, S)
 }
 
+corC <- function(X, center = TRUE, scale = TRUE) {
+    .Call(`_spca_corC`, X, center, scale)
+}
+
 var2corC <- function(S) {
     .Call(`_spca_var2corC`, S)
+}
+
+make_scoresC <- function(X, A) {
+    .Call(`_spca_make_scoresC`, X, A)
 }
 
 makeCorCompC <- function(A, S, ncomps = 0L) {

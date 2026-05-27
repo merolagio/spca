@@ -398,7 +398,7 @@ spca = function(M,
                               "cvexp" = 1)
   
   is_datamatrix_M = TRUE
-  if ((n == p) && isSymmetric(M))
+  if ((n == p))
     is_datamatrix_M = FALSE
   
   if (is.null(fat_matrix)) {
@@ -409,18 +409,18 @@ spca = function(M,
   
   if (isTRUE(fat_matrix)) {
     if (!is_datamatrix_M) {
-      warning("fat_matrix = TRUE ignored because the input is a covariance/correlation matrix; using the thin backend")
+      warning("fat_matrix = TRUE ignored because the input is a covariance/correlation matrix; using the tall backend")
       use_fat_backend = FALSE
     } else if (n < p) {
       use_fat_backend = TRUE
     } else {
-      warning("fat_matrix = TRUE ignored because the data matrix is not fat; using the thin backend")
+      warning("fat_matrix = TRUE ignored because the data matrix is not fat; using the tall backend")
       use_fat_backend = FALSE
     }
   } else {
     use_fat_backend = FALSE
     if (is_datamatrix_M && (n < p))
-      warning("fat_matrix = FALSE forces the thin backend on a fat data matrix; X'X may be singular")
+      warning("fat_matrix = FALSE forces the tall backend on a fat data matrix; X'X may be singular")
   }
   
   if (use_fat_backend) {
@@ -479,7 +479,7 @@ spca = function(M,
     var_selection_cpp = 0
   }
   if (use_fat_backend && intensive){
-    warning("intensive is currently available only for thin matrices", 
+    warning("intensive is currently available only for tall matrices", 
             call. = FALSE)
     intensive = FALSE
   }
@@ -497,7 +497,8 @@ spca = function(M,
       M = standardize_data(M, center_data, scale_data)
       
     }
-    S = ata(M)
+    if(!use_fat_backend)
+      S = ata(M)
   } else 
     if(!use_fat_backend){
       S = M
@@ -521,7 +522,7 @@ spca = function(M,
                      maxiterPMS = maxiter_pm_varsel,
                      rank_tol = 0.0)
   } else {
-    ## THIN_MATRIX BACKEND    
+    ## TALL_MATRIX BACKEND    
     selection_method_cpp = var_selection_cpp
     if (intensive)
       selection_method_cpp = 3
@@ -566,10 +567,7 @@ spca = function(M,
   # methods take loadings to be a matrix
   if (is.vector(spout$loadings))
     spout$loadings = matrix(spout$loadings, ncol = 1)
-  spout$loadings = apply(spout$loadings, 2, function(x) {
-    nz = which(abs(x) > 0)
-    if (length(nz) > 0) x * sign(x[nz[1]]) else x
-  })
+
   rownames(spout$loadings) = var_names
   colnames(spout$loadings) = paste0("sPC", 1:spout$ncomps)
   
@@ -634,11 +632,11 @@ spca = function(M,
              indices = spout$ind
   )
   ## FIX TIME NAMES
- # browser()
+#  browser()
   if (use_fat_backend) {
     out$scores = spout$scores
     if (n_comps > 1){
-      out$spc_cor = cor(spout$scores)
+      out$spc_cor = spout$cor_comps
       colnames(out$spc_cor) = paste0("sPC", seq_len(spout$ncomps))
       rownames(out$spc_cor) = paste0("sPC", seq_len(spout$ncomps))
     }
@@ -652,9 +650,10 @@ spca = function(M,
     out$time_unit_raw = spout$time_unit_raw
   }
   else {
-    # check if exist both scores and spc_cor add to cpp (done in thin but not checked) add to docs
+    # check if exist both scores and spc_cor add to cpp (done in tall but not checked) add to docs
+ #   browser()
     if ((is_datamatrix_M)) {
-      out$scores = ab(M, spout$loadings[, seq_len(spout$ncomps), 
+      out$scores = make_scores(M, spout$loadings[, seq_len(spout$ncomps), 
                                          drop = FALSE])
       
       colnames(out$scores) = paste0("sPC", seq_len(spout$ncomps))

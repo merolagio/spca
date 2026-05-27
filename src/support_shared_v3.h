@@ -14,9 +14,12 @@ void makeXdC(const Eigen::Ref<const Eigen::MatrixXd>& X,
              const Eigen::Ref<const Eigen::VectorXi>& ind,
              Eigen::MatrixXd& Xd);
 
-Eigen::MatrixXd CorCompC(const Eigen::Map<Eigen::MatrixXd>& A,
-                         const Eigen::Map<Eigen::MatrixXd>& S,
+Eigen::MatrixXd CorCompC(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                         const Eigen::Ref<const Eigen::MatrixXd>& S,
                          int d = 0);
+Eigen::MatrixXd cor_int(const Eigen::Ref<const Eigen::MatrixXd>& X,
+                        bool center = true,
+                        bool scale = true);
 
 Eigen::VectorXd eigvecPMC(const Eigen::MatrixXd& X,
                           double& val,

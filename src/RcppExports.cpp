@@ -263,6 +263,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// corC
+Eigen::MatrixXd corC(const Eigen::Map<Eigen::MatrixXd>& X, bool center, bool scale);
+RcppExport SEXP _spca_corC(SEXP XSEXP, SEXP centerSEXP, SEXP scaleSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< bool >::type center(centerSEXP);
+    Rcpp::traits::input_parameter< bool >::type scale(scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(corC(X, center, scale));
+    return rcpp_result_gen;
+END_RCPP
+}
 // var2corC
 Eigen::MatrixXd var2corC(const Eigen::Map<Eigen::MatrixXd>& S);
 RcppExport SEXP _spca_var2corC(SEXP SSEXP) {
@@ -271,6 +284,18 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type S(SSEXP);
     rcpp_result_gen = Rcpp::wrap(var2corC(S));
+    return rcpp_result_gen;
+END_RCPP
+}
+// make_scoresC
+Eigen::MatrixXd make_scoresC(const Eigen::Map<Eigen::MatrixXd>& X, const Eigen::Map<Eigen::MatrixXd>& A);
+RcppExport SEXP _spca_make_scoresC(SEXP XSEXP, SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(make_scoresC(X, A));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -533,7 +558,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_scaleC", (DL_FUNC) &_spca_scaleC, 3},
     {"_spca_scaleColsC", (DL_FUNC) &_spca_scaleColsC, 3},
     {"_spca_make_vexpSC", (DL_FUNC) &_spca_make_vexpSC, 2},
+    {"_spca_corC", (DL_FUNC) &_spca_corC, 3},
     {"_spca_var2corC", (DL_FUNC) &_spca_var2corC, 1},
+    {"_spca_make_scoresC", (DL_FUNC) &_spca_make_scoresC, 2},
     {"_spca_makeCorCompC", (DL_FUNC) &_spca_makeCorCompC, 3},
     {"_spca_makeCorScoresC", (DL_FUNC) &_spca_makeCorScoresC, 2},
     {"_spca_PMnEigenpairs", (DL_FUNC) &_spca_PMnEigenpairs, 5},

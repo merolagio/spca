@@ -450,307 +450,6 @@ static void cspcaTQ(const Eigen::Ref<const Eigen::MatrixXd>& X,
   a.head(cardt) = vec.array() / vec.norm();
 }
 
-// =============================================================================
-// fwd_selectT
-//
-// Forward variable selection for fat matrices (p > n).
-//
-// Let
-//   Q_j    = X deflated by the first j - 1 selected components,
-//   D      = Q_j Q_j'   = current deflated row-space matrix,
-//   D_orig = X X'       = original row-space matrix,
-//   u      = leading unit-norm eigenvector of D.
-//
-// Details
-// The inputs X, D, and D_orig are not modified. The function creates local
-// working copies only when they are needed.
-//
-// HOW SELECTION IS DONE
-//   The function always performs forward selection and adds one variable at a
-//   time to the current subset.
-//
-//   stop_rule = 0  ->  r2
-//     Screening is based on partial r2. The function creates
-//       Xw = working residualized copy of X,
-//       uw = working residualized copy of u.
-//     After each selected variable, the same one-variable projection is
-//     removed from uw and from the remaining columns of Xw. For a candidate
-//     variable xw_j, the screening value is
-//       (uw' xw_j)^2 / (||u||^2 xw_j' xw_j).
-//     The stopping rule is checked from the residual norm:
-//       r2 = 1 - ||uw||^2 / ||u||^2.
-//
-//   stop_rule = 1  ->  cvexp
-//     Screening is based on one-variable Rayleigh quotients. The function
-//     creates a working copy
-//       K_rank = D,
-//     and deflates it by the variables selected so far. For a candidate
-//     variable x_j, the screening value is
-//       x_j' K_rank x_j / (x_j' x_j).
-//     After each new variable is added, the current subset is evaluated on D.
-//     If exact cvexp is needed for the stopping check, cspcaTC() is used so the
-//     score column is available; otherwise cspcaTQ() is used to avoid writing
-//     scores during the search.
-//
-// RETURNS
-//   false if the target was reached.
-//   true  if the search stopped without reaching the target.
-//   @noRd
-// =============================================================================
-bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
-                  const MatrixXd& D,
-                  const MatrixXd& D_orig,
-                  double totvexp,
-                  const VectorXd& u,
-                  double oldcvexp,
-                  double maxcvexp,
-                  double alpha,
-                  int mincard,
-                  int stop_rule,
-                  Eigen::VectorXd& a,
-                  Eigen::VectorXi& ind,
-                  int& cardt,
-                  double& vexp,
-                  double& cvexp,
-                  double& r2,
-                  Eigen::MatrixXd& scores,
-                  int comp_number,
-                  bool exact_cvexp,
-                  bool PM,
-                  double epsPM, // 1e-5,
-                  int maxiterPM) //100
-{
-  const int p = X.cols();
-
-  if (stop_rule != 0 && stop_rule != 1)
-    Rcpp::stop("fwd_selectT: stop_rule must be 0 (r2) or 1 (cvexp)");
-
-  Eigen::VectorXi indnot = VectorXi::Constant(p, -2);
-  double eigval = 0.0;
-  double cur_cvexp = oldcvexp;
-  double cur_r2 = 0.0;
-
-  Eigen::MatrixXd K_rank;
-  if (stop_rule == 1)
-    K_rank = D;
-
-  Eigen::MatrixXd Xw;
-  Eigen::VectorXd uw;
-  double u_norm2_0 = 0.0;
-  if (stop_rule == 0) {
-    Xw = X;
-    uw = u;
-    u_norm2_0 = u.squaredNorm();
-    if (u_norm2_0 <= 0.0)
-      Rcpp::stop("fwd_selectT: input u must have positive norm for stop_rule = 0");
-  }
-
-  int indmax = -1;
-  double best_val = -1.0;
-
-  for (int j = 0; j < p; j++) {
-    double nor = X.col(j).squaredNorm();
-    if (nor <= 0.0) {
-      indnot(j) = -1;
-      continue;
-    }
-
-    double val = 0.0;
-    if (stop_rule == 0) {
-      double uxj = uw.dot(Xw.col(j));
-      val = (uxj * uxj) / (u_norm2_0 * nor);
-    } else {
-      double xKx = X.col(j).transpose() * K_rank * X.col(j);
-      val = xKx / nor;
-    }
-
-    if (val > best_val) {
-      best_val = val;
-      indmax = j;
-    }
-  }
-
-  if (indmax < 0 || best_val <= 0.0) {
-    Rcpp::warning("fwd_selectT: no admissible variables");
-    cardt = 0;
-    vexp = 0.0;
-    cvexp = oldcvexp;
-    r2 = 0.0;
-    return true;
-  }
-
-  ind(0) = indmax;
-  indnot(indmax) = indmax;
-  cardt = 1;
-
-  if (stop_rule == 0) {
-    const Eigen::VectorXd xj = Xw.col(indmax);
-    const double norj = xj.squaredNorm();
-    if (norj > 0.0) {
-      const double uxj = uw.dot(xj);
-      uw -= xj * (uxj / norj);
-      for (int k = 0; k < p; k++) {
-        if (indnot(k) != -2) continue;
-        const double proj = Xw.col(k).dot(xj) / norj;
-        Xw.col(k) -= xj * proj;
-      }
-    }
-    cur_r2 = 1.0 - uw.squaredNorm() / u_norm2_0;
-    if (cur_r2 < 0.0) cur_r2 = 0.0;
-    if (cur_r2 > 1.0) cur_r2 = 1.0;
-  }
-
-  Eigen::VectorXi indSorted(1);
-  indSorted(0) = ind(0);
-
-  // Single-variable case: Rayleigh quotient directly, no eigensolve needed.
-  // cspcaTC for cardt = 1 would give a(0) = 1, eigval = x'Dx / x'x, scores = x.
-  a(0) = 1.0; 
-  Eigen::VectorXd x0 = X.col(ind(0));
-  scores.col(comp_number) = x0;
-  double x0norm2 = x0.squaredNorm();
-  eigval = (x0norm2 > 0.0) ? (x0.dot(D * x0) / x0norm2) : 0.0;
-
-  vexp = eigval;
-  if (exact_cvexp && comp_number > 0)
-    cur_cvexp = compute_cvexp_T(scores, comp_number + 1, D_orig, totvexp);
-  else
-    cur_cvexp = oldcvexp + eigval;
-
-  if ((stop_rule == 0 && cur_r2 >= alpha && mincard <= 1) ||
-      (stop_rule == 1 && cur_cvexp >= alpha * maxcvexp && mincard <= 1)) {
-    cvexp = cur_cvexp;
-    r2 = (stop_rule == 0) ? cur_r2 : compute_r2_subset_T(X, u, indSorted, cardt);
-    std::sort(ind.data(), ind.data() + cardt);
-    return false;
-  }
-
-  bool stopSelect = false;
-  while (!stopSelect) {
-
-    if (stop_rule == 1) {
-      double ignored_vexp = 0.0;
-      deflT_rank1(X.col(ind(cardt - 1)), K_rank, ignored_vexp);
-    }
-
-    indmax = -1;
-    best_val = -1.0;
-
-    for (int j = 0; j < p; j++) {
-      if (indnot(j) != -2) continue;
-
-      if (stop_rule == 0) {
-        double nor = Xw.col(j).squaredNorm();
-        if (nor <= 0.0) {
-          indnot(j) = -1;
-          continue;
-        }
-        double uxj = uw.dot(Xw.col(j));
-        double pr2 = (uxj * uxj) / (u_norm2_0 * nor);
-        if (pr2 > best_val) {
-          best_val = pr2;
-          indmax = j;
-        }
-      } else {
-        double nor = X.col(j).squaredNorm();
-        if (nor <= 0.0) {
-          indnot(j) = -1;
-          continue;
-        }
-        double rayq = (X.col(j).transpose() * K_rank * X.col(j))(0, 0) / nor;
-        if (rayq > best_val) {
-          best_val = rayq;
-          indmax = j;
-        }
-      }
-    }
-
-    if (indmax < 0 || best_val <= 0.0) {
-      stopSelect = true;
-      break;
-    }
-
-    ind(cardt) = indmax;
-    indnot(indmax) = indmax;
-    cardt++;
-
-    if (stop_rule == 0) {
-      const Eigen::VectorXd xj = Xw.col(indmax);
-      const double norj = xj.squaredNorm();
-      if (norj > 0.0) {
-        const double uxj = uw.dot(xj);
-        uw -= xj * (uxj / norj);
-        for (int k = 0; k < p; k++) {
-          if (indnot(k) != -2) continue;
-          const double proj = Xw.col(k).dot(xj) / norj;
-          Xw.col(k) -= xj * proj;
-        }
-      }
-
-      cur_r2 = 1.0 - uw.squaredNorm() / u_norm2_0;
-      if (cur_r2 < 0.0) cur_r2 = 0.0;
-      if (cur_r2 > 1.0) cur_r2 = 1.0;
-
-      if (cardt >= mincard && cur_r2 >= alpha)
-        stopSelect = true;
-      else if (cardt == p)
-        stopSelect = true;
-
-    } else {
-      indSorted = ind.head(cardt);
-      std::sort(indSorted.data(), indSorted.data() + cardt);
-      if (exact_cvexp && comp_number > 0) {
-        
-        bool singular_fit = false;
-        cspcaTC(X, D, eigval, indSorted, cardt, a, scores, singular_fit,
-                comp_number, PM, epsPM, maxiterPM);
-        if (singular_fit)
-          return true;
-        
-        cur_cvexp = compute_cvexp_T(scores, comp_number + 1, D_orig, totvexp);
-        
-      } else {
-        cspcaTQ(X, D, eigval, indSorted, cardt, a,
-                PM, epsPM, maxiterPM);
-        cur_cvexp = oldcvexp + eigval;
-      }
-
-      vexp = eigval;
-
-      if (cardt >= mincard && cur_cvexp >= alpha * maxcvexp)
-        stopSelect = true;
-      else if (cardt == p)
-        stopSelect = true;
-    }
-  }
-
-  indSorted = ind.head(cardt);
-  std::sort(indSorted.data(), indSorted.data() + cardt);
-
-  // Final loadings and scores are always computed with cspcaTC().
-  // During forward cvexp selection, cspcaTQ() is used only when scores are not needed.
-
-  bool singular_fit = false;
-  cspcaTC(X, D, eigval, indSorted, cardt, a, scores, singular_fit, comp_number,
-          PM, epsPM, maxiterPM);
-  if (singular_fit)
-    return true;
-
-  vexp = eigval;
-  if (exact_cvexp && comp_number > 0)
-    cur_cvexp = compute_cvexp_T(scores, comp_number + 1, D_orig, totvexp);
-  else
-    cur_cvexp = oldcvexp + eigval;
-
-  cvexp = cur_cvexp;
-  if (stop_rule == 0)
-    r2 = cur_r2;
-  else
-    r2 = compute_r2_subset_T(X, u, indSorted, cardt);
-
-  std::sort(ind.data(), ind.data() + cardt);
-  return (stop_rule == 0) ? (r2 < alpha) : (cur_cvexp < alpha * maxcvexp);
-}
 
 // Variable selection for fat matrices — R wrapper for testing.
 //
@@ -776,3 +475,256 @@ bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
 // @param maxiterPM Power-method max iterations (default 150).
 // @return A list with selected indices, cardinality, loadings, vexp, cvexp,
 //   and r2.
+bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
+                  const Eigen::MatrixXd& D,
+                  const Eigen::MatrixXd& D_orig,
+                  double totvexp,
+                  const Eigen::VectorXd& u,
+                  double oldcvexp,
+                  double maxcvexp,
+                  double alpha,
+                  int mincard,
+                  int stop_rule,
+                  Eigen::VectorXd& a,
+                  Eigen::VectorXi& ind,
+                  int& cardt,
+                  double& vexp,
+                  double& cvexp,
+                  double& r2,
+                  Eigen::MatrixXd& scores,
+                  int comp_number,
+                  bool exact_cvexp,
+                  bool PM,
+                  double epsPM, // 1e-5,
+                  int maxiterPM) //100
+{
+  const int p = X.cols();
+  
+  if (stop_rule != 0 && stop_rule != 1)
+    Rcpp::stop("fwd_selectT: stop_rule must be 0 (r2) or 1 (cvexp)");
+  
+  Eigen::VectorXi indnot = VectorXi::Constant(p, -2);
+  double eigval = 0.0;
+  double cur_cvexp = oldcvexp;
+  double cur_r2 = 0.0;
+  
+  Eigen::MatrixXd K_rank;
+  if (stop_rule == 1)
+    K_rank = D;
+  
+  Eigen::MatrixXd Xw;
+  Eigen::VectorXd uw;
+  double u_norm2_0 = 0.0;
+  if (stop_rule == 0) {
+    Xw = X;
+    uw = u;
+    u_norm2_0 = u.squaredNorm();
+    if (u_norm2_0 <= 0.0)
+      Rcpp::stop("fwd_selectT: input u must have positive norm for stop_rule = 0");
+  }
+  
+  int indmax = -1;
+  double best_val = -1.0;
+  
+  for (int j = 0; j < p; j++) {
+    double nor = X.col(j).squaredNorm();
+    if (nor <= 0.0) {
+      indnot(j) = -1;
+      continue;
+    }
+    
+    double val = 0.0;
+    if (stop_rule == 0) {
+      double uxj = uw.dot(Xw.col(j));
+      val = (uxj * uxj) / (u_norm2_0 * nor);
+    } else {
+      val = X.col(j).dot(K_rank * X.col(j)) / nor;
+    }
+    
+    if (val > best_val) {
+      best_val = val;
+      indmax = j;
+    }
+  }
+  
+  if (indmax < 0 || best_val <= 0.0) {
+    Rcpp::warning("fwd_selectT: no admissible variables");
+    cardt = 0;
+    vexp = 0.0;
+    cvexp = oldcvexp;
+    r2 = 0.0;
+    return true;
+  }
+  
+  ind(0) = indmax;
+  indnot(indmax) = indmax;
+  cardt = 1;
+  
+  if (stop_rule == 0) {
+    const Eigen::VectorXd xj = Xw.col(indmax);
+    const double norj = xj.squaredNorm();
+    if (norj > 0.0) {
+      const double uxj = uw.dot(xj);
+      cur_r2 += (uxj * uxj) / (u_norm2_0 * norj);
+      uw -= xj * (uxj / norj);
+      for (int k = 0; k < p; k++) {
+        if (indnot(k) != -2) continue;
+        const double proj = Xw.col(k).dot(xj) / norj;
+        Xw.col(k) -= xj * proj;
+      }
+    }
+    if (cur_r2 < 0.0) cur_r2 = 0.0;
+    if (cur_r2 > 1.0) cur_r2 = 1.0;
+  }
+  
+  Eigen::VectorXi indSorted(1);
+  indSorted(0) = ind(0);
+  
+  // Single-variable case: Rayleigh quotient directly, no eigensolve needed.
+  // cspcaTC for cardt = 1 would give a(0) = 1, eigval = x'Dx / x'x, scores = x.
+  a(0) = 1.0; 
+  Eigen::VectorXd x0 = X.col(ind(0));
+  scores.col(comp_number) = x0;
+  double x0norm2 = x0.squaredNorm();
+  eigval = (x0norm2 > 0.0) ? (x0.dot(D * x0) / x0norm2) : 0.0;
+  
+  vexp = eigval;
+  if (exact_cvexp && comp_number > 0)
+    cur_cvexp = compute_cvexp_T(scores, comp_number + 1, D_orig, totvexp);
+  else
+    cur_cvexp = oldcvexp + eigval;
+  
+  if ((stop_rule == 0 && cur_r2 >= alpha && mincard <= 1) ||
+      (stop_rule == 1 && cur_cvexp >= alpha * maxcvexp && mincard <= 1)) {
+    cvexp = cur_cvexp;
+    r2 = (stop_rule == 0) ? cur_r2 : compute_r2_subset_T(X, u, indSorted, cardt);
+    std::sort(ind.data(), ind.data() + cardt);
+    return false;
+  }
+  
+  bool stopSelect = false;
+  while (!stopSelect) {
+    
+    if (stop_rule == 1) {
+      double ignored_vexp = 0.0;
+      deflT_rank1(X.col(ind(cardt - 1)), K_rank, ignored_vexp);
+    }
+    
+    indmax = -1;
+    best_val = -1.0;
+    
+    for (int j = 0; j < p; j++) {
+      if (indnot(j) != -2) continue;
+      
+      if (stop_rule == 0) {
+        double nor = Xw.col(j).squaredNorm();
+        if (nor <= 0.0) {
+          indnot(j) = -1;
+          continue;
+        }
+        double uxj = uw.dot(Xw.col(j));
+        double pr2 = (uxj * uxj) / (u_norm2_0 * nor);
+        if (pr2 > best_val) {
+          best_val = pr2;
+          indmax = j;
+        }
+      } else {
+        double nor = X.col(j).squaredNorm();
+        if (nor <= 0.0) {
+          indnot(j) = -1;
+          continue;
+        }
+        double rayq = X.col(j).dot(K_rank * X.col(j)) / nor;
+        if (rayq > best_val) {
+          best_val = rayq;
+          indmax = j;
+        }
+      }
+    }
+    
+    if (indmax < 0 || best_val <= 0.0) {
+      stopSelect = true;
+      break;
+    }
+    
+    ind(cardt) = indmax;
+    indnot(indmax) = indmax;
+    cardt++;
+    
+    if (stop_rule == 0) {
+      const Eigen::VectorXd xj = Xw.col(indmax);
+      const double norj = xj.squaredNorm();
+      if (norj > 0.0) {
+        const double uxj = uw.dot(xj);
+        cur_r2 += (uxj * uxj) / (u_norm2_0 * norj);
+        uw -= xj * (uxj / norj);
+        for (int k = 0; k < p; k++) {
+          if (indnot(k) != -2) continue;
+          const double proj = Xw.col(k).dot(xj) / norj;
+          Xw.col(k) -= xj * proj;
+        }
+      }
+      
+      if (cur_r2 < 0.0) cur_r2 = 0.0;
+      if (cur_r2 > 1.0) cur_r2 = 1.0;
+      
+      if (cardt >= mincard && cur_r2 >= alpha)
+        stopSelect = true;
+      else if (cardt == p)
+        stopSelect = true;
+      
+    } else {
+      indSorted = ind.head(cardt);
+      std::sort(indSorted.data(), indSorted.data() + cardt);
+      if (exact_cvexp && comp_number > 0) {
+        
+        bool singular_fit = false;
+        cspcaTC(X, D, eigval, indSorted, cardt, a, scores, singular_fit,
+                comp_number, PM, epsPM, maxiterPM);
+        if (singular_fit)
+          return true;
+        
+        cur_cvexp = compute_cvexp_T(scores, comp_number + 1, D_orig, totvexp);
+        
+      } else {
+        cspcaTQ(X, D, eigval, indSorted, cardt, a,
+                PM, epsPM, maxiterPM);
+        cur_cvexp = oldcvexp + eigval;
+      }
+      
+      vexp = eigval;
+      
+      if (cardt >= mincard && cur_cvexp >= alpha * maxcvexp)
+        stopSelect = true;
+      else if (cardt == p)
+        stopSelect = true;
+    }
+  }
+  
+  indSorted = ind.head(cardt);
+  std::sort(indSorted.data(), indSorted.data() + cardt);
+  
+  // Final loadings and scores are always computed with cspcaTC().
+  // During forward cvexp selection, cspcaTQ() is used only when scores are not needed.
+  
+  bool singular_fit = false;
+  cspcaTC(X, D, eigval, indSorted, cardt, a, scores, singular_fit, comp_number,
+          PM, epsPM, maxiterPM);
+  if (singular_fit)
+    return true;
+  
+  vexp = eigval;
+  if (exact_cvexp && comp_number > 0)
+    cur_cvexp = compute_cvexp_T(scores, comp_number + 1, D_orig, totvexp);
+  else
+    cur_cvexp = oldcvexp + eigval;
+  
+  cvexp = cur_cvexp;
+  if (stop_rule == 0)
+    r2 = cur_r2;
+  else
+    r2 = compute_r2_subset_T(X, u, indSorted, cardt);
+  
+  std::sort(ind.data(), ind.data() + cardt);
+  return (stop_rule == 0) ? (r2 < alpha) : (cur_cvexp < alpha * maxcvexp);
+}

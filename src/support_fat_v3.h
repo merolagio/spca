@@ -96,8 +96,7 @@ bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
                  double epsPM = 1e-5,
                  int maxiterPM = 100);
 
-Rcpp::List varsel_cvexp_T_wrap(Eigen::MatrixXd X,
-                               double alpha = 0.95,
+Rcpp::List varsel_cvexp_T_wrap(Eigen::MatrixXd X,double alpha = 0.95,
                                int mincard = 1,
                                int varsel_method = 0,
                                int stop_rule = 1,
@@ -106,4 +105,27 @@ Rcpp::List varsel_cvexp_T_wrap(Eigen::MatrixXd X,
                                double epsPM = 1e-5,
                                int maxiterPM = 150);
 
-#endif
+bool fwd_selectT2(const Eigen::Ref<const Eigen::MatrixXd>& X,
+                  const Eigen::MatrixXd& D,
+                  const Eigen::MatrixXd& D_orig,
+                  double totvexp,
+                  const Eigen::VectorXd& u,
+                  double oldcvexp,
+                  double maxcvexp,
+                  double alpha,
+                  int mincard,
+                  int stop_rule,
+                  Eigen::VectorXd& a,
+                  Eigen::VectorXi& ind,
+                  int& cardt,
+                  double& vexp,
+                  double& cvexp,
+                  double& r2,
+                  Eigen::MatrixXd& scores,
+                  int comp_number,
+                  bool exact_cvexp,
+                  bool PM,
+                  double epsPM, // 1e-5,
+                  int maxiterPM);
+  
+  #endif

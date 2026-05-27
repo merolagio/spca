@@ -21,11 +21,66 @@ using Eigen::SelfAdjointEigenSolver;
 using Eigen::LLT;
 using Eigen::Ref;
 
-// Provided by Cpp_Utils_exptd_R_v2.cpp. CorCompC() delegates to this to keep
-// one implementation of component correlations.
-Eigen::MatrixXd makeCorCompC(const Eigen::Map<Eigen::MatrixXd>& A,
-                             const Eigen::Map<Eigen::MatrixXd>& S,
-                             int ncomps);
+// same as Cpp_Utils_exptd_R_v2.cpp. CorCompC() but
+// takes Ref<const 
+Eigen::MatrixXd makeCorComp_int(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                             const Eigen::Ref<const Eigen::MatrixXd>& S,
+                             int ncomps){
+  try {
+    if (A.rows() == 0 || A.cols() == 0)
+      Rcpp::stop("A must have at least one row and one column");
+    
+    if (S.rows() != S.cols())
+      Rcpp::stop("S must be square");
+    
+    if (A.rows() != S.rows())
+      Rcpp::stop("A and S have incompatible dimensions");
+    
+    if (!A.allFinite() || !S.allFinite())
+      Rcpp::stop("A and S must contain only finite values");
+    
+    if (ncomps == 0 || ncomps > A.cols())
+      ncomps = A.cols();
+    
+    if (ncomps < 2)
+      Rcpp::stop("ncomps must be > 1");
+    
+    if (ncomps < 0)
+      Rcpp::stop("ncomps must be non-negative");
+    
+    const Eigen::MatrixXd Ad = A.leftCols(ncomps);
+    
+    Eigen::MatrixXd SA(S.rows(), ncomps);
+    SA.noalias() = S * Ad;
+    
+    Eigen::MatrixXd C(ncomps, ncomps);
+    C.noalias() = Ad.transpose() * SA;
+    
+    Eigen::ArrayXd v = C.diagonal().array();
+    
+    if ((!v.isFinite()).any())
+      Rcpp::stop("component variances are non-finite");
+    
+    if ((v <= 0.0).any())
+      Rcpp::stop("component variances must be positive");
+    
+    Eigen::ArrayXd s = v.sqrt();
+    
+    C.array().rowwise() /= s.transpose();
+    C.array().colwise() /= s;
+    
+    if (!C.allFinite())
+      Rcpp::stop("non-finite correlations produced");
+    
+    return C;
+  }
+  catch (std::exception& ex) {
+    Rcpp::stop("makeCorComp_int failed: " + std::string(ex.what()));
+  }
+  catch (...) {
+    Rcpp::stop("makeCorComp_int failed: unknown C++ error");
+  }
+}
 
 // Creates a sub-matrix of covariance matrix S with indices in e, 
 //   both rows and columns faster x2 varsion, because in Eigen matrices 
@@ -150,12 +205,12 @@ void makeXdC(const Eigen::Ref<const Eigen::MatrixXd>& X,
   }
 }
 
-Eigen::MatrixXd CorCompC(const Eigen::Map<Eigen::MatrixXd>& A,
-                         const Eigen::Map<Eigen::MatrixXd>& S,
-                         int d) // 0
+Eigen::MatrixXd CorCompC(const  Eigen::Ref<const Eigen::MatrixXd>& A,
+                         const  Eigen::Ref<const Eigen::MatrixXd>& S,
+                         int d)  
 {
   try {
-    return makeCorCompC(A, S, d);
+    return makeCorComp_int(A, S, d);
   }
   catch (std::exception& ex) {
     Rcpp::stop("CorCompC failed: " + std::string(ex.what()));
@@ -164,6 +219,37 @@ Eigen::MatrixXd CorCompC(const Eigen::Map<Eigen::MatrixXd>& A,
     Rcpp::stop("CorCompC failed: unknown C++ error");
   }
 }
+
+Eigen::MatrixXd cor_int(const Eigen::Ref<const Eigen::MatrixXd>& X,
+                        bool center,
+                        bool scale)
+{
+  try {
+    
+    Eigen::MatrixXd C = X;
+    
+    if (center)
+      C.array().rowwise() -= C.colwise().mean().array();
+    
+    if (scale) {
+      Eigen::VectorXd s = C.colwise().norm();
+      
+      if ((s.array() <= 0.0).any())
+        Rcpp::stop("at least one column has zero norm");
+      
+      C.array().rowwise() /= s.array().transpose();
+    }
+
+    return C.transpose() * C;;
+  }
+  catch (std::exception& ex) {
+    Rcpp::stop("corC failed: " + std::string(ex.what()));
+  }
+  catch (...) {
+    Rcpp::stop("corC failed: unknown C++ error");
+  }
+}
+
 
 // Power method computes first eigvec, about 82 times faster than eigen!
 // 

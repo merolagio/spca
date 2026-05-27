@@ -24,27 +24,18 @@ Eigen::MatrixXd scaleC(const Eigen::Map<Eigen::MatrixXd>& A,
     if (!A.allFinite())
       Rcpp::stop("A must contain only finite values");
     
-    if (scale && A.rows() < 2)
-      Rcpp::stop("at least two rows are needed to scale columns");
+    Eigen::MatrixXd C = A;
     
-    Eigen::MatrixXd C = A; // copy is required
-    Eigen::VectorXd m(A.cols());
-    
-    if (center) {
-      m = C.colwise().mean();
-      C.array().rowwise() -= m.array().transpose();
-    }
+    if (center)
+      C.array().rowwise() -= C.colwise().mean().array();
     
     if (scale) {
-      Eigen::VectorXd cm = A.colwise().mean();
-      Eigen::MatrixXd Ac = A;
-      Ac.array().rowwise() -= cm.array().transpose();
-      m = (Ac.array().square().colwise().sum() / double(A.rows() - 1)).sqrt();
+      Eigen::VectorXd s = C.colwise().norm();
       
-      if ((m.array() <= 0.0).any())
-        Rcpp::stop("at least one column has zero scale");
+      if ((s.array() <= 0.0).any())
+        Rcpp::stop("at least one column has zero norm");
       
-      C.array().rowwise() /= m.array().transpose();
+      C.array().rowwise() /= s.array().transpose();
     }
     
     return C;
@@ -133,6 +124,30 @@ List make_vexpSC(const Eigen::Map<Eigen::MatrixXd>& A,
     Rcpp::stop("make_vexpSC failed: unknown C++ error");
   }
 }
+/////////////////////////////////////////////////////////
+// computes correlation matrix
+// [[Rcpp::export]]
+Eigen::MatrixXd corC(const Eigen::Map<Eigen::MatrixXd>& X,
+                     bool center = true,
+                     bool scale = true) {
+  try {
+    
+    Eigen::MatrixXd M;
+    if(scale || center)
+      M = scaleC(X, center, scale);
+    
+    
+    return M.transpose() * M;
+  }
+  catch (std::exception& ex) {
+    Rcpp::stop("corC failed: " + std::string(ex.what()));
+  }
+  catch (...) {
+    Rcpp::stop("corC failed: unknown C++ error");
+  }
+}
+
+//////////////////////////////////////////////////////////
 // transforms a variance matrix to correlation matrix
 // [[Rcpp::export]]
 Eigen::MatrixXd var2corC(const Eigen::Map<Eigen::MatrixXd>& S) {
@@ -166,6 +181,44 @@ Eigen::MatrixXd var2corC(const Eigen::Map<Eigen::MatrixXd>& S) {
     Rcpp::stop("var2corC failed: unknown C++ error");
   }
 }
+
+//computes efficiently scores from sparse loading matrix
+
+// [[Rcpp::export]]
+Eigen::MatrixXd make_scoresC(const Eigen::Map<Eigen::MatrixXd>& X,
+                                  const Eigen::Map<Eigen::MatrixXd>& A) {
+  try {
+    if (X.cols() != A.rows())
+      Rcpp::stop("X columns must match A rows");
+    
+    if (!X.allFinite())
+      Rcpp::stop("X must contain only finite values");
+    
+    if (!A.allFinite())
+      Rcpp::stop("A must contain only finite values");
+    
+    const int n = X.rows();
+    const int r = A.cols();
+    
+    Eigen::MatrixXd T = Eigen::MatrixXd::Zero(n, r);
+    
+    for (int j = 0; j < r; j++) {
+      for (int k = 0; k < A.rows(); k++) {
+        if (A(k, j) != 0.0)
+          T.col(j).noalias() += X.col(k) * A(k, j);
+      }
+    }
+    
+    return T;
+  }
+  catch (std::exception& ex) {
+    Rcpp::stop("makeScoresSparseC failed: " + std::string(ex.what()));
+  }
+  catch (...) {
+    Rcpp::stop("makeScoresSparseC failed: unknown C++ error");
+  }
+}
+
 
 
 // Computes the correlation between sPCs (using loadings A and cov  S).

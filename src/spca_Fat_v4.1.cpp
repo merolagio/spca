@@ -21,7 +21,7 @@
 #include <ctime>
 
 #include "support_shared_v3.h"
-#include "support_fat_v3.h"
+#include "support_fat_v3.h" // this with new var_sel
 
 using namespace Rcpp;
 using namespace Eigen;
@@ -139,6 +139,8 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
   const int n = X.rows();
   const int p = X.cols();
 
+  try {
+
   const long long t_setup0_wall = wall_now_ns();
   const double t_setup0_cpu = cpu_now_ns();
 
@@ -192,6 +194,8 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
   MatrixXd TimeWall = MatrixXd::Zero(ncomps, 4);
   MatrixXd TimeCPU = MatrixXd::Zero(ncomps, 4);
+  Timer timer;
+  Timer timecomp;
 
   VectorXd PCvexp(n);
   MatrixXd PCscores = MatrixXd::Zero(n, ncomps);
@@ -210,6 +214,9 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
   const long long setup_wall_ns = wall_now_ns() - t_setup0_wall;
   const double setup_cpu_ns = cpu_now_ns() - t_setup0_cpu;
+
+  timer.step("start");
+  timecomp.step("start");
 
   try {
     int j = 0;
@@ -293,6 +300,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
       TimeWall(j, 0) = static_cast<double>(wall_now_ns() - t_phase0_wall);
       TimeCPU(j, 0) = cpu_now_ns() - t_phase0_cpu;
+      timer.step("comp " + std::to_string(j + 1) + ":  PC");
 
       const long long t_phase1_wall = wall_now_ns();
       const double t_phase1_cpu = cpu_now_ns();
@@ -319,6 +327,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
       TimeWall(j, 1) = static_cast<double>(wall_now_ns() - t_phase1_wall);
       TimeCPU(j, 1) = cpu_now_ns() - t_phase1_cpu;
+      timer.step("comp " + std::to_string(j + 1) + "variable_selection");
 
       const long long t_phase2_wall = wall_now_ns();
       const double t_phase2_cpu = cpu_now_ns();
@@ -377,14 +386,13 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
       TimeWall(j, 2) = static_cast<double>(wall_now_ns() - t_phase2_wall);
       TimeCPU(j, 2) = cpu_now_ns() - t_phase2_cpu;
+      timer.step("comp " + std::to_string(j + 1) + "Component");
 
       const long long t_phase3_wall = wall_now_ns();
       const double t_phase3_cpu = cpu_now_ns();
 
       double cvt = 0.0;
-      double curtrace = D.trace();
-      MatrixXd pcj = scores.middleCols(j, 1);
-      deflT_F(pcj, D, curtrace, cvt);
+      deflT_rank1(scores.col(j), D, cvt);
 
       nc = j + 1;
       VectorXd vtmp(nc), cvtmp(nc);
@@ -398,43 +406,70 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
       TimeWall(nc - 1, 3) = static_cast<double>(wall_now_ns() - t_phase3_wall);
       TimeCPU(nc - 1, 3) = cpu_now_ns() - t_phase3_cpu;
+      timer.step("comp " + std::to_string(nc) + "Deflation");
+      timecomp.step("comp " + std::to_string(nc));
     }
   } catch (const std::exception& e) {
     Rcpp::stop(std::string("lsspcaTC component loop: ") + e.what());
   }
 
-  VectorXd vexp_final(nc), cvexp_final(nc);
-  compute_vexp_cvexp_T_exact(scores.leftCols(nc), nc, D_orig, totvexp, vexp_final, cvexp_final);
+  timer.step("end");
+  try {
+    NumericVector res(timer);
 
-  IntegerVector idx = Rcpp::seq(0, nc - 1);
-  CharacterVector meth(nc, "uSPCA");
-  for (int j = 0; j < nc; j++) {
-    if (Rcpp::as<string>(method[j]) == "c") meth[j] = "cSPCA";
-    if (Rcpp::as<string>(method[j]) == "p") meth[j] = "pSPCA";
+    MatrixXd Ti(nc, 4);
+    NumericVector tt = diff(res);
+    for (int i = 0; i < nc; i++)
+      for (int j = 0; j < 4; j++)
+        Ti(i, j) = tt(i * 4 + j);
+
+    VectorXd vexp_final(nc), cvexp_final(nc);
+    compute_vexp_cvexp_T_exact(scores.leftCols(nc), nc, D_orig, totvexp, vexp_final, cvexp_final);
+
+    IntegerVector idx = Rcpp::seq(0, nc - 1);
+    CharacterVector meth(nc, "uSPCA");
+    for (int j = 0; j < nc; j++) {
+      if (Rcpp::as<string>(method[j]) == "c") meth[j] = "cSPCA";
+      if (Rcpp::as<string>(method[j]) == "p") meth[j] = "pSPCA";
+    }
+
+    string varselection = (stop_criterion == 0) ? "forward R2" : "forward cvexp";
+    CharacterVector Time_colnames = CharacterVector::create("PC", "varsel", "loadings", "deflation");
+   Eigen::MatrixXd  cor_comps = cor_int(scores.leftCols(nc), false, true);
+   
+    return List::create(
+      Named("loadings") = A.leftCols(nc),
+      Named("loadlist") = loadlist[idx],
+      Named("ncomps") = nc,
+      Named("ind") = indout[idx],
+      Named("card") = card.head(nc),
+      Named("vexp") = vexp_final.head(nc),
+      Named("cvexp") = cvexp_final.head(nc),
+      Named("vexpPC") =  PCvexp.head(nc),
+      Named("scores") = scores.leftCols(nc),
+      Named("cor_comps") = cor_comps,
+      Named("r") = rvec.head(nc),
+      Named("totvar") = totvexp,
+      Named("Time") = Ti,
+      Named("Time_wall") = TimeWall.topRows(nc),
+      Named("Time_cpu") = TimeCPU.topRows(nc),
+      Named("Time_colnames") = Time_colnames,
+      Named("setup_wall") = static_cast<double>(setup_wall_ns),
+      Named("setup_cpu") = setup_cpu_ns,
+      Named("time_unit_raw") = "nanoseconds",
+      Named("timevec") = res,
+      Named("timecomp") = timecomp,
+      Named("method") = meth,
+      Named("varSelection") = varselection
+    );
+  } catch (const std::exception& e) {
+    Rcpp::stop(std::string("lsspcaTC output: ") + e.what());
   }
-
-  string varselection = (stop_criterion == 0) ? "forward R2" : "forward cvexp";
-  CharacterVector Time_colnames = CharacterVector::create("setup", "varsel", "loadings", "deflation");
-
-  return List::create(
-    Named("loadings") = A.leftCols(nc),
-    Named("loadlist") = loadlist[idx],
-    Named("ncomps") = nc,
-    Named("ind") = indout[idx],
-    Named("card") = card.head(nc),
-    Named("vexp") = vexp_final.head(nc),
-    Named("cvexp") = cvexp_final.head(nc),
-    Named("vexpPC") =  PCvexp.head(nc),
-    Named("scores") = scores.leftCols(nc),
-    Named("r") = rvec.head(nc),
-    Named("totvar") = totvexp,
-    Named("Time_wall") = TimeWall.topRows(nc),
-    Named("Time_cpu") = TimeCPU.topRows(nc),
-    Named("Time_colnames") = Time_colnames,
-    Named("setup_wall") = static_cast<double>(setup_wall_ns),
-    Named("setup_cpu") = setup_cpu_ns,
-    Named("time_unit_raw") = "nanoseconds",
-    Named("method") = meth,
-    Named("varSelection") = varselection
-  );
+  return List();
+  } catch (const std::exception& e) {
+    Rcpp::stop(std::string("lsspcaTC: ") + e.what());
+  } catch (...) {
+    Rcpp::stop("lsspcaTC: unknown C++ error");
+  }
+  return List();
 }
