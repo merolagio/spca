@@ -1,6 +1,5 @@
 test_that("fixed_index_list bypasses variable selection by component", {
   m = spca_test_matrices()
-dim(m$S_diag)
 
   fit = spca(m$S_diag, n_comps = 2, method = "c",
               fixed_index_list = list(c(1, 2), c(3, 4)),
@@ -19,7 +18,7 @@ test_that("fixed_index_list validates component count and uSPCA cardinality", {
     spca(m$S_diag, n_comps = 2, method = "c",
          fixed_index_list = list(1, 2, 3, 4, 5)),
     "fixed_index_list must be a mutually exclusive and exhaustive
-             partition of the variables of length > 1"
+       partition of the variables of length > 1"
   )
 
   expect_error(

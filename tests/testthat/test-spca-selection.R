@@ -59,7 +59,8 @@ test_that("fat backend issue eror unsupported selection options", {
     spca(m$X_fat, n_comps = 2, method = "c",
                var_selection = "fwd", intensive = TRUE, 
                fat_matrix = TRUE),
-    "Intensive variable selection not implemented for fat matrices."
+    "Intensive variable selection is not implemented for 
+           objective = 'r2'"
   )
   
 })
