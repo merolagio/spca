@@ -26,33 +26,33 @@
 \arguments{
 \item{x}{An object of class \code{spca}.}
 
-\item{n_plot}{\link{NULL} Integer. Number of components to plot. If \code{NULL}, all
+\item{n_plot}{(NULL) Integer. Number of components to plot. If \code{NULL}, all
 components in \code{x} are plotted.}
 
-\item{plot_type}{\link{c("bars", "circular", "heatmap")} Character. Plot type:
+\item{plot_type}{(c("bars", "circular", "heatmap")) Character. Plot type:
 \code{"bars"}, \code{"circular"}, or \code{"heatmap"}. The first character is enough.}
 
-\item{contributions}{\link{TRUE} Logical. If \code{TRUE}, plot contributions
+\item{contributions}{(TRUE) Logical. If \code{TRUE}, plot contributions
 (loadings scaled to sum to 100\\% within each component); otherwise plot
 L2 unit loadings.}
 
-\item{only_nonzero}{\link{TRUE} Logical. If \code{TRUE}, plot only nonzero entries.}
+\item{only_nonzero}{(TRUE) Logical. If \code{TRUE}, plot only nonzero entries.}
 
-\item{pc_loadings}{\link{NULL} Optional numeric matrix of PCA loadings or PCA
+\item{pc_loadings}{(NULL) Optional numeric matrix of PCA loadings or PCA
 contributions with the same dimensions as \code{x$loadings}. If supplied, SPCA
 and PCA values are plotted together for comparison.}
 
-\item{variable_groups}{\link{NULL} Optional factor or character vector of length
+\item{variable_groups}{(NULL) Optional factor or character vector of length
 \eqn{p} defining groups of variables. If provided, bars or tiles are
 colored by group instead of by component.}
 
-\item{plot_title}{\link{NULL} Optional character. Plot title.}
+\item{plot_title}{(NULL) Optional character. Plot title.}
 
-\item{return_plot}{\link{FALSE} Logical. If \code{TRUE}, return the \code{ggplot2} object.}
+\item{return_plot}{(FALSE) Logical. If \code{TRUE}, return the \code{ggplot2} object.}
 
-\item{show_plot}{\link{TRUE} Logical. If \code{TRUE}, print the plot.}
+\item{show_plot}{(TRUE) Logical. If \code{TRUE}, print the plot.}
 
-\item{controls}{\code{\link[=list]{list()}} List of graphical controls. Supported entries are
+\item{controls}{(list()) List of graphical controls. Supported entries are
 \code{color_scale}, \code{variable_names}, \code{legend_position}, \code{grid_type},
 \code{facet_labels}, \code{legend_title}, \code{x_axis_lab}, \code{adjust_labels_circ},
 \code{flip_heatmap}, and \code{heatmap_color_range}.}
@@ -79,36 +79,39 @@ first character of the supplied string is used to match the
 corresponding option.
 
 \itemize{
-\item{controls} these are common parameters to customize the plots. Advanced
-users can override these by returning the ggplot and apply preferred
-setting through \code{ggplot} functions. The variable that
-controls facetting is \code{component}. See the examples.
-\item{\code{color_scale}}
+\item{\code{controls}}{These are common parameters to customize the plots.
+Advanced users can override these by returning the ggplot and applying
+preferred settings through \code{ggplot} functions. The variable that
+controls faceting is \code{component}. See the examples.}
+\item{\code{color_scale}}{
 \itemize{
-\item '"cbb"' is colorblind-friendly (with black).
-\item \code{"printsafe"} is colorblind- and printer-friendly, \code{"bw"} uses gray tone.
+\item \code{"cbb"} is colorblind-friendly with black.
+\item \code{"printsafe"} is colorblind- and printer-friendly.
+\item \code{"bw"} uses gray tones.
 \item \code{"ggplot"} uses the default ggplot2 scale.
-For more than 8 colors \code{cbb} and \code{printsafe} scales are automatically
-changed to  \code{ggplot}.
-\item{pc_loadings} adds the PCs loadings or contributions side-by side with
-those of the sPCs for comparison, only_zero is automatically set to FALSE
-and only two colors are used.
-For large matrices, the plots may become difficult to interpret.
-\item{Circular plots} are fragile and, for large sets of loadings or
-several components, they may require adjusting the default tuning
-parameters with \code{adjust_labels_circ}.
-This option is not recommended for large matrices.
-\item{variable_names} behaves as follows:
+}
+For more than 8 colors, \code{"cbb"} and \code{"printsafe"} are
+automatically changed to \code{"ggplot"}.}
+\item{\code{pc_loadings}}{Adds PC loadings or contributions side by side
+with those of the sPCs for comparison. \code{only_zero} is automatically
+set to \code{FALSE} and only two colors are used. For large matrices, the
+plots may become difficult to interpret.}
+\item{Circular plots}{Circular plots are fragile and, for large sets of
+loadings or several components, may require adjusting the default tuning
+parameters with \code{adjust_labels_circ}. This option is not recommended
+for large matrices.}
+\item{\code{variable_names}}{Behaves as follows:
 \itemize{
-\item{NULL} the row names of the loading matrix are used
-(or \verb{V1, ..., Vp} if missing).
-\item{"none"} variable names are not used in plotting
-\item{character vector} If it is of length \code{p}, it is used as the
-variable names. If the length is different it is switched to \code{NULL}.
+\item \code{NULL}: the row names of the loading matrix are used, or
+\code{V1, ..., Vp} if missing.
+\item \code{"none"}: variable names are not used in plotting.
+\item character vector: if it is of length \code{p}, it is used as the
+variable names. If the length is different, it is switched to
+\code{NULL}.
+}
 }
 }
 @note When variable groups are present, \verb{legend_position is set to "bottom".}
-}
 }
 \examples{
 \dontrun{

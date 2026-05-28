@@ -41,7 +41,7 @@ corresponding PCs are printed.}
 
 \item{print_table}{Logical: If \code{TRUE} the table is printed.}
 
-\item{thresh_card}{\link{0.0001} Value below which loadings are treated as zero when computing minimum loadings or contributions.}
+\item{thresh_card}{(0.0001) Value below which loadings are treated as zero when computing minimum loadings or contributions.}
 
 \item{...}{Further arguments; currently ignored.}
 }

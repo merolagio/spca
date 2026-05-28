@@ -27,25 +27,7 @@
 #' The 12 items correspond to four ability scales: 
 #'  spatial (SPL), verbal (VBL), speed (SPD), and mathematical (MTH). 
 #'  The data provided with this package are scaled to mean zero and unit
-#'  variance.
-#'
-#' @docType data
-#' @aliases holzinger holzinger_scales
-#'
-#' @references
-#' Holzinger, K. J., and Swineford, F. (1939). \emph{A study in factor analysis:
-#'  The stability of a bi-factor solution}.
-#'  Supplementary Educational Monographs, No. 48.
-#'
-#' Ferrara, C., Martella, F., and Vichi, M. (2019). Probabilistic disjoint
-#'  principal component analysis.
-#' \emph{Multivariate Behavioral Research}, 54(1), 47--61.
-#'
-#' @format
-#' \describe{
-#'   \item{holzinger}{A numeric data frame with 145 rows and 12 variables.}
-#'   \item{hsp_scalesh_fac}{A factor of length 12 giving each variable's scale membership (SPL, VBL, SPD, MTH), with levels in scale order.}
-#' }
+#'  variance. The scales are available as a factor called `holzinger_scales`
 #'
 #' @format
 #' \describe{
@@ -66,11 +48,17 @@
 #'   \item{numeric}{Numerical puzzles test (MTH).}
 #'   \item{series}{Series completion test (MTH).}
 #' }
-#' \describe{
-#' \item{holzinger_scales}{A factor of length 12 giving each variable's scale
-#'  membership (SPL, VBL, SPD, MTH), with levels in scale order.}
-#' }
-#' @name holzinger & holzinger_scales
+#' 
+#' @references
+#' Holzinger, K. J., and Swineford, F. (1939). \emph{A study in factor analysis:
+#'  The stability of a bi-factor solution}.
+#'  Supplementary Educational Monographs, No. 48.
+#'
+#' Ferrara, C., Martella, F., and Vichi, M. (2019). Probabilistic disjoint
+#'  principal component analysis.
+#' \emph{Multivariate Behavioral Research}, 54(1), 47--61.
+#'
+#' @name holzinger
 #' @docType data
 #' @keywords datasets
 ##' @describeIn destination description

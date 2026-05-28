@@ -16,16 +16,16 @@ spca_screeplot(
 \arguments{
 \item{eigenvalues}{Numeric vector of eigenvalues.}
 
-\item{nplot}{\link{NULL} Integer. Number of leading eigenvalues to plot. If
+\item{nplot}{(NULL) Integer. Number of leading eigenvalues to plot. If
 \code{NULL}, all eigenvalues are plotted.}
 
-\item{ylab}{\link{"eigenvalues"} Character. Y-axis label.}
+\item{ylab}{("eigenvalues") Character. Y-axis label.}
 
-\item{addtitle}{\link{TRUE} Logical. If \code{TRUE}, add a plot title.}
+\item{addtitle}{(TRUE) Logical. If \code{TRUE}, add a plot title.}
 
-\item{show_plot}{\link{TRUE} Logical. If \code{TRUE}, print the plot.}
+\item{show_plot}{(TRUE) Logical. If \code{TRUE}, print the plot.}
 
-\item{return_plot}{\link{FALSE} Logical. If \code{TRUE}, return the ggplot object.}
+\item{return_plot}{(FALSE) Logical. If \code{TRUE}, return the ggplot object.}
 }
 \value{
 If \code{return_plot = TRUE}, a \code{ggplot} object; otherwise \code{NULL} (invisibly).

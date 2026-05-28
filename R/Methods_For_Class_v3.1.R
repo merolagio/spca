@@ -655,7 +655,7 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
 #'    Default all. If an integer is passed, it is set to 1:cols.
 #' @param only_nonzero  Logical: if = TRUE only the nonzero loadings are
 #'  printed. Otherwise all loadings are printed.
-#'  @param contributions Logical [TRUE]. If `TRUE`, print loadings 
+#' @param contributions (TRUE) Logical. If `TRUE`, print loadings 
 #'  scaled to unit \eqn{L_1} norm as percentage contributions.
 #' @param digits Integer: number of decimal figures.
 #' @param thresh_card Value below which loadings are considered zero and not
@@ -822,11 +822,11 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 #' It just turns an spca object loadings_list into a list of loadings 
 #' 
 #' @param spca_obj An spca object
-#' 
 #' @param cols A vector containg the indices of the loadings to be shown.  Can
 #'  be a single value. if missing all loadings are shown: If an integer is
 #'  passed, only that dimension will be returned.
-#' @param return_list Logical: if `TRUE` the list is returned
+#' @param print_list Logical: if `TRUE` the list is printed.
+#' @param return_list Logical: if `TRUE` the list is returned.
 #' @family spca
 #' @export 
 show_contributions_spca = function(spca_obj, cols = NULL, print_list = TRUE, 
@@ -1025,7 +1025,7 @@ aggregate_by_group = function(X, groups,
 #'   corresponding PCs are printed.
 #' @param return_table Logical: If `TRUE` the raw summary matrix is returned.
 #' @param print_table Logical: If `TRUE` the table is printed.
-#' @param thresh_card [0.0001] Value below which loadings are treated as zero when computing minimum loadings or contributions.
+#' @param thresh_card (0.0001) Value below which loadings are treated as zero when computing minimum loadings or contributions.
 
 #' @param ... Further arguments; currently ignored.
 #' 

@@ -23,8 +23,9 @@
 Default all. If an integer is passed, it is set to 1:cols.}
 
 \item{only_nonzero}{Logical: if = TRUE only the nonzero loadings are
-printed. Otherwise all loadings are printed.
-@param contributions Logical \link{TRUE}. If \code{TRUE}, print loadings
+printed. Otherwise all loadings are printed.}
+
+\item{contributions}{(TRUE) Logical. If \code{TRUE}, print loadings
 scaled to unit \eqn{L_1} norm as percentage contributions.}
 
 \item{digits}{Integer: number of decimal figures.}

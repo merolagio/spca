@@ -18,7 +18,9 @@ show_contributions_spca(
 be a single value. if missing all loadings are shown: If an integer is
 passed, only that dimension will be returned.}
 
-\item{return_list}{Logical: if \code{TRUE} the list is returned}
+\item{print_list}{Logical: if \code{TRUE} the list is printed.}
+
+\item{return_list}{Logical: if \code{TRUE} the list is returned.}
 }
 \description{
 It just turns an spca object loadings_list into a list of loadings

@@ -24,45 +24,45 @@ pca(
 \arguments{
 \item{M}{A data matrix, correlation matrix, or covariance matrix.}
 
-\item{n_comps}{\link{NULL} Integer. Number of components to retain. If \code{NULL},
+\item{n_comps}{(NULL) Integer. Number of components to retain. If \code{NULL},
 all components are retained up to the maximum allowed by the selected backend.}
 
-\item{center_data}{\link{FALSE} Logical. If \code{TRUE}, center variables to zero mean.
+\item{center_data}{(FALSE) Logical. If \code{TRUE}, center variables to zero mean.
 If \code{M} is detected as a data matrix and any column mean is nonzero,
 centering is performed automatically.}
 
-\item{scale_data}{\link{FALSE} Logical. If \code{TRUE}, scale variables.}
+\item{scale_data}{(FALSE) Logical. If \code{TRUE}, scale variables.}
 
-\item{fat_matrix}{\link{NULL} Logical or \code{NULL}. If \code{NULL}, the backend is
+\item{fat_matrix}{(NULL) Logical or \code{NULL}. If \code{NULL}, the backend is
 selected automatically: data matrices with \eqn{n < p} use the fat backend
 and all other inputs use the tall backend. If \code{TRUE}, request the fat
 backend. If \code{FALSE}, use the tall backend. Covariance/correlation matrices
 always use the tall backend.}
 
-\item{screeplot}{\link{FALSE} Logical. If \code{TRUE}, produce a scree plot.}
+\item{screeplot}{(FALSE) Logical. If \code{TRUE}, produce a scree plot.}
 
-\item{qq_plot}{\link{TRUE} Logical. If \code{TRUE}, produce a Wachter QQ-plot with
+\item{qq_plot}{(TRUE) Logical. If \code{TRUE}, produce a Wachter QQ-plot with
 \link{wachter_qqplot}. The fitted line is based on \code{n_comps}.}
 
-\item{nrow_data}{\link{NULL} Integer. Number of rows in the original data set.
+\item{nrow_data}{(NULL) Integer. Number of rows in the original data set.
 Required when \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
 matrix. If not available, the Wachter QQ-plot cannot be produced.}
 
-\item{neigen_toplot}{\link{NULL} Integer. Number of eigenvalues to show in
+\item{neigen_toplot}{(NULL) Integer. Number of eigenvalues to show in
 diagnostic plots. If \code{NULL}, all available eigenvalues are shown.}
 
-\item{cor}{\link{TRUE} Logical. If \code{TRUE}, rescales MP quantiles to match a
+\item{cor}{(TRUE) Logical. If \code{TRUE}, rescales MP quantiles to match a
 correlation matrix.}
 
-\item{common_var}{\link{1} Numeric. Common variance of the variables used for the
+\item{common_var}{(1) Numeric. Common variance of the variables used for the
 Marchenko--Pastur quantiles in the Wachter QQ-plot.}
 
-\item{pm}{\link{FALSE} Logical. If \code{TRUE}, compute the requested eigenpairs by
+\item{pm}{(FALSE) Logical. If \code{TRUE}, compute the requested eigenpairs by
 power method and rank-one deflation.}
 
-\item{eps_pm}{\link{1e-4} Numeric. Convergence tolerance for the power method.}
+\item{eps_pm}{(1e-4) Numeric. Convergence tolerance for the power method.}
 
-\item{maxiter_pm}{\link{1000} Integer. Maximum number of power-method iterations.}
+\item{maxiter_pm}{(1000) Integer. Maximum number of power-method iterations.}
 }
 \value{
 An \link{spca_object} with the addition of the vector \code{eigenvalues}
