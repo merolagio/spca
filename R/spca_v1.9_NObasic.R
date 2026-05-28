@@ -10,12 +10,12 @@
 #'   matrix. Cannot contain missing values.
 #' @param alpha \code{NULL} or numeric scalar in \eqn{(0, 1]}. Target retained
 #'   proportion.
-#' @param n_comps \\code{NULL} or nonnegative integer scalar. Number of
-#'   components to compute. If \\code{NULL}, components are computed until
-#'   \\code{ncomp_by_cvexp} is reached.
-#' @param ncomp_by_cvexp \\code{NULL} or numeric scalar in \\eqn{(0, 1]}. Target
-#'   cumulative variance explained used to determine the number of components.
-#'   At least one of \\code{n_comps} and \\code{ncomp_by_cvexp} must be supplied.
+#' @param n_comps \code{NULL} or nonnegative integer scalar. Number of
+#'   components to compute. If \code{NULL}, components are computed until
+#'   \code{ncomp_by_cvexp} is reached.
+#' @param ncomp_by_cvexp \code{NULL} or numeric scalar in \eqn{(0, 1]}. Target
+#'  cumulative variance explained used to determine the number of components.
+#'  At least one of \code{n_comps} and \code{ncomp_by_cvexp} must be supplied.
 #' @param method \code{NULL} or character vector. Each entry must start with
 #'   \code{"u"}, \code{"c"}, or \code{"p"}.
 #' @param var_selection \code{NULL} or character vector. The first entry must
@@ -39,26 +39,27 @@
 #' @return Invisibly returns \code{TRUE} if all inputs are valid.
 #' @noRd
 
-validate_spca_inputs = function(M,
-                                alpha,
-                                n_comps,
-                                ncomp_by_cvexp,
-                                method,
-                                var_selection,
-                                objective,
-                                intensive,
-                                fat_matrix,
-                                fixed_index_list,
-                                center_data,
-                                scale_data,
-                                pm_loading,
-                                eps_pm_loading,
-                                maxiter_pm_loading,
-                                pm_varsel,
-                                eps_pm_varsel,
-                                maxiter_pm_varsel) {
-  
-  validate_no_na(
+validate_spca_inputs = 
+  function(M,
+           alpha,
+           n_comps,
+           ncomp_by_cvexp,
+           method,
+           var_selection,
+           objective,
+           intensive,
+           fat_matrix,
+           fixed_index_list,
+           center_data,
+           scale_data,
+           pm_loading,
+           eps_pm_loading,
+           maxiter_pm_loading,
+           pm_varsel,
+           eps_pm_varsel,
+           maxiter_pm_varsel) {
+    
+    validate_no_na(
     alpha = alpha,
     n_comps = n_comps,
     ncomp_by_cvexp = ncomp_by_cvexp,
@@ -119,7 +120,6 @@ validate_spca_inputs = function(M,
     if (!is_int(n_comps) || length(n_comps) != 1 || (n_comps < 0))
       stop("n_comps must be NULL or a nonnegative integer scalar", call. = FALSE)
   }
-  
   #n_comp_by_cvexp   
   if (!is.null(ncomp_by_cvexp)) {
     if (!is.numeric(ncomp_by_cvexp) || length(ncomp_by_cvexp) != 1 ||
@@ -237,82 +237,6 @@ validate_spca_inputs = function(M,
   invisible(TRUE)
 }
 
-#NEW =====================================================================
-#' Lightweight input validation for spca() when basic_output = TRUE
-#'
-#' Checks only the inputs that are strictly necessary to route the call to the
-#' C++ backend safely. Skips all expensive checks (fixed_index_list exhaustiveness,
-#' detailed scalar-range checks on pm parameters, etc.).
-#'
-#' @noRd
-validate_spca_inputs_basic = function(M,
-                                      alpha,
-                                      n_comps,
-                                      ncomp_by_cvexp,
-                                      method,
-                                      var_selection,
-                                      objective,
-                                      fat_matrix,
-                                      center_data,
-                                      scale_data,
-                                      pm_loading,
-                                      pm_varsel) {
-  # M
-  if (is.null(M))
-    stop("M cannot be NULL", call. = FALSE)
-  if (!is.matrix(M) && !is.data.frame(M))
-    stop("M must be a matrix or data.frame", call. = FALSE)
-  if (is.data.frame(M) && !all(vapply(M, is.numeric, logical(1))))
-    stop("all columns of M must be numeric", call. = FALSE)
-  if (is.matrix(M) && !is.numeric(M))
-    stop("M must be numeric", call. = FALSE)
-  if (anyNA(M))
-    stop("M cannot contain missing values", call. = FALSE)
-  
-  # at least one stopping criterion
-  if (is.null(n_comps) && is.null(ncomp_by_cvexp))
-    stop("specify either n_comps or ncomp_by_cvexp", call. = FALSE)
-  
-  # alpha
-  if (!is.null(alpha)) {
-    if (!is.numeric(alpha) || length(alpha) != 1 || is.na(alpha) ||
-        alpha <= 0 || alpha > 1)
-      stop("alpha must be NULL or a numeric scalar in (0, 1]", call. = FALSE)
-  }
-  
-  # method / var_selection / objective: first-letter checks only
-  if (!is.null(method)) {
-    if (!is.character(method) || length(method) < 1)
-      stop("method must be NULL or a character vector", call. = FALSE)
-    if (!(tolower(substr(trimws(method[1]), 1, 1)) %in% c("c", "p", "u")))
-      stop("method must start with one of c, p or u", call. = FALSE)
-  }
-  if (!is.null(var_selection)) {
-    if (!is.character(var_selection) || length(var_selection) < 1)
-      stop("var_selection must be NULL or a character vector", call. = FALSE)
-    if (!(tolower(substr(trimws(var_selection[1]), 1, 1)) %in% c("f", "b", "s")))
-      stop("var_selection must start with one of f, b, or s", call. = FALSE)
-  }
-  if (!is.null(objective)) {
-    if (!is.character(objective) || length(objective) < 1)
-      stop("objective must be NULL or a character vector", call. = FALSE)
-    if (!(tolower(substr(trimws(objective[1]), 1, 1)) %in% c("r", "c")))
-      stop("objective must start with one of r or c", call. = FALSE)
-  }
-  
-  # booleans
-  validate_booleans_or_null(
-    fat_matrix   = fat_matrix,
-    center_data  = center_data,
-    scale_data   = scale_data,
-    pm_loading   = pm_loading,
-    pm_varsel    = pm_varsel
-  )
-  
-  invisible(TRUE)
-}
-#END NEW =================================================================
-
 #spca doc=========================
 #' Compute LS-SPCA components
 #'
@@ -323,11 +247,11 @@ validate_spca_inputs_basic = function(M,
 #' @param M A numeric matrix or data frame. If `M` is square and symmetric, it
 #'   is treated as a covariance/correlation matrix (only for the tall backend).
 #'    Otherwise it is treated as an \eqn{n \times p} data matrix.
-#' @param alpha A number in \eqn{(0, 1]}. Target proportion used by variable
-#'   selection.
 #' @param n_comps `NULL` or a nonnegative integer scalar. Number of components
 #'   to compute. If `NULL`, `ncomp_by_cvexp` is used to determine the number of
 #'   components.
+#' @param alpha A number in \eqn{(0, 1]}. Target proportion used by variable
+#'   selection.
 #' @param ncomp_by_cvexp `NULL` or a number in \eqn{(0, 1]}. If `n_comps` is
 #'   `NULL`, components are computed until cumulative variance explained reaches
 #'   this value. At least one of `n_comps` and `ncomp_by_cvexp` must be 
@@ -392,13 +316,12 @@ validate_spca_inputs_basic = function(M,
 #'
 #' The returned object is documented in [spca_object].
 #'
-#' @return An object of class `spca`, or of class `spca_basic` when
-#'   `basic_output = TRUE`.
+#' @return An object of class `spca`.
 #' @family spca
 #' @export
 spca = function(M,
-                alpha = 0.95,
                 n_comps = NULL,
+                alpha = 0.95,
                 ncomp_by_cvexp = NULL,
                 method =  c("cspca", "uspca", "pspca"),
                 var_selection = c("fwd", "bkw", "step"),
@@ -413,43 +336,26 @@ spca = function(M,
                 maxiter_pm_loading = 1000,
                 pm_varsel = FALSE,
                 eps_pm_varsel = 1e-4,
-                maxiter_pm_varsel = 500,
-                basic_output = FALSE) { #NEW
+                maxiter_pm_varsel = 500) {
   
-  #NEW: lightweight validation path when basic_output = TRUE
-  if (basic_output) {
-    validate_spca_inputs_basic(M = M,
-                               alpha = alpha,
-                               n_comps = n_comps,
-                               ncomp_by_cvexp = ncomp_by_cvexp,
-                               method = method,
-                               var_selection = var_selection,
-                               objective = objective,
-                               fat_matrix = fat_matrix,
-                               center_data = center_data,
-                               scale_data = scale_data,
-                               pm_loading = pm_loading,
-                               pm_varsel = pm_varsel)
-  } else {
-    validate_spca_inputs(M = M,
-                         alpha = alpha,
-                         n_comps = n_comps,
-                         ncomp_by_cvexp = ncomp_by_cvexp,
-                         method = method,
-                         var_selection = var_selection,
-                         objective = objective,
-                         intensive = intensive,
-                         fat_matrix = fat_matrix,
-                         fixed_index_list = fixed_index_list,
-                         center_data = center_data,
-                         scale_data = scale_data,
-                         pm_loading = pm_loading,
-                         eps_pm_loading = eps_pm_loading,
-                         maxiter_pm_loading = maxiter_pm_loading,
-                         pm_varsel = pm_varsel,
-                         eps_pm_varsel = eps_pm_varsel,
-                         maxiter_pm_varsel = maxiter_pm_varsel)
-  } #NEW end validation branch
+  validate_spca_inputs(M = M,
+                       alpha = alpha,
+                       n_comps = n_comps,
+                       ncomp_by_cvexp = ncomp_by_cvexp,
+                       method = method,
+                       var_selection = var_selection,
+                       objective = objective,
+                       intensive = intensive,
+                       fat_matrix = fat_matrix,
+                       fixed_index_list = fixed_index_list,
+                       center_data = center_data,
+                       scale_data = scale_data,
+                       pm_loading = pm_loading,
+                       eps_pm_loading = eps_pm_loading,
+                       maxiter_pm_loading = maxiter_pm_loading,
+                       pm_varsel = pm_varsel,
+                       eps_pm_varsel = eps_pm_varsel,
+                       maxiter_pm_varsel = maxiter_pm_varsel)
   
   if (is.data.frame(M))
     M = as.matrix(M)
@@ -458,7 +364,7 @@ spca = function(M,
   p = ncol(M)
   
   var_names = colnames(M)
-  if(is.null(var_names)) var_names = paste0("V", 1:ncol(M))
+  if(is.null(var_names)) var_names = paste0("V", seq_len(ncol(M)))
   
   
   method_cpp = tolower(substr(trimws(method[1]), 1, 1))
@@ -525,7 +431,7 @@ spca = function(M,
            call. = FALSE)
     }
   }
-
+  
   max_n_comps = if (use_fat_backend) n else p
   
   fixed_n_comps = !is.null(n_comps)
@@ -550,7 +456,6 @@ spca = function(M,
   indvec_in = NULL
   cardvec_in = NULL
   
-  #    browser()
   if (is.factor(fixed_index_list) && (nlevels(fixed_index_list) > 1)) {
     indvec_in = as.integer(fac2index(fixed_index_list)) - 1L #C++ takes 0 based indices
     cardvec_in = table(fixed_index_list)
@@ -593,7 +498,6 @@ spca = function(M,
     if(!use_fat_backend){
       S = M
     }
-  # browser()
   if (use_fat_backend) {
     spout = lsspcaTC(X = M,
                      ncomps = n_comps,
@@ -616,7 +520,7 @@ spca = function(M,
     selection_method_cpp = var_selection_cpp
     if (intensive)
       selection_method_cpp = 3
-
+    
     spout = lsspcaC(S = S,
                     ncomps = n_comps,
                     selection_method = selection_method_cpp,
@@ -661,28 +565,25 @@ spca = function(M,
   rownames(spout$loadings) = var_names
   colnames(spout$loadings) = paste0("sPC", 1:spout$ncomps)
   
-  if (!basic_output) { #NEW: skip expensive post-processing for basic output
-    #contributions =====================  
-    contributions = make_contributions(spout$loadings)
-    
-    # spca methods take contributions to be a matrix
-    if (is.vector(contributions))
-      contributions = matrix(contributions, ncol = 1)
-    dimnames(contributions) = dimnames(spout$loadings)
-    
-    
-    if(is.null(spout$loadlist)){
-      spout$loadlist = lapply(seq_len(spout$ncomps), function(i, A) {
-        A[A[, i] != 0, i]
-      }, A = spout$loadings)
-    }
-    names(spout$loadlist) = colnames(contributions)
-    names(spout$ind) = colnames(contributions)
-    
-    for(i in seq_along(spout$loadlist)){
-      names(spout$loadlist[[i]]) = var_names[spout$ind[[i]]]
-    }
-  } #NEW end !basic_output block
+  #contributions =====================  
+  contributions = make_contributions(spout$loadings)    
+  # spca methods take contributions to be a matrix
+  if (is.vector(contributions))
+    contributions = matrix(contributions, ncol = 1)
+  dimnames(contributions) = dimnames(spout$loadings)
+  
+  
+  if(is.null(spout$loadlist)){
+    spout$loadlist = lapply(seq_len(spout$ncomps), function(i, A) {
+      A[A[, i] != 0, i]
+    }, A = spout$loadings)
+  }
+  names(spout$loadlist) = colnames(contributions)
+  names(spout$ind) = colnames(contributions)
+  
+  for(i in seq_along(spout$loadlist)){
+    names(spout$loadlist[[i]]) = var_names[spout$ind[[i]]]
+  }
   
   n_comps_input = n_comps
   n_comps = spout$ncomps
@@ -697,31 +598,9 @@ spca = function(M,
   vexpPC = spout$vexpPC[1:n_comps]
   rvexp =  spout$vexp/vexpPC[1:n_comps]
   rcvexp = spout$cvexp/cumsum(vexpPC[1:n_comps])
-#browser()
   spc_cor = spout$cor_comps
   dimnames(spc_cor) = list(paste0("sPC", seq_len(spout$ncomps)),
                            paste0("sPC", seq_len(spout$ncomps)))
-  
-  #NEW: basic output branch — return spca_basic with no further computation
-  if (basic_output) {
-    out = list(
-      loadings    = spout$loadings,
-      n_comps     = spout$ncomps,
-      cardinality = spout$card,
-      vexp        = spout$vexp,
-      vexp_pc     = vexpPC,
-      cvexp       = spout$cvexp,
-      rvexp       = rvexp,
-      rcvexp      = rcvexp,
-      tot_var     = spout$totvar,
-      spc_cor     = spc_cor,
-      indices     = spout$ind
-    )
-    out$call  = match.call()
-    class(out) = list("list", "spca_basic")
-    return(out)
-  }
-  #NEW end basic_output branch
   
   parameters = list(
     method = ifelse(method_cpp == "c", "cspca", 
@@ -749,8 +628,6 @@ spca = function(M,
              loadings_list = spout$loadlist,
              indices = spout$ind
   )
-  ## FIX TIME NAMES
-  #  browser()
   if (use_fat_backend) {
     out$scores = spout$scores
     out$parameters = parameters
@@ -762,7 +639,6 @@ spca = function(M,
     out$time_unit_raw = spout$time_unit_raw
   } 
   else {
-     #   browser()
     if ((is_datamatrix_M)) {
       out$scores = make_scores(M, spout$loadings[, seq_len(spout$ncomps), 
                                                  drop = FALSE])
