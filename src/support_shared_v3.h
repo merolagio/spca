@@ -3,6 +3,10 @@
 
 #include <RcppEigen.h>
 
+Eigen::MatrixXd makeCorComp_int(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                                const Eigen::Ref<const Eigen::MatrixXd>& S,
+                                int ncomps);
+
 Eigen::MatrixXd makeSubS(const Eigen::Ref<const Eigen::MatrixXd>& S,
                          Eigen::VectorXi& e);
 

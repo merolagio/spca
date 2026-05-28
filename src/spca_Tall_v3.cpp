@@ -139,7 +139,8 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 // 3   0   Not allowed
 //
 // Returns
-// A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC, r,
+// A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC, 
+// cor_comps sPCs correlation matrix, r,
 // totvar, method, varSelection, Time, Time_colnames, timevec, and timecomp.
 // The element r contains signed correlations between each sPC and the
 // corresponding original PC.
@@ -548,7 +549,12 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        vexp_final = vexp_list["vexp"];
        cvexp_final = vexp_list["cvexp"];
      }
-
+     Eigen::MatrixXd cor_comps;
+     if(nc > 1)
+       cor_comps = makeCorComp_int(A.leftCols(nc), S, nc); 
+     else 
+       cor_comps = Eigen::MatrixXd::Ones(1, 1);
+     
      IntegerVector idx = Rcpp::seq(0, nc - 1);
 
      Rcpp::CharacterVector meth(nc, "uSPCA");
@@ -581,6 +587,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
          Named("vexp") = vexp_final.head(nc),
          Named("cvexp") = cvexp_final.head(nc),
          Named("vexpPC") =  PCvexp.head(nc),
+         Named("cor_comps") = cor_comps,
          Named("r") = r.head(nc),
          Named("totvar") = totvexp,
          Named("method") = meth,

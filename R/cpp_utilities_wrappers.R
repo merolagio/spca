@@ -282,7 +282,7 @@ scale_columns = function(M, normtype = 2, sig = NULL){
   scaleColsC(M, normtype, sig)
 }
 
-args(scale)
+
 standardize_data = function(M, center = TRUE, scale = TRUE){
   if(is.data.frame(M))
     M = as.matrix(M)
@@ -291,6 +291,11 @@ standardize_data = function(M, center = TRUE, scale = TRUE){
   scaleC(M, center, scale)
 }
 
+cor_nocopy = function(X, center = TRUE, scale = TRUE){
+  if(is.data.frame((x)))
+    X = as.matrix(X, center, scale)
+  corC(X)
+}
 ##Other utilities ====================
 # returns the non-zero loading with the smallest absolute value for each column
 # input a matrix of loadings or contributions

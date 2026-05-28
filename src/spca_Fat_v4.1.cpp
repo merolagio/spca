@@ -116,7 +116,7 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
 //
 // Returns
 // A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC,
-// scores, r, totvar, method, varSelection, Time_wall, Time_cpu, Time_colnames,
+// scores, cor_comps, r, totvar, method, varSelection, Time_wall, Time_cpu, Time_colnames,
 // setup_wall, setup_cpu, and time_unit_raw. The element r contains signed
 // correlations between each sPC and the corresponding original PC.
 // This function is called from the R wrapper spca()
@@ -435,8 +435,13 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
 
     string varselection = (stop_criterion == 0) ? "forward R2" : "forward cvexp";
     CharacterVector Time_colnames = CharacterVector::create("PC", "varsel", "loadings", "deflation");
-   Eigen::MatrixXd  cor_comps = cor_int(scores.leftCols(nc), false, true);
-   
+    
+    Eigen::MatrixXd cor_comps;
+    if (nc > 1)
+      cor_comps = cor_int(scores.leftCols(nc), false, true);
+    else
+      cor_comps = Eigen::MatrixXd::Ones(1, 1);   
+    
     return List::create(
       Named("loadings") = A.leftCols(nc),
       Named("loadlist") = loadlist[idx],
