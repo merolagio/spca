@@ -18,8 +18,8 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
-<!-- [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) -->
-<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18829364.svg)](https://doi.org/10.5281/zenodo.18829364) -->
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)]()
 <!-- badges: end -->
@@ -52,47 +52,44 @@ pak::pak("merolagio/spca")
 The `holzinger` dataset is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables.
 ```{r load_data, results = 'hide', message = FALSE, warning = FALSE, dpi = 300}
 library(spca)
-## basic example code
 data(holzinger)
 ```
-### Decide the number of components
-```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="47%", fig.width=4, fig.height=4}
-ho_r = cor(holzinger)
-ho_ee = eigen(ho_r)
-spca_screeplot(ho_ee$value)
-wachter_qqplot(ho_ee$values, p = ncol(holzinger), n = nrow(holzinger), nfit_line = -4)
-```
 
-### Compute PCA
-```{r run_pca, message = FALSE, warning = FALSE}
-ho_pca = pca(holzinger, n_comps = 4, screeplot = FALSE, qq_plot = FALSE)
-summary(ho_pca)
+### Preliminary PCA
+```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="47%", fig.width=4, fig.height=4}
+ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
+summary(ho_pca,cols = 10)
 ```
+We settle for 4 components
 
 ### Compute the sparse loadings
-Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated and "p" for projection [default]); and *var_selection* ("stepwise" [default], "backward",  or "forward"). see the help for these parameters and more.
+Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ [default]) or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; and *var_selection* ("stepwise" [default], "backward",  or "forward"). see the help for these parameters and more.
 
-The following command computes four sPCs using forward variable selection with the cSPCA method so that each sPC as at least 0.95 squared correlation with the corresponding PC ($r > 0.9$).
+The following command computes four sPCs with default seetings: *alpha = 0.95*, *forward* variable selection with the *cSPCA* method. We expect each sPC yield at least 0.95% cumulative VEXP, allowing some very mild correlation between sPCs.
 ```{r run_spca, message = FALSE, warning = FALSE}
-myspca = spca(holzinger, alpha = 0.95, n_compss = 4)
+myspca = spca(holzinger, n_comps = 4)
 ```
 
 ### Inspect spca results
 Methods are *print*, *plot* (several options available) and *summary*.
 By defaut, plot and print show the percentage *contributions*, that is the loadings scaled to have sum of their absolute values equal to 1.
 ```{r methods, message = TRUE, warning = FALSE, out.width="60%"}
-myspca 
+myspca # print
 
-summary(myspca)
+summary(myspca, cor_with_pc = TRUE)
 
 plot(myspca, plot_type = "bar")
+
+#sPCs correlation
+round(myspca$spc_cor, 2)
+
 ```
 
 Other types of plots are available.
 
 Circular, 
 ```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(myspca, plot_type = "circular") # "c" would be enough
+plot(myspca, plot_type = "c") # "c" for "circular"
 ```
 
 Heatmap
@@ -100,10 +97,20 @@ Heatmap
 plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
 ```
 
+
+
 ## variable groups
 The variables in the `holzinger` dataset belong to four different scales, recorded in the factor `holzinger_scales`. These can be differenciated in the barplot
-```{r scales_circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
+```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
 plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
+
+aggregate_by_group(myspca,groups = holzinger_scales)
 ```
 
-## comparison with the standard PCs' contributions
+## comparison of two or more spca solutions
+Compare the *CSPCA* solutions with *alpha = 0.95* those with  *alpha = 0.90*.
+```{r spca90, message = FALSE, warning = FALSE}
+myspca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
+
+compare_spca(obj_list = list(myspca, myspca90), methods_names = c("alpha = 95", "alpha = 90"))
+```
