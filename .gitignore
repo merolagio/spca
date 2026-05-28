@@ -3,11 +3,10 @@
 .Rprofile
 *Compile_output*.txt
 *Rcpp_Output*.txt
+*Document_output*.txt
 Github_commands.R
 inst/Shiny
 remove_test.R
-Document_output.txt
-Compile_output.txt
 Ignore
 R/remove
 .Rhistory
