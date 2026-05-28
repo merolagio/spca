@@ -132,7 +132,7 @@ Eigen::MatrixXd corC(const Eigen::Map<Eigen::MatrixXd>& X,
                      bool scale = true) {
   try {
     
-    Eigen::MatrixXd M;
+    Eigen::MatrixXd M = X;
     if(scale || center)
       M = scaleC(X, center, scale);
     
