@@ -24,11 +24,11 @@ knitr::opts_chunk$set(
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)]()
 <!-- badges: end -->
 
-This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA)
+This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details and full presentation can be found in the extended_vignette document.
 
 The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). print, summery and plot methods are available. 
 
-Functions are new.spca (to create an `spca' object from a set of loadings and aggregate_by_scale to visualize the contribution by scale.
+Utilities available are `compare_spca` (to compare two or more spca solutions), `aggregate_by_scale` (to visualize the contribution by scale) and `new.spca` (to create an `spca' object from a set of loadings).
 
 ## Installation
 
@@ -48,9 +48,9 @@ pak::pak("merolagio/spca")
 
 ## Example
 
-### load data
-The `holzinger` dataset is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables.
-```{r load_data, results = 'hide', message = FALSE, warning = FALSE, dpi = 300}
+### Load data
+The `holzinger` dataset is the small classic Holzinger-Swineford dataset with 145 cases on 12 variables grouped in 4 scales.
+```{r load_data, results = 'hide', message = FALSE, warning = FALSE}
 library(spca)
 data(holzinger)
 ```
@@ -58,12 +58,12 @@ data(holzinger)
 ### Preliminary PCA
 ```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="47%", fig.width=4, fig.height=4}
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
-summary(ho_pca,cols = 10)
+summary(ho_pca, cols = 10)
 ```
 We settle for 4 components
 
 ### Compute the sparse loadings
-Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ [default]) or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; and *var_selection* ("stepwise" [default], "backward",  or "forward"). see the help for these parameters and more.
+Important parameters in the `spca` function are: $\alpha$ the minimum $R^2$ [default]) or the minimum proportion of cumulative vexp of the PCs reproduced by the sPCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; and *var_selection* ("forward" [default], "stepwise", or "backward"). See the `spca` help for details on these parameters and more.
 
 The following command computes four sPCs with default seetings: *alpha = 0.95*, *forward* variable selection with the *cSPCA* method. We expect each sPC yield at least 0.95% cumulative VEXP, allowing some very mild correlation between sPCs.
 ```{r run_spca, message = FALSE, warning = FALSE}
