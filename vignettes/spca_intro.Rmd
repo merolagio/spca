@@ -1,7 +1,7 @@
-
-<!--  "Introduction to the spca package"-->
 ---
 title: "Introduction to the spca package"
+author: "giovanni Maria Merola"
+date: "`r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
 vignette: >
