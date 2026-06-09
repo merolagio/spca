@@ -288,7 +288,7 @@ standardize_data = function(M, center = TRUE, scale = TRUE){
     M = as.matrix(M)
   if(!is.matrix(M))
     stop("M must be a matrix or a data.frame")
-  scaleC(M, center, scale)
+  scaleC(M, center, scale)*sqrt(nrow(M))
 }
 
 cor_nocopy = function(X, center = TRUE, scale = TRUE){
