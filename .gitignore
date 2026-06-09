@@ -1,6 +1,7 @@
 .Rproj.user
 .Rdata
 .Rprofile
+.Rbuildignore
 *Compile_output*.txt
 *Rcpp_Output*.txt
 *Document_output*.txt
@@ -8,6 +9,7 @@ Github_commands.R
 inst/Shiny
 remove_test.R
 Ignore
+renv
 R/remove
 .Rhistory
 .httr-oauth

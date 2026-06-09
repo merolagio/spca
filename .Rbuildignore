@@ -1,0 +1,9 @@
+^renv$
+^renv\.lock$
+^.*\.Rproj$
+^\.Rproj\.user$
+.Rprofile$
+^Ignore$
+^R\Remove$
+Document_output.txt$
+Compile_output.txt$
