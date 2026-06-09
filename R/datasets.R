@@ -5,17 +5,10 @@
 
 
 # load("data/holzinger_scales.rda", verbose = T)
-# load("data/hsp.rda", verbose = T)
-# 
-# holzinger_scales = hsp_scalesh_fac
-# holzinger = hsp 
-# 
-# holzinger = standardize_data(holzinger, center = T, scale = T)
-
-
 
 # holzinger data=======================
-#' Holzinger--Swineford Student Ability data and scales
+
+#' Holzinger--Swineford Student Ability data 
 #'
 #' This dataset is based on the classic Holzinger and Swineford (1939) Student
 #'  Ability dataset.
@@ -58,14 +51,28 @@
 #'  principal component analysis.
 #' \emph{Multivariate Behavioral Research}, 54(1), 47--61.
 #'
-#' @name holzinger
+## #' @name holzinger 
 #' @docType data
 #' @keywords datasets
-##' @describeIn destination description
+"holzinger"
 
 
+#' Holzinger--Swineford Student Ability scales
+#'
+## #' @describeIn holzinger
+#' @format
+#' \describe{
+#' \item{holzinger_scales}{A factor listing the 4 scales: SPL, VBL, SPD and MTH,
+#'   for each variable.} 
+#' }
+## #' @name holzinger_scales
+#' @docType data
+#' @keywords datasets
+"holzinger_scales"
+
 # 
-# 
+##
+ 
 # #MSSCQ data=======================
 # #' Multidimensional Sexual Self-Concept Questionnaire (MSSCQ) data
 # #'
