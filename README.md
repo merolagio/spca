@@ -120,7 +120,7 @@ summary(myspca, cor_with_pc = TRUE)
 plot(myspca, plot_type = "bar")
 ```
 
-<img src="man/figures/README-methods-1.png" width="60%" />
+<img src="man/figures/README-methods-1.png" width="50%" />
 
 ``` r
 

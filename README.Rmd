@@ -60,7 +60,7 @@ myspca = spca(holzinger, n_comps = 4)
 ### Inspect spca results
 Methods are *print*, *plot* (several options available) and *summary*.
 By defaut, plot and print show the percentage *contributions*, that is the loadings scaled to have sum of their absolute values equal to 1.
-```{r methods, cache = TRUE, message = TRUE, warning = FALSE, out.width="60%"}
+```{r methods, cache = TRUE, message = TRUE, warning = FALSE, out.width="50%"}
 myspca # print
 
 summary(myspca, cor_with_pc = TRUE)
