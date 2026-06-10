@@ -6,7 +6,6 @@
 *Rcpp_Output*.txt
 *Document_output*.txt
 Github_commands.R
-inst/Shiny
 remove_test.R
 Ignore
 renv
