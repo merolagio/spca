@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
 #  ,out.width = "60%"
 ```
 <img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "110" alt = "spca logo" />
+
 # Package spca
 
 <!-- badges: start -->

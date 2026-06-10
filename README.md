@@ -1,77 +1,63 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src = "man/figures/spca_Logo.png" align = "left" height = "110" alt = "spca logo" />
+<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "110" alt = "spca logo" />
 
 # Package spca
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
-<!-- [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) -->
-<!-- [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18829364.svg)](https://doi.org/10.5281/zenodo.18829364) -->
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status:
-Active](https://img.shields.io/badge/status-active-success.svg)]()
+Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
+[![Codecov test
+coverage](https://codecov.io/gh/merolagio/spca/branch/main/graph/badge.svg)](https://app.codecov.io/gh/merolagio/spca?branch=main)
 <!-- badges: end -->
 
 This package contains functions to compute, print and plot Least Squares
-Sparse Principal Components Analysis (LS-SPCA)
+Sparse Principal Components Analysis (LS-SPCA). Methodological details
+and full presentation can be found in the extended_vignette document.
 
 The main function *spca()* computes the sparse loadings and various
 statistics, such as the variance explained by each sparse component
 (sPC). print, summery and plot methods are available.
 
-Functions are new.spca (to create an \`spca’ object from a set of
-loadings and aggregate_by_scale to visualize the contribution by scale.
-
-## Installation
-
-You can install the development version of spca from
-[GitHub](https://github.com/) with:
-
-``` r
-# `remotes' is the lightest alternative
-install.packages("remotes")
-remotes::install_github("merolagio/spca")
-#or
-#install.packages("devtools")
-devtools::install_github("merolagio/spca")
-# or
-# install.packages("pak")
-pak::pak("merolagio/spca")
-```
+Utilities available are `compare_spca` (to compare two or more spca
+solutions), `aggregate_by_scale` (to visualize the contribution by
+scale) and `new.spca` (to create an \`spca’ object from a set of
+loadings).
 
 ## Example
 
-### load data
+### Load data
 
 The `holzinger` dataset is the small classic Holzinger-Swineford dataset
-with 145 cases on 12 variables.
+with 145 cases on 12 variables grouped in 4 scales.
 
 ``` r
 library(spca)
+data(holzinger)
+dim(holzinger)
+#> [1] 145  12
+holzinger_scales
+#>  [1] SPL SPL SPL VBL VBL VBL SPD SPD SPD MTH MTH MTH
+#> Levels: SPL VBL SPD MTH
 ```
 
 ### Preliminary PCA
 
 ``` r
-data(holzinger)
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
-summary(ho_pca)
+summary(ho_pca,cols = 10)
 #>          sPC1   sPC2   sPC3   sPC4   sPC5   sPC6   sPC7   sPC8   sPC9  sPC10
 #> Vexp    40.2%  13.7%  10.6%   6.4%   5.6%   5.1%   4.3%   3.9%   3.2%   2.6%
 #> Cvexp   40.2%  53.9%  64.5%  70.9%  76.5%  81.6%  85.9%  89.8%  93.0%  95.6%
 #> Rvexp  100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0%
 #> Rcvexp 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0%
 #> Card       12     12     12     12     12     12     12     12     12     12
-#>         sPC11  sPC12
-#> Vexp     2.3%   2.0%
-#> Cvexp   98.0% 100.0%
-#> Rvexp  100.0% 100.0%
-#> Rcvexp 100.0% 100.0%
-#> Card       12     12
 ```
 
 <img src="man/figures/README-pca_checks-1.png" width="47%" /><img src="man/figures/README-pca_checks-2.png" width="47%" />
@@ -83,9 +69,9 @@ Important parameters in the `spca` function are: $`\alpha`$ the minimum
 $`R^2`$ \[default\]) or the minimum proportion of cumulative vexp of the
 PCs reproduced by the sPCs; *n_comps* the number of components to
 compute; *method* the LS-SPCA method to use (“u” for uncorrelated, “c”
-for correlated \[default\]) and “p” for projection; and *var_selection*
-(“stepwise” \[default\], “backward”, or “forward”). see the help for
-these parameters and more.
+for correlated \[default\]) and “p” for projection; *var_selection*
+(“forward” \[default\], “stepwise”, or “backward”). See the `spca` help
+for details on these parameters and more.
 
 The following command computes four sPCs with default seetings: *alpha =
 0.95*, *forward* variable selection with the *cSPCA* method. We expect
@@ -147,9 +133,9 @@ round(myspca$spc_cor, 2)
 #> sPC4  0.02 -0.01 -0.01  1.00
 ```
 
-Other types of plots are available.
+Other plot types are available.
 
-Circular,
+Circular:
 
 ``` r
 plot(myspca, plot_type = "c") # "c" for "circular"
@@ -157,7 +143,7 @@ plot(myspca, plot_type = "c") # "c" for "circular"
 
 ![](man/figures/README-circular-1.png)<!-- -->
 
-Heatmap
+Heatmap:
 
 ``` r
 plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
@@ -165,7 +151,7 @@ plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is e
 
 ![](man/figures/README-heatmap-1.png)<!-- -->
 
-## variable groups
+## Variable groups
 
 The variables in the `holzinger` dataset belong to four different
 scales, recorded in the factor `holzinger_scales`. These can be
@@ -188,7 +174,7 @@ aggregate_by_group(myspca,groups = holzinger_scales)
 #> MTH 29.8%               26.8%
 ```
 
-## comparison of two or more spca solutions
+## Comparison of two or more spca solutions
 
 Compare the *CSPCA* solutions with *alpha = 0.95* those with *alpha =
 0.90*.
@@ -196,7 +182,8 @@ Compare the *CSPCA* solutions with *alpha = 0.95* those with *alpha =
 ``` r
 myspca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
 
-compare_spca(obj_list = list(myspca, myspca90), methods_names = c("alpha = 95", "alpha = 90"))
+compare_spca(obj_list = list(myspca, myspca90), 
+             methods_names = c("alpha = 95", "alpha = 90"))
 ```
 
 ![](man/figures/README-spca90-1.png)<!-- -->
