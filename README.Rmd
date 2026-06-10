@@ -13,10 +13,10 @@ knitr::opts_chunk$set(
 #  ,out.width = "60%"
 ```
 <img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "110" alt = "spca logo" />
-
 # Package spca
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
