@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
+[![Codecov test coverage](https://codecov.io/gh/merolagio/spca/branch/main/graph/badge.svg)](https://app.codecov.io/gh/merolagio/spca?branch=main)
 <!-- badges: end -->
 
 This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details and full presentation can be found in the extended_vignette document.
