@@ -20,5 +20,6 @@ R/remove
 *.dll
 *.a
 *.d
+.lintr
 Image_26-05-16.RData
 image_05_10.RData
