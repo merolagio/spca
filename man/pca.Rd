@@ -25,7 +25,8 @@ pca(
 \item{M}{A data matrix, correlation matrix, or covariance matrix.}
 
 \item{n_comps}{(NULL) Integer. Number of components to retain. If \code{NULL},
-all components are retained up to the maximum allowed by the selected backend.}
+all components are retained up to the maximum allowed by the selected
+backend.}
 
 \item{center_data}{(FALSE) Logical. If \code{TRUE}, center variables to zero mean.
 If \code{M} is detected as a data matrix and any column mean is nonzero,
@@ -79,13 +80,10 @@ backend computes PCA in row space and converts the retained eigenvectors back
 to variable loadings.
 }
 \examples{
-\dontrun{
 data(holzinger)
 ho_pca = pca(holzinger, n_comps = 4, screeplot = TRUE,
              nrow_data = 144, qq_plot = TRUE)
 summary(ho_pca)
-}
-
 }
 \seealso{
 Other pca: 

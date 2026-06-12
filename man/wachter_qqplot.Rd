@@ -62,8 +62,10 @@ A simple introduction to the qq-plot can be found at
 for references.
 }
 \examples{
-# wachter_qqplot(eigenvalues, p = ncol(X), n = nrow(X), cor = TRUE, n_fitline = 5, return_plot = TRUE)
-
+data(holzinger)
+ho_pca = pca(holzinger,  qq_plot = FALSE)
+ wachter_qqplot(ho_pca$eigenvalues, p = ncol(holzinger), n = nrow(holzinger),
+  cor = TRUE, n_fitline = -3)
 }
 \seealso{
 Other pca: 

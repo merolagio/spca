@@ -28,10 +28,17 @@ spca_screeplot(
 \item{return_plot}{(FALSE) Logical. If \code{TRUE}, return the ggplot object.}
 }
 \value{
-If \code{return_plot = TRUE}, a \code{ggplot} object; otherwise \code{NULL} (invisibly).
+If \code{return_plot = TRUE}, a \code{ggplot} object;
+otherwise \code{NULL} (invisibly).
 }
 \description{
 Plots the first \code{nplot} eigenvalues (or their proportions) against component order.
+}
+\examples{
+data(holzinger)
+ho_pca = pca(holzinger,  qq_plot = FALSE)
+ spca_screeplot(ho_pca$eigenvalues)
+
 }
 \seealso{
 Other pca: 
