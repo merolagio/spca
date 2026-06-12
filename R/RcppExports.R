@@ -121,19 +121,3 @@ lsspcaC <- function(S, ncomps = 0L, selection_method = 0L, stop_criterion = 0L, 
     .Call(`_spca_lsspcaC`, S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
 }
 
-vifXC <- function(X, ind, intercept = FALSE) {
-    .Call(`_spca_vifXC`, X, ind, intercept)
-}
-
-vifSC <- function(S, ind) {
-    .Call(`_spca_vifSC`, S, ind)
-}
-
-vifSPseudoC <- function(S, ind) {
-    .Call(`_spca_vifSPseudoC`, S, ind)
-}
-
-# Register entry points for exported C++ functions
-methods::setLoadAction(function(ns) {
-    .Call(`_spca_RcppExport_registerCCallable`)
-})
