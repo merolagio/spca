@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 #  ,out.width = "60%"
 ```
-<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "110" alt = "spca logo" />
+<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "80" alt = "spca logo" />
 
 # Package spca
 
@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
 <!-- badges: end -->
+
 
 This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details and full presentation can be found in the extended_vignette document.
 

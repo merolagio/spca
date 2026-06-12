@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "110" alt = "spca logo" />
+<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "80" alt = "spca logo" />
 
 # Package spca
 
@@ -13,8 +13,6 @@
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status:
 Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
-[![Codecov test
-coverage](https://codecov.io/gh/merolagio/spca/branch/main/graph/badge.svg)](https://app.codecov.io/gh/merolagio/spca?branch=main)
 <!-- badges: end -->
 
 This package contains functions to compute, print and plot Least Squares
