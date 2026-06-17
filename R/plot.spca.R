@@ -1,7 +1,15 @@
-#library(ggplot2)
-#detach("package:ggplot2", unload = TRUE)
-
 # Define themes for plots ==============
+#' Theme for SPCA bar plots
+#'
+#' Return the ggplot2 theme used by SPCA bar plots.
+#'
+#' @param legend_position A character scalar (default \code{"bottom"}). Legend
+#'   position passed to ggplot2.
+#' @param grid_type A character scalar (default \code{"horizontal"}). Grid type
+#'   for the plot. Supported values are \code{"horizontal"} and \code{"none"}.
+#'
+#' @return A ggplot2 theme object.
+#' @noRd
 spca_bar_theme = function(legend_position = "bottom", 
                           grid_type = "horizontal") {
   th = ggplot2::theme_light() +
@@ -31,6 +39,18 @@ spca_bar_theme = function(legend_position = "bottom",
 } 
 
 
+#' Theme for SPCA circular bar plots
+#'
+#' Return the ggplot2 theme used by SPCA circular bar plots.
+#'
+#' @param legend_position A character scalar. Legend position passed to ggplot2.
+#' @param grid_type A character scalar (default \code{"horizontal"}). Grid type
+#'   for the plot. Supported values are \code{"horizontal"}, \code{"full"}, and
+#'   \code{"none"}. Full grids are reduced to horizontal grids for circular
+#'   plots.
+#'
+#' @return A ggplot2 theme object.
+#' @noRd
 spca_circular_theme = function(legend_position, 
                                grid_type = "horizontal") {
   th = ggplot2::theme_light() +
@@ -55,6 +75,16 @@ spca_circular_theme = function(legend_position,
 }
 
 # DEFINE COLORS =============================
+#' Match an SPCA color scale
+#'
+#' Match a color-scale name by its first character.
+#'
+#' @param color_scale A character vector. The first element is used. Supported
+#'   values are \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and
+#'   \code{"bw"}.
+#'
+#' @return A character scalar giving the matched color scale.
+#' @noRd
 spca_color_scale = function(color_scale) {
   
   color_scale = color_scale[1]
@@ -74,6 +104,12 @@ spca_color_scale = function(color_scale) {
 }
 
 
+#' Color palette for SPCA heatmaps
+#'
+#' Return the diverging color palette used for SPCA heatmaps.
+#'
+#' @return A character vector of colors.
+#' @noRd
 spca_tile_palette = function() {
   c(
     "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#F7F7F7",
@@ -82,6 +118,19 @@ spca_tile_palette = function() {
 }
 
 
+#' Color palette for SPCA fill scales
+#'
+#' Return a fill palette for grouped SPCA bar plots.
+#'
+#' @param color_scale A character vector. The first element is used. Supported
+#'   values are \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and
+#'   \code{"bw"}.
+#' @param pc_loadings A numeric matrix or \code{NULL} (default \code{NULL}).
+#'   Optional PCA loadings used to select a two-color comparison palette.
+#'
+#' @return A character vector of colors, \code{NULL}, or the supplied
+#'   \code{color_scale}.
+#' @noRd
 spca_fill_palette = function(color_scale, pc_loadings = NULL) {
   if (color_scale[1] == "cbb") {
     pal = c(
@@ -118,6 +167,20 @@ spca_fill_palette = function(color_scale, pc_loadings = NULL) {
 }
 
 
+#' Add a fill scale to an SPCA plot
+#'
+#' Add the requested fill scale to an SPCA bar or circular bar plot.
+#'
+#' @param pl A ggplot object.
+#' @param color_scale A character vector. The first element is used.
+#' @param data_df A data frame used to create the plot.
+#' @param variable_groups A vector, factor, or \code{NULL} (default
+#'   \code{NULL}). Optional variable-group labels.
+#' @param pc_loadings A numeric matrix or \code{NULL} (default \code{NULL}).
+#'   Optional PCA loadings.
+#'
+#' @return A ggplot object.
+#' @noRd
 spca_add_fill_scale = function(pl, color_scale, data_df,
                                variable_groups = NULL, pc_loadings = NULL) {
   if (color_scale[1] == "ggplot")
@@ -152,6 +215,25 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
 
 # CREATE PLOTS =============================
 
+#' Create plotting data for an SPCA plot
+#'
+#' Build the data frame used by SPCA plotting helpers.
+#'
+#' @param x An object of class \code{spca}.
+#' @param n_plot An integer scalar. Number of components to plot.
+#' @param contributions A logical value. If \code{TRUE}, use contributions;
+#'   otherwise, use loadings.
+#' @param only_nonzero A logical value. If \code{TRUE}, keep only variables
+#'   with at least one nonzero loading.
+#' @param variable_groups A vector, factor, or \code{NULL}. Optional
+#'   variable-group labels.
+#' @param pc_loadings A numeric matrix or \code{NULL}. Optional PCA loadings to
+#'   add for comparison.
+#' @param lbl A character vector of variable labels.
+#' @param facet_labels A character vector of component labels.
+#'
+#' @return A data frame used for plotting.
+#' @noRd
 create_data = function(x, n_plot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels){
   p = nrow(x$loadings)
   
@@ -198,6 +280,25 @@ create_data = function(x, n_plot, contributions, only_nonzero,  variable_groups,
 }
 
 # Helper: Create circular barplot
+#' Create an SPCA circular bar plot
+#'
+#' Create a circular bar plot from prepared SPCA plotting data.
+#'
+#' @param data_df A data frame returned by \code{create_data()}.
+#' @param n_plot An integer scalar. Number of components to plot.
+#' @param plotlab A logical value. If \code{TRUE}, show variable labels.
+#' @param lbl A character vector of variable labels.
+#' @param legend_position A character scalar. Legend position.
+#' @param grid_type A character scalar. Grid type.
+#' @param legend_title A character scalar or \code{NULL}. Legend title.
+#' @param variable_groups A vector, factor, or \code{NULL}. Optional
+#'   variable-group labels.
+#' @param color_scale A character vector. The first element is used.
+#' @param adjust_labels_circ A numeric vector or \code{NULL}. Optional angular
+#'   adjustment for circular component labels.
+#'
+#' @return A ggplot object.
+#' @noRd
 plot_spca_circular = function(
     data_df, n_plot, plotlab, lbl, 
     legend_position, grid_type, 
@@ -291,6 +392,27 @@ plot_spca_circular = function(
 }
 
 # Helper: Create standard barplot (handles both SPCA-only and with PCs)
+#' Create an SPCA bar plot
+#'
+#' Create a standard bar plot from prepared SPCA plotting data.
+#'
+#' @param data_df A data frame returned by \code{create_data()}.
+#' @param n_plot An integer scalar. Number of components to plot.
+#' @param contributions A logical value. If \code{TRUE}, plot contributions;
+#'   otherwise, plot loadings.
+#' @param variable_groups A vector, factor, or \code{NULL}. Optional
+#'   variable-group labels.
+#' @param has_pc_loadings A logical value. If \code{TRUE}, the plotting data
+#'   include PCA loadings for comparison.
+#' @param plotlab A logical value. If \code{TRUE}, show variable labels.
+#' @param lbl A character vector of variable labels.
+#' @param color_scale A character vector. The first element is used.
+#' @param legend_position A character scalar. Legend position.
+#' @param grid_type A character scalar. Grid type.
+#' @param x_axis_lab A character scalar. Label for the x axis.
+#'
+#' @return A ggplot object.
+#' @noRd
 plot_spca_bars = function(data_df, 
                           n_plot, 
                           contributions,
@@ -357,6 +479,24 @@ plot_spca_bars = function(data_df,
 
 
 # Helper: Create heatmap (handles both SPCA-only and with PCs)
+#' Create an SPCA heatmap
+#'
+#' Create a heatmap from prepared SPCA plotting data.
+#'
+#' @param data_df A data frame returned by \code{create_data()}.
+#' @param n_plot An integer scalar. Number of components to plot.
+#' @param contributions A logical value. If \code{TRUE}, plot contributions;
+#'   otherwise, plot loadings.
+#' @param has_pc_loadings A logical value. If \code{TRUE}, the plotting data
+#'   include PCA loadings for comparison.
+#' @param indices Integer indices of nonzero loadings.
+#' @param lbl A character vector of variable labels.
+#' @param legend_position A character scalar. Legend position.
+#' @param flip_heatmap A logical value. If \code{TRUE}, flip the heatmap axes.
+#' @param heatmap_color_range A character scalar. Color range for the heatmap.
+#'
+#' @return A ggplot object.
+#' @noRd
 plot_spca_heatmap = function(
     data_df,
     n_plot,
@@ -459,6 +599,16 @@ plot_spca_heatmap = function(
   pl
 }
 #Validate inputs=================
+#' Validate SPCA plot inputs
+#'
+#' Validate user inputs and graphical controls for \code{plot.spca()}.
+#'
+#' @param inputs A named list of unevaluated input expressions.
+#' @param controls A list of graphical controls or \code{NULL}.
+#' @param fun_formals A pairlist of formal arguments from \code{plot.spca()}.
+#'
+#' @return A list with validated \code{inputs} and \code{controls}.
+#' @noRd
 validate_plot_inputs = function(inputs, controls, fun_formals) {
 
   crl_defaults = eval(fun_formals$controls, envir = parent.frame())
@@ -531,101 +681,113 @@ if (is.null(controls)) {
 }
 
 # plot.spca=====================
-#' Plot an `spca` object
+#' Plot an spca object
 #'
-#' Plots the sparse loadings (or the corresponding percent contributions)
-#'   stored in an `spca` object. Plots can be produced as linear bar plots,
-#'   circular bar plots, or a heatmap. For large problems, it is recommended
-#'   to set only_nonzero = TRUE` and `variable_names = FALSE`.
+#' Plot the sparse loadings, or the corresponding percentage contributions, from
+#' an \code{spca} object. The plot can be shown as a bar plot, circular bar
+#' plot, or heatmap.
 #'
-#' If `pc_loadings` is provided, the plot overlays SPCA and PCA values
-#'   for comparison (circular bar plots with PCA are not implemented and
-#'   standard bar plots are used instead). All loadings are plotted with this option (only_nonzero set to FALSE).
-#' 
-#' For character arguments defined by a default vector of allowed values, the
-#'   first character of the supplied string is used to match the
-#'   corresponding option.
-#' 
-#' @param x An object of class `spca`.
-#' @param n_plot (NULL) Integer. Number of components to plot. If `NULL`, all
-#'   components in `x` are plotted.
-#' @param plot_type (c("bars", "circular", "heatmap")) Character. Plot type:
-#'   `"bars"`, `"circular"`, or `"heatmap"`. The first character is enough.
-#' @param contributions (TRUE) Logical. If `TRUE`, plot contributions
-#'   (loadings scaled to sum to 100\% within each component); otherwise plot
-#'   L2 unit loadings.
-#' @param only_nonzero (TRUE) Logical. If `TRUE`, plot only nonzero entries.
-#' @param pc_loadings (NULL) Optional numeric matrix of PCA loadings or PCA
-#'   contributions with the same dimensions as `x$loadings`. If supplied, SPCA
-#'   and PCA values are plotted together for comparison.
-#' @param variable_groups (NULL) Optional factor or character vector of length
-#'   \eqn{p} defining groups of variables. If provided, bars or tiles are
-#'   colored by group instead of by component.
-#' @param plot_title (NULL) Optional character. Plot title.
-#' @param return_plot (FALSE) Logical. If `TRUE`, return the `ggplot2` object.
-#' @param show_plot (TRUE) Logical. If `TRUE`, print the plot.
-#' @param controls (list()) List of graphical controls. Supported entries are
-#'   `color_scale`, `variable_names`, `legend_position`, `grid_type`,
-#'   `facet_labels`, `legend_title`, `x_axis_lab`, `adjust_labels_circ`,
-#'   `flip_heatmap`, and `heatmap_color_range`.
-#' @param ... Further arguments; currently ignored.
-#' 
-#' @details
+#' If \code{pc_loadings} is supplied, SPCA and PCA values are plotted side by
+#' side for comparison. Circular bar plots are not implemented for this
+#' comparison, so a standard bar plot is used instead. In this case all
+#' variables are plotted, regardless of \code{only_nonzero}.
+#'
+#' @param x An object of class \code{spca}.
+#' @param n_plot An integer scalar or \code{NULL} (default \code{NULL}). Number
+#'   of components to plot. If \code{NULL}, all components in \code{x} are
+#'   plotted.
+#' @param plot_type A character vector (default first element \code{"bars"}).
+#'   Plot type. Accepted values are \code{"bars"}, \code{"circular"}, and
+#'   \code{"heatmap"}. The first character is enough for matching.
+#' @param contributions A logical value (default \code{TRUE}). If \code{TRUE},
+#'   plot percentage contributions; otherwise, plot L2 unit loadings.
+#' @param only_nonzero A logical value (default \code{TRUE}). If \code{TRUE},
+#'   plot only variables with at least one nonzero loading.
+#' @param pc_loadings A numeric matrix, data frame, or \code{NULL} (default
+#'   \code{NULL}). Optional PCA loadings or contributions to plot together with
+#'   the SPCA values for comparison.
+#' @param variable_groups A vector, factor, or \code{NULL} (default
+#'   \code{NULL}). Optional grouping variable of length \eqn{p}, where \eqn{p}
+#'   is the number of variables. If supplied, bars or tiles are colored by group
+#'   instead of by component.
+#' @param plot_title A character scalar or \code{NULL} (default \code{NULL}).
+#'   Optional plot title.
+#' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
+#'   return the ggplot2 object.
+#' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE}, print
+#'   the plot.
+#' @param controls A list of graphical controls (default described below).
+#'   Supported entries are \code{color_scale}, \code{variable_names},
+#'   \code{legend_position}, \code{grid_type}, \code{facet_labels},
+#'   \code{legend_title}, \code{x_axis_lab}, \code{adjust_labels_circ},
+#'   \code{flip_heatmap}, and \code{heatmap_color_range}.
+#' @param ... Further arguments. These are currently unused and trigger an error
+#'   if supplied.
+#'
+#' @details For character arguments defined by a default vector of accepted
+#' values, the first element is the default and the first character of the
+#' supplied string is used for matching.
+#'
+#' The entries in \code{controls} are:
 #' \itemize{
-#' \item{\code{controls}}{These are common parameters to customize the plots.
-#'   Advanced users can override these by returning the ggplot and applying
-#'   preferred settings through \code{ggplot} functions. The variable that
-#'   controls faceting is \code{component}. See the examples.}
-#' \item{\code{color_scale}}{
-#'   \itemize{
-#'   \item \code{"cbb"} is colorblind-friendly with black.
-#'   \item \code{"printsafe"} is colorblind- and printer-friendly.
-#'   \item \code{"bw"} uses gray tones.
-#'   \item \code{"ggplot"} uses the default ggplot2 scale.
-#'   }
-#'   For more than 8 colors, \code{"cbb"} and \code{"printsafe"} are
-#'   automatically changed to \code{"ggplot"}.}
-#' \item{\code{pc_loadings}}{Adds PC loadings or contributions side by side
-#'   with those of the sPCs for comparison. \code{only_zero} is automatically
-#'   set to \code{FALSE} and only two colors are used. For large matrices, the
-#'   plots may become difficult to interpret.}
-#' \item{Circular plots}{Circular plots are fragile and, for large sets of
-#'   loadings or several components, may require adjusting the default tuning
-#'   parameters with \code{adjust_labels_circ}. This option is not recommended
-#'   for large matrices.}
-#' \item{\code{variable_names}}{Behaves as follows:
-#'   \itemize{
-#'   \item \code{NULL}: the row names of the loading matrix are used, or
-#'     \code{V1, ..., Vp} if missing.
-#'   \item \code{"none"}: variable names are not used in plotting.
-#'   \item character vector: if it is of length \code{p}, it is used as the
-#'     variable names. If the length is different, it is switched to
-#'     \code{NULL}.
-#'   }
+#' \item \code{color_scale}: a character vector (default first element
+#'   \code{"ggplot"}). Accepted values are \code{"ggplot"}, \code{"cbb"},
+#'   \code{"printsafe"}, and \code{"bw"}. \code{"cbb"} is colorblind-friendly
+#'   with black, \code{"printsafe"} is colorblind- and printer-friendly,
+#'   \code{"bw"} uses gray tones, and \code{"ggplot"} uses the default ggplot2
+#'   scale.
+#' \item \code{variable_names}: a character vector or \code{NULL} (default
+#'   \code{NULL}). If \code{NULL}, row names of the loading matrix are used, or
+#'   \code{V1}, ..., \code{Vp} if row names are missing. If set to
+#'   \code{"none"}, variable names are not shown. If a character vector of
+#'   length \eqn{p} is supplied, it is used as the variable names.
+#' \item \code{legend_position}: a character vector (default first element
+#'   \code{"none"}). Accepted values are \code{"none"}, \code{"bottom"},
+#'   \code{"right"}, \code{"top"}, and \code{"left"}.
+#' \item \code{grid_type}: a character vector (default first element
+#'   \code{"horizontal"}). Accepted values are \code{"horizontal"},
+#'   \code{"full"}, and \code{"none"}.
+#' \item \code{facet_labels}: a character vector or \code{NULL} (default
+#'   \code{NULL}). Optional facet labels for components.
+#' \item \code{legend_title}: a character scalar or \code{NULL} (default
+#'   \code{NULL}). Optional legend title.
+#' \item \code{x_axis_lab}: a character scalar (default \code{"variables"}).
+#'   Label for the x axis.
+#' \item \code{adjust_labels_circ}: a numeric vector or \code{NULL} (default
+#'   \code{NULL}). Optional angular adjustments for circular plot labels.
+#' \item \code{flip_heatmap}: a logical value (default \code{FALSE}). If
+#'   \code{TRUE}, flip the heatmap axes.
+#' \item \code{heatmap_color_range}: a character vector (default first element
+#'   \code{"values"}). Accepted values are \code{"values"} and \code{"unit"}.
 #' }
-#' }
-#'  @note When variable groups are present, `legend_position is set to "bottom".`
-#'   
-#' @return If `return_plot = TRUE`, the `ggplot2` object; otherwise `NULL`
-#'   (invisibly).
+#'
+#' When variable groups are supplied, a legend is needed to identify the groups;
+#' if the legend is missing or suppressed, it is moved to the bottom. For
+#' circular plots, the legend is moved to the right unless it is suppressed.
+#'
+#' @return If \code{return_plot = TRUE}, returns the ggplot2 object. Otherwise,
+#' returns \code{NULL} invisibly.
 #' @family spca
 #' @references
 #' Circular bar plot layouts follow examples from
 #' \url{https://www.r-graph-gallery.com/all-graphs/}.
-#' The `cbb` palette is adapted from
+#' The \code{cbb} palette is adapted from
 #' \url{http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/}.
-#' The `printsafe` palette corresponds to `OrRd` from
+#' The \code{printsafe} palette corresponds to \code{OrRd} from
 #' \url{http://colorbrewer2.org/}.
 #' @examples
 #' \dontrun{
 #' data(holzinger)
-#' myspca = spca(ho)
-#' myplot = plot(ho)
-#' change facetting and legend position
-#' myplot + facet_wrap(facets = vars(component), ncol = 4, nrow = 1) +
-#'   theme(legend.position = "r")
+#' myspca = spca(holzinger)
+#' myplot = plot(myspca, return_plot = TRUE)
+#'
+#' # Change faceting and legend position.
+#' myplot + ggplot2::facet_wrap(
+#'   facets = ggplot2::vars(component),
+#'   ncol = 4,
+#'   nrow = 1
+#' ) + ggplot2::theme(legend.position = "right")
 #' }
-#' @family spca
 #' @export
 #' @method plot spca
 plot.spca = function(

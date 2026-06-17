@@ -1,42 +1,42 @@
 #' Validate inputs for spca
 #'
-#' Checks user inputs for \code{spca}. This helper only verifies that supplied
+#' Check user inputs for \code{spca()}. This helper verifies that supplied
 #' values have admissible types, lengths, and ranges. It does not assign
 #' defaults, parse character options for C++, choose the backend, change index
-#' bases, or modify the data matrix. All input normalization is done explicitly
-#' in \code{spca()}.
+#' bases, or modify the data matrix; those steps are handled in \code{spca()}.
 #'
-#' @param M Numeric matrix or data.frame. Data matrix or covariance/correlation
-#'   matrix. Cannot contain missing values.
-#' @param alpha \code{NULL} or numeric scalar in \eqn{(0, 1]}. Target retained
-#'   proportion.
-#' @param n_comps \code{NULL} or nonnegative integer scalar. Number of
-#'   components to compute. If \code{NULL}, components are computed until
-#'   \code{ncomp_by_cvexp} is reached.
-#' @param ncomp_by_cvexp \code{NULL} or numeric scalar in \eqn{(0, 1]}. Target
-#'  cumulative variance explained used to determine the number of components.
-#'  At least one of \code{n_comps} and \code{ncomp_by_cvexp} must be supplied.
-#' @param method \code{NULL} or character vector. Each entry must start with
-#'   \code{"u"}, \code{"c"}, or \code{"p"}.
-#' @param var_selection \code{NULL} or character vector. The first entry must
-#'   start with \code{"f"}, \code{"b"}, or \code{"s"}.
-#' @param objective \code{NULL} or character vector. The first entry must
+#' @param M A numeric matrix or data frame. This can be a data matrix or a
+#'   covariance/correlation matrix and must not contain missing values.
+#' @param alpha A numeric scalar in \eqn{(0, 1]} or \code{NULL}. Target retained
+#'   proportion used by variable selection.
+#' @param n_comps A nonnegative integer scalar or \code{NULL}. Number of
+#'   components to compute.
+#' @param ncomp_by_cvexp A numeric scalar in \eqn{(0, 1]} or \code{NULL}.
+#'   Target cumulative variance explained used to determine the number of
+#'   components. At least one of \code{n_comps} and \code{ncomp_by_cvexp} must
+#'   be supplied.
+#' @param method A character vector or \code{NULL}. The first element must start
+#'   with \code{"u"}, \code{"c"}, or \code{"p"}.
+#' @param var_selection A character vector or \code{NULL}. The first element
+#'   must start with \code{"f"}, \code{"b"}, or \code{"s"}.
+#' @param objective A character vector or \code{NULL}. The first element must
 #'   start with \code{"r"} or \code{"c"}.
-#' @param intensive \code{NULL} or logical scalar.
-#' @param fat_matrix \code{NULL} or logical scalar.
-#' @param fixed_index_list \code{NULL} or list of numeric/integer vectors or
-#'  a factor.
-#'  \code{NULL} implies no grouping. 
-#' @param center_data \code{NULL} or logical scalar.
-#' @param scale_data \code{NULL} or logical scalar.
-#' @param pm_loading \code{NULL} or logical scalar.
-#' @param eps_pm_loading \code{NULL} or positive numeric scalar.
-#' @param maxiter_pm_loading \code{NULL} or positive integer scalar.
-#' @param pm_varsel \code{NULL} or logical scalar.
-#' @param eps_pm_varsel \code{NULL} or positive numeric scalar.
-#' @param maxiter_pm_varsel \code{NULL} or positive integer scalar.
+#' @param intensive A logical scalar or \code{NULL}.
+#' @param fat_matrix A logical scalar or \code{NULL}.
+#' @param fixed_index_list A list of numeric or integer vectors, a factor, or
+#'   \code{NULL}. If supplied, it must define a mutually exclusive and
+#'   exhaustive partition of the variables with at least two groups.
+#' @param center_data A logical scalar or \code{NULL}.
+#' @param scale_data A logical scalar or \code{NULL}.
+#' @param pm_loading A logical scalar or \code{NULL}.
+#' @param eps_pm_loading A positive numeric scalar or \code{NULL}.
+#' @param maxiter_pm_loading A positive integer scalar or \code{NULL}.
+#' @param pm_varsel A logical scalar or \code{NULL}.
+#' @param eps_pm_varsel A positive numeric scalar or \code{NULL}.
+#' @param maxiter_pm_varsel A positive integer scalar or \code{NULL}.
 #'
-#' @return Invisibly returns \code{TRUE} if all inputs are valid.
+#' @return Invisibly returns \code{TRUE} if all inputs are valid; otherwise,
+#'   throws an error.
 #' @noRd
 
 validate_spca_inputs = 
@@ -237,86 +237,106 @@ validate_spca_inputs =
   invisible(TRUE)
 }
 
-#spca doc=========================
+#spca=========================
 #' Compute LS-SPCA components
 #'
-#' `spca()` computes sparse principal components from a data matrix or from a
-#' covariance/correlation matrix. Data matrices are routed to the tall or fat
-#' C++ backend; covariance/correlation matrices always use the tall backend.
+#' Compute least squares sparse principal components (LS-SPCA) from a data
+#' matrix or from a covariance/correlation matrix.
 #'
-#' @param M A numeric matrix or data frame. If `M` is square and symmetric, it
-#'   is treated as a covariance/correlation matrix (only for the tall backend).
-#'    Otherwise it is treated as an \eqn{n \times p} data matrix.
-#' @param n_comps `NULL` or a nonnegative integer scalar. Number of components
-#'   to compute. If `NULL`, `ncomp_by_cvexp` is used to determine the number of
-#'   components.
-#' @param alpha A number in \eqn{(0, 1]}. Target proportion used by variable
-#'   selection.
-#' @param ncomp_by_cvexp `NULL` or a number in \eqn{(0, 1]}. If `n_comps` is
-#'   `NULL`, components are computed until cumulative variance explained reaches
-#'   this value. At least one of `n_comps` and `ncomp_by_cvexp` must be 
-#'   supplied.
-#' @param method A character selecting the LS-SPCA variant. Values may
-#'   be `"cspca"`, `"uspca"`, or `"pspca"`; only the first letter is used. 
-#' @param var_selection A character vector selecting the variable-selection
-#'   algorithm. Values starting with `"f"` use forward selection, values
-#'   starting with `"b"` use backward elimination, and values starting with
-#'   `"s"` use forward-stepwise selection.
-#' @param objective A character vector selecting the stopping criterion
-#'   for variable selection. Values starting with `"r"` use the squared
-#'   correlation criterion; values starting with `"c"` use cumulative variance
-#'   explained.
-#' @param intensive A logical scalar. If `TRUE`, the tall backend uses intensive
-#'   forward CVEXP selection. This option is not available for fat matrices.
-#' @param fat_matrix `NULL` or a logical scalar. If `NULL`, data matrices with
-#'   more columns than rows use the fat backend and all other inputs use the
-#'   tall backend. If `TRUE`, the fat backend is requested. If `FALSE`, the tall
-#'   backend is used.
-#' @param fixed_index_list [`NULL`] A list of integer-valued vectors giving
-#'   fixed 1-based variable indices for selected components or a factor. 
-#'   Use `NULL` for components without fixed indices.
-#' @param center_data A logical scalar. If `TRUE`, center data-matrix columns
-#'   before fitting. Ignored when `M` is a covariance/correlation matrix.
-#' @param scale_data A logical scalar. If `TRUE`, scale data-matrix columns
-#'   before fitting. Ignored when `M` is a covariance/correlation matrix.
-#' @param pm_loading A logical scalar. If `TRUE`, use the power method for PC
-#'   and sparse-loading eigenvectors.
-#' @param eps_pm_loading A positive number. Convergence tolerance for
-#'   `pm_loading`.
-#' @param maxiter_pm_loading A positive integer. Maximum number of iterations
-#'   for `pm_loading`.
-#' @param pm_varsel A logical scalar. If `TRUE`, use the power method inside
-#'   variable selection.
-#' @param eps_pm_varsel A positive number. Convergence tolerance for
-#'   `pm_varsel`.
-#' @param maxiter_pm_varsel A positive integer. Maximum number of iterations
-#'   for `pm_varsel`.
+#' @param M A numeric matrix or data frame. If \code{M} is square, it is treated
+#'   as a covariance/correlation matrix and the tall backend is used. Otherwise,
+#'   \code{M} is treated as an \eqn{n \times p} data matrix.
+#' @param n_comps A nonnegative integer scalar or \code{NULL} (default
+#'   \code{NULL}). Number of components to compute. If \code{NULL},
+#'   \code{ncomp_by_cvexp} is used to determine the number of components. At
+#'   least one of \code{n_comps} and \code{ncomp_by_cvexp} must be supplied.
+#' @param alpha A numeric scalar in \eqn{(0, 1]} (default \code{0.95}). Target
+#'   retained proportion used by variable selection.
+#' @param ncomp_by_cvexp A numeric scalar in \eqn{(0, 1]} or \code{NULL}
+#'   (default \code{NULL}). If \code{n_comps = NULL}, components are computed
+#'   until cumulative variance explained reaches this value.
+#' @param method A character vector (default first element \code{"cspca"}).
+#'   LS-SPCA variant. Accepted values are \code{"cspca"}, \code{"uspca"}, and
+#'   \code{"pspca"}; only the first letter is used.
+#' @param var_selection A character vector (default first element
+#'   \code{"fwd"}). Variable-selection algorithm. Values starting with
+#'   \code{"f"} use forward selection, values starting with \code{"b"} use
+#'   backward elimination, and values starting with \code{"s"} use
+#'   forward-stepwise selection.
+#' @param objective A character vector (default first element \code{"r2"}).
+#'   Stopping criterion for variable selection. Values starting with \code{"r"}
+#'   use the squared-correlation criterion; values starting with \code{"c"} use
+#'   cumulative variance explained.
+#' @param intensive A logical value (default \code{FALSE}). If \code{TRUE}, the
+#'   tall backend uses intensive forward CVEXP selection. This option is not
+#'   available for fat matrices.
+#' @param fat_matrix A logical value or \code{NULL} (default \code{NULL}). If
+#'   \code{NULL}, data matrices with more columns than rows use the fat backend,
+#'   and all other inputs use the tall backend. If \code{TRUE}, the fat backend
+#'   is requested. If \code{FALSE}, the tall backend is used.
+#' @param fixed_index_list A list of integer-valued vectors, a factor, or
+#'   \code{NULL} (default \code{NULL}). If supplied, it must define a mutually
+#'   exclusive and exhaustive partition of the variables with at least two
+#'   groups. List indices are 1-based.
+#' @param center_data A logical value (default \code{FALSE}). If \code{TRUE},
+#'   center data-matrix columns before fitting. Ignored when \code{M} is treated
+#'   as a covariance/correlation matrix.
+#' @param scale_data A logical value (default \code{FALSE}). If \code{TRUE},
+#'   scale data-matrix columns before fitting. Ignored when \code{M} is treated
+#'   as a covariance/correlation matrix.
+#' @param pm_loading A logical value (default \code{FALSE}). If \code{TRUE}, use
+#'   the power method for PC and sparse-loading eigenvectors.
+#' @param eps_pm_loading A positive numeric scalar (default \code{1e-4}).
+#'   Convergence tolerance for \code{pm_loading}.
+#' @param maxiter_pm_loading A positive integer scalar (default \code{1000}).
+#'   Maximum number of iterations for \code{pm_loading}.
+#' @param pm_varsel A logical value (default \code{FALSE}). If \code{TRUE}, use
+#'   the power method inside variable selection.
+#' @param eps_pm_varsel A positive numeric scalar (default \code{1e-4}).
+#'   Convergence tolerance for \code{pm_varsel}.
+#' @param maxiter_pm_varsel A positive integer scalar (default \code{500}).
+#'   Maximum number of iterations for \code{pm_varsel}.
 #'
-#' @details
-#' A covariance matrix as input to `M` is accepted only for 
-#'   tall matrices. 
-
-#' Variable selection is controlled by `var_selection`, `objective`, and
-#' `intensive`.
+#' @details Data matrices are routed to the tall or fat C++ backend. Square
+#' matrices are treated as covariance/correlation matrices and use the tall
+#' backend.
+#'
+#' Variable selection is controlled by \code{var_selection}, \code{objective},
+#' and \code{intensive}.
 #'
 #' \tabular{lll}{
-#'   `var_selection` \tab `objective` \tab Algorithm \cr
-#'   `"fwd"` \tab `"r2"` \tab Forward selection with squared-correlation stopping \cr
-#'   `"bkw"` \tab `"r2"` \tab Backward elimination with squared-correlation stopping \cr
-#'   `"step"` \tab `"r2"` \tab Forward-stepwise selection with squared-correlation stopping \cr
-#'   `"fwd"` \tab `"cvexp"` \tab Forward selection with CVEXP stopping \cr
-#'   `"bkw"` \tab `"cvexp"` \tab Backward elimination with CVEXP stopping \cr
-#'   `"step"` \tab `"cvexp"` \tab Forward-stepwise selection with CVEXP stopping
-#'    .\cr  `intensive = TRUE` requires "fwd" \tab `"cvexp"` \tab Intensive
-#'    forward CVEXP selection. \cr
+#' \code{var_selection} \tab \code{objective} \tab Algorithm \cr
+#' \code{"fwd"} \tab \code{"r2"} \tab Forward selection with
+#' squared-correlation stopping \cr
+#' \code{"bkw"} \tab \code{"r2"} \tab Backward elimination with
+#' squared-correlation stopping \cr
+#' \code{"step"} \tab \code{"r2"} \tab Forward-stepwise selection with
+#' squared-correlation stopping \cr
+#' \code{"fwd"} \tab \code{"cvexp"} \tab Forward selection with CVEXP stopping
+#' \cr
+#' \code{"bkw"} \tab \code{"cvexp"} \tab Backward elimination with CVEXP
+#' stopping \cr
+#' \code{"step"} \tab \code{"cvexp"} \tab Forward-stepwise selection with
+#' CVEXP stopping \cr
+#' \code{intensive = TRUE} requires \code{"fwd"} \tab \code{"cvexp"} \tab
+#' Intensive forward CVEXP selection \cr
 #' }
 #'
-#' The fat backend currently uses regression-based forward variable selection only: `var_selection = "f"`, `intensive = FALSE`. 
-#' Any another combination supplied will generate an error.  
+#' The fat backend currently supports regression-based forward variable
+#' selection only: \code{var_selection = "f"} and \code{intensive = FALSE}.
+#' Other combinations generate an error.
 #'
 #' The returned object is documented in [spca_object].
-#'
-#' @return An object of class `spca`.
+#' @return An object of class \code{spca}.
+#' 
+#' @examples
+#' data(holzinger)
+#' #default
+#' ho_cspca = spca(holzinger, n_comps = 4)
+#' #uncorrelated components and subsets determined using CVEXP as stopping rule
+#' ho_uspca = spca(holzinger, n_comps = 4, method = "uspca", 
+#'                 objective = "cvexp")
+#' 
 #' @family spca
 #' @export
 spca = function(M,

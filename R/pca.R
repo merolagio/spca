@@ -1,46 +1,54 @@
-#' Compute Principal Components
+#' Compute principal components
 #'
-#' Creates PCA output as an `spca` object, so the result can be used with
-#' `spca` methods.
+#' Compute a principal component analysis (PCA) and return the result as an
+#' \code{spca} object, so that it can be used with \code{spca} methods.
 #'
 #' @param M A data matrix, correlation matrix, or covariance matrix.
-#' @param n_comps (NULL) Integer. Number of components to retain. If `NULL`,
-#'   all components are retained up to the maximum allowed by the selected
-#'   backend.
-#' @param center_data (FALSE) Logical. If `TRUE`, center variables to zero mean.
-#'   If `M` is detected as a data matrix and any column mean is nonzero,
-#'   centering is performed automatically.
-#' @param scale_data (FALSE) Logical. If `TRUE`, scale variables.
-#' @param fat_matrix (NULL) Logical or `NULL`. If `NULL`, the backend is
-#'  selected automatically: data matrices with \eqn{n < p} use the fat backend
-#'  and all other inputs use the tall backend. If `TRUE`, request the fat
-#'  backend. If `FALSE`, use the tall backend. Covariance/correlation matrices
-#'  always use the tall backend.
-#' @param screeplot (FALSE) Logical. If `TRUE`, produce a scree plot.
-#' @param qq_plot (TRUE) Logical. If `TRUE`, produce a Wachter QQ-plot with
-#'   \link{wachter_qqplot}. The fitted line is based on `n_comps`.
-#' @param nrow_data (NULL) Integer. Number of rows in the original data set.
-#'   Required when `qq_plot = TRUE` and `M` is a covariance or correlation
+#' @param n_comps An integer scalar or \code{NULL} (default \code{NULL}).
+#'   Number of components to retain. If \code{NULL}, all components are retained
+#'   up to the maximum allowed by the selected backend.
+#' @param center_data A logical value (default \code{FALSE}). If \code{TRUE},
+#'   center variables to zero mean. If \code{M} is detected as a data matrix and
+#'   any column mean is nonzero, centering is performed automatically.
+#' @param scale_data A logical value (default \code{FALSE}). If \code{TRUE},
+#'   scale variables.
+#' @param fat_matrix A logical value or \code{NULL} (default \code{NULL}). If
+#'   \code{NULL}, the backend is selected automatically: data matrices with
+#'   \eqn{n < p} use the fat backend and all other inputs use the tall backend.
+#'   If \code{TRUE}, request the fat backend. If \code{FALSE}, use the tall
+#'   backend. Covariance and correlation matrices always use the tall backend.
+#' @param screeplot A logical value (default \code{FALSE}). If \code{TRUE},
+#'   produce a scree plot.
+#' @param qq_plot A logical value (default \code{TRUE}). If \code{TRUE},
+#'   produce a Wachter QQ plot with \code{\link{wachter_qqplot}}.
+#' @param nrow_data An integer scalar or \code{NULL} (default \code{NULL}).
+#'   Number of rows in the original data set. Required when
+#'   \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
 #'   matrix. If not available, the Wachter QQ-plot cannot be produced.
-#' @param neigen_toplot (NULL) Integer. Number of eigenvalues to show in
-#'   diagnostic plots. If `NULL`, all available eigenvalues are shown.
-#' @param cor (TRUE) Logical. If `TRUE`, rescales MP quantiles to match a
-#'   correlation matrix.
-#' @param common_var (1) Numeric. Common variance of the variables used for the
-#'   Marchenko--Pastur quantiles in the Wachter QQ-plot.
-#' @param pm (FALSE) Logical. If `TRUE`, compute the requested eigenpairs by
-#'   power method and rank-one deflation.
-#' @param eps_pm (1e-4) Numeric. Convergence tolerance for the power method.
-#' @param maxiter_pm (1000) Integer. Maximum number of power-method iterations.
+#' @param neigen_toplot An integer scalar or \code{NULL} (default
+#'   \code{NULL}). Number of eigenvalues to show in diagnostic plots. If
+#'   \code{NULL}, all available eigenvalues are shown.
+#' @param cor A logical value (default \code{TRUE}). Currently accepted for
+#'   compatibility; the diagnostic plot uses \code{common_var} for the
+#'   Marchenko--Pastur quantiles.
+#' @param common_var A numeric scalar (default \code{1}). Common variance of
+#'   the variables used for the Marchenko--Pastur quantiles in the Wachter QQ
+#'   plot.
+#' @param pm A logical value (default \code{FALSE}). If \code{TRUE}, compute
+#'   the requested eigenpairs by power method and rank-one deflation.
+#' @param eps_pm A positive numeric scalar (default \code{1e-4}). Convergence
+#'   tolerance for the power method.
+#' @param maxiter_pm A positive integer scalar (default \code{1000}). Maximum
+#'   number of power-method iterations.
 #'
-#' @return An \link{spca_object} with the addition of the vector `eigenvalues`
-#'   containing the eigenvalues up to the rank used by the selected backend.
+#' @return An \code{\link{spca_object}} with an additional
+#'   \code{eigenvalues} vector containing the eigenvalues up to the rank used by
+#'   the selected backend.
 #'
-#' @details
-#' `n_comps` controls how many components are retained in the returned object.
-#' The tall backend computes PCA from the covariance/correlation matrix. The fat
-#' backend computes PCA in row space and converts the retained eigenvectors back
-#' to variable loadings.
+#' @details \code{n_comps} controls how many components are retained in the
+#' returned object. The tall backend computes PCA from the covariance or
+#' correlation matrix. The fat backend computes PCA in row space and converts
+#' the retained eigenvectors back to variable loadings.
 #'
 #' @examples
 #' data(holzinger)
@@ -246,6 +254,15 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   out
 }
 
+#' Theme for PCA diagnostic plots
+#'
+#' Return the ggplot2 theme used by the PCA diagnostic plots.
+#'
+#' @param base_size A numeric scalar (default \code{12}). Base font size.
+#' @param base_family A character scalar (default \code{""}). Base font family.
+#'
+#' @return A ggplot2 theme object.
+#' @noRd
 theme_pca = function(base_size = 12, base_family = "") {
   ggplot2::theme_minimal(base_size = base_size,
                          base_family = base_family) +
@@ -258,36 +275,46 @@ theme_pca = function(base_size = 12, base_family = "") {
 }
 
 
-#' Wachter (Marchenko--Pastur) qq-plot for eigenvalues
+#' Wachter QQ plot for eigenvalues
 #'
-#' Produces a QQ-plot comparing observed eigenvalues to Marchenko--Pastur
-#' (Wachter) theoretical quantiles for aspect ratio `gamma` = n/p.
+#' Produce a QQ plot comparing observed eigenvalues with Marchenko--Pastur
+#' (Wachter) theoretical quantiles.
 #'
-#' @param eigenvalues Numeric vector of eigenvalues (assumed sorted decreasing).
-#' @param p Integer. Number of variables.
-#' @param n Integer. Sample size.
-#' @param gamma Numeric. Aspect ratio; defaults to `n/p` if missing.
-#' @param cor Logical. If `TRUE`, rescales MP quantiles to match a correlation
-#' @param common_var numeric > 0. The common variance of the variables. 
-#'  Use if the variables were rescaled to 
-#'  unit variance. See Details. 
-#' @param nplot Integer. Number of leading eigenvalues to include; defaults to
-#'   length(eigenvalues).
-#' @param n_fitline Integer or `NULL`. If positive, fits an `lm` line using the
-#'   last `n_fitline` points; if negative, excludes the nfit largest values.
-#' @param addtitle Logical. If `TRUE`, adds a plot title.
-#' @param show_plot Logical. If `TRUE`, prints the plot.
-#' @param return_plot Logical. If `TRUE`, returns the ggplot object.
+#' @param eigenvalues A numeric vector of eigenvalues, assumed to be sorted in
+#'   decreasing order.
+#' @param p An integer scalar or \code{NULL} (default \code{NULL}). Number of
+#'   variables. If \code{NULL}, \code{length(eigenvalues)} is used.
+#' @param n An integer scalar. Sample size.
+#' @param gamma A numeric scalar. Aspect ratio. If missing, \code{n / p} is
+#'   used.
+#' @param cor A logical value (default \code{TRUE}). Currently accepted for
+#'   compatibility; the plotted quantiles are controlled by \code{common_var}.
+#' @param common_var A positive numeric scalar (default \code{1}). Common
+#'   variance of the variables. Use this when the variables were rescaled to
+#'   unit variance. See Details.
+#' @param nplot An integer scalar or \code{NULL} (default \code{NULL}). Number
+#'   of leading eigenvalues to include. If \code{NULL}, all eigenvalues are
+#'   included.
+#' @param n_fitline An integer scalar or \code{NULL} (default \code{NULL}). If
+#'   positive, fit a least-squares line using the last \code{n_fitline} points.
+#'   If negative, exclude the largest \code{abs(n_fitline)} values from the
+#'   fitted line.
+#' @param addtitle A logical value (default \code{TRUE}). If \code{TRUE}, add a
+#'   plot title.
+#' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE},
+#'   print the plot.
+#' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
+#'   return the ggplot object.
 #'
-#' @details The qq-plot is based on the Marchenko-Pastur distribution of the
-#'  eigenvalues of a random covariance matrix generated with variance
-#'  with a common variance. If the dataset or the covariance matrix were
-#'  generated from variables with different variances, the qq-plot is not valid.
-#'  A simple introduction to the qq-plot can be found at  
-#'  \url{https://brainder.org/tag/wachter-test/}, see the extended vignette 
-#'  for references.  
-#' 
-#' @return If `return_plot = TRUE`, a `ggplot` object.
+#' @details The QQ plot is based on the Marchenko--Pastur distribution of the
+#' eigenvalues of a random covariance matrix generated from variables with a
+#' common variance. If the data set or covariance matrix comes from variables
+#' with different variances, the QQ plot is not valid. A simple introduction to
+#' the QQ plot can be found at \url{https://brainder.org/tag/wachter-test/};
+#' see the extended vignette for references.
+#'
+#' @return If \code{return_plot = TRUE}, returns a \code{ggplot} object.
+#' Otherwise, returns \code{NULL} invisibly.
 #'
 #' @examples
 #' data(holzinger)
@@ -330,21 +357,25 @@ wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE, common_va
     return(pl)
 }
 
-#' Scree plot of eigenvalues
+#' Plot eigenvalues in a scree plot
 #'
-#' Plots the first `nplot` eigenvalues (or their proportions) against component order.
+#' Plot the first \code{nplot} eigenvalues against component order.
 #'
-#' @param eigenvalues Numeric vector of eigenvalues.
-#' @param nplot (NULL) Integer. Number of leading eigenvalues to plot. If
-#'   `NULL`, all eigenvalues are plotted.
-#' @param ylab ("eigenvalues") Character. Y-axis label.
-#' @param addtitle (TRUE) Logical. If `TRUE`, add a plot title.
-#' @param show_plot (TRUE) Logical. If `TRUE`, print the plot.
-#' @param return_plot (FALSE) Logical. If `TRUE`, return the ggplot object.
-
+#' @param eigenvalues A numeric vector of eigenvalues.
+#' @param nplot An integer scalar or \code{NULL} (default \code{NULL}). Number
+#'   of leading eigenvalues to plot. If \code{NULL}, all eigenvalues are
+#'   plotted.
+#' @param ylab A character scalar (default \code{"eigenvalues"}). Label for the
+#'   y axis.
+#' @param addtitle A logical value (default \code{TRUE}). If \code{TRUE}, add a
+#'   plot title.
+#' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE},
+#'   print the plot.
+#' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
+#'   return the ggplot object.
 #'
-#' @return If `return_plot = TRUE`, a `ggplot` object; 
-#'   otherwise `NULL` (invisibly).
+#' @return If \code{return_plot = TRUE}, returns a \code{ggplot} object;
+#' otherwise, returns \code{NULL} invisibly.
 #' @examples
 #' data(holzinger)
 #' ho_pca = pca(holzinger,  qq_plot = FALSE)

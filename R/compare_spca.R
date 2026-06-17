@@ -1,47 +1,59 @@
 #' Compare two or more spca solutions
-#' 
-#' Plot loadings and print summary statistics for several \code{spca} objects
-#' side by side. For the meaning of each summary statistic see
+#'
+#' Plot loadings and print summary statistics for two or more \code{spca}
+#' objects side by side. For the meaning of each summary statistic, see
 #' \code{\link{summary.spca}}. Tables and plots can optionally be returned.
 #'
 #' @param obj_list A list of two or more \code{spca} objects.
-#' @param n_comps Integer scalar. Number of components to compare. If
-#'   \code{NULL}, the minimum number of available components across objects is
-#'   used.
-#' @param contributions Logical. If \code{TRUE}, compare percentage
-#'   contributions; otherwise compare loadings.
-#' @param only_nonzero Logical. If \code{TRUE}, only variables with at least one
-#'   nonzero loading/contribution are plotted or printed.
-#' @param variable_groups Optional variable grouping. Can be a list of indices,
-#'   a vector, or a factor with one entry per variable. Used to draw vertical
-#'   group-separating lines in the loadings plot.
-#' @param plot_loadings Logical. If \code{TRUE}, plot the loadings or
-#'   contributions.
-#' @param plot_type Character scalar. Values starting with \code{"b"} use bars;
-#'   values starting with \code{"p"} use points. Other values default to bars.
-#' @param methods_names Optional character vector with one label per object. If
-#'   \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
-#' @param x_axis_var_names Logical. If \code{TRUE}, show variable names on 
-#'   the x axis of the loadings plot.
-#' @param col_grouplines Character scalar. Color of the vertical group lines.
-#' @param color_scale Character scalar. Color palette for bar plots. Accepted
-#'   values are \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and
-#'   \code{"bw"}.
-#' @param col_short_names Logical. If \code{TRUE}, use short component names
-#'   such as \code{C1.M1}; otherwise use \code{C1.object_name}.
-#' @param print_loadings Logical. If \code{TRUE}, print the loadings or
-#'   contributions table.
-#' @param return_tables Logical. If \code{TRUE}, return the loadings
-#'  contributions matrix and the raw summary matrix.
-#' @param print_tables Logical. If \code{FALSE}, suppress table printing. Takes
-#'   priority over \code{print_loadings}.
-#' @param return_plot Logical. If \code{TRUE}, return the loadings plot.
-#' @param show_plot Logical. If \code{TRUE}, print the loadings plot.
-#' @return Invisibly returns \code{NULL} by default. 
-#'   If \code{return_tables = TRUE}, returns a list containing the comparison
-#'   matrix and summary matrix. If
-#' \code{return_plot = TRUE}, the returned object also includes the 
-#'   loadings plot.
+#' @param n_comps An integer scalar or \code{NULL} (default \code{NULL}).
+#'   Number of components to compare. If \code{NULL}, the minimum number of
+#'   available components across objects is used.
+#' @param contributions A logical value (default \code{TRUE}). If \code{TRUE},
+#'   compare percentage contributions; otherwise, compare loadings.
+#' @param only_nonzero A logical value (default \code{TRUE}). If \code{TRUE},
+#'   only variables with at least one nonzero loading or contribution are
+#'   plotted or printed.
+#' @param variable_groups Optional variable grouping (default \code{NULL}). Can
+#'   be a list of indices, a vector, or a factor with one entry per variable.
+#'   Used to draw vertical group-separating lines in the loadings plot.
+#' @param plot_loadings A logical value (default \code{TRUE}). If \code{TRUE},
+#'   plot the loadings or contributions.
+#' @param plot_type A character vector (default first element \code{"bars"}).
+#'   Values starting with \code{"b"} use bars; values starting with \code{"p"}
+#'   use points. Other values default to bars.
+#' @param methods_names An optional character vector (default \code{NULL}) with
+#'   one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
+#' @param x_axis_var_names A logical value (default \code{TRUE}). If
+#'   \code{TRUE}, show variable names on the x axis of the loadings plot.
+#' @param col_grouplines A character scalar (default \code{"red"}). Color of the
+#'   vertical group lines.
+#' @param color_scale A character vector (default first element
+#'   \code{"ggplot"}). Color palette for bar plots. Accepted values are
+#'   \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and \code{"bw"}.
+#' @param col_short_names A logical value (default \code{TRUE}). If \code{TRUE},
+#'   use short component names such as \code{C1.M1}; otherwise, use names such 
+#'   as \code{C1.object_name}.
+#' @param print_tables A logical value (default \code{TRUE}). If \code{FALSE},
+#'   suppress table printing. Takes priority over \code{print_loadings}.
+#' @param print_loadings A logical value (default \code{TRUE}). If \code{TRUE},
+#'   print the loadings or contributions table.
+#' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE}, show
+#'   the loadings or contributions plot.
+#' @param return_tables A logical value (default \code{FALSE}). If \code{TRUE},
+#'   return the loadings or contributions matrix and the raw summary matrix.
+#' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
+#'   return the loadings or contributions plot.
+#'
+#' @return Invisibly returns \code{NULL} by default. If
+#'   \code{return_tables = TRUE}, returns a list containing the comparison
+#'   matrix and summary matrix. If \code{return_plot = TRUE}, the returned
+#'   object also includes the loadings or contributions plot.
+#' @examples
+#' data(holzinger)
+#' ho_uspca = spca(holzinger, n_comps = 4, method = "u")
+#' ho_cspca = spca(holzinger, n_comps = 4, method = "c")
+#' compare_spca(list(ho_uspca, ho_cspca))
+#'
 #' @family spca
 #' @export
 compare_spca = function(

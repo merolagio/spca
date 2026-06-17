@@ -73,6 +73,22 @@ solveC <- function(S) {
     .Call(`_spca_solveC`, S)
 }
 
+PMnEigenpairs <- function(M, ncomps, fat_matrix = FALSE, epsPM = 1e-5, maxiterPM = 100L) {
+    .Call(`_spca_PMnEigenpairs`, M, ncomps, fat_matrix, epsPM, maxiterPM)
+}
+
+pcaC <- function(M, ncomps, data_matrix = TRUE, fat_matrix = FALSE, PM = FALSE, epsPM = 1e-5, maxiterPM = 100L) {
+    .Call(`_spca_pcaC`, M, ncomps, data_matrix, fat_matrix, PM, epsPM, maxiterPM)
+}
+
+lsspcaTC <- function(X, ncomps = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 300L, maxiterPMS = 200L, rank_tol = 0.0) {
+    .Call(`_spca_lsspcaTC`, X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
+}
+
+lsspcaC <- function(S, ncomps = 0L, selection_method = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 100L, maxiterPMS = 200L, rank_tol = 0.0) {
+    .Call(`_spca_lsspcaC`, S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
+}
+
 scaleC <- function(A, center = TRUE, scale = TRUE) {
     .Call(`_spca_scaleC`, A, center, scale)
 }
@@ -103,21 +119,5 @@ makeCorCompC <- function(A, S, ncomps = 0L) {
 
 makeCorScoresC <- function(T, ncomps = 0L) {
     .Call(`_spca_makeCorScoresC`, T, ncomps)
-}
-
-PMnEigenpairs <- function(M, ncomps, fat_matrix = FALSE, epsPM = 1e-5, maxiterPM = 100L) {
-    .Call(`_spca_PMnEigenpairs`, M, ncomps, fat_matrix, epsPM, maxiterPM)
-}
-
-pcaC <- function(M, ncomps, data_matrix = TRUE, fat_matrix = FALSE, PM = FALSE, epsPM = 1e-5, maxiterPM = 100L) {
-    .Call(`_spca_pcaC`, M, ncomps, data_matrix, fat_matrix, PM, epsPM, maxiterPM)
-}
-
-lsspcaTC <- function(X, ncomps = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 300L, maxiterPMS = 200L, rank_tol = 0.0) {
-    .Call(`_spca_lsspcaTC`, X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
-}
-
-lsspcaC <- function(S, ncomps = 0L, selection_method = 0L, stop_criterion = 0L, exact_cvexp = FALSE, alpha = 0.95, ncompbycvexp = 0.95, method = as.character( c("c")), indvec_in = NULL, cardvec_in = NULL, PMPC = FALSE, PMS = FALSE, epsPMPC = 1E-5, epsPMS = 1E-7, maxiterPMPC = 100L, maxiterPMS = 200L, rank_tol = 0.0) {
-    .Call(`_spca_lsspcaC`, S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol)
 }
 
