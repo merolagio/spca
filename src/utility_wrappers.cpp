@@ -1,8 +1,8 @@
 #include <cmath>
 #include <RcppEigen.h>
 
-#include "Cpp_LinAlg_exptd_R.h"  // get validators
-#include "support_tall_v3.h"
+#include "linalg_wrappers.h"  // get validators
+#include "support_tall.h"
 // [[Rcpp::depends(RcppEigen)]]
 using namespace Rcpp;
 using namespace std;
@@ -30,7 +30,7 @@ Eigen::MatrixXd scaleC(const Eigen::Map<Eigen::MatrixXd>& A,
       C.array().rowwise() -= C.colwise().mean().array();
     
     if (scale) {
-      Eigen::VectorXd s = C.colwise().norm() * std::sqrt(A.rows());
+      Eigen::VectorXd s = C.colwise().norm() * std::sqrt(A.rows() - 1);
       
       if ((s.array() <= 0.0).any())
         Rcpp::stop("at least one column has zero norm");
