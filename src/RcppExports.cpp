@@ -222,6 +222,91 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// PMnEigenpairs
+Rcpp::List PMnEigenpairs(const Eigen::Map<Eigen::MatrixXd>& M, int ncomps, bool fat_matrix, double epsPM, int maxiterPM);
+RcppExport SEXP _spca_PMnEigenpairs(SEXP MSEXP, SEXP ncompsSEXP, SEXP fat_matrixSEXP, SEXP epsPMSEXP, SEXP maxiterPMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
+    Rcpp::traits::input_parameter< bool >::type fat_matrix(fat_matrixSEXP);
+    Rcpp::traits::input_parameter< double >::type epsPM(epsPMSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiterPM(maxiterPMSEXP);
+    rcpp_result_gen = Rcpp::wrap(PMnEigenpairs(M, ncomps, fat_matrix, epsPM, maxiterPM));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pcaC
+Rcpp::List pcaC(const Eigen::Map<Eigen::MatrixXd>& M, int ncomps, bool data_matrix, bool fat_matrix, bool PM, double epsPM, int maxiterPM);
+RcppExport SEXP _spca_pcaC(SEXP MSEXP, SEXP ncompsSEXP, SEXP data_matrixSEXP, SEXP fat_matrixSEXP, SEXP PMSEXP, SEXP epsPMSEXP, SEXP maxiterPMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
+    Rcpp::traits::input_parameter< bool >::type data_matrix(data_matrixSEXP);
+    Rcpp::traits::input_parameter< bool >::type fat_matrix(fat_matrixSEXP);
+    Rcpp::traits::input_parameter< bool >::type PM(PMSEXP);
+    Rcpp::traits::input_parameter< double >::type epsPM(epsPMSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiterPM(maxiterPMSEXP);
+    rcpp_result_gen = Rcpp::wrap(pcaC(M, ncomps, data_matrix, fat_matrix, PM, epsPM, maxiterPM));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lsspcaTC
+List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X, int ncomps, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
+RcppExport SEXP _spca_lsspcaTC(SEXP XSEXP, SEXP ncompsSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
+    Rcpp::traits::input_parameter< int >::type stop_criterion(stop_criterionSEXP);
+    Rcpp::traits::input_parameter< bool >::type exact_cvexp(exact_cvexpSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type ncompbycvexp(ncompbycvexpSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type indvec_in(indvec_inSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type cardvec_in(cardvec_inSEXP);
+    Rcpp::traits::input_parameter< bool >::type PMPC(PMPCSEXP);
+    Rcpp::traits::input_parameter< bool >::type PMS(PMSSEXP);
+    Rcpp::traits::input_parameter< double >::type epsPMPC(epsPMPCSEXP);
+    Rcpp::traits::input_parameter< double >::type epsPMS(epsPMSSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiterPMPC(maxiterPMPCSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiterPMS(maxiterPMSSEXP);
+    Rcpp::traits::input_parameter< double >::type rank_tol(rank_tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(lsspcaTC(X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lsspcaC
+List lsspcaC(const Eigen::Map<Eigen::MatrixXd>& S, int ncomps, int selection_method, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
+RcppExport SEXP _spca_lsspcaC(SEXP SSEXP, SEXP ncompsSEXP, SEXP selection_methodSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type S(SSEXP);
+    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
+    Rcpp::traits::input_parameter< int >::type selection_method(selection_methodSEXP);
+    Rcpp::traits::input_parameter< int >::type stop_criterion(stop_criterionSEXP);
+    Rcpp::traits::input_parameter< bool >::type exact_cvexp(exact_cvexpSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type ncompbycvexp(ncompbycvexpSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type indvec_in(indvec_inSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type cardvec_in(cardvec_inSEXP);
+    Rcpp::traits::input_parameter< bool >::type PMPC(PMPCSEXP);
+    Rcpp::traits::input_parameter< bool >::type PMS(PMSSEXP);
+    Rcpp::traits::input_parameter< double >::type epsPMPC(epsPMPCSEXP);
+    Rcpp::traits::input_parameter< double >::type epsPMS(epsPMSSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiterPMPC(maxiterPMPCSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiterPMS(maxiterPMSSEXP);
+    Rcpp::traits::input_parameter< double >::type rank_tol(rank_tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(lsspcaC(S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scaleC
 Eigen::MatrixXd scaleC(const Eigen::Map<Eigen::MatrixXd>& A, bool center, bool scale);
 RcppExport SEXP _spca_scaleC(SEXP ASEXP, SEXP centerSEXP, SEXP scaleSEXP) {
@@ -321,91 +406,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// PMnEigenpairs
-Rcpp::List PMnEigenpairs(const Eigen::Map<Eigen::MatrixXd>& M, int ncomps, bool fat_matrix, double epsPM, int maxiterPM);
-RcppExport SEXP _spca_PMnEigenpairs(SEXP MSEXP, SEXP ncompsSEXP, SEXP fat_matrixSEXP, SEXP epsPMSEXP, SEXP maxiterPMSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
-    Rcpp::traits::input_parameter< bool >::type fat_matrix(fat_matrixSEXP);
-    Rcpp::traits::input_parameter< double >::type epsPM(epsPMSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiterPM(maxiterPMSEXP);
-    rcpp_result_gen = Rcpp::wrap(PMnEigenpairs(M, ncomps, fat_matrix, epsPM, maxiterPM));
-    return rcpp_result_gen;
-END_RCPP
-}
-// pcaC
-Rcpp::List pcaC(const Eigen::Map<Eigen::MatrixXd>& M, int ncomps, bool data_matrix, bool fat_matrix, bool PM, double epsPM, int maxiterPM);
-RcppExport SEXP _spca_pcaC(SEXP MSEXP, SEXP ncompsSEXP, SEXP data_matrixSEXP, SEXP fat_matrixSEXP, SEXP PMSEXP, SEXP epsPMSEXP, SEXP maxiterPMSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
-    Rcpp::traits::input_parameter< bool >::type data_matrix(data_matrixSEXP);
-    Rcpp::traits::input_parameter< bool >::type fat_matrix(fat_matrixSEXP);
-    Rcpp::traits::input_parameter< bool >::type PM(PMSEXP);
-    Rcpp::traits::input_parameter< double >::type epsPM(epsPMSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiterPM(maxiterPMSEXP);
-    rcpp_result_gen = Rcpp::wrap(pcaC(M, ncomps, data_matrix, fat_matrix, PM, epsPM, maxiterPM));
-    return rcpp_result_gen;
-END_RCPP
-}
-// lsspcaTC
-List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X, int ncomps, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
-RcppExport SEXP _spca_lsspcaTC(SEXP XSEXP, SEXP ncompsSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type X(XSEXP);
-    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
-    Rcpp::traits::input_parameter< int >::type stop_criterion(stop_criterionSEXP);
-    Rcpp::traits::input_parameter< bool >::type exact_cvexp(exact_cvexpSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type ncompbycvexp(ncompbycvexpSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type indvec_in(indvec_inSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type cardvec_in(cardvec_inSEXP);
-    Rcpp::traits::input_parameter< bool >::type PMPC(PMPCSEXP);
-    Rcpp::traits::input_parameter< bool >::type PMS(PMSSEXP);
-    Rcpp::traits::input_parameter< double >::type epsPMPC(epsPMPCSEXP);
-    Rcpp::traits::input_parameter< double >::type epsPMS(epsPMSSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiterPMPC(maxiterPMPCSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiterPMS(maxiterPMSSEXP);
-    Rcpp::traits::input_parameter< double >::type rank_tol(rank_tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(lsspcaTC(X, ncomps, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
-    return rcpp_result_gen;
-END_RCPP
-}
-// lsspcaC
-List lsspcaC(const Eigen::Map<Eigen::MatrixXd>& S, int ncomps, int selection_method, int stop_criterion, bool exact_cvexp, double alpha, double ncompbycvexp, Rcpp::CharacterVector method, Rcpp::Nullable<Rcpp::IntegerVector> indvec_in, Rcpp::Nullable<Rcpp::IntegerVector> cardvec_in, bool PMPC, bool PMS, double epsPMPC, double epsPMS, int maxiterPMPC, int maxiterPMS, double rank_tol);
-RcppExport SEXP _spca_lsspcaC(SEXP SSEXP, SEXP ncompsSEXP, SEXP selection_methodSEXP, SEXP stop_criterionSEXP, SEXP exact_cvexpSEXP, SEXP alphaSEXP, SEXP ncompbycvexpSEXP, SEXP methodSEXP, SEXP indvec_inSEXP, SEXP cardvec_inSEXP, SEXP PMPCSEXP, SEXP PMSSEXP, SEXP epsPMPCSEXP, SEXP epsPMSSEXP, SEXP maxiterPMPCSEXP, SEXP maxiterPMSSEXP, SEXP rank_tolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type S(SSEXP);
-    Rcpp::traits::input_parameter< int >::type ncomps(ncompsSEXP);
-    Rcpp::traits::input_parameter< int >::type selection_method(selection_methodSEXP);
-    Rcpp::traits::input_parameter< int >::type stop_criterion(stop_criterionSEXP);
-    Rcpp::traits::input_parameter< bool >::type exact_cvexp(exact_cvexpSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type ncompbycvexp(ncompbycvexpSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type indvec_in(indvec_inSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type cardvec_in(cardvec_inSEXP);
-    Rcpp::traits::input_parameter< bool >::type PMPC(PMPCSEXP);
-    Rcpp::traits::input_parameter< bool >::type PMS(PMSSEXP);
-    Rcpp::traits::input_parameter< double >::type epsPMPC(epsPMPCSEXP);
-    Rcpp::traits::input_parameter< double >::type epsPMS(epsPMSSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiterPMPC(maxiterPMPCSEXP);
-    Rcpp::traits::input_parameter< int >::type maxiterPMS(maxiterPMSSEXP);
-    Rcpp::traits::input_parameter< double >::type rank_tol(rank_tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(lsspcaC(S, ncomps, selection_method, stop_criterion, exact_cvexp, alpha, ncompbycvexp, method, indvec_in, cardvec_in, PMPC, PMS, epsPMPC, epsPMS, maxiterPMPC, maxiterPMS, rank_tol));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_spca_aatC", (DL_FUNC) &_spca_aatC, 1},
@@ -426,6 +426,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_comp_eigvalC", (DL_FUNC) &_spca_comp_eigvalC, 1},
     {"_spca_GenEigenC", (DL_FUNC) &_spca_GenEigenC, 2},
     {"_spca_solveC", (DL_FUNC) &_spca_solveC, 1},
+    {"_spca_PMnEigenpairs", (DL_FUNC) &_spca_PMnEigenpairs, 5},
+    {"_spca_pcaC", (DL_FUNC) &_spca_pcaC, 7},
+    {"_spca_lsspcaTC", (DL_FUNC) &_spca_lsspcaTC, 16},
+    {"_spca_lsspcaC", (DL_FUNC) &_spca_lsspcaC, 17},
     {"_spca_scaleC", (DL_FUNC) &_spca_scaleC, 3},
     {"_spca_scaleColsC", (DL_FUNC) &_spca_scaleColsC, 3},
     {"_spca_make_vexpSC", (DL_FUNC) &_spca_make_vexpSC, 2},
@@ -434,10 +438,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_make_scoresC", (DL_FUNC) &_spca_make_scoresC, 2},
     {"_spca_makeCorCompC", (DL_FUNC) &_spca_makeCorCompC, 3},
     {"_spca_makeCorScoresC", (DL_FUNC) &_spca_makeCorScoresC, 2},
-    {"_spca_PMnEigenpairs", (DL_FUNC) &_spca_PMnEigenpairs, 5},
-    {"_spca_pcaC", (DL_FUNC) &_spca_pcaC, 7},
-    {"_spca_lsspcaTC", (DL_FUNC) &_spca_lsspcaTC, 16},
-    {"_spca_lsspcaC", (DL_FUNC) &_spca_lsspcaC, 17},
     {NULL, NULL, 0}
 };
 

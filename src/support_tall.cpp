@@ -6,8 +6,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "support_shared_v3.h"
-#include "support_tall_v3.h"
+#include "support_shared.h"
+#include "support_tall.h"
 
 using namespace Rcpp;
 using namespace Eigen;

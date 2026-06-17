@@ -4,9 +4,9 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "support_shared_v3.h"
-#include "support_tall_v3.h"
-#include "support_fat_v3.h"
+#include "support_shared.h"
+#include "support_tall.h"
+#include "support_fat.h"
 
 // [[Rcpp::depends(RcppEigen)]]
 

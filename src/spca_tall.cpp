@@ -4,8 +4,8 @@
 #include <set>
 #include <Rcpp/Benchmark/Timer.h>
 
-#include "support_shared_v3.h"
-#include "support_tall_v3.h"
+#include "support_shared.h"
+#include "support_tall.h"
 
 using namespace Rcpp;
 using namespace Eigen;

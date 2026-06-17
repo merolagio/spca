@@ -1,9 +1,9 @@
-#ifndef SUPPORT_FAT_V3_H
-#define SUPPORT_FAT_V3_H
+#ifndef SUPPORT_FAT_H
+#define SUPPORT_FAT_H
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include "support_shared_v3.h"
+#include "support_shared.h"
 
 double compute_r2_subset_T(const Eigen::Ref<const Eigen::MatrixXd>& X,
                            const Eigen::VectorXd& u,

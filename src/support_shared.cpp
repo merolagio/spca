@@ -3,7 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "support_shared_v3.h"
+#include "support_shared.h"
 
 using namespace Rcpp;
 using namespace std;

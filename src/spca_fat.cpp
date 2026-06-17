@@ -20,8 +20,8 @@
 #include <chrono>
 #include <ctime>
 
-#include "support_shared_v3.h"
-#include "support_fat_v3.h" // this with new var_sel
+#include "support_shared.h"
+#include "support_fat.h" // this with new var_sel
 
 using namespace Rcpp;
 using namespace Eigen;

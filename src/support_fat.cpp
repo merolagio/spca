@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include "support_shared_v3.h"
-#include "support_fat_v3.h"
+#include "support_shared.h"
+#include "support_fat.h"
 
 using namespace Rcpp;
 using namespace Eigen;

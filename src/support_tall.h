@@ -1,9 +1,9 @@
-#ifndef SUPPORT_TALL_V3_H
-#define SUPPORT_TALL_V3_H
+#ifndef SUPPORT_TALL_H
+#define SUPPORT_TALL_H
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include "support_shared_v3.h"
+#include "support_shared.h"
 
 double deflSC(const Eigen::Ref<const Eigen::VectorXd>& a,
               Eigen::MatrixXd& G,

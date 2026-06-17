@@ -2,7 +2,7 @@
 
 // [[Rcpp::depends(RcppEigen)]]
 
-#include "Cpp_LinAlg_exptd_R.h"  // get validators
+#include "linalg_wrappers.h"  // get validators
 
 // Linear-algebra helpers (no-copy interfaces)
 
