@@ -49,7 +49,7 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
   if (length(dots) > 0) {
     stop("Unused arguments: ", paste(names(dots), collapse = ", "))
   }
-  #browser()
+  
   fun_inp = as.list(match.call(expand.dots = FALSE))[-(1:2)]
   fun_inp = lapply(fun_inp, eval, envir = environment())
   validate_no_na(arg_list = eval(fun_inp))  

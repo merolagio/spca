@@ -111,7 +111,7 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
     message("Scaling loadings to unit L2 norm")
     A = scale_columns(A, 2)
   }
-  #browser() 
+  
   
   n_comps = ncol(A)
   
@@ -272,7 +272,7 @@ show_contributions_spca = function(spca_obj, cols = NULL, print_list = TRUE,
   test = validate_spca(spca_obj)
   if (!test)
     stop("show_loadings requires an spca object as first argument")
-  #browser()  
+  
   if(is.null(cols)){
     cols = seq_along(spca_obj$vexp)
   }
@@ -409,7 +409,7 @@ aggregate_by_group = function(X, groups,
     if (only_nonzero)
       out = out[rowSums(abs(out)) > 10e-4, ]
   }
-  #browser()
+  
   if(print_table){
     if(contributions){
       print("percentage contributions")

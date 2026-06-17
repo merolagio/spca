@@ -234,12 +234,13 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
 #'
 #' @return A data frame used for plotting.
 #' @noRd
-create_data = function(x, n_plot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels){
+create_data = function(x, n_plot, contributions, only_nonzero,  
+                       variable_groups, pc_loadings, lbl, facet_labels){
   p = nrow(x$loadings)
   
   # common part, PCloadings binded later if needed
   
-  #browser()
+  
   
   if(!is.null(pc_loadings))
     facet_labels = paste("Comp", 1:n_plot)
@@ -428,7 +429,7 @@ plot_spca_bars = function(data_df,
   # Create plot (same code for both cases)
   nrows = ceiling(n_plot / 3)
   ncols = ceiling(n_plot / nrows)
-#  browser()
+  
   #variable groups
   if (!is.null(variable_groups) && (!has_pc_loadings))
     pl = ggplot2::ggplot(data_df, 
@@ -510,7 +511,7 @@ plot_spca_heatmap = function(
   
       tile_pal = spca_tile_palette()
       
-    #browser()
+    
     
     if (heatmap_color_range == "values"){
     col_lims = range(data_df$value)
@@ -548,7 +549,7 @@ plot_spca_heatmap = function(
     # pl
 
     if(has_pc_loadings){
-      #browser() 
+      
       
       data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
       data_df$compNum = c(rep(1:n_plot, each = length(lbl)), 
@@ -614,7 +615,7 @@ validate_plot_inputs = function(inputs, controls, fun_formals) {
   crl_defaults = eval(fun_formals$controls, envir = parent.frame())
   inp_defaults = fun_formals[names(fun_formals) != "controls"]
 
-  #browser()
+  
   inputs = lapply(inputs, eval)
   
   validate_no_na(arg_list = inputs)  
@@ -656,7 +657,7 @@ if (is.null(controls)) {
   }
   controls = modifyList(crl_defaults, controls, keep.null = FALSE)
 }
-  #browser()
+  
   validate_no_na(arg_list = controls)  
   
   controls$color_scale = match.arg(controls$color_scale[1],
@@ -667,7 +668,7 @@ if (is.null(controls)) {
   
   controls$grid_type = match.arg(controls$grid_type[1],
                                  choices = crl_defaults$grid_type)
-  #browser()
+  
   
   controls$heatmap_color_range = 
     match.arg(controls$heatmap_color_range[1],
@@ -834,7 +835,6 @@ plot.spca = function(
   fun_formals = formals(sys.function())
   fun_inp = as.list(match.call(expand.dots = FALSE))[-1]
   
-  #browser()
   inputs = fun_formals
   inputs[names(fun_inp)] = fun_inp
   
@@ -842,8 +842,6 @@ plot.spca = function(
   inputs$controls = NULL
   inputs$... = NULL
 
-  #browser()
-  
   validated = validate_plot_inputs(inputs, controls, fun_formals)
   names(validated)[1] = "inputs"
 
@@ -957,7 +955,7 @@ plot.spca = function(
   #Also zero PC loadings needed for comparison
   if(!is.null(pc_loadings))
     only_nonzero = FALSE
-#browser()  
+#'
   data_df = create_data(x, n_plot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels)
 
 #circular plot ==============

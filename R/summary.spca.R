@@ -120,8 +120,8 @@ summary.spca = function(
   if (variance_metrics %in% c("cumulative_relative", "both")) {
     out = rbind(out, Rcvexp = object$rcvexp)
   }
-  #browser()  
-  # Add cardinality
+
+# Add cardinality
   out = rbind(out, Card = get_card(object, thresh_card = thresh_card))
   
   # Add minimum loading/contributions if requested

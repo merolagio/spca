@@ -323,9 +323,11 @@ theme_pca = function(base_size = 12, base_family = "") {
 #'   cor = TRUE, n_fitline = -3)
 #' @family pca
 #' @export
-wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE, common_var = 1,  nplot = NULL, n_fitline = NULL, addtitle = TRUE, show_plot = TRUE, return_plot = FALSE) {
-  #  browser()
-  
+wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE,
+                          common_var = 1,  nplot = NULL, n_fitline = NULL,
+                          addtitle = TRUE, show_plot = TRUE, 
+                          return_plot = FALSE) {
+
   if (is.null(p)) p = length(eigenvalues)
   if (missing(gamma)) gamma = n/p
   
@@ -334,10 +336,13 @@ wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE, common_va
   probs = ((p - (1:p) + 1)- 0.5)/p
   mp_quantiles = RMTstat::qmp(p = probs, svr = gamma, var = common_var)
   
-  if (common_var) mp_quantiles = p * mp_quantiles/sum(mp_quantiles)
-  #  browser()
-  df = data.frame(expected = mp_quantiles[1:nplot], observed = eigenvalues[1:nplot])
-  pl = ggplot(df, aes(x = expected, y = observed)) + geom_point(size = 2) + theme_pca()
+  if (common_var) 
+    mp_quantiles = p * mp_quantiles/sum(mp_quantiles)
+
+  df = data.frame(expected = mp_quantiles[1:nplot], 
+                  observed = eigenvalues[1:nplot])
+  pl = ggplot(df, aes(x = expected, y = observed)) + geom_point(size = 2) +
+    theme_pca()
   
   if ((is.numeric(n_fitline)) && (n_fitline != 0)) {
     if (n_fitline < 0) n_fitline = nplot + n_fitline
@@ -345,7 +350,6 @@ wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE, common_va
                 data = df[(nplot - n_fitline + 1):nplot, ])$coefficients
     pl = pl + geom_abline(intercept = lmcoef[1], slope = lmcoef[2] ,
                           color = "blue", linewidth = 1.15)
-    # pl = pl + geom_smooth(data = df[(nplot - n_fitline + 1):nplot, ], se = F, method = "lm")
   }
   if (addtitle)
     pl = pl + labs(title = "wachter qq-plot") +
@@ -384,10 +388,11 @@ wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE, common_va
 #' @family pca
 #' @export
 spca_screeplot = function(eigenvalues, nplot = NULL, ylab = "eigenvalues",
-                          addtitle = TRUE, show_plot = TRUE, return_plot = FALSE) {
+                          addtitle = TRUE, show_plot = TRUE, 
+                          return_plot = FALSE) {
   if (!is.vector(eigenvalues) || any(is.na(eigenvalues)))
-    stop("eigenvalues must be a vector of eigenvalues and missing values are not allowed")
-  
+    stop("eigenvalues must be a vector of eigenvalues and 
+         missing values are not allowed")
   if (is.null(nplot))
     nplot = length(eigenvalues)
   

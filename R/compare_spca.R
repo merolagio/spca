@@ -158,7 +158,7 @@ compare_spca = function(
   
 
   ##methods names==========================
-#browser() 
+
   if(is.null(methods_names)){
     methods_names = c(paste0("M", 1:n_objects))  
   }
@@ -187,8 +187,6 @@ compare_spca = function(
   }
 ## plot laodings ==================
 
-#browser()
-    
 # identify nonzero loadings 
     if(only_nonzero == TRUE){
       zeros = sapply(A, function(x) apply(x, 1, function(y) any(y != 0)))
@@ -201,10 +199,10 @@ compare_spca = function(
       variables_name = paste0("V", 1:p)
 
   if(plot_loadings){
-#helpers in plot.spca    
+#helpers in plot.spca
     color_scale = spca_color_scale(color_scale)
     color_pal = spca_fill_palette(color_scale, pc_loadings = NULL)
- #browser()   
+ 
     loadings_vec = c(sapply(A, function(L, np) c(L[,1:(np)]),
                       np = n_plot))
     if(!is.null(variable_groups)){
@@ -324,7 +322,7 @@ compare_spca = function(
   
   ## summary table ---------------
   ## sum_list is list of summaries for all objects
-#browser()
+
   sum_list = lapply(obj_list, summary, print_table = FALSE, return_table = TRUE,
                     cor_with_pc = TRUE) 
   
@@ -340,7 +338,6 @@ compare_spca = function(
   colnames(sum_matrix) = col_names
   rownames(sum_matrix) = rownames(sum_list[[1]])  
   n_summat = nrow(sum_matrix)
-  #browser()
   
 # table shows absolute correlation
     sum_matrix[n_summat, ] =  abs(sum_matrix[n_summat, ])
@@ -348,7 +345,6 @@ compare_spca = function(
   rownames(sum_matrix)[n_summat] = "abs_r"
 
 ## printing----------------------------  
-#  browser()
   if(print_tables == TRUE){
     if (print_loadings){
       if (only_nonzero == TRUE)
