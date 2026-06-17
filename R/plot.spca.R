@@ -778,11 +778,11 @@ if (is.null(controls)) {
 #' @examples
 #' \dontrun{
 #' data(holzinger)
-#' myspca = spca(holzinger)
-#' myplot = plot(myspca, return_plot = TRUE)
+#' ho_cspca = spca(holzinger, n_comps = 4)
+#' ho_plot = plot(ho_cspca, return_plot = TRUE)
 #'
 #' # Change faceting and legend position.
-#' myplot + ggplot2::facet_wrap(
+#' ho_plot + ggplot2::facet_wrap(
 #'   facets = ggplot2::vars(component),
 #'   ncol = 4,
 #'   nrow = 1

@@ -1,13 +1,12 @@
 
 
-# R wrappers for exported C++ utilities =======
+# Internal R wrappers for exported C++ utilities =======
 #
-# Naming convention:
 # - Matrix multiplication exported h C suffix: 
 # ataC(), abC(), etc.
-# are named:
-#  
-#     aat(), ata(), atb(), ab(), abt(), atda(), atdb()
+# Naming convention: u and v are vectors, a, b and d matrices. A t means
+# transpose. functions:
+#    aat(), ata(), atb(), ab(), abt(), atda(), atdb()
 #     av(), atv(), vta(), vtau(), vtv(), vtu()
 #
 #     eigen_sym() for eigenC()
@@ -39,7 +38,7 @@
 # - make_contributions
 
 
-# Matrix products
+# Matrix products ======================
 
 #' Compute A times t(A)
 #'
