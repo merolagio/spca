@@ -19,14 +19,30 @@ This package contains functions to compute, print and plot Least Squares
 Sparse Principal Components Analysis (LS-SPCA). Methodological details
 and full presentation can be found in the extended_vignette document.
 
+## Installation
+
+You can install the release version from CRAN
+
+``` r
+install.packages("spca")
+```
+
+or the development version from GitHub
+
+``` r
+remotes::install_github("merolagio/spca")
+```
+
+## Usage
+
 The main function *spca()* computes the sparse loadings and various
 statistics, such as the variance explained by each sparse component
-(sPC). print, summery and plot methods are available.
+(sPC). print, summery and plot methods are available. PCA solutions
+stored as an `*spca*` object cn be obtained with the function *pca()*.
 
-Utilities available are `compare_spca` (to compare two or more spca
-solutions), `aggregate_by_scale` (to visualize the contribution by
-scale) and `new.spca` (to create an \`spca’ object from a set of
-loadings).
+Utilities available are
+*compare_spca()*`(to compare two or more spca solutions), *aggregate_by_scale()* (to visualize the contribution by scale) and *new.spca()* (to create an`spca\`
+object from a set of loadings).
 
 ## Example
 
@@ -63,18 +79,19 @@ We settle for 4 components
 
 ### Compute the sparse loadings
 
-Important parameters in the `spca` function are: $`\alpha`$ the minimum
-$`R^2`$ \[default\]) or the minimum proportion of cumulative vexp of the
-PCs reproduced by the sPCs; *n_comps* the number of components to
-compute; *method* the LS-SPCA method to use (“u” for uncorrelated, “c”
-for correlated \[default\]) and “p” for projection; *var_selection*
-(“forward” \[default\], “stepwise”, or “backward”). See the `spca` help
-for details on these parameters and more.
+Important parameters in the *spca()* function are: *alpha* which
+controls for the minimum $`R^2`$ \[default\]) or the minimum proportion
+of cumulative variance explained (VEXP) by the sPCs realtive to that
+explained by the corresponding PCs; *n_comps* the number of components
+to compute; *method* the LS-SPCA method to use (“u” for uncorrelated,
+“c” for correlated \[default\]) and “p” for projection; *var_selection*
+(“forward” \[default\], “stepwise”, or “backward”). See the `**spca**`
+help for details on these parameters and more.
 
-The following command computes four sPCs with default seetings: *alpha =
-0.95*, *forward* variable selection with the *cSPCA* method. We expect
-each sPC yield at least 0.95% cumulative VEXP, allowing some very mild
-correlation between sPCs.
+The following command computes four sPCs with default settings: *alpha =
+0.95*, *var_selection = forward*, *method = “c”* that selects the
+*cSPCA* method. Hence, we expect each sPC to yield at least 0.95%
+cumulative VEXP, allowing some very mild correlation between sPCs.
 
 ``` r
 myspca = spca(holzinger, n_comps = 4)
