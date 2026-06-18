@@ -1,6 +1,7 @@
 ^renv$
 ^renv\.lock$
 ^.*\.Rproj$
+^\.github$
 ^\.Rproj\.user$
 .Rprofile$
 ^Ignore$
