@@ -27,8 +27,8 @@ Build an object of class \code{spca} from a loadings matrix and either a
 covariance or correlation matrix, a data matrix, or both.
 }
 \examples{
-setseed(1)
-A = round(matrix(runif(24, -1, 1), 12)
+set.seed(1)
+A = round(matrix(runif(24, -1, 1), 12))
 spca_new = new_spca(A, X = holzinger)
 is.spca(spca_new)
 summary(spca_new)

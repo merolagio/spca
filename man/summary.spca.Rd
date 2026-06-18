@@ -78,7 +78,7 @@ requested.\cr
 \examples{
 data(holzinger)
 ho_cspca = spca(holzinger, n_comps = 2)
-summary(ho_spca)
+summary(ho_cspca)
 
 }
 \seealso{
