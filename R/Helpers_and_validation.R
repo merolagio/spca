@@ -58,6 +58,7 @@ is.spca <- function(x) {
 #' @examples
 #' set.seed(1)
 #' A = round(matrix(runif(24, -1, 1), 12))
+#' data(holzinger)
 #' spca_new = new_spca(A, X = holzinger)
 #' is.spca(spca_new)
 #' summary(spca_new)
