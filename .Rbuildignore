@@ -8,3 +8,5 @@
 ^R\Remove$
 Document_output.txt$
 Compile_output.txt$
+^README\.Rmd$
+^README_cache$
