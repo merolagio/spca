@@ -58,6 +58,7 @@ is.spca <- function(x) {
 #' @examples
 #' set.seed(1)
 #' A = round(matrix(runif(24, -1, 1), 12))
+#' A[abs(A) < 0.4] = 0 #no need to scale to unit norm
 #' data(holzinger)
 #' spca_new = new_spca(A, X = holzinger)
 #' is.spca(spca_new)
