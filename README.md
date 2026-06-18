@@ -16,8 +16,9 @@ Active](https://img.shields.io/badge/status-active-success.svg)](https://github.
 <!-- badges: end -->
 
 This package contains functions to compute, print and plot Least Squares
-Sparse Principal Components Analysis (LS-SPCA). Methodological details
-and full presentation can be found in the extended_vignette document.
+Sparse Principal Components Analysis (LS-SPCA). Methodological details,
+references and full presentation can be found in the extended_vignette
+document.
 
 ## Installation
 
