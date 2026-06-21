@@ -1,0 +1,83 @@
+
+
+%% \codo allows to use of underscores ========================
+\makeatletter
+\newcommand\codo{%
+  \begingroup
+  \@makeother\_\@makeother\~\@makeother\$\@codox
+}
+\def\@codox#1{%
+  {\normalfont\ttfamily\hyphenchar\font=-1 \detokenize{#1}}%
+  \endgroup
+}
+\makeatother
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\trasp}{^{\scriptstyle{\intercal}}}
+\newcommand{\traspj}{^{\scriptstyle{\intercal}}_j}
+\newcommand{\trasps}[1]{^{\raisebox{\depth}{$\scriptstyle{\intercal}$}}_{#1}} %use without overset symbol
+\newcommand{\traspd}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{#1}} %use with overset symbol
+\newcommand{\traspdb}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{[#1]}}
+%use with overset symbol and subscript in []
+\newcommand{\traspdr}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{(#1)}}
+%use with overset symbol and subscript in ()
+
+\newcommand{\Xj}{{{X}_j}}
+\newcommand{\XjT}{{{X}\trasps{j}}}
+\newcommand{\Qj}{{{Q}_j}}
+\newcommand{\QjT}{{{Q}\trasps{j}}}
+ \newcommand{\bQj}{{\mathbf{Q}_j}}
+\newcommand{\bQjT}{{\mathbf{Q}\trasps{j}}}
+ \newcommand{\bQ}{{\mathbf{Q}}}
+\newcommand{\bXj}{{\mathbf{X}_j}}
+\newcommand{\bXjT}{{\mathbf{X}\trasps{j}}}
+\newcommand{\bX}{{\mathbf{X}}}
+\newcommand{\dajT}{{\overset{\boldsymbol{.}}{a}\traspd{j}}}
+\newcommand{\daj}{{\overset{\boldsymbol{.}}{a}_j}}
+
+
+\newcommand{\dA}{{\overset{\boldsymbol{.}}{A}}}
+\newcommand{\dAj}{{\overset{\boldsymbol{.}}{A}_j}}
+\newcommand{\dAjT}{{\overset{\boldsymbol{.}}{{A}}\traspd{j}}}
+\newcommand{\da}{{\overset{\boldsymbol{.}}{a}}}
+% \newcommand{\daj}{{\overset{\boldsymbol{.}}{a}_j}}
+% \newcommand{\dajT}{{\overset{\boldsymbol{.}}{{a}}\traspd{j}}}
+\newcommand{\dX}{{\overset{\boldsymbol{.}}{X}}}
+\newcommand{\dXj}{{\overset{\boldsymbol{.}}{X}_j}}
+\newcommand{\dXjT}{{\overset{\boldsymbol{.}}{{X}}\traspd{j}}}
+\newcommand{\dQ}{{\overset{\boldsymbol{.}}{Q}}}
+\newcommand{\dQj}{{\overset{\boldsymbol{.}}{Q}_j}}
+\newcommand{\dQjT}{{\overset{\boldsymbol{.}}{Q}\traspd{j}}}
+\newcommand{\dS}{{\overset{\boldsymbol{.}}{S}}}
+\newcommand{\dST}{{\overset{\boldsymbol{.}}{S}\trasp}}
+\newcommand{\dSj}{{\overset{\boldsymbol{.}}{S}_j}}
+\newcommand{\dSjT}{{\overset{\boldsymbol{.}}{S}\traspd{j}}}
+
+
+\newcommand{\vexp}{\emph{vexp}}
+\newcommand{\vexpq}{\emph{vexp}_Q}
+\newcommand{\evexp}{\emph{evexp}}
+
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+
+%% internal
+%% these are for the matrix Q_T_[j-1] -- argument is the matrix T (or Y or Z, etc)
+\newcommand{\traspsM}[1]{^{\raisebox{\depth}{$\scriptstyle{\intercal}$}}_{{#1}_{[j - 1]}}} %use without overset symbol
+\newcommand{\traspdM}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{{#1}_{[j - 1]}}} %use with overset symbol and
+%\newcommand{\traspdMM}[1]{^{\raisebox{-2.0mm}{$\scriptstyle{\intercal}$}}_{{#1}_{[j - 1]}}} %use with overset symbol and subscript in []
+\newcommand{\traspsMb}[1]{^{\raisebox{\depth}{$\scriptstyle{\intercal}$}}_{\mathbf{#1}_{[j - 1]}}} %use without overset symbol
+\newcommand{\traspdMb}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{\intercal}$}}_{\mathbf{#1}_{[j - 1]}}} %use with overset symbol and
+
+
+\newcommand{\matinv}{^{\raisebox{+1.0mm}{$\scriptstyle{{-1}}$}}} %use for matrices
+\newcommand{\matinvj}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{{-1}}$}}_{#1}} %use for matrices with overset symbol
+\newcommand{\matinvjb}[1]{^{\raisebox{-1.0mm}{$\scriptstyle{{-1}}$}}_{[#1]}} %use for matrices with overset symbol and subscript in []
+\newcommand{\matginv}{^{\raisebox{+1.0mm}{$\scriptstyle{{+}}$}}} %use for matrices
+%%%%%%%%%%%%%%%%%%%%% Ignoring Font Warnings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+
