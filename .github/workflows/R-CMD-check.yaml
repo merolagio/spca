@@ -37,7 +37,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           Rscript -e "if (!requireNamespace('tinytex', quietly = TRUE)) install.packages('tinytex', repos='https://packagemanager.posit.co/cran/latest')"
-          Rscript -e "tinytex::install_tinytex(force = FALSE)"          
+          Rscript -e "tinytex::install_tinytex(force = FALSE)"
           
 
       - uses: r-lib/actions/setup-r-dependencies@v2
