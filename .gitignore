@@ -10,6 +10,12 @@ remove_test.R
 Ignore
 renv
 R/remove
+Vignettes\spca_extended_vignette.bbl
+Vignettes\spca_extended_vignette.log
+Vignettes\spca_extended_vignette\spca_extended_vignette.synctex.gz
+Vignettes\spca_extended_vignette.pdf
+Vignettes\spca_extended_vignette.tex
+Vignettes\spca_extended_vignette-concordance.tex
 .Rhistory
 .httr-oauth
 .DS_Store
