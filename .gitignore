@@ -9,7 +9,6 @@ Github_commands.R
 remove_test.R
 Ignore
 renv
-R/remove
 Vignettes\spca_extended_vignette.bbl
 Vignettes\spca_extended_vignette.log
 Vignettes\spca_extended_vignette\spca_extended_vignette.synctex.gz
@@ -26,5 +25,4 @@ Vignettes\spca_extended_vignette-concordance.tex
 *.a
 *.d
 .lintr
-Image_26-05-16.RData
-image_05_10.RData
+*.RData
