@@ -4,7 +4,7 @@
 ^\.github$
 ^\.Rproj\.user$
 .Rprofile$
-*.RData$
+^.*.RData$
 ^Ignore$
 ^R\Remove$
 Document_output.txt$
