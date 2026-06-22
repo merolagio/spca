@@ -24,7 +24,7 @@ Suggests:
     knitr,
     rmarkdown,
     bench,
-    covr, Suggests: 
+    covr, 
     R.rsp
 VignetteBuilder: R.rsp
 Config/testthat/edition: 3
