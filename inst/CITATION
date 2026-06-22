@@ -1,5 +1,4 @@
-citHeader("To cite PMlsspca in publications use:")
-
+citHeader("To cite spca in publications use:")
 bibentry(
   bibtype = "Article",
   title = "Least Squares Sparse Principal Component Analysis: a Backward Elimination approach to attain large loadings",
