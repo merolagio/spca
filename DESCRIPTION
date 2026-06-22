@@ -24,8 +24,9 @@ Suggests:
     knitr,
     rmarkdown,
     bench,
-    covr
-VignetteBuilder: knitr    
+    covr, Suggests: 
+    R.rsp
+VignetteBuilder: R.rsp
 Config/testthat/edition: 3
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.3.2
