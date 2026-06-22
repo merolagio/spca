@@ -39,7 +39,7 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
+          build_args: '"--no-manual"
           args: 'c("--no-manual", "--as-cran")'
-          build_args: '"--no-build-vignettes"'
           error-on: '"warning"'
           check-dir: '"check"'
