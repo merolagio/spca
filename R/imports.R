@@ -6,11 +6,12 @@
 #' @importFrom ggplot2 element_rect  element_blank element_text unit element_line
 #' @importFrom ggplot2 scale_y_discrete scale_y_continuous scale_x_discrete scale_x_continuous 
 #' @importFrom ggplot2 scale_fill_manual scale_fill_grey scale_fill_gradientn 
-#' @importFrom ggplot2 scale_colour_manual xlab ylab labs
+#' @importFrom ggplot2 scale_colour_manual xlab ylab 
 #' @importFrom ggplot2 facet_wrap facet_grid vars labs
 #' @importFrom ggplot2 annotate coord_polar coord_flip rel expansion 
 #' @importFrom utils modifyList
 #' @importFrom stats cor na.omit lm
+#' @importFrom rlang .data 
 #' @noRd
 NULL
 

@@ -1,11 +1,11 @@
 
 #' Least Squares Sparse Principal Components Analysis
 #'
-#' The package provides functions to compute LSSPCA solutions, where sparsity is
+#' The package provides functions to compute LS-SPCA solutions, where sparsity is
 #'  imposed to Pearson's PCA's least-squares reconstruction objective. 
 #' 
-#' LSSPCA is different for other SPCA methods that compute sparse PCs with
-#'  maximal variance. Details about LSSPCA can be found in the articles cited below and in the extended vignette.
+#' LS-SPCA is different for other SPCA methods that compute sparse PCs with
+#'  maximal variance. Details about LS-SPCA can be found in the articles cited below and in the extended vignette.
 #'  
 #' This release  accompanies the related article and is intended  to support full
 #'  reproduction of the results reported therein.
@@ -14,7 +14,7 @@
 #'  for variable selection and sparse loading estimation.
 #'
 #' Fitting functions
-#' * [spca()] Computes LSSPCA solutions from a data or covariance/correlation
+#' * [spca()] Computes LS-SPCA solutions from a data or covariance/correlation
 #'   matrix. Returns an  \link{spca_object} of class `spca`.
 #' * [pca()] Computes PCA solutions from a data or covariance/correlation
 #'   matrix. Returns an  \link{spca_object} of class `spca`.
@@ -28,7 +28,7 @@
 #' 
 #' \strong{Utilities}
 #' * [is.spca()] Verifies if an object inherits from class `spca`.
-#' * [compare_spca()] Compares two or more LSSPCA solutions numerically 
+#' * [compare_spca()] Compares two or more LS-SPCA solutions numerically 
 #'   and visually.
 #' * [new_spca()] Creates an `spca` object from a set of loadings.
 #' * [aggregate_by_group()] Sums loadings or contributions wrt an index vector.

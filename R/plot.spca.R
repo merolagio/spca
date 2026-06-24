@@ -771,11 +771,9 @@ if (is.null(controls)) {
 #' @family spca
 #' @references
 #' Circular bar plot layouts follow examples from
-#' \url{https://www.r-graph-gallery.com/all-graphs/}.
-#' The \code{cbb} palette is adapted from
-#' \url{http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/}.
+#' \url{https://r-graph-gallery.com/all-graphs/}.
 #' The \code{printsafe} palette corresponds to \code{OrRd} from
-#' \url{http://colorbrewer2.org/}.
+#' \url{https://colorbrewer2.org/}.
 #' @examples
 #' \dontrun{
 #' data(holzinger)

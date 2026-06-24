@@ -5,12 +5,12 @@
 \alias{spca-package}
 \title{Least Squares Sparse Principal Components Analysis}
 \description{
-The package provides functions to compute LSSPCA solutions, where sparsity is
+The package provides functions to compute LS-SPCA solutions, where sparsity is
 imposed to Pearson's PCA's least-squares reconstruction objective.
 }
 \details{
-LSSPCA is different for other SPCA methods that compute sparse PCs with
-maximal variance. Details about LSSPCA can be found in the articles cited below and in the extended vignette.
+LS-SPCA is different for other SPCA methods that compute sparse PCs with
+maximal variance. Details about LS-SPCA can be found in the articles cited below and in the extended vignette.
 
 This release  accompanies the related article and is intended  to support full
 reproduction of the results reported therein.
@@ -20,7 +20,7 @@ for variable selection and sparse loading estimation.
 
 Fitting functions
 \itemize{
-\item \code{\link[=spca]{spca()}} Computes LSSPCA solutions from a data or covariance/correlation
+\item \code{\link[=spca]{spca()}} Computes LS-SPCA solutions from a data or covariance/correlation
 matrix. Returns an  \link{spca_object} of class \code{spca}.
 \item \code{\link[=pca]{pca()}} Computes PCA solutions from a data or covariance/correlation
 matrix. Returns an  \link{spca_object} of class \code{spca}.
@@ -38,7 +38,7 @@ S3 methods for objects of class \code{spca} include:
 \strong{Utilities}
 \itemize{
 \item \code{\link[=is.spca]{is.spca()}} Verifies if an object inherits from class \code{spca}.
-\item \code{\link[=compare_spca]{compare_spca()}} Compares two or more LSSPCA solutions numerically
+\item \code{\link[=compare_spca]{compare_spca()}} Compares two or more LS-SPCA solutions numerically
 and visually.
 \item \code{\link[=new_spca]{new_spca()}} Creates an \code{spca} object from a set of loadings.
 \item \code{\link[=aggregate_by_group]{aggregate_by_group()}} Sums loadings or contributions wrt an index vector.
@@ -69,6 +69,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Giovanni M. Merola \email{merolagio@gmail.com}
+\strong{Maintainer}: Giovanni Maria Merola \email{merolagio@gmail.com}
 
 }

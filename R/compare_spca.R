@@ -234,7 +234,7 @@ compare_spca = function(
 #plot skeleton      
       pl = ggplot(
         data = df, aes(x = variable, y = loadings, label = variable)) + 
-        facet_wrap(facets = vars(Comp), nrow = facets_nrows, ncol = facets_ncols, 
+        facet_wrap(facets = vars(.data$Comp), nrow = facets_nrows, ncol = facets_ncols, 
                    scales = "free_y") + theme_classic() + 
         ggplot2::theme(
           axis.text.x = element_text(angle = 90, vjust = 0.5, size = 8),

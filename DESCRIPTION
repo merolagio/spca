@@ -4,8 +4,8 @@ Title: Least Squares Sparse Principal Components Analysis
 Version: 1.1.0
 Date: 2026-05-28
 Authors@R: 
-    person("Giovanni M.", "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
-Description: Implements least-squares sparse principal component analysis (LSSPCA). The approach follows Merola (2015) <https://doi.org/10.1111/anzs.12128> and Merola and Chen (2019) <https://doi.org/10.1016/j.jmva.2019.04.001>.
+  person("Giovanni Maria", "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
+Description: Implements least-squares sparse principal component analysis (LSSPCA). The approach follows Merola (2015) <doi:10.1111/anzs.12128> and Merola and Chen (2019) <doi:10.1016/j.jmva.2019.04.001>.
 Maintainer: Giovanni Maria Merola <merolagio@gmail.com>
 URL: https://github.com/merolagio/spca
 BugReports: https://github.com/merolagio/spca/issues
@@ -17,14 +17,14 @@ Imports:
   Rcpp (>= 1.0.14),
   ggplot2 (>= 4.0.0), 
   RMTstat (>= 0.3.1),
-  scales 
+  scales,
+  rlang
 Suggests: 
     testthat (>= 3.0.0),
     peakRAM (>= 1.0.2),
     knitr,
     rmarkdown,
     bench,
-    covr, 
     R.rsp
 VignetteBuilder: R.rsp
 Config/testthat/edition: 3
