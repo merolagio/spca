@@ -1,7 +1,6 @@
 #include <cmath>
 #include <RcppEigen.h>
 
-#include "linalg_wrappers.h"  // get validators
 #include "support_tall.h"
 // [[Rcpp::depends(RcppEigen)]]
 using namespace Rcpp;

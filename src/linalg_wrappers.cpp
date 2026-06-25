@@ -1,5 +1,3 @@
-#include <RcppEigen.h>
-
 // [[Rcpp::depends(RcppEigen)]]
 
 #include "linalg_wrappers.h"  // get validators

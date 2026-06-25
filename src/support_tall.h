@@ -1,7 +1,6 @@
 #ifndef SUPPORT_TALL_H
 #define SUPPORT_TALL_H
 
-#include <Rcpp.h>
 #include <RcppEigen.h>
 #include "support_shared.h"
 

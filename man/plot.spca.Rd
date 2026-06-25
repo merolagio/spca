@@ -138,8 +138,6 @@ ho_plot + ggplot2::facet_wrap(
 }
 }
 \references{
-Circular bar plot layouts follow examples from
-\url{https://r-graph-gallery.com/all-graphs/}.
 The \code{printsafe} palette corresponds to \code{OrRd} from
 \url{https://colorbrewer2.org/}.
 }

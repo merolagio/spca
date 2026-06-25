@@ -1,8 +1,5 @@
-#include <Rcpp.h>
 #include <RcppEigen.h>
-#include <set>
 #include <cmath>
-#include <algorithm>
 #include <stdexcept>
 #include <string>
 

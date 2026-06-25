@@ -12,8 +12,8 @@
 
 // [[Rcpp::depends(RcppEigen)]]
 #include <RcppEigen.h>
-#include <set>
 #include <algorithm>
+#include <exception>
 #include <cmath>
 #include <string>
 #include <Rcpp/Benchmark/Timer.h>

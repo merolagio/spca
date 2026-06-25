@@ -1,7 +1,6 @@
 #ifndef SUPPORT_FAT_H
 #define SUPPORT_FAT_H
 
-#include <Rcpp.h>
 #include <RcppEigen.h>
 #include "support_shared.h"
 

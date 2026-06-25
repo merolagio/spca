@@ -3,8 +3,7 @@ Type: Package
 Title: Least Squares Sparse Principal Components Analysis
 Version: 1.1.0
 Date: 2026-05-28
-Authors@R: 
-  person(given = "Giovanni Maria", family = "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
+Authors@R: person(given = "Giovanni Maria", family = "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
 Description: Implements least-squares sparse principal component analysis (LS-SPCA). The approach follows Merola (2015) <doi:10.1111/anzs.12128> and Merola and Chen (2019) <doi:10.1016/j.jmva.2019.04.001>.
 Maintainer: Giovanni Maria Merola <merolagio@gmail.com>
 URL: https://github.com/merolagio/spca

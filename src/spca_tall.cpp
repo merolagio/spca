@@ -1,8 +1,9 @@
-#include <Rcpp.h>
 #include <RcppEigen.h>
-#include <Eigen/Dense>
-#include <set>
+#include <algorithm>
+#include <cmath>
+#include <exception>
 #include <Rcpp/Benchmark/Timer.h>
+#include <string>
 
 #include "support_shared.h"
 #include "support_tall.h"

@@ -1,7 +1,7 @@
-#include <Rcpp.h>
 #include <RcppEigen.h>
 #include <cmath>
 #include <stdexcept>
+#include <string>
 
 #include "support_shared.h"
 

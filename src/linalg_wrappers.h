@@ -2,7 +2,9 @@
 #define CPP_LINALG_EXPTD_R_H
 
 #include <RcppEigen.h>
+#include <algorithm>
 #include <cmath>
+#include <string>
 
 
 // validators 

@@ -1,10 +1,8 @@
-#include <Rcpp.h>
 #include <RcppEigen.h>
-#include <Eigen/Dense>
 #include <cmath>
 #include <stdexcept>
+#include <string>
 
-#include "support_shared.h"
 #include "support_tall.h"
 #include "support_fat.h"
 
