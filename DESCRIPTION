@@ -1,7 +1,7 @@
 Package: spca
 Type: Package
 Title: Least Squares Sparse Principal Components Analysis
-Version: 1.1.0
+Version: 1.1.1
 Date: 2026-05-28
 Authors@R: person(given = "Giovanni Maria", family = "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
 Description: Implements least-squares sparse principal component analysis (LS-SPCA). The approach follows Merola (2015) <doi:10.1111/anzs.12128> and Merola and Chen (2019) <doi:10.1016/j.jmva.2019.04.001>.
@@ -10,24 +10,16 @@ URL: https://github.com/merolagio/spca
 BugReports: https://github.com/merolagio/spca/issues
 License: AGPL-3
 Encoding: UTF-8
-Depends:
-    R (>= 4.3) 
-Imports: 
-  Rcpp (>= 1.0.14),
-  ggplot2 (>= 4.0.0), 
-  RMTstat (>= 0.3.1),
-  scales,
-  rlang
-Suggests: 
-    testthat (>= 3.0.0),
-    peakRAM (>= 1.0.2),
-    knitr,
-    rmarkdown,
-    bench,
-    R.rsp
-VignetteBuilder: R.rsp
+Depends: R (>= 4.3)
+Imports: Rcpp (>= 1.0.14), ggplot2 (>= 4.0.0), RMTstat (>= 0.3.1),
+        scales, rlang
+Suggests: testthat (>= 3.0.0), peakRAM (>= 1.0.2), knitr, rmarkdown,
+        bench, R.rsp
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 LazyData: true
+NeedsCompilation: yes
+Packaged: 2026-06-25 23:25:26 UTC; merol

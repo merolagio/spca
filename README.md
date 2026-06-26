@@ -22,13 +22,15 @@ document.
 
 ## Installation
 
-You can install the release version from CRAN
+You can install the stable release version from CRAN
 
 ``` r
 install.packages("spca")
+#or
+https://github.com/merolagio/spca/releases/tag/CRAN_submission
 ```
 
-or the development version from GitHub
+The current development version from GitHub
 
 ``` r
 remotes::install_github("merolagio/spca")
