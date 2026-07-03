@@ -124,7 +124,7 @@ if the legend is missing or suppressed, it is moved to the bottom. For
 circular plots, the legend is moved to the right unless it is suppressed.
 }
 \examples{
-\dontrun{
+\\donttest{
 data(holzinger)
 ho_cspca = spca(holzinger, n_comps = 4)
 ho_plot = plot(ho_cspca, return_plot = TRUE)
