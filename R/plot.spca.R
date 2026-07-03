@@ -773,7 +773,7 @@ if (is.null(controls)) {
 #' The \code{printsafe} palette corresponds to \code{OrRd} from
 #' \url{https://colorbrewer2.org/}.
 #' @examples
-#' \dontrun{
+#' \\donttest{
 #' data(holzinger)
 #' ho_cspca = spca(holzinger, n_comps = 4)
 #' ho_plot = plot(ho_cspca, return_plot = TRUE)

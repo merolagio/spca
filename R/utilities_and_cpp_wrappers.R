@@ -278,7 +278,6 @@ eigen_sym = function(S) {
 eigenvalues_sym = function(S) {
   S = as_numeric_matrix_no_na(S, "S")
   out = comp_eigvalC(S)
-  names(out) = "values"
   out
 }
 

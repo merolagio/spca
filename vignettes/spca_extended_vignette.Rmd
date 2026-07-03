@@ -1,6 +1,5 @@
 <!--
-Converted from spca_extended_vignette.Rnw to an HTML vignette.
-Why it differs from the .Rnw (all forced by HTML output):
+Adapted from JSS artticle to an HTML vignette.
   * R2latex() emits LaTeX, which does NOT render in HTML (it dumps raw LaTeX
     table source and shows no table). Each table is therefore shown by letting
     the object print its own spca/compare_spca output - no table is dropped.
@@ -32,7 +31,12 @@ knitr::opts_chunk$set(
   fig.width = 6,
   fig.height = 4.5
 )
-
+old_opt <- options(
+  prompt = "R> ",
+  continue = "+  ",
+  width = 70,
+  useFancyQuotes = FALSE
+)
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
 library("spca")
@@ -43,10 +47,6 @@ source("Extended_vignette_material/spca_utilities_for_vignettes.R")
 load("Extended_vignette_material/spca_JSS_article_results.rda")
 ```
 
-<!-- newcommand section: MathJax macros, defined once and available page-wide.
-     NOTE: \trasp and \traspj are best-guess reconstructions (the macros file
-     was not available). Replace the right-hand sides if your definitions in
-     spca_JSS_macros.TeX differ. -->
 $$
 \newcommand{\trasp}{^{\top}}
 \newcommand{\traspj}{_{j}^{\top}}
@@ -458,6 +458,7 @@ compare_spca(list(gas_lsspca, gas_enspca_obj, gas_abspca_obj),
 
 The maximum meaningful cardinality is 59, yet both `en-spca` and `ab-spca` return loadings of cardinality 100, while `ls-spca` reaches 0.999 CVEXP with cardinalities of 6 and 8. Both `ls-spca` and `en-spca` recover the first two PCs almost exactly (RCVEXP 100%, correlation 1). The `ab-spca` solution is less accurate (second sPC at 95.8% RCVEXP, correlation 0.51) and its two sPCs remain correlated at 0.84, whereas the ls-spca and en-spca components are effectively uncorrelated.
 
+
 # References
 
 Camacho J, Smilde AK, Saccenti E, Westerhuis JA (2020). "All sparse PCA models are wrong, but some are useful. Part I: Computation of scores, residuals and explained variance." *Chemometrics and Intelligent Laboratory Systems*, **196**, 103907. doi:10.1016/j.chemolab.2019.103907.
@@ -479,3 +480,7 @@ Zou H, Hastie T, Tibshirani R (2006). "Sparse Principal Component Analysis." *Jo
 Zou H, Hastie T (2020). *elasticnet: Elastic-Net for Sparse Estimation and Sparse PCA*. R package version 1.3. <https://CRAN.R-project.org/package=elasticnet>.
 
 Liland KH, Mevik B-H, Wehrens R (2026). *pls: Partial Least Squares and Principal Component Regression*. R package version 2.9-0. <https://CRAN.R-project.org/package=pls>.
+
+```{r cleanup, include = FALSE}
+options(old_opt)
+```
