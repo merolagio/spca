@@ -773,7 +773,6 @@ if (is.null(controls)) {
 #' The \code{printsafe} palette corresponds to \code{OrRd} from
 #' \url{https://colorbrewer2.org/}.
 #' @examples
-#' \\donttest{
 #' data(holzinger)
 #' ho_cspca = spca(holzinger, n_comps = 4)
 #' ho_plot = plot(ho_cspca, return_plot = TRUE)
@@ -784,7 +783,6 @@ if (is.null(controls)) {
 #'   ncol = 4,
 #'   nrow = 1
 #' ) + ggplot2::theme(legend.position = "right")
-#' }
 #' @export
 #' @method plot spca
 plot.spca = function(

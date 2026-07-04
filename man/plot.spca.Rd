@@ -124,7 +124,6 @@ if the legend is missing or suppressed, it is moved to the bottom. For
 circular plots, the legend is moved to the right unless it is suppressed.
 }
 \examples{
-\\donttest{
 data(holzinger)
 ho_cspca = spca(holzinger, n_comps = 4)
 ho_plot = plot(ho_cspca, return_plot = TRUE)
@@ -135,7 +134,6 @@ ho_plot + ggplot2::facet_wrap(
   ncol = 4,
   nrow = 1
 ) + ggplot2::theme(legend.position = "right")
-}
 }
 \references{
 The \code{printsafe} palette corresponds to \code{OrRd} from
