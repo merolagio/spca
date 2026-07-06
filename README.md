@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src = "man/figures/spca_Logo_bordered.png" align = "left" height = "80" alt = "spca logo" />
+<img src = "man/figures/spca_logo_octagon.png" align = "left" height = "80" alt = "spca logo" />
 
 # Package spca
 
