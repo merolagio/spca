@@ -239,6 +239,11 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
       spca_obj$spc_cor[, index_to_change[i]] = 
         - spca_obj$spc_cor[, index_to_change[i]]
     }
+    if (!is.null(spca_obj$cor_with_pc)) {
+      spca_obj$cor_with_pc[index_to_change[i]] =
+        - spca_obj$cor_with_pc[index_to_change[i]]
+    }
+    
   }
   return(spca_obj)
 }
