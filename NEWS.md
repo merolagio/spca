@@ -1,4 +1,13 @@
 
+# spca 1.1.2
+- fixed cor_with_pcs sign in change_loadings_sign_spca
+
+# spca 1.1.1
+-fixes for release
+-removed windows only compiler flags
+- removed references to deceased website
+- various minor changes
+
 # spca 1.1.0
 
 ## Major changes
