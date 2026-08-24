@@ -9,6 +9,7 @@
 ^R\Remove$
 Document_output.txt$
 Compile_output.txt$
+change_log.txt$
 ^README\.Rmd$
 ^README_cache$
 ^Vignettes\spca_extended_vignette.bbl$

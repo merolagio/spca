@@ -3,8 +3,8 @@
 - fixed cor_with_pcs sign in change_loadings_sign_spca
 
 # spca 1.1.1
--fixes for release
--removed windows only compiler flags
+- fixes for release
+- removed windows only compiler flags
 - removed references to deceased website
 - various minor changes
 
