@@ -1,7 +1,7 @@
 
 
 #  summary.spca==============
-#' Summarize an spca object
+#' Summarize an \code{spca} Object
 #'
 #' Print and optionally return summary statistics for evaluating an \code{spca}
 #' object and comparing it with the corresponding PCA solution.
@@ -13,8 +13,8 @@
 #' Rvexp \tab The variance explained relative to the corresponding PC.\cr
 #' Rcvexp \tab The cumulative variance explained relative to the 
 #'  corresponding PCs.\cr
-#' Card \tab The cardinality, that is the number of non zero loadings.\cr
-#' Min load/Min cont \tab The minimum absolute value of the nonzero loadings
+#' Card \tab The cardinality, that is the number of non zero weights.\cr
+#' Min weight/Min cont \tab The minimum absolute value of the nonzero weights
 #' or contributions, if requested.\cr
 #' r \tab The correlation between sPCs and the corresponding PCs, if
 #' requested.\cr
@@ -26,13 +26,13 @@
 #'   components \code{1:cols} are included.
 #' @param contributions A logical value (default \code{TRUE}). If \code{TRUE},
 #'   minimum nonzero values are computed from percentage contributions;
-#'   otherwise, they are computed from loadings.
+#'   otherwise, they are computed from weights.
 #' @param variance_metrics A character vector (default first element
 #'   \code{"both"}). Controls which relative variance metrics are included.
 #'   Accepted values are \code{"relative"}, \code{"cumulative_relative"},
 #'   \code{"both"}, and \code{"none"}.
-#' @param min_load A logical value (default \code{FALSE}). If \code{TRUE},
-#'   include the minimum nonzero loading or contribution.
+#' @param min_weight A logical value (default \code{FALSE}). If \code{TRUE},
+#'   include the minimum nonzero weight or contribution.
 #' @param cor_with_pc A logical value (default \code{FALSE}). If \code{TRUE},
 #'   include correlations between sPCs and the corresponding PCs when available.
 #' @param return_table A logical value (default \code{FALSE}). If \code{TRUE},
@@ -63,7 +63,7 @@ summary.spca = function(
     contributions = TRUE, 
     variance_metrics = c("both", "cumulative_relative",
                          "relative", "none"),
-    min_load = FALSE, 
+    min_weight = FALSE, 
     cor_with_pc = FALSE,
     return_table = FALSE, 
     print_table = TRUE, 
@@ -87,16 +87,16 @@ summary.spca = function(
   
   # Determine columns
   if (missing(cols)) {
-    cols = 1:min(ncol(object$loadings), length(object$vexp))
+    cols = 1:min(ncol(.get_spca_weights(object)), length(object$vexp))
   } else 
     if (length(cols) == 1L) {
       cols = seq(cols)
     }
-  if (any(cols) > ncol(object$loadings))
+  if (any(cols) > ncol(.get_spca_weights(object)))
     stop("cols cannot contain values larger than the number of components
          available")
   
-  validate_booleans(contributions = contributions, min_load = min_load,
+  validate_booleans(contributions = contributions, min_weight = min_weight,
                     cor_with_pc = cor_with_pc, return_table = return_table , print_table = print_table)
   
   if(is.vector(variance_metrics))
@@ -124,14 +124,14 @@ summary.spca = function(
 # Add cardinality
   out = rbind(out, Card = get_card(object, thresh_card = thresh_card))
   
-  # Add minimum loading/contributions if requested
-  if (min_load) {
+  # Add minimum weight/contributions if requested
+  if (min_weight) {
     if(contributions)
-      min_vals = get_minload(object$contributions)
+      min_vals = get_minweight(object$contributions)
     else
-      min_vals = get_minload(object$loadings)
+      min_vals = get_minweight(.get_spca_weights(object))
     out = rbind(out, temp = min_vals)
-    min_label = ifelse(contributions, "Min cont", "Min load")
+    min_label = ifelse(contributions, "Min cont", "Min weight")
     rownames(out)[nrow(out)] = min_label
   }
   
@@ -166,9 +166,9 @@ format_summary_matrix = function(out, contributions) {
   
   # will be used for different formatting
   percentage_rows = c("Vexp", "Cvexp", "Rvexp", "Rcvexp", 
-                      ifelse(contributions, "Min cont", "Min load"))
+                      ifelse(contributions, "Min cont", "Min weight"))
   integer_rows =  "Card"
-  decimal_rows = c("min_load", "r")
+  decimal_rows = c("Min weight", "r")
   
   # chracter matrix fx will be filled with formatted 
   outp = matrix("", nrow = nrow(out), ncol = ncol(out))

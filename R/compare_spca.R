@@ -1,6 +1,6 @@
-#' Compare two or more spca solutions
+#' Compare Two or More \code{spca} Solutions
 #'
-#' Plot loadings and print summary statistics for two or more \code{spca}
+#' Plots weights and print summary statistics for two or more \code{spca}
 #' objects side by side. For the meaning of each summary statistic, see
 #' \code{\link{summary.spca}}. Tables and plots can optionally be returned.
 #'
@@ -9,22 +9,22 @@
 #'   Number of components to compare. If \code{NULL}, the minimum number of
 #'   available components across objects is used.
 #' @param contributions A logical value (default \code{TRUE}). If \code{TRUE},
-#'   compare percentage contributions; otherwise, compare loadings.
+#'   compare percentage contributions; otherwise, compare weights.
 #' @param only_nonzero A logical value (default \code{TRUE}). If \code{TRUE},
-#'   only variables with at least one nonzero loading or contribution are
+#'   only variables with at least one nonzero weight or contribution are
 #'   plotted or printed.
 #' @param variable_groups Optional variable grouping (default \code{NULL}). Can
 #'   be a list of indices, a vector, or a factor with one entry per variable.
-#'   Used to draw vertical group-separating lines in the loadings plot.
-#' @param plot_loadings A logical value (default \code{TRUE}). If \code{TRUE},
-#'   plot the loadings or contributions.
+#'   Used to draw vertical group-separating lines in the weights plot.
+#' @param plot_weights A logical value (default \code{TRUE}). If \code{TRUE},
+#'   plot the weights or contributions.
 #' @param plot_type A character vector (default first element \code{"bars"}).
 #'   Values starting with \code{"b"} use bars; values starting with \code{"p"}
 #'   use points. Other values default to bars.
 #' @param methods_names An optional character vector (default \code{NULL}) with
 #'   one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
 #' @param x_axis_var_names A logical value (default \code{TRUE}). If
-#'   \code{TRUE}, show variable names on the x axis of the loadings plot.
+#'   \code{TRUE}, show variable names on the x axis of the weights plot.
 #' @param col_grouplines A character scalar (default \code{"red"}). Color of the
 #'   vertical group lines.
 #' @param color_scale A character vector (default first element
@@ -34,20 +34,20 @@
 #'   use short component names such as \code{C1.M1}; otherwise, use names such 
 #'   as \code{C1.object_name}.
 #' @param print_tables A logical value (default \code{TRUE}). If \code{FALSE},
-#'   suppress table printing. Takes priority over \code{print_loadings}.
-#' @param print_loadings A logical value (default \code{TRUE}). If \code{TRUE},
-#'   print the loadings or contributions table.
+#'   suppress table printing. Takes priority over \code{print_weights}.
+#' @param print_weights A logical value (default \code{TRUE}). If \code{TRUE},
+#'   print the weights or contributions table.
 #' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE}, show
-#'   the loadings or contributions plot.
+#'   the weights or contributions plot.
 #' @param return_tables A logical value (default \code{FALSE}). If \code{TRUE},
-#'   return the loadings or contributions matrix and the raw summary matrix.
+#'   return the weights or contributions matrix and the raw summary matrix.
 #' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
-#'   return the loadings or contributions plot.
+#'   return the weights or contributions plot.
 #'
 #' @return Invisibly returns \code{NULL} by default. If
 #'   \code{return_tables = TRUE}, returns a list containing the comparison
 #'   matrix and summary matrix. If \code{return_plot = TRUE}, the returned
-#'   object also includes the loadings or contributions plot.
+#'   object also includes the weights or contributions plot.
 #' @examples
 #' data(holzinger)
 #' ho_uspca = spca(holzinger, n_comps = 4, method = "u")
@@ -62,7 +62,7 @@ compare_spca = function(
     contributions = TRUE, # change to contributions if safe 
     only_nonzero = TRUE,
     variable_groups = NULL,
-    plot_loadings = TRUE,
+    plot_weights = TRUE,
     plot_type = c("bars", "points"),
     methods_names = NULL,
     x_axis_var_names = TRUE,
@@ -70,21 +70,21 @@ compare_spca = function(
     color_scale = c("ggplot", "cbb", "printsafe", "bw"), 
     col_short_names = TRUE,
     print_tables = TRUE,
-    print_loadings = TRUE,
+    print_weights = TRUE,
     show_plot = TRUE,
     return_tables = FALSE,
     return_plot = FALSE) {
   tryCatch({
-  ## -------------------------------------------------------#
+  ## -------------------------------------------------------P
   ## obj_list two or more spca objects
-  ##==============================================================#
+  ##==============================================================P
 
   logical_args = list(
     contributions = contributions,
     only_nonzero = only_nonzero,
-    plot_loadings = plot_loadings,
+    plot_weights = plot_weights,
     col_short_names = col_short_names,
-    print_loadings = print_loadings,
+    print_weights = print_weights,
     return_tables = return_tables,
     print_tables = print_tables,
     return_plot = return_plot,
@@ -108,10 +108,10 @@ compare_spca = function(
     stop(paste("Object number", which(!are_valid_spca), "is not a valid spca object"))
 
 
-  p = nrow(obj_list[[1]]$loadings)
+  p = nrow(.get_spca_weights(obj_list[[1]]))
   
 # check if spca solutions are compatible
-  nrow_all = sapply(obj_list, function(a) nrow(a$loadings))
+  nrow_all = sapply(obj_list, function(a) nrow(.get_spca_weights(a)))
   if(any(nrow_all != p))
     stop(paste("objects", which(nrow_all != nrow_all[1]) , "was built with a different dataset than the first"))
   
@@ -147,14 +147,14 @@ compare_spca = function(
   }
   
   if (print_tables == FALSE){
-    print_loadings = FALSE
+    print_weights = FALSE
   }
   
-## A is list of loadings of all objects--------------
+## A is list of weights of all objects--------------
   if(contributions)
     A = lapply(obj_list, function(x) x$contributions[, 1:n_comps])
   else
-    A = lapply(obj_list, function(x) x$loadings[, 1:n_comps])
+    A = lapply(obj_list, function(x) .get_spca_weights(x)[, 1:n_comps])
   
 
   ##methods names==========================
@@ -167,9 +167,9 @@ compare_spca = function(
 # graphic parameters  
   pchlist = c(15:20,7:14)
   
-# n_plot is number of loadings to plot
+# n_plot is number of weights to plot
 
-  if (isTRUE(plot_loadings)){
+  if (isTRUE(plot_weights)){
     n_plot = n_comps
   facets_nrows = ceiling(n_plot/3)
   facets_ncols = ceiling(n_plot/facets_nrows)
@@ -187,23 +187,23 @@ compare_spca = function(
   }
 ## plot laodings ==================
 
-# identify nonzero loadings 
+# identify nonzero weights 
     if(only_nonzero == TRUE){
       zeros = sapply(A, function(x) apply(x, 1, function(y) any(y != 0)))
       ind_nonzero = apply(zeros, 1, any)
       }    
       
-    if (!is.null(rownames(obj_list[[1]]$loadings)))
-      variables_name = rownames(obj_list[[1]]$loadings)
+    if (!is.null(rownames(.get_spca_weights(obj_list[[1]]))))
+      variables_name = rownames(.get_spca_weights(obj_list[[1]]))
     else 
       variables_name = paste0("V", 1:p)
 
-  if(plot_loadings){
+  if(plot_weights){
 #helpers in plot.spca
     color_scale = spca_color_scale(color_scale)
-    color_pal = spca_fill_palette(color_scale, pc_loadings = NULL)
+    color_pal = spca_fill_palette(color_scale, pc_weights = NULL)
  
-    loadings_vec = c(sapply(A, function(L, np) c(L[,1:(np)]),
+    weights_vec = c(sapply(A, function(L, np) c(L[,1:(np)]),
                       np = n_plot))
     if(!is.null(variable_groups)){
       if (is.list(variable_groups)) variable_groups = list2fac(variable_groups)
@@ -213,7 +213,7 @@ compare_spca = function(
     }
     
     df = data.frame(
-      loadings = loadings_vec, 
+      weights = weights_vec, 
       variable = factor(rep(1:p, n_plot * n_objects), labels = variables_name), 
       method = factor(rep(1:n_objects, each = p * n_plot), 
                       labels = methods_names), 
@@ -223,9 +223,9 @@ compare_spca = function(
     
     if(only_nonzero){
       df = droplevels(df[rep(ind_nonzero, n_plot*n_objects), ])
-      df$loadings[df$loadings == 0] = NA
+      df$weights[df$weights == 0] = NA
     }
-      ra = range(na.omit(loadings_vec))*(1.05)
+      ra = range(na.omit(weights_vec))*(1.05)
       #ra[1] = min(0, ra[1])
       di = diff(ra)/5
       yLabels = seq(ra[1], ra[2], di)
@@ -233,7 +233,7 @@ compare_spca = function(
       
 #plot skeleton      
       pl = ggplot(
-        data = df, aes(x = variable, y = loadings, label = variable)) + 
+        data = df, aes(x = variable, y = weights, label = variable)) + 
         facet_wrap(facets = vars(.data$Comp), nrow = facets_nrows, ncol = facets_ncols, 
                    scales = "free_y") + theme_classic() + 
         ggplot2::theme(
@@ -242,27 +242,28 @@ compare_spca = function(
                                       linewidth = 1, linetype = 1),
           legend.position = "bottom", 
           panel.grid.major.y = element_line(color = "grey85")) + 
-        geom_abline(intercept = 0, slope = 0) +
+        geom_abline(intercept = 0, slope = 0, na.rm = TRUE) +
         ggplot2::xlab("variables") + 
-        ggplot2::ylab(ifelse(contributions == TRUE, "contributions", "loadings"))
+        ggplot2::ylab(ifelse(contributions == TRUE, "contributions", "weights"))
      
       if (plot_type == "points"){
         pl = pl + aes(colour = method, shape = method) + 
-          geom_point(size = 2, alpha = 0.75) 
+          geom_point(size = 2, alpha = 0.75, na.rm = TRUE) 
       
       } 
       else{#plots bars
 
         pl = pl + aes(fill = method, group = method) + 
           ggplot2::geom_col(position = "dodge", color = 
-                     ifelse(color_scale == "printsafe", "black", NA)
+                     ifelse(color_scale == "printsafe", "black", NA), 
+                     na.rm = TRUE
                    )
         
         if((!is.null(color_scale[1])) && (color_scale[1] != "ggplot"))
           pl = pl + scale_fill_manual(values = color_pal) 
         if (!isTRUE(x_axis_var_names)) 
           pl = pl + theme(axis.text.x = element_blank())
-      }#end plot_loadings   
+      }#end plot_weights   
       
 # adds vertical lines to separate groups----------------------      
     if (!is.null(variable_groups)){
@@ -271,7 +272,7 @@ compare_spca = function(
       groups_table = table(variable_groups)
       cuts = cumsum(groups_table)[-length(groups_table)] + 0.5 
       pl = pl + geom_vline(xintercept = cuts, linewidth = 1,
-                           colour = col_grouplines
+                           colour = col_grouplines, na.rm = TRUE
                            )
       }#end variable_groups
       
@@ -293,14 +294,14 @@ compare_spca = function(
         )
         
 ##  end plot was } ==================  #
-  }#end plot_loadings  
+  }#end plot_weights  
  
 
 #TABLES ===========
-##loadings_matrix======== 
-# loadings of each object, grouped by their rank  
+##weights_matrix======== 
+# weights of each object, grouped by their rank  
   
-  loadings_matrix = matrix(0, nrow = p, ncol = n_objects *n_comps) 
+  weights_matrix = matrix(0, nrow = p, ncol = n_objects *n_comps) 
   if (col_short_names == FALSE)
     col_names = paste(rep(paste0("C",1:n_comps), each = n_objects), 
                   rep(methods_names, times = n_comps), sep = "."
@@ -313,12 +314,12 @@ compare_spca = function(
   for (i in 1:n_comps){
     for (j in 1:n_objects){
       k = k + 1
-      loadings_matrix[,k] = A[[j]][,i]
+      weights_matrix[,k] = A[[j]][,i]
     }
   } # 
   
-  colnames(loadings_matrix) = col_names
-  rownames(loadings_matrix) = variables_name
+  colnames(weights_matrix) = col_names
+  rownames(weights_matrix) = variables_name
   
   ## summary table ---------------
   ## sum_list is list of summaries for all objects
@@ -346,34 +347,34 @@ compare_spca = function(
 
 ## printing----------------------------  
   if(print_tables == TRUE){
-    if (print_loadings){
+    if (print_weights){
       if (only_nonzero == TRUE)
         which_rows = which(ind_nonzero)
       else
         which_rows = 1:p
-        loadings_matrix_fmt = 
-        format_loadings(loadings_matrix, cols = 1:(n_comps*n_objects), 
+        weights_matrix_fmt = 
+        format_weights(weights_matrix, cols = 1:(n_comps*n_objects), 
                         namescomp = col_names, contributions = contributions, 
                         rows = which_rows
                         )
       if (contributions == TRUE)
-        print("Percentage Contributions")
+        message("Percentage contributions")
       else
-        print("Loadings")
-      print(loadings_matrix_fmt, quote = FALSE)
+        message("Weights")
+      print(weights_matrix_fmt, quote = FALSE)
       writeLines(" ")
     }
     sum_matrix_fmt = format_summaries(sum_matrix, contributions)
-    print(paste("Summary statistics"), quote = FALSE)    
+    message("Summary statistics")    
     print(sum_matrix_fmt, quote = FALSE, justify = "right")
   }  
     ## out list------------------------  
     if(return_tables){
-      out = list(loadings = loadings_matrix, summary = sum_matrix)
+      out = list(weights = weights_matrix, summary = sum_matrix)
       if(contributions) names(out)[1] = "contributions"
     
       if(return_plot)
-        out$loadings_plot = pl
+        out$weights_plot = pl
       return(out)  
     } else{
       if(return_plot)
@@ -387,9 +388,9 @@ compare_spca = function(
 }
 
 
-#' internal formats the joint loadings/contribititons matrix for printing
+#' Format the Joint Weights/Contributions Matrix for Printing
 #' @noRd
-format_loadings = function(A, cols, digits = 3, rows, noprint = 1E-03,
+format_weights = function(A, cols, digits = 3, rows, noprint = 1E-03,
                           rtn = FALSE, contributions = FALSE, namescomp = NULL) {
   
   if(is.vector(A)) A = matrix(A, ncol = 1)
@@ -418,21 +419,21 @@ format_loadings = function(A, cols, digits = 3, rows, noprint = 1E-03,
   }
   
   if (contributions == TRUE)
-    load_matrix_fmt = format(round(A * 100, max(digits - 2, 0)),
+    weight_matrix_fmt = format(round(A * 100, max(digits - 2, 0)),
                 drop0trailing = TRUE, justify = "centre")
   else
-    load_matrix_fmt = format(round(A, digits),
+    weight_matrix_fmt = format(round(A, digits),
                 drop0trailing = TRUE, justify = "centre")
   
-  nc = nchar(load_matrix_fmt[1L], type = "c")
-  load_matrix_fmt[abs(A) < noprint] = paste(rep(" ", nc), collapse = "")
+  nc = nchar(weight_matrix_fmt[1L], type = "c")
+  weight_matrix_fmt[abs(A) < noprint] = paste(rep(" ", nc), collapse = "")
   
-  load_matrix_fmt = format(load_matrix_fmt, justify = "right")
+  weight_matrix_fmt = format(weight_matrix_fmt, justify = "right")
   
-  load_matrix_fmt
+  weight_matrix_fmt
 }
 
-#' internal formats the joint summary matrix for printing
+#' Format the Joint Summary Matrix for Printing
 #' @noRd
 format_summaries = function(sum_matrix, contributions)
   {

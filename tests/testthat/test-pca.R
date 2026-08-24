@@ -6,7 +6,7 @@ test_that("pca() returns a valid object for tall data", {
   )
 
   expect_pca_object(fit, n_comps = 3, has_scores = TRUE)
-  expect_equal(nrow(fit$loadings), ncol(X))
+  expect_equal(nrow(fit$weights), ncol(X))
 })
 
 test_that("pca() returns a valid object for covariance input", {
@@ -17,7 +17,7 @@ test_that("pca() returns a valid object for covariance input", {
     )
   
   expect_pca_object(fit, n_comps = 3, has_scores = FALSE)
-  expect_equal(nrow(fit$loadings), ncol(S))
+  expect_equal(nrow(fit$weights), ncol(S))
 })
 
 test_that("pca() returns a valid object for fat data", {
@@ -27,7 +27,7 @@ test_that("pca() returns a valid object for fat data", {
     pca(X, n_comps = 3, fat_matrix = TRUE, qq_plot = FALSE)
     )
   expect_pca_object(fit, n_comps = 3, has_scores = TRUE)
-  expect_equal(nrow(fit$loadings), ncol(X))
+  expect_equal(nrow(fit$weights), ncol(X))
 })
 
 test_that("pca() supports the power-method backend", {

@@ -1,7 +1,7 @@
 # print.spca =======================
-#' Print an spca object
+#' Print an \code{spca} Object
 #'
-#' Print sparse loadings, or the corresponding percentage contributions, from an
+#' Print sparse weights, or the corresponding percentage contributions, from an
 #' \code{spca} object. By default, variables with only zero entries are omitted,
 #' and cumulative explained variance is shown at the bottom of the table.
 #'
@@ -10,13 +10,13 @@
 #'   Components to print. If \code{NULL}, all components are printed. If a
 #'   single integer is supplied, components \code{1:cols} are printed.
 #' @param only_nonzero A logical value (default \code{TRUE}). If \code{TRUE},
-#'   print only variables with at least one loading or contribution whose
+#'   print only variables with at least one weight or contribution whose
 #'   absolute value is greater than or equal to \code{thresh_card}.
 #' @param contributions A logical value (default \code{TRUE}). If \code{TRUE},
-#'   print loadings scaled to unit \eqn{L_1} norm as percentage contributions;
-#'   otherwise, print L2 unit loadings.
+#'   print weights scaled to unit \eqn{L_1} norm as percentage contributions;
+#'   otherwise, print L2 unit weights.
 #' @param digits An integer scalar (default \code{3}). Number of decimal places
-#'   used when printing loadings. Contributions are printed as percentages with
+#'   used when printing weights. Contributions are printed as percentages with
 #'   one decimal place.
 #' @param thresh_card A numeric scalar (default \code{1e-07}). Values with
 #'   absolute magnitude below this threshold are treated as zero in the printed
@@ -66,7 +66,7 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
   
   if (contributions == TRUE){
     A = x$contributions
-  } else  { A = x$loadings}
+  } else  { A = .get_spca_weights(x)}
   
   if (is.null(cols))
     cols = 1:ncol(A)
@@ -81,7 +81,7 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
   
   A = A[, cols]
   
-  ## assigns names to loadings
+  ## assigns names to weights
   if(is.null(component_names)){
     if(is.null(colnames(A)))
       component_names = paste0("sPC", ncol(A))
@@ -112,20 +112,17 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
   nc = nchar(fx[1L], type = "c")
   fx[abs(A) < thresh_card] = paste(rep(" ", nc), collapse = "")
   
-  #  ind = (abs(A)> thresh_card & abs(A) < thresh_card)
-  #  fx[ind] = "--"
   fx = format(fx, justify = "right" )
-  if (any(class(x) == "spca")){
-    vexp = cumsum(x$vexp[cols])
-    dashes = rep("-----", ifelse(is.null(ncol(fx)), 1, ncol(fx)))
-    fx = rbind(fx, dashes, paste0(sprintf("%.1f", round(100*vexp,1)), "%"))
-    rownames(fx)[nrow(fx) - 1] = ""     
-    rownames(fx)[nrow(fx)] = "Cvexp"
-  }  
+  vexp = cumsum(x$vexp[cols])
+  dashes = rep("-----", ifelse(is.null(ncol(fx)), 1, ncol(fx)))
+  fx = rbind(fx, dashes, paste0(sprintf("%.1f", round(100*vexp,1)), "%"))
+  rownames(fx)[nrow(fx) - 1] = ""     
+  rownames(fx)[nrow(fx)] = "Cvexp"
+  
   if (contributions == TRUE)
-    message("Contributions (%)")
+    message("Percentage contributions")
   else
-    message("Loadings")
+    message("Weights")
   if (ncol(A) == 1L){
     print(t(fx), quote = FALSE, right = TRUE)
   }

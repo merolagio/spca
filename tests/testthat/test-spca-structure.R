@@ -24,7 +24,7 @@ test_that("spca accepts numeric data frames", {
               fat_matrix = FALSE)
 
   expect_spca_object(fit, n_comps = 2, has_scores = TRUE)
-  expect_equal(rownames(fit$loadings), names(m$DF_tall))
+  expect_equal(rownames(fit$weights), names(m$DF_tall))
 })
 
 test_that("spca fits fat data matrices through the fat backend", {

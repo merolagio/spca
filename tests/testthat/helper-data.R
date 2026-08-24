@@ -19,25 +19,25 @@ expect_spca_object = function(x, n_comps = NULL, has_scores = NULL) {
   expect_true(is.spca(x))
 #browser()
   required_names = c(
-    "loadings", "contributions", "n_comps", "cardinality",
+    "weights", "contributions", "n_comps", "cardinality",
     "vexp", "vexp_pc", "cvexp", "rvexp", "rcvexp",
-    "cor_with_pc", "tot_var", "loadings_list", "indices",
+    "cor_with_pc", "tot_var", "weights_list", "indices",
      "spc_cor"
   )
   expect_true(all(required_names %in% names(x)))
 #browser()
   if (!is.null(n_comps)) {
     expect_equal(x$n_comps, n_comps)
-    expect_equal(ncol(x$loadings), n_comps)
+    expect_equal(ncol(x$weights), n_comps)
     expect_equal(ncol(x$contributions), n_comps)
     expect_equal(length(x$cardinality), n_comps)
     expect_equal(length(x$vexp), n_comps)
     expect_equal(length(x$cvexp), n_comps)
-    expect_equal(length(x$loadings_list), n_comps)
+    expect_equal(length(x$weights_list), n_comps)
     expect_equal(length(x$indices), n_comps)
   }
 
-  expect_equal(dim(x$contributions), dim(x$loadings))
+  expect_equal(dim(x$contributions), dim(x$weights))
   expect_true(all(is.finite(x$vexp)))
   expect_true(all(is.finite(x$cvexp)))
   expect_true(all(x$cardinality >= 0))
@@ -56,7 +56,7 @@ expect_spca_object = function(x, n_comps = NULL, has_scores = NULL) {
 expect_pca_object = function(x, n_comps = NULL, has_scores = NULL) {
   expect_spca_object(x, n_comps = n_comps, has_scores = has_scores)
   expect_equal(x$method, "PCA")
-  expect_true(all(x$cardinality == nrow(x$loadings)))
+  expect_true(all(x$cardinality == nrow(x$weights)))
   expect_true(all(abs(x$rvexp - 1) < 1e-12))
   expect_true(all(abs(x$rcvexp - 1) < 1e-12))
   expect_true(all(abs(x$cor_with_pc - 1) < 1e-12))

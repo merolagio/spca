@@ -11,7 +11,7 @@
 #'  reproduction of the results reported therein.
 #'
 #' Computation relies on efficient C++ routines and includes multiple options
-#'  for variable selection and sparse loading estimation.
+#'  for variable selection and sparse weight estimation.
 #'
 #' Fitting functions
 #' * [spca()] Computes LS-SPCA solutions from a data or covariance/correlation
@@ -30,18 +30,18 @@
 #' * [is.spca()] Verifies if an object inherits from class `spca`.
 #' * [compare_spca()] Compares two or more LS-SPCA solutions numerically 
 #'   and visually.
-#' * [new_spca()] Creates an `spca` object from a set of loadings.
-#' * [aggregate_by_group()] Sums loadings or contributions wrt an index vector.
+#' * [new_spca()] Creates an `spca` object from a set of weights.
+#' * [aggregate_by_group()] Sums weights or contributions wrt an index vector.
 #' * [show_contributions_spca()] Prints the nonzero contributions 
 #'   separately for each sPC.
-#' * [change_loadings_sign_spca()] Changes the sign of the loadings and all
+#' * [change_weights_sign_spca()] Changes the sign of the weights and all
 #'      related elements in an 'spca` object`.
 #' * [spca_screeplot()] and  [wachter_qqplot()] Diagnostic plots usefull to 
 #'   determine the number of components to retain in PCA.  
 #'   
 #' @references
 #' Merola, G. M. (2015). Least Squares Sparse Principal Component Analysis:
-#' a Backward Elimination approach to attain large loadings.
+#' a Backward Elimination approach to attain large weights.
 #' \emph{Australia & New Zealand Journal of Statistics}, 57, 391--429.
 #' \doi{10.1111/anzs.12128}
 #'
@@ -56,7 +56,7 @@ NULL
 
 #spca object=================
 
-#' Sparse principal component analysis object
+#' Sparse Principal Component Analysis Object
 #'
 #' Objects of class `spca` are returned by the fitting functions
 #' \code{spca()}, \code{pca()} and by \code{new_spca()}..
@@ -65,11 +65,11 @@ NULL
 #' An object of class `spca` is a list with the following elements:
 #'
 #' \describe{
-#' \item{loadings}{\eqn{p \times r} matrix of sparse loadings.}
-#' \item{contributions}{\eqn{p \times r} matrix of loadings scaled to unit
+#' \item{weights}{\eqn{p \times r} matrix of sparse weights.}
+#' \item{contributions}{\eqn{p \times r} matrix of weights scaled to unit
 #'   \eqn{L_1} norm within each sPC.}
 #' \item{n_comps}{Number of sPCs.}
-#' \item{cardinality}{Number of nonzero loadings in each sPC.}
+#' \item{cardinality}{Number of nonzero weights in each sPC.}
 #' \item{vexp}{Variance explained by each sPC.}
 #' \item{vexp_pc}{Variance explained by the corresponding PCs.}
 #' \item{cvexp}{Cumulative variance explained by the sPCs.}
@@ -80,10 +80,10 @@ NULL
 #' \item{cor_with_pc}{Correlation between each sPC and the
 #'   corresponding PC.}
 #' \item{tot_var}{Total variance of the data.}
-#' \item{loadings_list}{List of nonzero loading vectors, one per sPC.}
+#' \item{weights_list}{List of nonzero weight vectors, one per sPC.}
 #' \item{spc_cor}{\eqn{n_comps \times n_comps} correlation matrix of the 
 #'   sPC scores.}
-#' \item{indices}{List of variable indices with nonzero loadings, one per sPC.}
+#' \item{indices}{List of variable indices with nonzero weights, one per sPC.}
 #' \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
 #'   is supplied.}
 #' \item{parameters}{List of parameters used to compute the fit.}

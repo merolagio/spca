@@ -1,4 +1,4 @@
-#' Validate inputs for spca
+#' Validate Inputs for SPCA
 #'
 #' Check user inputs for \code{spca()}. This helper verifies that supplied
 #' values have admissible types, lengths, and ranges. It does not assign
@@ -28,9 +28,9 @@
 #'   exhaustive partition of the variables with at least two groups.
 #' @param center_data A logical scalar or \code{NULL}.
 #' @param scale_data A logical scalar or \code{NULL}.
-#' @param pm_loading A logical scalar or \code{NULL}.
-#' @param eps_pm_loading A positive numeric scalar or \code{NULL}.
-#' @param maxiter_pm_loading A positive integer scalar or \code{NULL}.
+#' @param pm_weights A logical scalar or \code{NULL}.
+#' @param eps_pm_weights A positive numeric scalar or \code{NULL}.
+#' @param maxiter_pm_weights A positive integer scalar or \code{NULL}.
 #' @param pm_varsel A logical scalar or \code{NULL}.
 #' @param eps_pm_varsel A positive numeric scalar or \code{NULL}.
 #' @param maxiter_pm_varsel A positive integer scalar or \code{NULL}.
@@ -52,9 +52,9 @@ validate_spca_inputs =
            fixed_index_list,
            center_data,
            scale_data,
-           pm_loading,
-           eps_pm_loading,
-           maxiter_pm_loading,
+           pm_weights,
+           eps_pm_weights,
+           maxiter_pm_weights,
            pm_varsel,
            eps_pm_varsel,
            maxiter_pm_varsel) {
@@ -71,9 +71,9 @@ validate_spca_inputs =
     fixed_index_list = fixed_index_list,
     center_data = center_data,
     scale_data = scale_data,
-    pm_loading = pm_loading,
-    eps_pm_loading = eps_pm_loading,
-    maxiter_pm_loading = maxiter_pm_loading,
+    pm_weights = pm_weights,
+    eps_pm_weights = eps_pm_weights,
+    maxiter_pm_weights = maxiter_pm_weights,
     pm_varsel = pm_varsel,
     eps_pm_varsel = eps_pm_varsel,
     maxiter_pm_varsel = maxiter_pm_varsel
@@ -84,7 +84,7 @@ validate_spca_inputs =
     fat_matrix = fat_matrix,
     center_data = center_data,
     scale_data = scale_data,
-    pm_loading = pm_loading,
+    pm_weights = pm_weights,
     pm_varsel = pm_varsel
   )
   #data or covariance matrix
@@ -206,18 +206,18 @@ validate_spca_inputs =
     stop("scale_data must be NULL, TRUE, or FALSE", call. = FALSE)
   
   #power method  
-  if (!is.null(pm_loading) && !is_boolean(pm_loading))
-    stop("pm_loading must be NULL, TRUE, or FALSE", call. = FALSE)
+  if (!is.null(pm_weights) && !is_boolean(pm_weights))
+    stop("pm_weights must be NULL, TRUE, or FALSE", call. = FALSE)
   
-  if (!is.null(eps_pm_loading)) {
-    if (!is.numeric(eps_pm_loading) || length(eps_pm_loading) != 1 ||
-        is.na(eps_pm_loading) || (eps_pm_loading <= 0))
-      stop("eps_pm_loading must be NULL or a positive numeric scalar", call. = FALSE)
+  if (!is.null(eps_pm_weights)) {
+    if (!is.numeric(eps_pm_weights) || length(eps_pm_weights) != 1 ||
+        is.na(eps_pm_weights) || (eps_pm_weights <= 0))
+      stop("eps_pm_weights must be NULL or a positive numeric scalar", call. = FALSE)
   }
   
-  if (!is.null(maxiter_pm_loading)) {
-    if (!is_int(maxiter_pm_loading) || length(maxiter_pm_loading) != 1 || (maxiter_pm_loading < 1))
-      stop("maxiter_pm_loading must be NULL or a positive integer", call. = FALSE)
+  if (!is.null(maxiter_pm_weights)) {
+    if (!is_int(maxiter_pm_weights) || length(maxiter_pm_weights) != 1 || (maxiter_pm_weights < 1))
+      stop("maxiter_pm_weights must be NULL or a positive integer", call. = FALSE)
   }
   
   if (!is.null(pm_varsel) && !is_boolean(pm_varsel))
@@ -238,7 +238,7 @@ validate_spca_inputs =
 }
 
 #spca=========================
-#' Compute LS-SPCA components
+#' Compute LS-SPCA Components
 #'
 #' Compute least squares sparse principal components (LS-SPCA) from a data
 #' matrix or from a covariance/correlation matrix.
@@ -284,12 +284,12 @@ validate_spca_inputs =
 #' @param scale_data A logical value (default \code{FALSE}). If \code{TRUE},
 #'   scale data-matrix columns before fitting. Ignored when \code{M} is treated
 #'   as a covariance/correlation matrix.
-#' @param pm_loading A logical value (default \code{FALSE}). If \code{TRUE}, use
-#'   the power method for PC and sparse-loading eigenvectors.
-#' @param eps_pm_loading A positive numeric scalar (default \code{1e-4}).
-#'   Convergence tolerance for \code{pm_loading}.
-#' @param maxiter_pm_loading A positive integer scalar (default \code{1000}).
-#'   Maximum number of iterations for \code{pm_loading}.
+#' @param pm_weights A logical value (default \code{FALSE}). If \code{TRUE}, use
+#'   the power method for PC and sparse-weight eigenvectors.
+#' @param eps_pm_weights A positive numeric scalar (default \code{1e-4}).
+#'   Convergence tolerance for \code{pm_weights}.
+#' @param maxiter_pm_weights A positive integer scalar (default \code{1000}).
+#'   Maximum number of iterations for \code{pm_weights}.
 #' @param pm_varsel A logical value (default \code{FALSE}). If \code{TRUE}, use
 #'   the power method inside variable selection.
 #' @param eps_pm_varsel A positive numeric scalar (default \code{1e-4}).
@@ -351,9 +351,9 @@ spca = function(M,
                 fixed_index_list = NULL,
                 center_data = FALSE,
                 scale_data = FALSE,
-                pm_loading = FALSE,
-                eps_pm_loading = 1e-4,
-                maxiter_pm_loading = 1000,
+                pm_weights = FALSE,
+                eps_pm_weights = 1e-4,
+                maxiter_pm_weights = 1000,
                 pm_varsel = FALSE,
                 eps_pm_varsel = 1e-4,
                 maxiter_pm_varsel = 500) {
@@ -370,9 +370,9 @@ spca = function(M,
                        fixed_index_list = fixed_index_list,
                        center_data = center_data,
                        scale_data = scale_data,
-                       pm_loading = pm_loading,
-                       eps_pm_loading = eps_pm_loading,
-                       maxiter_pm_loading = maxiter_pm_loading,
+                       pm_weights = pm_weights,
+                       eps_pm_weights = eps_pm_weights,
+                       maxiter_pm_weights = maxiter_pm_weights,
                        pm_varsel = pm_varsel,
                        eps_pm_varsel = eps_pm_varsel,
                        maxiter_pm_varsel = maxiter_pm_varsel)
@@ -528,11 +528,11 @@ spca = function(M,
                      method = method_cpp,
                      indvec_in = indvec_in,
                      cardvec_in = cardvec_in,
-                     PMPC = pm_loading,
+                     PMPC = pm_weights,
                      PMS = pm_varsel,
-                     epsPMPC = eps_pm_loading,
+                     epsPMPC = eps_pm_weights,
                      epsPMS = eps_pm_varsel,
-                     maxiterPMPC = maxiter_pm_loading,
+                     maxiterPMPC = maxiter_pm_weights,
                      maxiterPMS = maxiter_pm_varsel,
                      rank_tol = 0.0)
   } else {
@@ -551,11 +551,11 @@ spca = function(M,
                     method = method_cpp,
                     indvec_in = indvec_in,
                     cardvec_in = cardvec_in,
-                    PMPC = pm_loading,
+                    PMPC = pm_weights,
                     PMS = pm_varsel,
-                    epsPMPC = eps_pm_loading,
+                    epsPMPC = eps_pm_weights,
                     epsPMS = eps_pm_varsel,
-                    maxiterPMPC = maxiter_pm_loading,
+                    maxiterPMPC = maxiter_pm_weights,
                     maxiterPMS = maxiter_pm_varsel,
                     rank_tol = 0.0)
   }
@@ -563,8 +563,8 @@ spca = function(M,
   if (fixed_n_comps && (spout$ncomps != n_comps))
     warning(paste("the number of components computed is", spout$ncomps))
   
-  if (is.null(spout$loadings)) {
-    stop("backend output does not contain loadings", call. = FALSE)
+  if (is.null(spout$weights)) {
+    stop("backend output does not contain weights", call. = FALSE)
   }
   
   if (is.null(spout$card)) {
@@ -576,33 +576,35 @@ spca = function(M,
   
   
   
-  ## loadings=============
+  ## weights=============
   
-  # methods take loadings to be a matrix
-  if (is.vector(spout$loadings))
-    spout$loadings = matrix(spout$loadings, ncol = 1)
+  # methods take weights to be a matrix
+  if (is.vector(spout$weights))
+    spout$weights = matrix(spout$weights, ncol = 1)
   
-  rownames(spout$loadings) = var_names
-  colnames(spout$loadings) = paste0("sPC", 1:spout$ncomps)
+  rownames(spout$weights) = var_names
+  colnames(spout$weights) = paste0("sPC", 1:spout$ncomps)
   
   #contributions =====================  
-  contributions = make_contributions(spout$loadings)    
+  contributions = make_contributions(spout$weights)    
   # spca methods take contributions to be a matrix
   if (is.vector(contributions))
     contributions = matrix(contributions, ncol = 1)
-  dimnames(contributions) = dimnames(spout$loadings)
+  dimnames(contributions) = dimnames(spout$weights)
   
   
-  if(is.null(spout$loadlist)){
-    spout$loadlist = lapply(seq_len(spout$ncomps), function(i, A) {
+  # Convert the legacy backend field name at the R/C++ boundary.
+  weights_list = spout$weightlist
+  if(is.null(weights_list)){
+    weights_list = lapply(seq_len(spout$ncomps), function(i, A) {
       A[A[, i] != 0, i]
-    }, A = spout$loadings)
+    }, A = spout$weights)
   }
-  names(spout$loadlist) = colnames(contributions)
+  names(weights_list) = colnames(contributions)
   names(spout$ind) = colnames(contributions)
   
-  for(i in seq_along(spout$loadlist)){
-    names(spout$loadlist[[i]]) = var_names[spout$ind[[i]]]
+  for(i in seq_along(weights_list)){
+    names(weights_list[[i]]) = var_names[spout$ind[[i]]]
   }
   
   n_comps_input = n_comps
@@ -633,7 +635,7 @@ spca = function(M,
   
   # OUTPUT =================
   
-  out = list(loadings = spout$loadings,
+  out = list(weights = spout$weights,
              contributions = contributions,
              n_comps = spout$ncomps,
              cardinality = spout$card,
@@ -645,7 +647,7 @@ spca = function(M,
              cor_with_pc = spout$r,
              spc_cor = spc_cor,
              tot_var = spout$totvar,
-             loadings_list = spout$loadlist,
+             weights_list = weights_list,
              indices = spout$ind
   )
   if (use_fat_backend) {
@@ -660,7 +662,7 @@ spca = function(M,
   } 
   else {
     if ((is_datamatrix_M)) {
-      out$scores = make_scores(M, spout$loadings[, seq_len(spout$ncomps), 
+      out$scores = make_scores(M, spout$weights[, seq_len(spout$ncomps), 
                                                  drop = FALSE])
       colnames(out$scores) = paste0("sPC", seq_len(spout$ncomps))
     }
@@ -682,6 +684,6 @@ spca = function(M,
   }
   
   out$call = match.call()
-  class(out) = c(class(out), "spca")
+  class(out) = c("spca", class(out))
   return(out)
 }

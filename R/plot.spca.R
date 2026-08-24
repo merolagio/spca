@@ -1,5 +1,5 @@
 # Define themes for plots ==============
-#' Theme for SPCA bar plots
+#' Theme for SPCA Bar Plots
 #'
 #' Return the ggplot2 theme used by SPCA bar plots.
 #'
@@ -39,7 +39,7 @@ spca_bar_theme = function(legend_position = "bottom",
 } 
 
 
-#' Theme for SPCA circular bar plots
+#' Theme for SPCA Circular Bar Plots
 #'
 #' Return the ggplot2 theme used by SPCA circular bar plots.
 #'
@@ -75,7 +75,7 @@ spca_circular_theme = function(legend_position,
 }
 
 # DEFINE COLORS =============================
-#' Match an SPCA color scale
+#' Match an SPCA Color Scale
 #'
 #' Match a color-scale name by its first character.
 #'
@@ -104,7 +104,7 @@ spca_color_scale = function(color_scale) {
 }
 
 
-#' Color palette for SPCA heatmaps
+#' Color Palette for SPCA Heatmaps
 #'
 #' Return the diverging color palette used for SPCA heatmaps.
 #'
@@ -118,39 +118,34 @@ spca_tile_palette = function() {
 }
 
 
-#' Color palette for SPCA fill scales
+#' Color Palette for SPCA Fill Scales
 #'
 #' Return a fill palette for grouped SPCA bar plots.
 #'
 #' @param color_scale A character vector. The first element is used. Supported
 #'   values are \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and
 #'   \code{"bw"}.
-#' @param pc_loadings A numeric matrix or \code{NULL} (default \code{NULL}).
-#'   Optional PCA loadings used to select a two-color comparison palette.
+#' @param pc_weights A numeric matrix or \code{NULL} (default \code{NULL}).
+#'   Optional PCA weights used to select a two-color comparison palette.
 #'
 #' @return A character vector of colors, \code{NULL}, or the supplied
 #'   \code{color_scale}.
 #' @noRd
-spca_fill_palette = function(color_scale, pc_loadings = NULL) {
+spca_fill_palette = function(color_scale, pc_weights = NULL) {
   if (color_scale[1] == "cbb") {
     pal = c(
       "#000000", "#E69F00", "#56B4E9", "#009E73",
       "#F0E442", "#0072B2", "#D55E00", "#CC79A7"
     )
-    if (!is.null(pc_loadings))
+    if (!is.null(pc_weights))
       pal = pal[c(1, 7)]
     return(pal)
   }
   
   if (color_scale[1] == "printsafe") {
-    if (!is.null(pc_loadings))
+    if (!is.null(pc_weights))
       pal = pal[c(1, 4)]
     else{
-    # if (ncolors > 8) {
-    #   warning(paste("cannot use printsafe palette with more than 9",
-    #                 "colours. Switching to colour_scale ggplot"))
-    #   color_scale = "ggplot"
-    # } else {
     pal = rev(c(
       "#FFF7EC", "#FEE8C8", "#FDD49E", "#FDBB84", "#FC8D59",
       "#EF6548", "#D7301F", "#B30000", "#7F0000"
@@ -167,7 +162,7 @@ spca_fill_palette = function(color_scale, pc_loadings = NULL) {
 }
 
 
-#' Add a fill scale to an SPCA plot
+#' Add a Fill Scale to an SPCA Plot
 #'
 #' Add the requested fill scale to an SPCA bar or circular bar plot.
 #'
@@ -176,13 +171,13 @@ spca_fill_palette = function(color_scale, pc_loadings = NULL) {
 #' @param data_df A data frame used to create the plot.
 #' @param variable_groups A vector, factor, or \code{NULL} (default
 #'   \code{NULL}). Optional variable-group labels.
-#' @param pc_loadings A numeric matrix or \code{NULL} (default \code{NULL}).
-#'   Optional PCA loadings.
+#' @param pc_weights A numeric matrix or \code{NULL} (default \code{NULL}).
+#'   Optional PCA weights.
 #'
 #' @return A ggplot object.
 #' @noRd
 spca_add_fill_scale = function(pl, color_scale, data_df,
-                               variable_groups = NULL, pc_loadings = NULL) {
+                               variable_groups = NULL, pc_weights = NULL) {
   if (color_scale[1] == "ggplot")
     return(pl)
   
@@ -190,7 +185,7 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
     return(pl + ggplot2::scale_fill_grey())
   
   pal = spca_fill_palette(color_scale = color_scale, 
-                          pc_loadings = pc_loadings)
+                          pc_weights = pc_weights)
   
   if (!is.null(variable_groups)) {
     nfill = nlevels(data_df$variable_groups)
@@ -203,7 +198,7 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
     )
   }
   
-  if (!is.null(pc_loadings)) {
+  if (!is.null(pc_weights)) {
     nfill = nlevels(data_df$method)
   } else {
     nfill = nlevels(data_df$component)
@@ -215,19 +210,19 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
 
 # CREATE PLOTS =============================
 
-#' Create plotting data for an SPCA plot
+#' Create Plotting Data for an SPCA Plot
 #'
 #' Build the data frame used by SPCA plotting helpers.
 #'
 #' @param x An object of class \code{spca}.
 #' @param n_plot An integer scalar. Number of components to plot.
 #' @param contributions A logical value. If \code{TRUE}, use contributions;
-#'   otherwise, use loadings.
+#'   otherwise, use weights.
 #' @param only_nonzero A logical value. If \code{TRUE}, keep only variables
-#'   with at least one nonzero loading.
+#'   with at least one nonzero weight.
 #' @param variable_groups A vector, factor, or \code{NULL}. Optional
 #'   variable-group labels.
-#' @param pc_loadings A numeric matrix or \code{NULL}. Optional PCA loadings to
+#' @param pc_weights A numeric matrix or \code{NULL}. Optional PCA weights to
 #'   add for comparison.
 #' @param lbl A character vector of variable labels.
 #' @param facet_labels A character vector of component labels.
@@ -235,14 +230,15 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
 #' @return A data frame used for plotting.
 #' @noRd
 create_data = function(x, n_plot, contributions, only_nonzero,  
-                       variable_groups, pc_loadings, lbl, facet_labels){
-  p = nrow(x$loadings)
+                       variable_groups, pc_weights, lbl, facet_labels){
+  weights = .get_spca_weights(x)
+  p = nrow(weights)
   
-  # common part, PCloadings binded later if needed
+  # common part, PCweights binded later if needed
   
   
   
-  if(!is.null(pc_loadings))
+  if(!is.null(pc_weights))
     facet_labels = paste("Comp", 1:n_plot)
   
   data_df = data.frame(
@@ -254,25 +250,25 @@ create_data = function(x, n_plot, contributions, only_nonzero,
   if (contributions) 
     data_df$value = c(x$contributions[, 1:n_plot])
   else
-    data_df$value = c(x$loadings[, 1:n_plot])
+    data_df$value = c(weights[, 1:n_plot])
   if (!is.null(variable_groups))
     data_df$variable_groups = rep(variable_groups, n_plot)
   
-  if (!is.null(pc_loadings)){
+  if (!is.null(pc_weights)){
     df = data_df
     if (contributions) 
-      df$value = c(make_contributions(pc_loadings[, 1:n_plot]))
+      df$value = c(make_contributions(pc_weights[, 1:n_plot]))
     else
-      df$value = c(pc_loadings[, 1:n_plot])
+      df$value = c(pc_weights[, 1:n_plot])
     
     data_df = rbind(data_df, df)
     data_df$method = factor(c(rep(1:2, each = p * n_plot)),
                             labels = c("SPCA", "PCA")
     )
   } else{
-    #only_nonzero disabled if pc_loadings == TRUE
+    #only_nonzero disabled if pc_weights == TRUE
     if (only_nonzero == TRUE) {
-      ind_nonzero = apply(x$loadings, 1, function(a) any(a != 0))
+      ind_nonzero = apply(weights, 1, function(a) any(a != 0))
       data_df = droplevels(data_df[ind_nonzero, ])
     }
   }
@@ -281,7 +277,7 @@ create_data = function(x, n_plot, contributions, only_nonzero,
 }
 
 # Helper: Create circular barplot
-#' Create an SPCA circular bar plot
+#' Create an SPCA Circular Bar Plot
 #'
 #' Create a circular bar plot from prepared SPCA plotting data.
 #'
@@ -343,22 +339,22 @@ plot_spca_circular = function(
     ggplot2::geom_col(position = "dodge", 
                       alpha = 0.80,
                       color = ifelse(color_scale[1] == "printsafe", 
-                                     "black", NA)) +
+                                     "black", NA), na.rm = TRUE) +
     ggplot2::ylim(-0.5 - stats::median(abs(stats::na.omit(
       data_df$value))), mval + 0.2) +
     spca_circular_theme(legend_position = legend_position, 
                         grid_type = grid_type) + 
     ggplot2::labs(fill = legend_title) +
-    ggplot2::geom_abline(slope = 0, intercept = 0)
+    ggplot2::geom_abline(slope = 0, intercept = 0, na.rm = TRUE)
   
   indg = (!is.na(data_df$variable))
-  minloads = tapply(X = as.numeric(data_df$id[indg]), 
-                    INDEX = data_df$component[indg], min)
-  medloads = tapply(data_df$id[indg], 
-                    INDEX = data_df$component[indg], stats::median)
+  min_weights = tapply(X = as.numeric(data_df$id[indg]), 
+                       INDEX = data_df$component[indg], min)
+  median_weights = tapply(data_df$id[indg], 
+                          INDEX = data_df$component[indg], stats::median)
   lia = min(data_df$value[indg]) - 0.05
   
-  medangle = 360 * medloads / number_of_bar
+  medangle = 360 * median_weights / number_of_bar
   anglela = 180 - medangle
   anglela[((anglela > 90) | (anglela < -90))] = 
     anglela[((anglela > 90) | (anglela < -90))] + 180
@@ -372,7 +368,7 @@ plot_spca_circular = function(
   
   pl = pl +
     ggplot2::annotate(
-      "text", x = medloads, y = rep(lia, nlevels(data_df$component)),
+      "text", x = median_weights, y = rep(lia, nlevels(data_df$component)),
       label = paste("comp", 1:n_plot), hjust = 0.5, size = 4,
       angle = anglela, fontface = "bold"
     ) +
@@ -385,7 +381,7 @@ plot_spca_circular = function(
       ggplot2::aes(x = id, y = pos + 0.05, label = variable, 
                    hjust = hjust),
       color = "black", fontface = "bold", alpha = 0.85,
-      size = 3.5, angle = label_data$angle, inherit.aes = FALSE
+      size = 3.5, angle = label_data$angle, inherit.aes = FALSE, na.rm = TRUE
     )
   }
   
@@ -393,18 +389,18 @@ plot_spca_circular = function(
 }
 
 # Helper: Create standard barplot (handles both SPCA-only and with PCs)
-#' Create an SPCA bar plot
+#' Create an SPCA Bar Plot
 #'
 #' Create a standard bar plot from prepared SPCA plotting data.
 #'
 #' @param data_df A data frame returned by \code{create_data()}.
 #' @param n_plot An integer scalar. Number of components to plot.
 #' @param contributions A logical value. If \code{TRUE}, plot contributions;
-#'   otherwise, plot loadings.
+#'   otherwise, plot weights.
 #' @param variable_groups A vector, factor, or \code{NULL}. Optional
 #'   variable-group labels.
-#' @param has_pc_loadings A logical value. If \code{TRUE}, the plotting data
-#'   include PCA loadings for comparison.
+#' @param has_pc_weights A logical value. If \code{TRUE}, the plotting data
+#'   include PCA weights for comparison.
 #' @param plotlab A logical value. If \code{TRUE}, show variable labels.
 #' @param lbl A character vector of variable labels.
 #' @param color_scale A character vector. The first element is used.
@@ -418,7 +414,7 @@ plot_spca_bars = function(data_df,
                           n_plot, 
                           contributions,
                           variable_groups,
-                          has_pc_loadings, 
+                          has_pc_weights, 
                           plotlab, 
                           lbl, 
                           color_scale, 
@@ -431,12 +427,12 @@ plot_spca_bars = function(data_df,
   ncols = ceiling(n_plot / nrows)
   
   #variable groups
-  if (!is.null(variable_groups) && (!has_pc_loadings))
+  if (!is.null(variable_groups) && (!has_pc_weights))
     pl = ggplot2::ggplot(data_df, 
                          ggplot2::aes(x = variable, y = value, 
                                       fill = variable_groups))
   else 
-    if (has_pc_loadings){
+    if (has_pc_weights){
     pl = ggplot2::ggplot(data_df, 
                          ggplot2::aes(x = variable, y = value, 
                                       fill = method))
@@ -448,17 +444,17 @@ plot_spca_bars = function(data_df,
   
   pl = pl +
     ggplot2::geom_col(position = "dodge", 
-                      alpha = ifelse((!has_pc_loadings), 1, 0.75),
+                      alpha = ifelse((!has_pc_weights), 1, 0.75),
                       color = ifelse(color_scale[1] == "printsafe", 
-                                     "black", NA)) +
+                                     "black", NA), na.rm = TRUE) +
     ggplot2::facet_wrap(facets = ggplot2::vars(component), 
                         ncol = ncols, nrow = nrows) +
-    ggplot2::geom_abline(slope = 0, intercept = 0) +
+    ggplot2::geom_abline(slope = 0, intercept = 0, na.rm = TRUE) +
     spca_bar_theme(legend_position = legend_position, 
                    grid_type = grid_type) +
     ggplot2::xlab(x_axis_lab) +
     ggplot2::ylab(ifelse(contributions == TRUE, 
-                         "contributions", "loadings"))
+                         "contributions", "weights"))
   
   if (isTRUE(plotlab))
     pl = pl + ggplot2::theme(axis.text.x = 
@@ -472,7 +468,7 @@ plot_spca_bars = function(data_df,
   if (contributions)
     pl = pl + ggplot2::scale_y_continuous(labels = scales::percent)
   
-  if (!is.null(variable_groups) && (!has_pc_loadings))
+  if (!is.null(variable_groups) && (!has_pc_weights))
     pl = pl + ggplot2::theme(legend.position = legend_position)
   
   pl
@@ -480,17 +476,17 @@ plot_spca_bars = function(data_df,
 
 
 # Helper: Create heatmap (handles both SPCA-only and with PCs)
-#' Create an SPCA heatmap
+#' Create an SPCA Heatmap
 #'
 #' Create a heatmap from prepared SPCA plotting data.
 #'
 #' @param data_df A data frame returned by \code{create_data()}.
 #' @param n_plot An integer scalar. Number of components to plot.
 #' @param contributions A logical value. If \code{TRUE}, plot contributions;
-#'   otherwise, plot loadings.
-#' @param has_pc_loadings A logical value. If \code{TRUE}, the plotting data
-#'   include PCA loadings for comparison.
-#' @param indices Integer indices of nonzero loadings.
+#'   otherwise, plot weights.
+#' @param has_pc_weights A logical value. If \code{TRUE}, the plotting data
+#'   include PCA weights for comparison.
+#' @param indices Integer indices of nonzero weights.
 #' @param lbl A character vector of variable labels.
 #' @param legend_position A character scalar. Legend position.
 #' @param flip_heatmap A logical value. If \code{TRUE}, flip the heatmap axes.
@@ -502,7 +498,7 @@ plot_spca_heatmap = function(
     data_df,
     n_plot,
     contributions, 
-    has_pc_loadings,
+    has_pc_weights,
     indices,
     lbl, 
     legend_position, 
@@ -529,16 +525,16 @@ plot_spca_heatmap = function(
       ggplot2::theme_bw() +
       ggplot2::scale_fill_gradientn(
         colours = tile_pal, limits = col_lims,
-        name = ifelse(contributions, "Contributions", "Loadings")
+        name = ifelse(contributions, "Contributions", "Weights")
       ) +
       ggplot2::theme(legend.position = legend_position)
  
     pl = pl +
       ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0, 
-                           colour = "grey75") +
+                           colour = "grey75", na.rm = TRUE) +
       ggplot2::geom_vline(xintercept = 
                             (seq_along(unique(data_df$variable))) + 0.5, 
-                          colour = "grey75") +
+                          colour = "grey75", na.rm = TRUE) +
       ggplot2::theme(
         panel.grid.minor = ggplot2::element_blank(),
         panel.grid.major = ggplot2::element_blank(),
@@ -548,7 +544,7 @@ plot_spca_heatmap = function(
     
     # pl
 
-    if(has_pc_loadings){
+    if(has_pc_weights){
       
       
       data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
@@ -578,11 +574,11 @@ plot_spca_heatmap = function(
           labels = lab_y, expand = c(0, 0)
         ) +
         ggplot2::geom_abline(intercept = (1:n_plot) + 1, slope = 0, 
-                             colour = "black", linewidth = 1.5) +
+                             colour = "black", linewidth = 1.5, na.rm = TRUE) +
         ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0, 
-                             colour = "gray75", linewidth = 1) +
+                             colour = "gray75", linewidth = 1, na.rm = TRUE) +
         ggplot2::geom_vline(xintercept = (seq_along(lbl)) + 1, 
-                            colour = "grey75") +
+                            colour = "grey75", na.rm = TRUE) +
         ggplot2::theme(
           panel.grid.major.x = ggplot2::element_blank(),
           panel.grid.major.y = ggplot2::element_blank(),
@@ -600,7 +596,7 @@ plot_spca_heatmap = function(
   pl
 }
 #Validate inputs=================
-#' Validate SPCA plot inputs
+#' Validate SPCA Plot Inputs
 #'
 #' Validate user inputs and graphical controls for \code{plot.spca()}.
 #'
@@ -631,10 +627,10 @@ validate_plot_inputs = function(inputs, controls, fun_formals) {
                     show_plot = inputs$show_plot
                     )
   
-  if (!is.null(inputs$pc_loadings)) 
-     if ((!is.matrix(inputs$pc_loadings)) && 
-        (!is.data.frame(inputs$pc_loadings)))
-       stop("pc_loadings must be a matrix or a data.frame, or NULL")
+  if (!is.null(inputs$pc_weights)) 
+     if ((!is.matrix(inputs$pc_weights)) && 
+        (!is.data.frame(inputs$pc_weights)))
+       stop("pc_weights must be a matrix or a data.frame, or NULL")
   
   if (!is.null(inputs$variable_groups))
     if ((!is.vector(inputs$variable_groups)) &&
@@ -682,13 +678,13 @@ if (is.null(controls)) {
 }
 
 # plot.spca=====================
-#' Plot an spca object
+#' Plot an \code{spca} Object
 #'
-#' Plot the sparse loadings, or the corresponding percentage contributions, from
+#' Plot the sparse weights, or the corresponding percentage contributions, from
 #' an \code{spca} object. The plot can be shown as a bar plot, circular bar
 #' plot, or heatmap.
 #'
-#' If \code{pc_loadings} is supplied, SPCA and PCA values are plotted side by
+#' If \code{pc_weights} is supplied, SPCA and PCA values are plotted side by
 #' side for comparison. Circular bar plots are not implemented for this
 #' comparison, so a standard bar plot is used instead. In this case all
 #' variables are plotted, regardless of \code{only_nonzero}.
@@ -701,11 +697,11 @@ if (is.null(controls)) {
 #'   Plot type. Accepted values are \code{"bars"}, \code{"circular"}, and
 #'   \code{"heatmap"}. The first character is enough for matching.
 #' @param contributions A logical value (default \code{TRUE}). If \code{TRUE},
-#'   plot percentage contributions; otherwise, plot L2 unit loadings.
+#'   plot percentage contributions; otherwise, plot L2 unit weights.
 #' @param only_nonzero A logical value (default \code{TRUE}). If \code{TRUE},
-#'   plot only variables with at least one nonzero loading.
-#' @param pc_loadings A numeric matrix, data frame, or \code{NULL} (default
-#'   \code{NULL}). Optional PCA loadings or contributions to plot together with
+#'   plot only variables with at least one nonzero weight.
+#' @param pc_weights A numeric matrix, data frame, or \code{NULL} (default
+#'   \code{NULL}). Optional PCA weights or contributions to plot together with
 #'   the SPCA values for comparison.
 #' @param variable_groups A vector, factor, or \code{NULL} (default
 #'   \code{NULL}). Optional grouping variable of length \eqn{p}, where \eqn{p}
@@ -738,7 +734,7 @@ if (is.null(controls)) {
 #'   \code{"bw"} uses gray tones, and \code{"ggplot"} uses the default ggplot2
 #'   scale.
 #' \item \code{variable_names}: a character vector or \code{NULL} (default
-#'   \code{NULL}). If \code{NULL}, row names of the loading matrix are used, or
+#'   \code{NULL}). If \code{NULL}, row names of the weight matrix are used, or
 #'   \code{V1}, ..., \code{Vp} if row names are missing. If set to
 #'   \code{"none"}, variable names are not shown. If a character vector of
 #'   length \eqn{p} is supplied, it is used as the variable names.
@@ -791,7 +787,7 @@ plot.spca = function(
     plot_type = c("bars", "circular", "heatmap"),
     contributions = TRUE,
     only_nonzero = TRUE,
-    pc_loadings = NULL,
+    pc_weights = NULL,
     variable_groups = NULL,
     plot_title = NULL,
     return_plot = FALSE,
@@ -816,12 +812,16 @@ plot.spca = function(
   if (length(dots) > 0) {
     stop("Unused arguments: ", paste(names(dots), collapse = ", "))
   }
+
+  if(!is.spca(x))
+    stop("plot.spca requires an spca object as first argument")
   
   test = validate_spca(x)
   if (!test)
     stop("plot.spca requires an spca object as first argument")
   
-  p = nrow(x$loadings)
+  weights = .get_spca_weights(x)
+  p = nrow(weights)
   
   
   ## validate character inputs by initial characters   
@@ -841,11 +841,11 @@ plot.spca = function(
 
   #acquire noncontrol input======
   if (is.null(n_plot))
-    n_plot = ncol(x$loadings)
+    n_plot = ncol(weights)
   plot_type = validated$inputs$plot_type
   contributions = validated$inputs$contributions
   only_nonzero = validated$inputs$only_nonzero
-  pc_loadings = validated$inputs$pc_loadings
+  pc_weights = validated$inputs$pc_weights
   variable_groups = validated$inputs$variable_groups
   plot_title = validated$inputs$plot_title
   return_plot = validated$inputs$return_plot
@@ -864,13 +864,13 @@ plot.spca = function(
   heatmap_color_range = validated$controls$heatmap_color_range  
 
   # plots take a matrix
-  if ((!is.null(pc_loadings)) && (is.vector(pc_loadings))) {
-      pc_loadings = matrix(pc_loadings, ncol = 1)
+  if ((!is.null(pc_weights)) && (is.vector(pc_weights))) {
+      pc_weights = matrix(pc_weights, ncol = 1)
       }
 
   ## Contributions are not in minimal spca object
   if (contributions && is.null(x$contributions)) {
-    x$contributions = make_contributions(x$loadings[, 1:n_plot])
+    x$contributions = make_contributions(weights[, 1:n_plot])
   }
   
   if (!is.null(variable_groups)){
@@ -889,7 +889,6 @@ plot.spca = function(
       }
     }
     if (is.null(legend_position) || (legend_position == "none")){
-      warning("legend is necessary to identify the variable groups, changed its position to bottom")
       legend_position = "bottom"
     } 
   }
@@ -898,18 +897,16 @@ plot.spca = function(
   if (plot_type == "circular") {
           legend_position = ifelse(legend_position == "none", "none",
                                    "right")
-          warning("Legend moved to right for circular plot")
   }
-# too little space in circular plots to fit PC's loadings  
 
-  if ((plot_type == "circular") && (!is.null(pc_loadings))){
-    warning(paste("Circular barplots with PCloadings are not",
+  if ((plot_type == "circular") && (!is.null(pc_weights))){
+    warning(paste("Circular barplots with PCweights are not",
                   "implemented (and probably would not be useful),",
                   "using standard barplot"))
     plot_type = "bars"
   }
-  #legend is need to distinguish sPCs from Pcs
-  if(!is.null(pc_loadings))
+  #legend is need to distinguish sPCs from PCs
+  if(!is.null(pc_weights))
     legend_position = "bottom"
   
   color_scale = spca_color_scale(color_scale)
@@ -927,10 +924,10 @@ plot.spca = function(
   }  
   
   if (is.null(variable_names[1])) {
-    if (is.null(rownames(x$loadings))) {
+    if (is.null(rownames(weights))) {
       lbl = paste0("V", 1:p)
     } else 
-      lbl = rownames(x$loadings)
+      lbl = rownames(weights)
   } else {
     lbl = paste0("V", 1:p) 
     plotlab = NULL
@@ -946,11 +943,11 @@ plot.spca = function(
     }
   }
   
-  #Also zero PC loadings needed for comparison
-  if(!is.null(pc_loadings))
+  #Also zero PC weights needed for comparison
+  if(!is.null(pc_weights))
     only_nonzero = FALSE
 #'
-  data_df = create_data(x, n_plot, contributions, only_nonzero,  variable_groups, pc_loadings, lbl, facet_labels)
+  data_df = create_data(x, n_plot, contributions, only_nonzero,  variable_groups, pc_weights, lbl, facet_labels)
 
 #circular plot ==============
   if (plot_type == "circular") {
@@ -976,7 +973,7 @@ plot.spca = function(
       n_plot = n_plot,
       contributions = contributions,
       variable_groups = variable_groups,
-      has_pc_loadings = (!is.null(pc_loadings)),
+      has_pc_weights = (!is.null(pc_weights)),
       plotlab = plotlab,
       lbl = lbl,
       color_scale = color_scale,
@@ -993,7 +990,7 @@ plot.spca = function(
     data_df,
     n_plot = n_plot,
     contributions = contributions,
-    has_pc_loadings = (!is.null(pc_loadings)),
+    has_pc_weights = (!is.null(pc_weights)),
     indices = idx,
     lbl = lbl,
     legend_position = legend_position,
@@ -1009,7 +1006,7 @@ plot.spca = function(
       color_scale = color_scale,
       data_df = data_df,
       variable_groups = variable_groups,
-      pc_loadings = pc_loadings
+      pc_weights = pc_weights
     )
   }
   ## Plot title==========================

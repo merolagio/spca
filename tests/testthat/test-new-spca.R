@@ -1,4 +1,4 @@
-test_that("new_spca() builds an spca object from loadings and covariance", {
+test_that("new_spca() builds an spca object from weights and covariance", {
   X = make_tall_data()
   S = stats::var(X) 
     load_mat = make_load_mat()
@@ -10,7 +10,7 @@ test_that("new_spca() builds an spca object from loadings and covariance", {
   expect_equal(fit$method, "manual")
 })
 
-test_that("new_spca() doesn't work without loadings", {
+test_that("new_spca() doesn't work without weights", {
   X = make_tall_data()
   S = stats::cor(X) 
   load_mat = make_load_mat()

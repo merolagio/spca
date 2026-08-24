@@ -19,7 +19,7 @@ test_that("thin backend supports selection methods and stop criteria", {
   expect_spca_object(fit_intensive, n_comps = 2, has_scores = TRUE)
 })
 
-test_that("loading methods produce valid fits", {
+test_that("weight methods produce valid fits", {
   m = spca_test_matrices()
 
   for (method in c("c", "u", "p")) {

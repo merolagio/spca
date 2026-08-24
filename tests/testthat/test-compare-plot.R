@@ -18,12 +18,12 @@ test_that("compare_spca() returns tables and plot on request", {
   out = compare_spca(
     list(fit1, fit2),
     n_comps = 2,
-    plot_loadings = TRUE,
+    plot_weights = TRUE,
     show_plot = FALSE,
     return_plot = TRUE,
     return_tables = TRUE,
     print_tables = FALSE,
-    print_loadings = FALSE
+    print_weights = FALSE
   )
 
   expect_type(out, "list")
@@ -32,9 +32,9 @@ test_that("compare_spca() returns tables and plot on request", {
 
 test_that("aggregate_by_group() returns a table", {
   fit = spca(make_tall_data(), n_comps = 2, fat_matrix = FALSE)
-  groups = rep(c("A", "B"), length.out = nrow(fit$loadings))
+  groups = rep(c("A", "B"), length.out = nrow(fit$weights))
 
-  tab = aggregate_by_group(fit, groups = groups, print_table = FALSE,
+  tab = aggregate_by_group(spca_obj = fit, groups = groups, print_table = FALSE,
                            return_table = TRUE)
 
   expect_true(is.matrix(tab) || is.data.frame(tab))

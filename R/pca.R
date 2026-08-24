@@ -1,4 +1,4 @@
-#' Compute principal components
+#' Computes Principal Components
 #'
 #' Compute a principal component analysis (PCA) and return the result as an
 #' \code{spca} object, so that it can be used with \code{spca} methods.
@@ -20,7 +20,7 @@
 #' @param screeplot A logical value (default \code{FALSE}). If \code{TRUE},
 #'   produce a scree plot.
 #' @param qq_plot A logical value (default \code{TRUE}). If \code{TRUE},
-#'   produce a Wachter QQ plot with \code{\link{wachter_qqplot}}.
+#'   produce a Wachter QQ plot with \code{\link{qqplot_spca}}.
 #' @param nrow_data An integer scalar or \code{NULL} (default \code{NULL}).
 #'   Number of rows in the original data set. Required when
 #'   \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
@@ -43,12 +43,13 @@
 #'
 #' @return An \code{\link{spca_object}} with an additional
 #'   \code{eigenvalues} vector containing the eigenvalues up to the rank used by
-#'   the selected backend.
+#'   the selected backend and \code{n_obs} stores the number of observations,  
+#'   if a data matrix is passed, or NULL.
 #'
 #' @details \code{n_comps} controls how many components are retained in the
 #' returned object. The tall backend computes PCA from the covariance or
 #' correlation matrix. The fat backend computes PCA in row space and converts
-#' the retained eigenvectors back to variable loadings.
+#' the retained eigenvectors back to variable weights.
 #'
 #' @examples
 #' data(holzinger)
@@ -182,21 +183,21 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                maxiterPM = as.integer(maxiter_pm))
   
   # output   ====
-  loadings = pcout$loadings
-  rownames(loadings) = var_names
-  colnames(loadings) = paste0("PC", seq_len(ncol(loadings)))
+  weights = pcout$weights
+  rownames(weights) = var_names
+  colnames(weights) = paste0("PC", seq_len(ncol(weights)))
   
-  contributions = scale_columns(loadings[, 1:n_comps, drop = FALSE],
+  contributions = scale_columns(weights[, 1:n_comps, drop = FALSE],
                                 1, rep(1, n_comps))
   rownames(contributions) = var_names
   colnames(contributions) = paste0("PC", seq_len(ncol(contributions)))
   
-  loadings_list = lapply(1:n_comps, function(i, x) x[, i],
-                         x = loadings[, 1:n_comps, drop = FALSE])
+  weights_list = lapply(1:n_comps, function(i, x) x[, i],
+                         x = weights[, 1:n_comps, drop = FALSE])
   
   vexp = pcout$vexpPC
   
-  out = list(loadings = loadings[, 1:n_comps, drop = FALSE],
+  out = list(weights = weights[, 1:n_comps, drop = FALSE],
              contributions = contributions,
              n_comps = n_comps,
              cardinality = rep(p, n_comps),
@@ -207,10 +208,11 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
              rcvexp = rep(1, n_comps),
              cor_with_pc= rep(1, n_comps),
              tot_var = pcout$totvar,
-             loadings_list = loadings_list,
+             weights_list = weights_list,
              indices = as.list(rep(list(1:p), n_comps)),
              eigenvalues = pcout$eigenvalues[
-               seq_len(min(rank_M, length(pcout$eigenvalues)))]
+               seq_len(min(rank_M, length(pcout$eigenvalues)))],
+             n_obs = if (is_datamatrix_M) nrow_data else NULL
   )
   if (is_datamatrix_M) {
     out$scores = pcout$scores
@@ -218,33 +220,34 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   }
   out$spc_cor = diag(out$n_comps)
   
-  class(out) = c("list", "spca")
+  class(out) = c("spca_pca", "spca", "list")
   
   # plots =============
   
   if (screeplot || qq_plot) {
     
     if (is.null(neigen_toplot))
-      neigen_toplot = length(pcout$eigenvalues)
+      neigen_toplot = length(out$eigenvalues)
     if (neigen_toplot < 2) {
       warning(paste("neigen_toplot must be greater than 1, setting it to",
-                    length(pcout$eigenvalues)))
-      neigen_toplot = length(pcout$eigenvalues)
+                    length(out$eigenvalues)))
+      neigen_toplot = length(out$eigenvalues)
     }
-    if (neigen_toplot > length(pcout$eigenvalues)) {
+    if (neigen_toplot > length(out$eigenvalues)) {
       warning(paste("neigen_toplot exceeds the number of available eigenvalues;
                     setting it to",
-                    length(pcout$eigenvalues)))
-      neigen_toplot = length(pcout$eigenvalues)
+                    length(out$eigenvalues)))
+      neigen_toplot = length(out$eigenvalues)
     }
     
     if (screeplot == TRUE) {
-      pl = spca_screeplot(pcout$eigenvalues, nplot = neigen_toplot, 
+      
+      pl = screeplot_spca(out, nplot = neigen_toplot, 
                           ylab = "eigenvalues")
     }
     if (qq_plot == TRUE) {
-      pl = wachter_qqplot(pcout$eigenvalues, p = p, n = nrow_data, 
-                          common_var = common_var,nplot = neigen_toplot,
+      pl = qqplot_spca(out, n_vars = p, n_obs = nrow_data, 
+                          common_var = common_var, nplot = neigen_toplot,
                           n_fitline = NULL
       )
     }
@@ -254,7 +257,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   out
 }
 
-#' Theme for PCA diagnostic plots
+#' Theme for PCA Diagnostic Plots
 #'
 #' Return the ggplot2 theme used by the PCA diagnostic plots.
 #'
@@ -274,138 +277,3 @@ theme_pca = function(base_size = 12, base_family = "") {
     )
 }
 
-
-#' Wachter QQ plot for eigenvalues
-#'
-#' Produce a QQ plot comparing observed eigenvalues with Marchenko--Pastur
-#' (Wachter) theoretical quantiles.
-#'
-#' @param eigenvalues A numeric vector of eigenvalues, assumed to be sorted in
-#'   decreasing order.
-#' @param p An integer scalar or \code{NULL} (default \code{NULL}). Number of
-#'   variables. If \code{NULL}, \code{length(eigenvalues)} is used.
-#' @param n An integer scalar. Sample size.
-#' @param gamma A numeric scalar. Aspect ratio. If missing, \code{n / p} is
-#'   used.
-#' @param cor A logical value (default \code{TRUE}). Currently accepted for
-#'   compatibility; the plotted quantiles are controlled by \code{common_var}.
-#' @param common_var A positive numeric scalar (default \code{1}). Common
-#'   variance of the variables. Use this when the variables were rescaled to
-#'   unit variance. See Details.
-#' @param nplot An integer scalar or \code{NULL} (default \code{NULL}). Number
-#'   of leading eigenvalues to include. If \code{NULL}, all eigenvalues are
-#'   included.
-#' @param n_fitline An integer scalar or \code{NULL} (default \code{NULL}). If
-#'   positive, fit a least-squares line using the last \code{n_fitline} points.
-#'   If negative, exclude the largest \code{abs(n_fitline)} values from the
-#'   fitted line.
-#' @param addtitle A logical value (default \code{TRUE}). If \code{TRUE}, add a
-#'   plot title.
-#' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE},
-#'   print the plot.
-#' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
-#'   return the ggplot object.
-#'
-#' @details The QQ plot is based on the Marchenko--Pastur distribution of the
-#' eigenvalues of a random covariance matrix generated from variables with a
-#' common variance. If the data set or covariance matrix comes from variables
-#' with different variances, the QQ plot is not valid. A simple introduction to
-#' the QQ plot can be found at \url{https://brainder.org/tag/wachter-test/};
-#' see the extended vignette for references.
-#'
-#' @return If \code{return_plot = TRUE}, returns a \code{ggplot} object.
-#' Otherwise, returns \code{NULL} invisibly.
-#'
-#' @examples
-#' data(holzinger)
-#' ho_pca = pca(holzinger,  qq_plot = FALSE)
-#'  wachter_qqplot(ho_pca$eigenvalues, p = ncol(holzinger), n = nrow(holzinger),
-#'   cor = TRUE, n_fitline = -3)
-#' @family pca
-#' @export
-wachter_qqplot = function(eigenvalues, p = NULL, n, gamma, cor = TRUE,
-                          common_var = 1,  nplot = NULL, n_fitline = NULL,
-                          addtitle = TRUE, show_plot = TRUE, 
-                          return_plot = FALSE) {
-
-  if (is.null(p)) p = length(eigenvalues)
-  if (missing(gamma)) gamma = n/p
-  
-  if (is.null(nplot)) nplot = length(eigenvalues)
-  
-  probs = ((p - (1:p) + 1)- 0.5)/p
-  mp_quantiles = RMTstat::qmp(p = probs, svr = gamma, var = common_var)
-  
-  if (common_var) 
-    mp_quantiles = p * mp_quantiles/sum(mp_quantiles)
-
-  df = data.frame(expected = mp_quantiles[1:nplot], 
-                  observed = eigenvalues[1:nplot])
-  pl = ggplot(df, aes(x = expected, y = observed)) + geom_point(size = 2) +
-    theme_pca()
-  
-  if ((is.numeric(n_fitline)) && (n_fitline != 0)) {
-    if (n_fitline < 0) n_fitline = nplot + n_fitline
-    lmcoef = lm(observed ~ expected, 
-                data = df[(nplot - n_fitline + 1):nplot, ])$coefficients
-    pl = pl + geom_abline(intercept = lmcoef[1], slope = lmcoef[2] ,
-                          color = "blue", linewidth = 1.15)
-  }
-  if (addtitle)
-    pl = pl + labs(title = "wachter qq-plot") +
-    theme(plot.title = element_text(hjust = 0.5))
-  
-  if (show_plot)
-    print(pl)
-  if (return_plot)
-    return(pl)
-}
-
-#' Plot eigenvalues in a scree plot
-#'
-#' Plot the first \code{nplot} eigenvalues against component order.
-#'
-#' @param eigenvalues A numeric vector of eigenvalues.
-#' @param nplot An integer scalar or \code{NULL} (default \code{NULL}). Number
-#'   of leading eigenvalues to plot. If \code{NULL}, all eigenvalues are
-#'   plotted.
-#' @param ylab A character scalar (default \code{"eigenvalues"}). Label for the
-#'   y axis.
-#' @param addtitle A logical value (default \code{TRUE}). If \code{TRUE}, add a
-#'   plot title.
-#' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE},
-#'   print the plot.
-#' @param return_plot A logical value (default \code{FALSE}). If \code{TRUE},
-#'   return the ggplot object.
-#'
-#' @return If \code{return_plot = TRUE}, returns a \code{ggplot} object;
-#' otherwise, returns \code{NULL} invisibly.
-#' @examples
-#' data(holzinger)
-#' ho_pca = pca(holzinger,  qq_plot = FALSE)
-#'  spca_screeplot(ho_pca$eigenvalues)
-#'
-#' @family pca
-#' @export
-spca_screeplot = function(eigenvalues, nplot = NULL, ylab = "eigenvalues",
-                          addtitle = TRUE, show_plot = TRUE, 
-                          return_plot = FALSE) {
-  if (!is.vector(eigenvalues) || any(is.na(eigenvalues)))
-    stop("eigenvalues must be a vector of eigenvalues and 
-         missing values are not allowed")
-  if (is.null(nplot))
-    nplot = length(eigenvalues)
-  
-  df = data.frame(order = 1:nplot,
-                  eigenvalue = eigenvalues[1:nplot])
-  scree_pl = ggplot(df, aes(x = order, y = eigenvalue)) + geom_point(size = 2) +
-    geom_line() + labs(y = ylab) + theme_pca()
-  
-  if (addtitle) scree_pl = scree_pl + labs(title = "screeplot") +
-    theme(plot.title = element_text(hjust = 0.5))
-  
-  if (show_plot)
-    print(scree_pl)
-  if (return_plot)
-    return(scree_pl)
-}

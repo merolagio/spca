@@ -30,9 +30,9 @@ X[1,1] = NA
   expect_error(spca(m$X_tall, n_comps = 2, fixed_index_list = list(c(1, NA))),
                "fixed_index_list must not contain missing values")
 
-  expect_error(spca(m$X_tall, n_comps = 2, eps_pm_loading = 0), "eps_pm_loading must be NULL or a positive numeric scalar")
+  expect_error(spca(m$X_tall, n_comps = 2, eps_pm_weights = 0), "eps_pm_weights must be NULL or a positive numeric scalar")
   
-  expect_error(spca(m$X_tall, n_comps = 2, maxiter_pm_loading = 0), "maxiter_pm_loading must be NULL or a positive integer")
+  expect_error(spca(m$X_tall, n_comps = 2, maxiter_pm_weights = 0), "maxiter_pm_weights must be NULL or a positive integer")
   expect_error(spca(m$X_tall, n_comps = 2, eps_pm_varsel = 0), "eps_pm_varsel must be NULL or a positive numeric scalar")
   expect_error(spca(m$X_tall, n_comps = 2, maxiter_pm_varsel = 0), "maxiter_pm_varsel must be NULL or a positive integer scalar")
 })
