@@ -108,7 +108,7 @@ Eigen::MatrixXd scaleColsC(const Eigen::Map<Eigen::MatrixXd>& A,
 // Deflation and explained-variance helpers
 //====================================================
 
-// computes exact vexp using loadings A and cov S
+// computes exact vexp using weights A and cov S
 //exported wrapper for internal makeVexpSC
 // [[Rcpp::export]]
 List make_vexpSC(const Eigen::Map<Eigen::MatrixXd>& A,
@@ -181,7 +181,7 @@ Eigen::MatrixXd var2corC(const Eigen::Map<Eigen::MatrixXd>& S) {
   }
 }
 
-//computes efficiently scores from sparse loading matrix
+//computes efficiently scores from sparse weight matrix
 
 // [[Rcpp::export]]
 Eigen::MatrixXd make_scoresC(const Eigen::Map<Eigen::MatrixXd>& X,
@@ -220,7 +220,7 @@ Eigen::MatrixXd make_scoresC(const Eigen::Map<Eigen::MatrixXd>& X,
 
 
 
-// Computes the correlation between sPCs (using loadings A and cov  S).
+// Computes the correlation between sPCs (using weights A and cov  S).
 // Returns a ncomps x ncomps matrix.
 // [[Rcpp::export]]
 Eigen::MatrixXd makeCorCompC(const Eigen::Map<Eigen::MatrixXd>& A,
