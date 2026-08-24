@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
 <!-- badges: end -->
 
-This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details, references and full presentation can be found in the extended_vignette document.
+This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details, references and full presentation can be found in the spca_extended vignette.
 
 ## Installation
 You can install the stable release version from CRAN
@@ -41,7 +41,11 @@ The current development version from GitHub
 remotes::install_github("merolagio/spca")
 ```
 ## Usage
-The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). print, summery and plot methods are available. PCA solutions stored as an `*spca*` object cn be obtained with the function  *pca()*.
+The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining the standard PCs. These can be computed and stored in a compatible object of class *spca*  with the function  *pca()*.
+
+The class 
+
+print, summery and plot methods are available. 
 
 Utilities available are *compare_spca()*` (to compare two or more spca solutions), *aggregate_by_scale()* (to visualize the contribution by scale) and *new.spca()* (to create an `spca` object from a set of loadings).
 

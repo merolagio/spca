@@ -1,43 +1,48 @@
 
 #' Least Squares Sparse Principal Components Analysis
 #'
-#' The package provides functions to compute LS-SPCA solutions, where sparsity is
-#'  imposed to Pearson's PCA's least-squares reconstruction objective. 
+#' The package provides functions to compute LS-SPCA solutions, in which
+#' sparsity is imposed on Pearson PCA's least-squares reconstruction objective.
 #' 
-#' LS-SPCA is different for other SPCA methods that compute sparse PCs with
-#'  maximal variance. Details about LS-SPCA can be found in the articles cited below and in the extended vignette.
+#' LS-SPCA differs from SPCA methods that compute sparse PCs by maximizing
+#' variance. Details are provided in the references below and in the extended
+#' vignette.
 #'  
-#' This release  accompanies the related article and is intended  to support full
-#'  reproduction of the results reported therein.
+#' This release accompanies the related article and supports reproduction of
+#' the results reported therein.
 #'
 #' Computation relies on efficient C++ routines and includes multiple options
 #'  for variable selection and sparse weight estimation.
 #'
-#' Fitting functions
+#' strong{Fitting functions}
 #' * [spca()] Computes LS-SPCA solutions from a data or covariance/correlation
-#'   matrix. Returns an  \link{spca_object} of class `spca`.
+#'   matrix. It returns a \link{spca_object} of class `spca`.
 #' * [pca()] Computes PCA solutions from a data or covariance/correlation
-#'   matrix. Returns an  \link{spca_object} of class `spca`.
-#'      
-#' S3 methods for objects of class `spca` include:
-#' [pca()] returns PCA results as an `spca` object.
-#' \strong{methods}
-#' * [print()]
-#' * [plot()]
-#' * [summary()]
+#'   matrix. It returns a \link{spca_object} inheriting from classes `spca_pca`
+#'   and `spca`.
+#'
+#' \strong{Methods}
+#' * [print()], [summary()], and [plot()] inspect and display `spca` objects.
+#' * [change_sign()] changes the signs of selected components and their related
+#'   object elements.
+#' * [show_weights()] prints or returns the nonzero weights or contributions for
+#'   selected components.
+#' * [aggregate_by_group()] aggregates weights or contributions according to a
+#'   grouping vector.
+#' * [screeplot_spca()] and [qqplot_spca()] provide diagnostic plots for objects
+#'   returned by [pca()].
 #' 
 #' \strong{Utilities}
-#' * [is.spca()] Verifies if an object inherits from class `spca`.
+#' * [is.spca()] Verifies whether an object is an `spca` object.
 #' * [compare_spca()] Compares two or more LS-SPCA solutions numerically 
 #'   and visually.
 #' * [new_spca()] Creates an `spca` object from a set of weights.
-#' * [aggregate_by_group()] Sums weights or contributions wrt an index vector.
-#' * [show_contributions_spca()] Prints the nonzero contributions 
-#'   separately for each sPC.
-#' * [change_weights_sign_spca()] Changes the sign of the weights and all
-#'      related elements in an 'spca` object`.
-#' * [spca_screeplot()] and  [wachter_qqplot()] Diagnostic plots usefull to 
-#'   determine the number of components to retain in PCA.  
+#'
+#' The former interfaces [change_weights_sign_spca()],
+#' [change_loadings_sign_spca()], [spca_screeplot()], and [wachter_qqplot()] are
+#' retained for backward compatibility and issue deprecation warnings. Objects
+#' created by previous package versions with `loadings` and `loadings_list`
+#' elements remain supported.
 #'   
 #' @references
 #' Merola, G. M. (2015). Least Squares Sparse Principal Component Analysis:
@@ -59,7 +64,8 @@ NULL
 #' Sparse Principal Component Analysis Object
 #'
 #' Objects of class `spca` are returned by the fitting functions
-#' \code{spca()}, \code{pca()} and by \code{new_spca()}..
+#' [spca()], [pca()], and [new_spca()]. Objects returned by [pca()] also inherit
+#' from class `spca_pca`.
 #'
 #' @section Components:
 #' An object of class `spca` is a list with the following elements:
@@ -86,9 +92,16 @@ NULL
 #' \item{indices}{List of variable indices with nonzero weights, one per sPC.}
 #' \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
 #'   is supplied.}
-#' \item{parameters}{List of parameters used to compute the fit.}
-#' \item{call}{Matched call used to compute the fit.}
+#' \item{parameters}{List of parameters used to compute an [spca()] fit.}
+#' \item{call}{Matched call used to compute an [spca()] fit.}
+#' \item{eigenvalues}{For [pca()] objects, the available PCA eigenvalues.}
+#' \item{n_obs}{For [pca()] objects, the number of observations when available.}
+#' \item{method_name}{For [new_spca()] objects, an optional method label.}
 #' }
+#'
+#' For backward compatibility, methods also accept objects from earlier package
+#' versions containing `loadings` and `loadings_list` instead of `weights` and
+#' `weights_list`.
 #' @name spca_object
 #' @family spca
 NULL
