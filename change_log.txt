@@ -1,0 +1,16 @@
+log
+
+- changed function `aggregate_by_group_spca()` to method `aggregate_by_group()`
+- changed function `show_contributions_spca()` to method `show_weights()`
+- changed function `change_weights_sign_spca()` to method `change_sign()`
+- changed functions `spca_screeplot()` and `wachter_qqplot()` to methods `screeplot_spca()` and `qqplot_spca()`
+  - first argument changed from `eigenvalues` to `pca_obj`
+  - in `qqplot_spca()`, arguments `n` and `p` changed to `n_vars` and `n_obs`
+
+- pca() returns n_obs if available. output takes class pca_spca, spca, list
+
+renamed loadings to weights
+- objects now return `weights`, as documented.
+- same changes in C++ code but no need of backcompatibility
+- preserved backward compatibility by retaining the old function names as deprecated wrappers for the new S3 methods
+- preserved compatibility with older spca objects containing loadings-named elements through internal accessors
