@@ -5,50 +5,55 @@
 \alias{spca-package}
 \title{Least Squares Sparse Principal Components Analysis}
 \description{
-The package provides functions to compute LS-SPCA solutions, where sparsity is
-imposed to Pearson's PCA's least-squares reconstruction objective.
+The package provides functions to compute LS-SPCA solutions, in which
+sparsity is imposed on Pearson PCA's least-squares reconstruction objective.
 }
 \details{
-LS-SPCA is different for other SPCA methods that compute sparse PCs with
-maximal variance. Details about LS-SPCA can be found in the articles cited below and in the extended vignette.
+LS-SPCA differs from SPCA methods that compute sparse PCs by maximizing
+variance. Details are provided in the references below and in the extended
+vignette.
 
-This release  accompanies the related article and is intended  to support full
-reproduction of the results reported therein.
+This release accompanies the related article and supports reproduction of
+the results reported therein.
 
 Computation relies on efficient C++ routines and includes multiple options
 for variable selection and sparse weight estimation.
 
-Fitting functions
+strong{Fitting functions}
 \itemize{
 \item \code{\link[=spca]{spca()}} Computes LS-SPCA solutions from a data or covariance/correlation
-matrix. Returns an  \link{spca_object} of class \code{spca}.
+matrix. It returns a \link{spca_object} of class \code{spca}.
 \item \code{\link[=pca]{pca()}} Computes PCA solutions from a data or covariance/correlation
-matrix. Returns an  \link{spca_object} of class \code{spca}.
+matrix. It returns a \link{spca_object} inheriting from classes \code{spca_pca}
+and \code{spca}.
 }
 
-S3 methods for objects of class \code{spca} include:
-\code{\link[=pca]{pca()}} returns PCA results as an \code{spca} object.
-\strong{methods}
+\strong{Methods}
 \itemize{
-\item \code{\link[=print]{print()}}
-\item \code{\link[=plot]{plot()}}
-\item \code{\link[=summary]{summary()}}
+\item \code{\link[=print]{print()}}, \code{\link[=summary]{summary()}}, and \code{\link[=plot]{plot()}} inspect and display \code{spca} objects.
+\item \code{\link[=change_sign]{change_sign()}} changes the signs of selected components and their related
+object elements.
+\item \code{\link[=show_weights]{show_weights()}} prints or returns the nonzero weights or contributions for
+selected components.
+\item \code{\link[=aggregate_by_group]{aggregate_by_group()}} aggregates weights or contributions according to a
+grouping vector.
+\item \code{\link[=screeplot_spca]{screeplot_spca()}} and \code{\link[=qqplot_spca]{qqplot_spca()}} provide diagnostic plots for objects
+returned by \code{\link[=pca]{pca()}}.
 }
 
 \strong{Utilities}
 \itemize{
-\item \code{\link[=is.spca]{is.spca()}} Verifies if an object inherits from class \code{spca}.
+\item \code{\link[=is.spca]{is.spca()}} Verifies whether an object is an \code{spca} object.
 \item \code{\link[=compare_spca]{compare_spca()}} Compares two or more LS-SPCA solutions numerically
 and visually.
 \item \code{\link[=new_spca]{new_spca()}} Creates an \code{spca} object from a set of weights.
-\item \code{\link[=aggregate_by_group]{aggregate_by_group()}} Sums weights or contributions wrt an index vector.
-\item \code{\link[=show_contributions_spca]{show_contributions_spca()}} Prints the nonzero contributions
-separately for each sPC.
-\item \code{\link[=change_weights_sign_spca]{change_weights_sign_spca()}} Changes the sign of the weights and all
-related elements in an 'spca\code{ object}.
-\item \code{\link[=spca_screeplot]{spca_screeplot()}} and  \code{\link[=wachter_qqplot]{wachter_qqplot()}} Diagnostic plots usefull to
-determine the number of components to retain in PCA.
 }
+
+The former interfaces \code{\link[=change_weights_sign_spca]{change_weights_sign_spca()}},
+\code{\link[=change_loadings_sign_spca]{change_loadings_sign_spca()}}, \code{\link[=spca_screeplot]{spca_screeplot()}}, and \code{\link[=wachter_qqplot]{wachter_qqplot()}} are
+retained for backward compatibility and issue deprecation warnings. Objects
+created by previous package versions with \code{loadings} and \code{loadings_list}
+elements remain supported.
 }
 \references{
 Merola, G. M. (2015). Least Squares Sparse Principal Component Analysis:

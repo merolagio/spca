@@ -5,7 +5,8 @@
 \title{Sparse Principal Component Analysis Object}
 \description{
 Objects of class \code{spca} are returned by the fitting functions
-\code{spca()}, \code{pca()} and by \code{new_spca()}..
+\code{\link[=spca]{spca()}}, \code{\link[=pca]{pca()}}, and \code{\link[=new_spca]{new_spca()}}. Objects returned by \code{\link[=pca]{pca()}} also inherit
+from class \code{spca_pca}.
 }
 \section{Components}{
 
@@ -33,9 +34,16 @@ sPC scores.}
 \item{indices}{List of variable indices with nonzero weights, one per sPC.}
 \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
 is supplied.}
-\item{parameters}{List of parameters used to compute the fit.}
-\item{call}{Matched call used to compute the fit.}
+\item{parameters}{List of parameters used to compute an \code{\link[=spca]{spca()}} fit.}
+\item{call}{Matched call used to compute an \code{\link[=spca]{spca()}} fit.}
+\item{eigenvalues}{For \code{\link[=pca]{pca()}} objects, the available PCA eigenvalues.}
+\item{n_obs}{For \code{\link[=pca]{pca()}} objects, the number of observations when available.}
+\item{method_name}{For \code{\link[=new_spca]{new_spca()}} objects, an optional method label.}
 }
+
+For backward compatibility, methods also accept objects from earlier package
+versions containing \code{loadings} and \code{loadings_list} instead of \code{weights} and
+\code{weights_list}.
 }
 
 \seealso{
