@@ -325,7 +325,6 @@ plot(ho_spcadef, variable_groups = holzinger_scales, controls =
 ### Create an spca object
 
 `new_spca()` brings solutions from other analyses into the **spca** framework. It needs a set of weights and either the covariance or the data matrix.
-
 ```{r new_spca}
 A = cbind(ho_spcadef$weights[, 1], ho_pspca$weights[, 2])
 ho_r = cor(holzinger)
@@ -378,6 +377,7 @@ The three solutions differ little here; as required, the uSPCA sPCs are exactly 
 This varies the search direction (`var_selection`) and stopping rule (`objective`). Searches use partial squared correlation (`"r2"`) to pick candidates, except when `intensive = TRUE`, which uses CVEXP. The seven approaches are summarised below.
 
 *Comparative summaries for different variable selection methods.*
+
 
 ```{r comp_varsel, echo = FALSE}
 mss_varsel_table
