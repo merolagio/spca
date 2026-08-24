@@ -29,7 +29,7 @@ if (getRversion() >= "2.15.1") {
     "id", "component", "variable", "method",
     "pos", "hjust",
     "varNum", "compNum",
-    "loadings",
+    "weights",
     "n_comps"
   ))
 }

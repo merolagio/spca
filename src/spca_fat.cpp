@@ -81,7 +81,7 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
 //
 // Computes LS-SPCA components for a centered data matrix with p > n. The
 // backend works in row space, using X X' instead of X' X, and maps results back
-// to column-space loading vectors.
+// to column-space weight vectors.
 //
 // Parameters
 // X: Numeric n x p centered data matrix with p > n.
@@ -101,11 +101,11 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
 //   components.
 // cardvec_in: Optional cardinalities for fixed variable indices.
 // PMPC: Use the power method for PCs of the row-space matrix.
-// PMS: Use the power method for sparse-loading eigenvectors.
+// PMS: Use the power method for sparse-weight eigenvectors.
 // epsPMPC: Convergence tolerance for row-space PC power-method iterations.
-// epsPMS: Convergence tolerance for sparse-loading power-method iterations.
+// epsPMS: Convergence tolerance for sparse-weight power-method iterations.
 // maxiterPMPC: Maximum number of row-space PC power-method iterations.
-// maxiterPMS: Maximum number of sparse-loading power-method iterations.
+// maxiterPMS: Maximum number of sparse-weight power-method iterations.
 // rank_tol: Accepted for interface consistency; currently not used by the
 //   fat variable-selection backend.
 //
@@ -115,7 +115,7 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
 // 1               Forward selection with CVEXP stopping
 //
 // Returns
-// A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC,
+// A list with weights, weightlist, ncomps, ind, card, vexp, cvexp, vexpPC,
 // scores, cor_comps, r, totvar, method, varSelection, Time_wall, Time_cpu, Time_colnames,
 // setup_wall, setup_cpu, and time_unit_raw. The element r contains signed
 // correlations between each sPC and the corresponding original PC.
@@ -188,7 +188,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
   MatrixXd D = D_orig;
   MatrixXd scores = MatrixXd::Zero(n, ncomps);
   MatrixXd A = MatrixXd::Zero(p, ncomps);
-  List indout(ncomps), loadlist(ncomps);
+  List indout(ncomps), weightlist(ncomps);
   VectorXi card = VectorXi::Zero(ncomps);
   VectorXd rvec = VectorXd::Zero(ncomps);
 
@@ -239,10 +239,10 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
               PCscores.col(k).setZero();
               continue;
             }
-            VectorXd loading_k = X.transpose() * row_pc.col(k) / std::sqrt(PCvexp(k));
-            double nrm_pc = loading_k.norm();
-            if (nrm_pc > 0.0) loading_k /= nrm_pc;
-            if (loading_k(0) < 0.0) {
+            VectorXd weight_k = X.transpose() * row_pc.col(k) / std::sqrt(PCvexp(k));
+            double nrm_pc = weight_k.norm();
+            if (nrm_pc > 0.0) weight_k /= nrm_pc;
+            if (weight_k(0) < 0.0) {
               row_pc.col(k) = -row_pc.col(k);
             }
             PCscores.col(k) = std::sqrt(PCvexp(k)) * row_pc.col(k);
@@ -259,12 +259,12 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
           if (!std::isfinite(pc_val) || pc_val <= 0.0)
             Rcpp::stop("lsspcaTC: non-positive original row-space PC eigenvalue");
           VectorXd u_pc = u_scaled / std::sqrt(pc_val);
-          VectorXd loading_k = X.transpose() * u_pc / std::sqrt(pc_val);
-          double nrm_pc = loading_k.norm();
+          VectorXd weight_k = X.transpose() * u_pc / std::sqrt(pc_val);
+          double nrm_pc = weight_k.norm();
           if (!std::isfinite(nrm_pc) || nrm_pc <= 0.0)
-            Rcpp::stop("lsspcaTC: zero or non-finite original PC loading norm");
-          loading_k /= nrm_pc;
-          if (loading_k(0) < 0.0)
+            Rcpp::stop("lsspcaTC: zero or non-finite original PC weight norm");
+          weight_k /= nrm_pc;
+          if (weight_k(0) < 0.0)
             u_pc = -u_pc;
           PCvexp(pc_computed) = pc_val;
           PCscores.col(pc_computed) = std::sqrt(pc_val) * u_pc;
@@ -342,7 +342,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
       VectorXi indt = indj.head(cardt);
       std::sort(indt.data(), indt.data() + cardt);
       
-// compute lsspca loadings      
+// compute lsspca weights      
       bool singular_fit = false;
       try {
         if (method_j == "u") {
@@ -356,15 +356,15 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
         }
       } catch (const std::exception& e) {
         Rcpp::stop(std::string("lsspcaTC comp ") + std::to_string(j + 1) +
-          ": loading computation failed: " + e.what());
+          ": weight computation failed: " + e.what());
       } catch (...) {
         Rcpp::stop(std::string("lsspcaTC comp ") + std::to_string(j + 1) +
-          ": loading computation failed with unknown C++ error");
+          ": weight computation failed with unknown C++ error");
       }
       
       if (singular_fit) {
         Rcpp::stop(std::string("lsspcaTC comp ") + std::to_string(j + 1) +
-          ": singular loading fit");
+          ": singular weight fit");
       }
       
       double anorm = a.head(cardt).norm();
@@ -374,7 +374,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
       for (int i = 0; i < cardt; i++) A(indt(i), j) = a(i);
 
       indout[j] = indt.array() + 1;
-      loadlist[j] = a.head(cardt);
+      weightlist[j] = a.head(cardt);
       card(j) = cardt;
       double den_r = scores.col(j).squaredNorm() * PCvexp(j);
       if (den_r > 0.0)
@@ -434,7 +434,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
     }
 
     string varselection = (stop_criterion == 0) ? "forward R2" : "forward cvexp";
-    CharacterVector Time_colnames = CharacterVector::create("PC", "varsel", "loadings", "deflation");
+    CharacterVector Time_colnames = CharacterVector::create("PC", "varsel", "weights", "deflation");
     
     Eigen::MatrixXd cor_comps;
     if (nc > 1)
@@ -443,8 +443,8 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
       cor_comps = Eigen::MatrixXd::Ones(1, 1);   
     
     return List::create(
-      Named("loadings") = A.leftCols(nc),
-      Named("loadlist") = loadlist[idx],
+      Named("weights") = A.leftCols(nc),
+      Named("weightlist") = weightlist[idx],
       Named("ncomps") = nc,
       Named("ind") = indout[idx],
       Named("card") = card.head(nc),

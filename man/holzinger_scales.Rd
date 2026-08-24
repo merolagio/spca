@@ -3,7 +3,7 @@
 \docType{data}
 \name{holzinger_scales}
 \alias{holzinger_scales}
-\title{Holzinger--Swineford Student Ability scales}
+\title{Holzinger--Swineford Student Ability Scales}
 \format{
 \describe{
 \item{holzinger_scales}{A factor listing the 4 scales: SPL, VBL, SPD and MTH,
@@ -14,6 +14,6 @@ for each variable.}
 holzinger_scales
 }
 \description{
-Holzinger--Swineford Student Ability scales
+Holzinger--Swineford Student Ability Scales
 }
 \keyword{datasets}

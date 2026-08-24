@@ -109,7 +109,7 @@ Rcpp::List PMnEigenpairs(const Eigen::Map<Eigen::MatrixXd>& M,
 // @param maxiterPM Maximum number of power-method iterations.
 //
 // @return List with:
-//   loadings: p x ncomps matrix of unit L2 loading vectors.
+//   weights: p x ncomps matrix of unit L2 weight vectors.
 //   scores: n x ncomps matrix of PC scores when M is a data matrix, otherwise
 //     an empty matrix.
 //   vexpPC: variance explained by the returned PCs, scaled by total variance.
@@ -136,15 +136,15 @@ Rcpp::List pcaC(const Eigen::Map<Eigen::MatrixXd>& M,
       Rcpp::stop("maxiterPM must be positive");
 
     Eigen::VectorXd eigenvalues;
-    Eigen::MatrixXd loadings;
+    Eigen::MatrixXd weights;
     Eigen::MatrixXd scores(0, 0);
     double totvar = 0.0;
 
     if (fat_matrix) {
-      // Fat path: solve PCA in row space and return column-space loadings.
+      // Fat path: solve PCA in row space and return column-space weights.
       if (PM) {
         Rcpp::List pm = PMnEigenpairs_fat(M, ncomps, epsPM, maxiterPM);
-        loadings = Rcpp::as<Eigen::MatrixXd>(pm["vec"]);
+        weights = Rcpp::as<Eigen::MatrixXd>(pm["vec"]);
         scores = Rcpp::as<Eigen::MatrixXd>(pm["scores"]);
         eigenvalues = Rcpp::as<Eigen::VectorXd>(pm["val"]);
         totvar = (M * M.transpose()).trace();
@@ -159,17 +159,17 @@ Rcpp::List pcaC(const Eigen::Map<Eigen::MatrixXd>& M,
         Eigen::MatrixXd row_vec = Eigen::MatrixXd(es.eigenvectors()).rowwise().reverse();
 
         totvar = eigenvalues.sum();
-        loadings = M.transpose() * row_vec.leftCols(ncomps);
+        weights = M.transpose() * row_vec.leftCols(ncomps);
 
-        // Normalize loadings and keep score signs consistent with them.
+        // Normalize weights and keep score signs consistent with them.
         for (int j = 0; j < ncomps; ++j) {
-          const double nrm = loadings.col(j).norm();
+          const double nrm = weights.col(j).norm();
           if (!std::isfinite(nrm) || nrm <= 0.0)
-            Rcpp::stop("pcaC: zero or non-finite loading norm in fat backend");
-          loadings.col(j) /= nrm;
+            Rcpp::stop("pcaC: zero or non-finite weight norm in fat backend");
+          weights.col(j) /= nrm;
 
-          if (loadings(0, j) < 0.0) {
-            loadings.col(j) = -loadings.col(j);
+          if (weights(0, j) < 0.0) {
+            weights.col(j) = -weights.col(j);
             row_vec.col(j) = -row_vec.col(j);
           }
         }
@@ -189,7 +189,7 @@ Rcpp::List pcaC(const Eigen::Map<Eigen::MatrixXd>& M,
       if (PM) {
         // Leading eigenpairs by power method and covariance deflation.
         Rcpp::List pm = PMnEigenpairs_tall(S, ncomps, epsPM, maxiterPM);
-        loadings = Rcpp::as<Eigen::MatrixXd>(pm["vec"]);
+        weights = Rcpp::as<Eigen::MatrixXd>(pm["vec"]);
         eigenvalues = Rcpp::as<Eigen::VectorXd>(pm["val"]);
         totvar = S.trace();
       } else {
@@ -201,20 +201,20 @@ Rcpp::List pcaC(const Eigen::Map<Eigen::MatrixXd>& M,
         eigenvalues = Eigen::VectorXd(es.eigenvalues()).reverse();
         Eigen::MatrixXd eigvec = Eigen::MatrixXd(es.eigenvectors()).rowwise().reverse();
         totvar = eigenvalues.sum();
-        loadings = eigvec.leftCols(ncomps);
+        weights = eigvec.leftCols(ncomps);
 
         for (int j = 0; j < ncomps; ++j) {
-          if (loadings(0, j) < 0.0)
-            loadings.col(j) = -loadings.col(j);
+          if (weights(0, j) < 0.0)
+            weights.col(j) = -weights.col(j);
         }
       }
 
       if (data_matrix)
-        scores = M * loadings;
+        scores = M * weights;
     }
 
     return Rcpp::List::create(
-      Rcpp::Named("loadings") = loadings,
+      Rcpp::Named("weights") = weights,
       Rcpp::Named("scores") = scores,
       Rcpp::Named("vexpPC") = eigenvalues.head(ncomps) / totvar,
       Rcpp::Named("eigenvalues") = eigenvalues,

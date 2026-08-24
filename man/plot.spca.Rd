@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.spca.R
 \name{plot.spca}
 \alias{plot.spca}
-\title{Plot an spca object}
+\title{Plot an \code{spca} Object}
 \usage{
 \method{plot}{spca}(
   x,
@@ -10,7 +10,7 @@
   plot_type = c("bars", "circular", "heatmap"),
   contributions = TRUE,
   only_nonzero = TRUE,
-  pc_loadings = NULL,
+  pc_weights = NULL,
   variable_groups = NULL,
   plot_title = NULL,
   return_plot = FALSE,
@@ -35,13 +35,13 @@ Plot type. Accepted values are \code{"bars"}, \code{"circular"}, and
 \code{"heatmap"}. The first character is enough for matching.}
 
 \item{contributions}{A logical value (default \code{TRUE}). If \code{TRUE},
-plot percentage contributions; otherwise, plot L2 unit loadings.}
+plot percentage contributions; otherwise, plot L2 unit weights.}
 
 \item{only_nonzero}{A logical value (default \code{TRUE}). If \code{TRUE},
-plot only variables with at least one nonzero loading.}
+plot only variables with at least one nonzero weight.}
 
-\item{pc_loadings}{A numeric matrix, data frame, or \code{NULL} (default
-\code{NULL}). Optional PCA loadings or contributions to plot together with
+\item{pc_weights}{A numeric matrix, data frame, or \code{NULL} (default
+\code{NULL}). Optional PCA weights or contributions to plot together with
 the SPCA values for comparison.}
 
 \item{variable_groups}{A vector, factor, or \code{NULL} (default
@@ -72,12 +72,12 @@ If \code{return_plot = TRUE}, returns the ggplot2 object. Otherwise,
 returns \code{NULL} invisibly.
 }
 \description{
-Plot the sparse loadings, or the corresponding percentage contributions, from
+Plot the sparse weights, or the corresponding percentage contributions, from
 an \code{spca} object. The plot can be shown as a bar plot, circular bar
 plot, or heatmap.
 }
 \details{
-If \code{pc_loadings} is supplied, SPCA and PCA values are plotted side by
+If \code{pc_weights} is supplied, SPCA and PCA values are plotted side by
 side for comparison. Circular bar plots are not implemented for this
 comparison, so a standard bar plot is used instead. In this case all
 variables are plotted, regardless of \code{only_nonzero}.
@@ -95,7 +95,7 @@ with black, \code{"printsafe"} is colorblind- and printer-friendly,
 \code{"bw"} uses gray tones, and \code{"ggplot"} uses the default ggplot2
 scale.
 \item \code{variable_names}: a character vector or \code{NULL} (default
-\code{NULL}). If \code{NULL}, row names of the loading matrix are used, or
+\code{NULL}). If \code{NULL}, row names of the weight matrix are used, or
 \code{V1}, ..., \code{Vp} if row names are missing. If set to
 \code{"none"}, variable names are not shown. If a character vector of
 length \eqn{p} is supplied, it is used as the variable names.
@@ -141,12 +141,15 @@ The \code{printsafe} palette corresponds to \code{OrRd} from
 }
 \seealso{
 Other spca: 
+\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
+\code{\link{change_sign}()},
+\code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{print.spca}()},
-\code{\link{show_contributions_spca}()},
+\code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

@@ -19,7 +19,7 @@ using Eigen::SelfAdjointEigenSolver;
 using Eigen::GeneralizedSelfAdjointEigenSolver;
 
 // Compute the first ncomps PCA eigenpairs for a fat data matrix.
-// The power method is applied in row space and loadings are mapped back to columns.
+// The power method is applied in row space and weights are mapped back to columns.
 Rcpp::List PMnEigenpairs_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
                           int ncomps,
                           double epsPM,
@@ -28,7 +28,7 @@ Rcpp::List PMnEigenpairs_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
   const int n = X.rows();
   const int p = X.cols();
   Eigen::MatrixXd K = X * X.transpose();
-  Eigen::MatrixXd loadings(p, ncomps);
+  Eigen::MatrixXd weights(p, ncomps);
   Eigen::MatrixXd scores(n, ncomps);
   Eigen::VectorXd eigval(ncomps);
 
@@ -42,7 +42,7 @@ Rcpp::List PMnEigenpairs_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
     Eigen::VectorXd a = X.transpose() * u / std::sqrt(val);
     const double anrm = a.norm();
     if (!std::isfinite(anrm) || anrm <= 0.0)
-      Rcpp::stop("PMnEigenpairs: zero or non-finite loading norm in fat backend");
+      Rcpp::stop("PMnEigenpairs: zero or non-finite weight norm in fat backend");
     a /= anrm;
 
     if (a(0) < 0.0) {
@@ -53,13 +53,13 @@ Rcpp::List PMnEigenpairs_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
     double defl_vexp = 0.0;
     deflT_rank1(u, K, defl_vexp);
 
-    loadings.col(j) = a;
+    weights.col(j) = a;
     scores.col(j) = std::sqrt(val) * u;
     eigval(j) = val;
   }
 
   return Rcpp::List::create(
-    Rcpp::Named("vec") = loadings,
+    Rcpp::Named("vec") = weights,
     Rcpp::Named("scores") = scores,
     Rcpp::Named("val") = eigval
   );
@@ -74,7 +74,7 @@ Rcpp::List PMnEigenpairs_fat(const Eigen::Ref<const Eigen::MatrixXd>& X,
 //   K <- P K P
 //   vexp = trace_before - trace_after
 //
-// @param x vector of loadings size p
+// @param x vector of weights size p
 // @param K covariance matrix, typically already deflated of previous components
 // @param vexp scalar (output)
 // 
@@ -416,7 +416,7 @@ void compute_vexp_cvexp_T_exact(const MatrixXd& scores,
 //   - does not write scores
 //   - does not take comp_number
 //
-// Used when only eigval and loadings are needed during variable selection.
+// Used when only eigval and weights are needed during variable selection.
 // =============================================================================
 static void cspcaTQ(const Eigen::Ref<const Eigen::MatrixXd>& X,
              const MatrixXd& K,
@@ -472,7 +472,7 @@ static void cspcaTQ(const Eigen::Ref<const Eigen::MatrixXd>& X,
 // @param PM Use power method (default TRUE).
 // @param epsPM Power-method tolerance (default 1e-5).
 // @param maxiterPM Power-method max iterations (default 150).
-// @return A list with selected indices, cardinality, loadings, vexp, cvexp,
+// @return A list with selected indices, cardinality, weights, vexp, cvexp,
 //   and r2.
 bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
                   const Eigen::MatrixXd& D,
@@ -703,7 +703,7 @@ bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
   indSorted = ind.head(cardt);
   std::sort(indSorted.data(), indSorted.data() + cardt);
   
-  // Final loadings and scores are always computed with cspcaTC().
+  // Final weights and scores are always computed with cspcaTC().
   // During forward cvexp selection, cspcaTQ() is used only when scores are not needed.
   
   bool singular_fit = false;

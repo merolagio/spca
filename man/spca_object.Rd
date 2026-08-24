@@ -2,7 +2,7 @@
 % Please edit documentation in R/spca-package.R
 \name{spca_object}
 \alias{spca_object}
-\title{Sparse principal component analysis object}
+\title{Sparse Principal Component Analysis Object}
 \description{
 Objects of class \code{spca} are returned by the fitting functions
 \code{spca()}, \code{pca()} and by \code{new_spca()}..
@@ -12,11 +12,11 @@ Objects of class \code{spca} are returned by the fitting functions
 An object of class \code{spca} is a list with the following elements:
 
 \describe{
-\item{loadings}{\eqn{p \times r} matrix of sparse loadings.}
-\item{contributions}{\eqn{p \times r} matrix of loadings scaled to unit
+\item{weights}{\eqn{p \times r} matrix of sparse weights.}
+\item{contributions}{\eqn{p \times r} matrix of weights scaled to unit
 \eqn{L_1} norm within each sPC.}
 \item{n_comps}{Number of sPCs.}
-\item{cardinality}{Number of nonzero loadings in each sPC.}
+\item{cardinality}{Number of nonzero weights in each sPC.}
 \item{vexp}{Variance explained by each sPC.}
 \item{vexp_pc}{Variance explained by the corresponding PCs.}
 \item{cvexp}{Cumulative variance explained by the sPCs.}
@@ -27,10 +27,10 @@ the corresponding PCs.}
 \item{cor_with_pc}{Correlation between each sPC and the
 corresponding PC.}
 \item{tot_var}{Total variance of the data.}
-\item{loadings_list}{List of nonzero loading vectors, one per sPC.}
+\item{weights_list}{List of nonzero weight vectors, one per sPC.}
 \item{spc_cor}{\eqn{n_comps \times n_comps} correlation matrix of the
 sPC scores.}
-\item{indices}{List of variable indices with nonzero loadings, one per sPC.}
+\item{indices}{List of variable indices with nonzero weights, one per sPC.}
 \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
 is supplied.}
 \item{parameters}{List of parameters used to compute the fit.}
@@ -40,13 +40,16 @@ is supplied.}
 
 \seealso{
 Other spca: 
+\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
+\code{\link{change_sign}()},
+\code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
-\code{\link{show_contributions_spca}()},
+\code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{summary.spca}()}
 }

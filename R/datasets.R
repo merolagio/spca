@@ -8,7 +8,7 @@
 
 # holzinger data=======================
 
-#' Holzinger--Swineford Student Ability data 
+#' Holzinger--Swineford Student Ability Data
 #'
 #' This dataset is based on the classic Holzinger and Swineford (1939) Student
 #'  Ability dataset.
@@ -57,7 +57,7 @@
 "holzinger"
 
 
-#' Holzinger--Swineford Student Ability scales
+#' Holzinger--Swineford Student Ability Scales
 #'
 ## #' @describeIn holzinger
 #' @format

@@ -2,7 +2,7 @@
 % Please edit documentation in R/spca.R
 \name{spca}
 \alias{spca}
-\title{Compute LS-SPCA components}
+\title{Compute LS-SPCA Components}
 \usage{
 spca(
   M,
@@ -17,9 +17,9 @@ spca(
   fixed_index_list = NULL,
   center_data = FALSE,
   scale_data = FALSE,
-  pm_loading = FALSE,
-  eps_pm_loading = 1e-04,
-  maxiter_pm_loading = 1000,
+  pm_weights = FALSE,
+  eps_pm_weights = 1e-04,
+  maxiter_pm_weights = 1000,
   pm_varsel = FALSE,
   eps_pm_varsel = 1e-04,
   maxiter_pm_varsel = 500
@@ -79,14 +79,14 @@ as a covariance/correlation matrix.}
 scale data-matrix columns before fitting. Ignored when \code{M} is treated
 as a covariance/correlation matrix.}
 
-\item{pm_loading}{A logical value (default \code{FALSE}). If \code{TRUE}, use
-the power method for PC and sparse-loading eigenvectors.}
+\item{pm_weights}{A logical value (default \code{FALSE}). If \code{TRUE}, use
+the power method for PC and sparse-weight eigenvectors.}
 
-\item{eps_pm_loading}{A positive numeric scalar (default \code{1e-4}).
-Convergence tolerance for \code{pm_loading}.}
+\item{eps_pm_weights}{A positive numeric scalar (default \code{1e-4}).
+Convergence tolerance for \code{pm_weights}.}
 
-\item{maxiter_pm_loading}{A positive integer scalar (default \code{1000}).
-Maximum number of iterations for \code{pm_loading}.}
+\item{maxiter_pm_weights}{A positive integer scalar (default \code{1000}).
+Maximum number of iterations for \code{pm_weights}.}
 
 \item{pm_varsel}{A logical value (default \code{FALSE}). If \code{TRUE}, use
 the power method inside variable selection.}
@@ -147,13 +147,16 @@ ho_uspca = spca(holzinger, n_comps = 4, method = "uspca",
 }
 \seealso{
 Other spca: 
+\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
+\code{\link{change_sign}()},
+\code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
-\code{\link{show_contributions_spca}()},
+\code{\link{show_weights}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}
 }

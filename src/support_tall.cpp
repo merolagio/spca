@@ -63,12 +63,12 @@ Rcpp::List PMnEigenpairs_tall(const Eigen::Ref<const Eigen::MatrixXd>& S,
 }
 
 // ==============================================
-// # Rank-1 deflates of the covariance matrix G of a new component with loadings a
+// # Rank-1 deflates of the covariance matrix G of a new component with weights a
 // ==============================================
-// @param a  ONLY NONZERO loadings
+// @param a  ONLY NONZERO weights
 // @param G = deflated covariance matrix (input and output)
 //   G <-- (G - Gaa'G/(a'Ga) 
-// @param a nonzero loadings of new component
+// @param a nonzero weights of new component
 // @param ind indices of nonzero positions
 // @param vexp output variance explained by new component 
 // @param eps tolerance for norm new component
@@ -117,11 +117,11 @@ double deflSC(
   return out;
 }
 
-// Deflates the covariance matrix G and the M = G'G (deflated product matrix //  both are input and output pass only a nonzero loads
+// Deflates the covariance matrix G and the M = G'G (deflated product matrix //  both are input and output pass only a nonzero weightss
 // @param G <-- (G - Gaa'G/(a'Ga) // deflated S matrix
 // @param M deflated product matrix
 //  M <-- M - Maa'G/(a'Ga) - 2Gaa'M/(a'Ga) + Gaa'Maa'G/(a'Ga)^2
-// @param a  ONLY NONZERO loadings
+// @param a  ONLY NONZERO weights
 // @param ind indices of nonzero positions
 // @param vexp output variance explained by new component 
 // @param eps tolerance for norm new component
@@ -195,7 +195,7 @@ double deflSC(
 } 
 
 // computes the extra variance explained by a set of components
-// @param A full cardinality loading matrix including current
+// @param A full cardinality weight matrix including current
 // @param S covariance matrix
 //
 // @details extra variance explained is computed by difference 
@@ -264,7 +264,7 @@ Rcpp::List makeVexpSC(
 
 
 // computes  cum variance explained by one components
-// @param A full cardinality loading matrix including current
+// @param A full cardinality weight matrix including current
 // @param S covariance matrix
 // @param cvexp input and output full cumulative vexp
 // @returns 
@@ -438,15 +438,15 @@ void uspcaC(
 }
 
 // cspca
-// computes cSPCA loadings
+// computes cSPCA weights
 // 
 // @param S is original cov matrix S = X'X
 // @param M = G'G  where G is the deflated covariance matrix
 // @param indj vector of indices of the variables selected
 //
-// computes sparse loadings, a, as: define Hdot = H[, indj] then    
+// computes sparse weights, a, as: define Hdot = H[, indj] then    
 // Xdot'QQ'Xdot a = Xdot'Xdot lambda a  <==> M[indj, indj] a = lambda S[indj, indj] a 
-// output by reference a loadings, eigval = la is vexp (approximated if sPCs correlated)
+// output by reference a weights, eigval = la is vexp (approximated if sPCs correlated)
 // singular (output) true if the eigen step failed
  // 
  // @noRd
@@ -486,7 +486,7 @@ void uspcaC(
       maked_loopColF(M, Dd, indt); // this makes G[, indj]'G[, indj] on fly from deflated S
     
   try {
-    //  compute loadings        
+    //  compute weights        
     if (PM){
       a.head(cardt) =  GeigvecPMC(Dd, Sd, eigval, epsPM, maxiter);
       
@@ -519,7 +519,7 @@ void uspcaC(
 // si is first eigvec of S scaled to norm sqrt(lambda)
 // indj the indices of the variables selected
 //
-// computes sparse loadings, a, by simply projecting the PC u onto Xd = X[, indj]
+// computes sparse weights, a, by simply projecting the PC u onto Xd = X[, indj]
 // uses the trick that Xd'u = lambda v[indj] with lambda = eigaval and v eigenvector of S
 // singular (output) true if the submatrix inversion failed
 //
@@ -639,14 +639,14 @@ static void remove_index_pos(
 // eigval (output) approximate variance explained
 // indj indices of selected variables (0-based)
 // cardt cardinality of selected subset
-// a (output) loadings (only first cardt elements used)
+// a (output) weights (only first cardt elements used)
 // singular (output) true if the eigen step failed
 //
 // Singularity policy:
 //   - No separate rank check is used in this layer.
 //   - The generalized-eigen computation is attempted directly.
 //   - If it fails numerically, singular is set to true, eigval is set to 0,
-//     the returned loadings are zeroed, and the caller decides whether to skip
+//     the returned weights are zeroed, and the caller decides whether to skip
 //     the candidate subset or treat the failure as fatal for the current stage.
 static void cspca_varsel(
     const Eigen::Ref<const Eigen::MatrixXd>& S,
@@ -760,7 +760,7 @@ static double compute_subset_cvexp(
     int comp_number,
     double prev_cvexp,
     MatrixXd& B,
-    VectorXd& loadings_tmp,
+    VectorXd& weights_tmp,
     bool& singmat,
     bool exact_cvexp,
     bool PMSPC,
@@ -775,7 +775,7 @@ static double compute_subset_cvexp(
   double cvexp_val = 0.0;
 
   cspca_varsel(S, M, eigval,
-               indices, cardinality, loadings_tmp, singmat,
+               indices, cardinality, weights_tmp, singmat,
                PMSPC, epsPMSPC, maxiterPMSPC);
 
   if (singmat)
@@ -786,7 +786,7 @@ static double compute_subset_cvexp(
   if (exact_cvexp && comp_number > 0) {
     B.col(comp_number).setZero();
     for (int i = 0; i < cardinality; i++)
-      B(indices(i), comp_number) = loadings_tmp(i);
+      B(indices(i), comp_number) = weights_tmp(i);
 
     MatrixXd Bleft = B.leftCols(comp_number + 1);
     makeCvexpOneCompSC_int(Bleft, S, cvexp_val);
@@ -826,13 +826,13 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
                           VectorXi& indices,
                           int& cardinality,
                           double& criterion_value,
-                          VectorXd& loadings_out,
+                          VectorXd& weights_out,
                           double& vexp_out)
 {
   int p = S.cols();
   double target = (stop_criterion == 0) ? alpha : alpha * target_cvexp;
   criterion_value = (stop_criterion == 0) ? 0.0 : prev_cvexp;
-  VectorXd loadings_tmp(p);
+  VectorXd weights_tmp(p);
 
   (void) pc_vexp;
 
@@ -874,7 +874,7 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
         trial(cardinality) = cand;
         bool singmat = false;
         double trial_cvexp = compute_subset_cvexp(S, M, trial, cardinality + 1, p, comp_number,
-                                                  prev_cvexp, B, loadings_tmp, singmat,
+                                                  prev_cvexp, B, weights_tmp, singmat,
                                                   exact_cvexp, PMSPC,
                                                   epsPMSPC, maxiterPMSPC);
         if (!singmat) {
@@ -928,7 +928,7 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
             } else {
               bool singmat = false;
               trial_score = compute_subset_cvexp(S, M, trial, ntrial, p, comp_number,
-                                                 prev_cvexp, B, loadings_tmp, singmat,
+                                                 prev_cvexp, B, weights_tmp, singmat,
                                                  exact_cvexp, PMSPC,
                                                  epsPMSPC, maxiterPMSPC);
               if (singmat)
@@ -962,11 +962,11 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
         Rcpp::warning("varsel_fbs_r2C: target not reached");
     }
 
-    // final cspca_varsel to get loadings (CVEXP mode)
+    // final cspca_varsel to get weights (CVEXP mode)
     if (stop_criterion == 1 && cardinality > 0) {
       bool singular = false;
       cspca_varsel(S, M, vexp_out,
-                   indices, cardinality, loadings_out, singular,
+                   indices, cardinality, weights_out, singular,
                    PMSPC, epsPMSPC, maxiterPMSPC);
       if (singular) {
         Rcpp::warning("varsel_fbs_r2C: final selected subset is singular");
@@ -990,7 +990,7 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
   } else {
     bool singmat = false;
     criterion_value = compute_subset_cvexp(S, M, indices, cardinality, p, comp_number,
-                                           prev_cvexp, B, loadings_tmp, singmat,
+                                           prev_cvexp, B, weights_tmp, singmat,
                                            exact_cvexp, PMSPC,
                                            epsPMSPC, maxiterPMSPC);
     if (singmat) {
@@ -1022,7 +1022,7 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
       } else {
         bool singmat = false;
         trial_score = compute_subset_cvexp(S, M, trial, ntrial, p, comp_number,
-                                           prev_cvexp, B, loadings_tmp, singmat,
+                                           prev_cvexp, B, weights_tmp, singmat,
                                            exact_cvexp, PMSPC,
                                            epsPMSPC, maxiterPMSPC);
         if (singmat)
@@ -1048,7 +1048,7 @@ static int varsel_fbs_r2C(const Eigen::Ref<const Eigen::MatrixXd>& S,
   if (stop_criterion == 1 && cardinality > 0) {
     bool singular = false;
     cspca_varsel(S, M, vexp_out,
-                 indices, cardinality, loadings_out, singular,
+                 indices, cardinality, weights_out, singular,
                  PMSPC, epsPMSPC, maxiterPMSPC);
     if (singular) {
       Rcpp::warning("varsel_fbs_r2C: final selected subset is singular");
@@ -1087,7 +1087,7 @@ static int varsel_fwd_cvexpC(const Eigen::Ref<const Eigen::MatrixXd>& S,
                              VectorXi& indices,
                              int& cardinality,
                              double& cur_cvexp,
-                             VectorXd& loadings_out,
+                             VectorXd& weights_out,
                              double& vexp_out)
 {
   const int p = S.cols();
@@ -1121,7 +1121,7 @@ static int varsel_fwd_cvexpC(const Eigen::Ref<const Eigen::MatrixXd>& S,
   cardinality = 1;
   
   // For a single variable generalized eigensolver is needed:
-  // eigval = M(i, i) / S(i, i), loading = 1
+  // eigval = M(i, i) / S(i, i), weight = 1
   double eigtmp = M(best0, best0) / S(best0, best0);
   if (!std::isfinite(eigtmp) || eigtmp <= 0.0) {
     Rcpp::warning("varsel_fwd_cvexpC: invalid initial single-variable cvexp");
@@ -1131,10 +1131,10 @@ static int varsel_fwd_cvexpC(const Eigen::Ref<const Eigen::MatrixXd>& S,
   
   cur_cvexp = prev_cvexp + eigtmp;
   vexp_out = eigtmp;
-  loadings_out.setZero();
-  loadings_out(0) = 1.0;
+  weights_out.setZero();
+  weights_out(0) = 1.0;
   
-  VectorXd loadings_tmp(p);
+  VectorXd weights_tmp(p);
 
   
 
@@ -1194,8 +1194,8 @@ static int varsel_fwd_cvexpC(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
     cur_cvexp = prev_cvexp + best_eigval;
     vexp_out = best_eigval;
-    loadings_out.setZero();
-    loadings_out.head(cardinality) = best_a.head(cardinality);
+    weights_out.setZero();
+    weights_out.head(cardinality) = best_a.head(cardinality);
 
     if (cur_cvexp >= target && cardinality >= mincard)
       reached = true;
@@ -1227,7 +1227,7 @@ int varsel_fbsC(const Eigen::Ref<const Eigen::MatrixXd>& S,
                      VectorXi& indices,
                      int& cardinality,
                      double& criterion_value,
-                     VectorXd& loadings_out,
+                     VectorXd& weights_out,
                      double& vexp_out,
                      double alpha,
                      int selection_method,
@@ -1260,14 +1260,14 @@ int varsel_fbsC(const Eigen::Ref<const Eigen::MatrixXd>& S,
                           rank_tol, mincard, stop_criterion,
                           M, target_cvexp, prev_cvexp, exact_cvexp, comp_number, B,
                           PMSPC, epsPMSPC, maxiterPMSPC,
-                          indices, cardinality, criterion_value, loadings_out, vexp_out);
+                          indices, cardinality, criterion_value, weights_out, vexp_out);
   }
 
   if (selection_method == 0) {
     return varsel_fwd_cvexpC(S, si, M, target_cvexp, prev_cvexp, alpha,
                              mincard, rank_tol, comp_number,
                              PMSPC, epsPMSPC, maxiterPMSPC,
-                             indices, cardinality, criterion_value, loadings_out, vexp_out);
+                             indices, cardinality, criterion_value, weights_out, vexp_out);
   }
 
   throw std::invalid_argument("intensive = TRUE is only available for selection_method = 0 (forward)");

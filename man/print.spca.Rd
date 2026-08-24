@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.spca.R
 \name{print.spca}
 \alias{print.spca}
-\title{Print an spca object}
+\title{Print an \code{spca} Object}
 \usage{
 \method{print}{spca}(
   x,
@@ -24,15 +24,15 @@ Components to print. If \code{NULL}, all components are printed. If a
 single integer is supplied, components \code{1:cols} are printed.}
 
 \item{only_nonzero}{A logical value (default \code{TRUE}). If \code{TRUE},
-print only variables with at least one loading or contribution whose
+print only variables with at least one weight or contribution whose
 absolute value is greater than or equal to \code{thresh_card}.}
 
 \item{contributions}{A logical value (default \code{TRUE}). If \code{TRUE},
-print loadings scaled to unit \eqn{L_1} norm as percentage contributions;
-otherwise, print L2 unit loadings.}
+print weights scaled to unit \eqn{L_1} norm as percentage contributions;
+otherwise, print L2 unit weights.}
 
 \item{digits}{An integer scalar (default \code{3}). Number of decimal places
-used when printing loadings. Contributions are printed as percentages with
+used when printing weights. Contributions are printed as percentages with
 one decimal place.}
 
 \item{thresh_card}{A numeric scalar (default \code{1e-07}). Values with
@@ -54,7 +54,7 @@ If \code{return_table = TRUE}, returns the formatted character
 matrix. Otherwise, returns \code{NULL} invisibly.
 }
 \description{
-Print sparse loadings, or the corresponding percentage contributions, from an
+Print sparse weights, or the corresponding percentage contributions, from an
 \code{spca} object. By default, variables with only zero entries are omitted,
 and cumulative explained variance is shown at the bottom of the table.
 }
@@ -67,12 +67,15 @@ print(ho_cspca, contributions = FALSE, digits = 4)
 }
 \seealso{
 Other spca: 
+\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
+\code{\link{change_sign}()},
+\code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
-\code{\link{show_contributions_spca}()},
+\code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

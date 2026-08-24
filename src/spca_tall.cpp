@@ -96,7 +96,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 // Least-Squares Sparse Principal Component Analysis, tall backend
 //
 // Computes LS-SPCA components from a covariance/correlation matrix. The backend
-// supports cSPCA, uSPCA, and pSPCA loadings, fixed component supports, several
+// supports cSPCA, uSPCA, and pSPCA weights, fixed component supports, several
 // variable-selection algorithms, and optional power-method eigensolvers.
 //
 // Parameters
@@ -109,7 +109,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 // stop_criterion: Variable-selection stopping rule. 0 = squared correlation,
 //   1 = cumulative variance explained.
 // exact_cvexp: If true, use CVEXP values accumulated during the component loop.
-//   If false, recompute VEXP and CVEXP from the final loading matrix before
+//   If false, recompute VEXP and CVEXP from the final weight matrix before
 //   returning.
 // alpha: Target proportion used by variable selection.
 // ncompbycvexp: Target cumulative variance explained for automatic component
@@ -120,12 +120,12 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 //   components.
 // cardvec_in: Optional cardinalities for fixed variable indices.
 // PMPC: Use the power method for PC eigenvectors.
-// PMS: Use the power method for sparse-loading eigenvectors in variable
-//   selection and loading computation.
+// PMS: Use the power method for sparse-weight eigenvectors in variable
+//   selection and weight computation.
 // epsPMPC: Convergence tolerance for PC power-method iterations.
-// epsPMS: Convergence tolerance for sparse-loading power-method iterations.
+// epsPMS: Convergence tolerance for sparse-weight power-method iterations.
 // maxiterPMPC: Maximum number of PC power-method iterations.
-// maxiterPMS: Maximum number of sparse-loading power-method iterations.
+// maxiterPMS: Maximum number of sparse-weight power-method iterations.
 // rank_tol: Singularity tolerance for deflated covariance diagonals.
 //
 // Variable-selection combinations
@@ -140,7 +140,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 // 3   0   Not allowed
 //
 // Returns
-// A list with loadings, loadlist, ncomps, ind, card, vexp, cvexp, vexpPC, 
+// A list with weights, weightlist, ncomps, ind, card, vexp, cvexp, vexpPC, 
 // cor_comps sPCs correlation matrix, r,
 // totvar, method, varSelection, Time, Time_colnames, timevec, and timecomp.
 // The element r contains signed correlations between each sPC and the
@@ -234,7 +234,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
    Eigen::VectorXd a(p);
    Eigen::MatrixXd A = Eigen::MatrixXd::Zero(p, ncomps);
-   Rcpp::List indout(ncomps), loadlist(ncomps);
+   Rcpp::List indout(ncomps), weightlist(ncomps);
 
    Eigen::VectorXd vexp = Eigen::VectorXd::Zero(ncomps);
    Eigen::VectorXd cvexp = vexp;
@@ -271,7 +271,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
    // varsel_fbsC output variables
    double criterion_value = 0.0;
-   Eigen::VectorXd loadings_out = Eigen::VectorXd::Zero(p);
+   Eigen::VectorXd weights_out = Eigen::VectorXd::Zero(p);
    double vexp_out = 0.0;
    int varsel_reached = 0;
 
@@ -281,7 +281,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
    Eigen::MatrixXd M_varsel = Eigen::MatrixXd::Zero(1, 1);
    if (stop_criterion == 1)
      M_varsel = S * S;
-   // B = loading matrix for exact_cvexp
+   // B = weight matrix for exact_cvexp
    Eigen::MatrixXd B_varsel = Eigen::MatrixXd::Zero(p, ncomps);
 
    timer.step("start") ;   // START TIMING COMPONENTS ====================
@@ -362,7 +362,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
          // reset outputs
          criterion_value = 0.0;
-         loadings_out.setZero();
+         weights_out.setZero();
          vexp_out = 0.0;
 
          // translate selection_method == 3 to intensive forward for varsel_fbsC
@@ -372,7 +372,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
          varsel_reached = varsel_fbsC(
            S, si,
            // outputs
-           indj, cardt, criterion_value, loadings_out, vexp_out,
+           indj, cardt, criterion_value, weights_out, vexp_out,
            // control parameters
            alpha, varsel_method, stop_criterion,
            varsel_intensive, exact_cvexp,
@@ -383,9 +383,9 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
            rank_tol, PMS, epsPMS, maxiterPMS);
 
          // when selection_method == 3 (intensive forward CVEXP),
-         // loadings and eigval are computed during selection
+         // weights and eigval are computed during selection
          if (selection_method == 3 && cardt > 0) {
-           a.head(cardt) = loadings_out.head(cardt);
+           a.head(cardt) = weights_out.head(cardt);
            eigval = vexp_out;
          }
        }// end variable selection
@@ -399,8 +399,8 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
        card(j) = cardt;
 
-       // create submatrices for computing loadings
-       // when selection_method == 3 (intensive forward CVEXP), loadings (a) and
+       // create submatrices for computing weights
+       // when selection_method == 3 (intensive forward CVEXP), weights (a) and
        // eigval are already computed by varsel_fbsC via cspca_varsel
        if (!((selection_method == 3) && (method[j] == "c"))) {
          bool singular = false;
@@ -432,17 +432,17 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
            Rcpp::stop("error in PSPCA");
          }
        }
-       } // end loading computation (not intensive cvexp)
+       } // end weight computation (not intensive cvexp)
 
          timer.step(stringa + "Component") ; // ---------------- TIMER ==================
 
          //    Rcout << "fatte " << ncomps << " components" << endl;
-         // save loadings in column j
+         // save weights in column j
          a.head(cardt) = a.head(cardt).array()/a.head(cardt).norm();
          for (int i = 0; i < cardt; i++){
            A(indj(i), j) = a(i);
          }
-//  change sign to loadings if needed, Uses max loading but avoids
+//  change sign to weights if needed, Uses max weight but avoids
 // matrix multiplication. Not perfect can be fixed in R
 
 
@@ -461,13 +461,13 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
          if (r(j) < -1.0) r(j) = -1.0;
          if (r(j) > 1.0) r(j) = 1.0;
 
-         // save loadings in list
+         // save weights in list
 
          Eigen::VectorXi indt(indj);
          std::sort(indt.data(),indt.data() + cardt);
          indout[j] = indt.head(cardt).array() + 1;
 
-         loadlist[j] = a.head(cardt);
+         weightlist[j] = a.head(cardt);
          indjm1.head(cardt) = indj.head(cardt);
          cardtm1 = cardt;
          nc = nc + 1;
@@ -504,7 +504,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
          else
            cvexp(j) = vexp(j);
 
-         // update column j of B_varsel with current loadings for exact_cvexp
+         // update column j of B_varsel with current weights for exact_cvexp
          if (exact_cvexp)
            B_varsel.col(j) = A.col(j);
 
@@ -535,11 +535,11 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        for(int j = 0; j < 4; j++)
          Ti(i, j) =  tt(i*4 + j);
      Rcpp::CharacterVector Ti_colnames = Rcpp::CharacterVector::create(
-       "PC", "varsel", "loadings", "deflation");
+       "PC", "varsel", "weights", "deflation");
 
      // returned vexp/cvexp come directly from the fitting loop when
      // exact_cvexp = TRUE; otherwise recompute them exactly from the final
-     // loading matrix before returning.
+     // weight matrix before returning.
      Eigen::VectorXd vexp_final(nc);
      Eigen::VectorXd cvexp_final(nc);
      if (exact_cvexp) {
@@ -580,8 +580,8 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
        return
        List::create(
-         Named("loadings")= A.topLeftCorner(p,nc),
-         Named("loadlist") = loadlist[idx],
+         Named("weights")= A.topLeftCorner(p,nc),
+         Named("weightlist") = weightlist[idx],
          Named("ncomps") = nc,
          Named("ind") = indout[idx],
          Named("card") = card.head(nc),

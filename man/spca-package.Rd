@@ -16,7 +16,7 @@ This release  accompanies the related article and is intended  to support full
 reproduction of the results reported therein.
 
 Computation relies on efficient C++ routines and includes multiple options
-for variable selection and sparse loading estimation.
+for variable selection and sparse weight estimation.
 
 Fitting functions
 \itemize{
@@ -40,11 +40,11 @@ S3 methods for objects of class \code{spca} include:
 \item \code{\link[=is.spca]{is.spca()}} Verifies if an object inherits from class \code{spca}.
 \item \code{\link[=compare_spca]{compare_spca()}} Compares two or more LS-SPCA solutions numerically
 and visually.
-\item \code{\link[=new_spca]{new_spca()}} Creates an \code{spca} object from a set of loadings.
-\item \code{\link[=aggregate_by_group]{aggregate_by_group()}} Sums loadings or contributions wrt an index vector.
+\item \code{\link[=new_spca]{new_spca()}} Creates an \code{spca} object from a set of weights.
+\item \code{\link[=aggregate_by_group]{aggregate_by_group()}} Sums weights or contributions wrt an index vector.
 \item \code{\link[=show_contributions_spca]{show_contributions_spca()}} Prints the nonzero contributions
 separately for each sPC.
-\item \code{\link[=change_loadings_sign_spca]{change_loadings_sign_spca()}} Changes the sign of the loadings and all
+\item \code{\link[=change_weights_sign_spca]{change_weights_sign_spca()}} Changes the sign of the weights and all
 related elements in an 'spca\code{ object}.
 \item \code{\link[=spca_screeplot]{spca_screeplot()}} and  \code{\link[=wachter_qqplot]{wachter_qqplot()}} Diagnostic plots usefull to
 determine the number of components to retain in PCA.
@@ -52,7 +52,7 @@ determine the number of components to retain in PCA.
 }
 \references{
 Merola, G. M. (2015). Least Squares Sparse Principal Component Analysis:
-a Backward Elimination approach to attain large loadings.
+a Backward Elimination approach to attain large weights.
 \emph{Australia & New Zealand Journal of Statistics}, 57, 391--429.
 \doi{10.1111/anzs.12128}
 

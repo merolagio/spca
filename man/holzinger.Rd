@@ -3,7 +3,7 @@
 \docType{data}
 \name{holzinger}
 \alias{holzinger}
-\title{Holzinger--Swineford Student Ability data}
+\title{Holzinger--Swineford Student Ability Data}
 \format{
 \describe{
 \item{holzinger}{A numeric data frame with 145 rows and 12 variables.

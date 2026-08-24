@@ -2,7 +2,7 @@
 % Please edit documentation in R/compare_spca.R
 \name{compare_spca}
 \alias{compare_spca}
-\title{Compare two or more spca solutions}
+\title{Compare Two or More \code{spca} Solutions}
 \usage{
 compare_spca(
   obj_list,
@@ -10,7 +10,7 @@ compare_spca(
   contributions = TRUE,
   only_nonzero = TRUE,
   variable_groups = NULL,
-  plot_loadings = TRUE,
+  plot_weights = TRUE,
   plot_type = c("bars", "points"),
   methods_names = NULL,
   x_axis_var_names = TRUE,
@@ -18,7 +18,7 @@ compare_spca(
   color_scale = c("ggplot", "cbb", "printsafe", "bw"),
   col_short_names = TRUE,
   print_tables = TRUE,
-  print_loadings = TRUE,
+  print_weights = TRUE,
   show_plot = TRUE,
   return_tables = FALSE,
   return_plot = FALSE
@@ -32,18 +32,18 @@ Number of components to compare. If \code{NULL}, the minimum number of
 available components across objects is used.}
 
 \item{contributions}{A logical value (default \code{TRUE}). If \code{TRUE},
-compare percentage contributions; otherwise, compare loadings.}
+compare percentage contributions; otherwise, compare weights.}
 
 \item{only_nonzero}{A logical value (default \code{TRUE}). If \code{TRUE},
-only variables with at least one nonzero loading or contribution are
+only variables with at least one nonzero weight or contribution are
 plotted or printed.}
 
 \item{variable_groups}{Optional variable grouping (default \code{NULL}). Can
 be a list of indices, a vector, or a factor with one entry per variable.
-Used to draw vertical group-separating lines in the loadings plot.}
+Used to draw vertical group-separating lines in the weights plot.}
 
-\item{plot_loadings}{A logical value (default \code{TRUE}). If \code{TRUE},
-plot the loadings or contributions.}
+\item{plot_weights}{A logical value (default \code{TRUE}). If \code{TRUE},
+plot the weights or contributions.}
 
 \item{plot_type}{A character vector (default first element \code{"bars"}).
 Values starting with \code{"b"} use bars; values starting with \code{"p"}
@@ -53,7 +53,7 @@ use points. Other values default to bars.}
 one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.}
 
 \item{x_axis_var_names}{A logical value (default \code{TRUE}). If
-\code{TRUE}, show variable names on the x axis of the loadings plot.}
+\code{TRUE}, show variable names on the x axis of the weights plot.}
 
 \item{col_grouplines}{A character scalar (default \code{"red"}). Color of the
 vertical group lines.}
@@ -67,28 +67,28 @@ use short component names such as \code{C1.M1}; otherwise, use names such
 as \code{C1.object_name}.}
 
 \item{print_tables}{A logical value (default \code{TRUE}). If \code{FALSE},
-suppress table printing. Takes priority over \code{print_loadings}.}
+suppress table printing. Takes priority over \code{print_weights}.}
 
-\item{print_loadings}{A logical value (default \code{TRUE}). If \code{TRUE},
-print the loadings or contributions table.}
+\item{print_weights}{A logical value (default \code{TRUE}). If \code{TRUE},
+print the weights or contributions table.}
 
 \item{show_plot}{A logical value (default \code{TRUE}). If \code{TRUE}, show
-the loadings or contributions plot.}
+the weights or contributions plot.}
 
 \item{return_tables}{A logical value (default \code{FALSE}). If \code{TRUE},
-return the loadings or contributions matrix and the raw summary matrix.}
+return the weights or contributions matrix and the raw summary matrix.}
 
 \item{return_plot}{A logical value (default \code{FALSE}). If \code{TRUE},
-return the loadings or contributions plot.}
+return the weights or contributions plot.}
 }
 \value{
 Invisibly returns \code{NULL} by default. If
 \code{return_tables = TRUE}, returns a list containing the comparison
 matrix and summary matrix. If \code{return_plot = TRUE}, the returned
-object also includes the loadings or contributions plot.
+object also includes the weights or contributions plot.
 }
 \description{
-Plot loadings and print summary statistics for two or more \code{spca}
+Plots weights and print summary statistics for two or more \code{spca}
 objects side by side. For the meaning of each summary statistic, see
 \code{\link{summary.spca}}. Tables and plots can optionally be returned.
 }
@@ -101,12 +101,15 @@ compare_spca(list(ho_uspca, ho_cspca))
 }
 \seealso{
 Other spca: 
+\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
+\code{\link{change_sign}()},
+\code{\link{change_weights_sign_spca}()},
 \code{\link{is.spca}()},
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
-\code{\link{show_contributions_spca}()},
+\code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}
