@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-"
 )
-#devtools::load_all(".")
+devtools::load_all(".")
 #  ,out.width = "60%"
 ```
 <img src = "man/figures/spca_logo_octagon.png" align = "left" height = "80" alt = "spca logo" />
