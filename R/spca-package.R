@@ -14,7 +14,7 @@
 #' Computation relies on efficient C++ routines and includes multiple options
 #'  for variable selection and sparse weight estimation.
 #'
-#' strong{Fitting functions}
+#' \strong{Fitting functions}
 #' * [spca()] Computes LS-SPCA solutions from a data or covariance/correlation
 #'   matrix. It returns a \link{spca_object} of class `spca`.
 #' * [pca()] Computes PCA solutions from a data or covariance/correlation
