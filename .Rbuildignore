@@ -10,6 +10,8 @@
 Document_output.txt$
 Compile_output.txt$
 change_log.txt$
+test_res.txt$
+ext_chunks.R$
 ^README\.Rmd$
 ^README_cache$
 ^Vignettes\spca_extended_vignette.bbl$

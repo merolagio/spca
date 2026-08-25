@@ -5,6 +5,8 @@
 *Compile_output*.txt
 *Rcpp_Output*.txt
 *Document_output*.txt
+test_res.txt
+ext_chunks.R
 Github_commands.R
 remove_test.R
 Ignore
