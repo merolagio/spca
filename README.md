@@ -17,8 +17,8 @@ Active](https://img.shields.io/badge/status-active-success.svg)](https://github.
 
 This package contains functions to compute, print and plot Least Squares
 Sparse Principal Components Analysis (LS-SPCA). Methodological details,
-references and full presentation can be found in the extended_vignette
-document.
+references and full presentation can be found in the spca_extended
+vignette.
 
 ## Installation
 
@@ -40,12 +40,19 @@ remotes::install_github("merolagio/spca")
 
 The main function *spca()* computes the sparse loadings and various
 statistics, such as the variance explained by each sparse component
-(sPC). print, summery and plot methods are available. PCA solutions
-stored as an `*spca*` object cn be obtained with the function *pca()*.
+(sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is
+chosen by examining visually the eigenvalues of the covariance matrix.
+These can be computed and stored in a compatible object of class *spca*
+with the function *pca()*.
 
-Utilities available are
-*compare_spca()*`(to compare two or more spca solutions), *aggregate_by_scale()* (to visualize the contribution by scale) and *new.spca()* (to create an`spca\`
-object from a set of loadings).
+Different methods can be applied to class *spca* objects: additionally
+to standard *print()*, *summary()* and *plot()*, also
+*aggregate_by_group()* (to visualize the contribution by scale),
+*change_sign()* and *show_weights()* are available.
+
+Utilities available are *compare_spca()* (to compare two or more spca
+solutions) and *new.spca()* (to create an *spca* object from a set of
+loadings) are available.
 
 ## Example
 
@@ -78,7 +85,8 @@ summary(ho_pca,cols = 10)
 ```
 
 <img src="man/figures/README-pca_checks-1.png" width="47%" /><img src="man/figures/README-pca_checks-2.png" width="47%" />
-We settle for 4 components
+
+We can settle for 4 components
 
 ### Compute the sparse loadings
 
@@ -88,7 +96,7 @@ of cumulative variance explained (VEXP) by the sPCs realtive to that
 explained by the corresponding PCs; *n_comps* the number of components
 to compute; *method* the LS-SPCA method to use (“u” for uncorrelated,
 “c” for correlated \[default\]) and “p” for projection; *var_selection*
-(“forward” \[default\], “stepwise”, or “backward”). See the `**spca**`
+(“forward” \[default\], “stepwise”, or “backward”). See the **spca**\`
 help for details on these parameters and more.
 
 The following command computes four sPCs with default settings: *alpha =
@@ -108,7 +116,7 @@ the loadings scaled to have sum of their absolute values equal to 1.
 
 ``` r
 myspca # print
-#> Contributions (%)
+#> Percentage contributions
 #>             sPC1   sPC2   sPC3   sPC4
 #> visual     11.9%         13.2% -24.2%
 #> cubes                    22.1%  20.8%
@@ -143,12 +151,15 @@ plot(myspca, plot_type = "bar")
 ``` r
 
 #sPCs correlation
-round(myspca$spc_cor, 2)
-#>       sPC1  sPC2  sPC3  sPC4
-#> sPC1  1.00  0.03 -0.01  0.02
-#> sPC2  0.03  1.00 -0.01 -0.01
-#> sPC3 -0.01 -0.01  1.00 -0.01
-#> sPC4  0.02 -0.01 -0.01  1.00
+show_correlations(myspca)
+#>         sPC1  sPC2  sPC3  sPC4
+#> sPC1    1.00  0.03 -0.01  0.02
+#> sPC2    0.03  1.00 -0.01 -0.01
+#> sPC3   -0.01 -0.01  1.00 -0.01
+#> sPC4    0.02 -0.01 -0.01  1.00
+#>        ----- ----- ----- -----
+#> sPC-PC  0.98  0.97  0.98 -0.88
+#round(myspca$spc_cor, 2)
 ```
 
 Other plot types are available.
@@ -183,8 +194,7 @@ plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = 
 
 ``` r
 
-aggregate_by_group(myspca,groups = holzinger_scales)
-#> [1] "percentage contributions"
+aggregate_by_group(myspca, groups = holzinger_scales)
 #>      sPC1   sPC2   sPC3  sPC4
 #> SPL 26.0%         52.4% -3.5%
 #> VBL 19.6% -44.5% -29.1%      
@@ -206,7 +216,6 @@ compare_spca(obj_list = list(myspca, myspca90),
 
 ![](man/figures/README-spca90-1.png)<!-- -->
 
-    #> [1] "Percentage Contributions"
     #>           C1.M1 C1.M2 C2.M1 C2.M2 C3.M1 C3.M2 C4.M1 C4.M2
     #> visual     11.9                    13.2  13.3 -24.2      
     #> cubes                              22.1  23.4  20.8  21.5
@@ -221,7 +230,6 @@ compare_spca(obj_list = list(myspca, myspca90),
     #> numeric                                        17.5  12.9
     #> series     16.1  21.9                               -10.4
     #>  
-    #> [1] Summary statistics
     #>        C1.M1  C1.M2  C2.M1  C2.M2  C3.M1  C3.M2  C4.M1  C4.M2 
     #> Vexp    38.6%  37.3%  13.3%  13.2%  10.4%  10.1%   6.4%   6.6%
     #> Cvexp   38.6%  37.3%  51.9%  50.5%  62.3%  60.6%  68.8%  67.2%
