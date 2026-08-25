@@ -12,14 +12,11 @@ show_weights(spca_obj, ...)
   cols = NULL,
   contribution = TRUE,
   print_list = TRUE,
-  return_list = FALSE,
-  ...
+  return_list = FALSE
 )
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
-
-\item{...}{Unused.}
 
 \item{cols}{An integer vector or \code{NULL}. Components to show.}
 
@@ -48,6 +45,7 @@ Other spca:
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_correlations}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

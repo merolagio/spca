@@ -41,13 +41,11 @@ The current development version from GitHub
 remotes::install_github("merolagio/spca")
 ```
 ## Usage
-The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining the standard PCs. These can be computed and stored in a compatible object of class *spca*  with the function  *pca()*.
+The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining visually the eigenvalues of the covariance matrix. These can be computed and stored in a compatible object of class *spca*  with the function  *pca()*.
 
-The class 
+Different methods can be applied to class *spca* objects: additionally to standard *print()*, *summary()* and *plot()*, also *aggregate_by_group()* (to visualize the contribution by scale), *change_sign()* and *show_weights()*  are available.  
 
-print, summery and plot methods are available. 
-
-Utilities available are *compare_spca()*` (to compare two or more spca solutions), *aggregate_by_scale()* (to visualize the contribution by scale) and *new.spca()* (to create an `spca` object from a set of loadings).
+Utilities available are *compare_spca()* (to compare two or more spca solutions) and *new.spca()* (to create an *spca* object from a set of loadings) are available.
 
 ## Example
 
@@ -65,10 +63,11 @@ holzinger_scales
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
 summary(ho_pca,cols = 10)
 ```
-We settle for 4 components
+
+We can settle for 4 components
 
 ### Compute the sparse loadings
-Important parameters in the *spca()* function are: *alpha* which controls for the minimum $R^2$ [default]) or the minimum proportion of cumulative variance explained (VEXP) by the sPCs realtive to that explained by the corresponding  PCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; *var_selection* ("forward" [default], "stepwise", or "backward"). See the `**spca**` help for details on these parameters and more.
+Important parameters in the *spca()* function are: *alpha* which controls for the minimum $R^2$ [default]) or the minimum proportion of cumulative variance explained (VEXP) by the sPCs realtive to that explained by the corresponding  PCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; *var_selection* ("forward" [default], "stepwise", or "backward"). See the **spca**` help for details on these parameters and more.
 
 The following command computes four sPCs with default settings: *alpha = 0.95*, *var_selection = forward*, *method = "c"* that selects the *cSPCA* method. Hence, we expect each sPC to yield at least 0.95% cumulative VEXP, allowing some very mild correlation between sPCs.
 ```{r run_spca, message = FALSE, warning = FALSE}
@@ -86,8 +85,8 @@ summary(myspca, cor_with_pc = TRUE)
 plot(myspca, plot_type = "bar")
 
 #sPCs correlation
-round(myspca$spc_cor, 2)
-
+show_correlations(myspca)
+#round(myspca$spc_cor, 2)
 ```
 
 Other plot types are available.
@@ -107,7 +106,7 @@ The variables in the `holzinger` dataset belong to four different scales, record
 ```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
 plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
 
-aggregate_by_group(myspca,groups = holzinger_scales)
+aggregate_by_group(myspca, groups = holzinger_scales)
 ```
 
 ## Comparison of two or more spca solutions

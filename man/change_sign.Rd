@@ -7,12 +7,10 @@
 \usage{
 change_sign(spca_obj, ...)
 
-\method{change_sign}{spca}(spca_obj, index_to_change, ...)
+\method{change_sign}{spca}(spca_obj, index_to_change)
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
-
-\item{...}{Unused.}
 
 \item{index_to_change}{An integer vector of component indices whose signs
 should be changed.}
@@ -35,6 +33,7 @@ Other spca:
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_correlations}()},
 \code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},

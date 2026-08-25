@@ -52,7 +52,7 @@ $$
 \newcommand{\traspj}{_{j}^{\top}}
 $$
 
-> *This vignette shows how to use the **spca** package to compute least squares sparse principal component analysis (LS-SPCA). LS-SPCA replaces the principal components of a dataset with sparse components that maximise the explained variance and stay closely aligned with the principal components. The vignette is an instructional, condensed version of the submitted Journal of Statistical Software paper: it concentrates on the package and its workflow, illustrated with real datasets. Theory and proofs are in the references.*
+*This vignette shows how to use the **spca** package to compute least squares sparse principal component analysis (LS-SPCA). LS-SPCA replaces the principal components of a dataset with sparse components that maximise the explained variance and stay closely aligned with the principal components. The vignette is an instructional, condensed version of the submitted Journal of Statistical Software paper: it concentrates on the package and its workflow, illustrated with real datasets. Theory and proofs are in the references.*
 
 **Keywords:** SPCA, LS-SPCA, variance explained, projection, uncorrelated, R.
 
@@ -62,7 +62,7 @@ The **spca** package computes least squares sparse principal component analysis 
 
 This vignette is a condensed, instructional version of the submitted *Journal of Statistical Software* paper on the package. It focuses on using **spca**; for the theory, derivations, and proofs see Merola (2015) and Merola and Chen (2019).
 
-The package provides a fast **C++** backend, with separate engines for tall ($n > p$) and fat ($n < p$) matrices, and an **R** interface to fit, inspect, and compare solutions. Users choose among computational variants, forward, stepwise, or backward variable selection, stopping rules, and target approximation levels. Helper functions and the `print()`, `summary()`, and `plot()` methods evaluate fits numerically and visually, including against standard PCA, and let solutions computed by other packages be assessed in the same framework.
+The package provides a fast *C++* backend, with separate engines for tall ($n > p$) and fat ($n < p$) matrices, and an *R* interface to fit, inspect, and compare solutions. Users choose among computational variants, forward, stepwise, or backward variable selection, stopping rules, and target approximation levels. Helper functions and the `print()`, `summary()`, and `plot()` methods evaluate fits numerically and visually, including against standard PCA, and let solutions computed by other packages be assessed in the same framework.
 
 # LS-SPCA in brief
 
@@ -87,15 +87,15 @@ Variables are selected by forward, stepwise, or backward search, stopping when a
 
 # The spca package
 
-The **spca** package fits and compares sparse PCA solutions through a single interface. It uses two backends, one for tall matrices ($n > p$) and one for fat matrices ($n < p$), selected automatically from the input. The main fitting function, `spca()`, accepts either a data matrix or a covariance matrix: a square symmetric matrix is treated as a covariance matrix, otherwise as a data matrix. Character arguments are matched on their first letter. The fat backend requires the data matrix; PC scores are computed only when a data matrix is supplied.
+The *spca* package fits and compares sparse PCA solutions through a single interface. It uses two backends, one for tall matrices ($n > p$) and one for fat matrices ($n < p$), selected automatically from the input. The main fitting function, `spca()`, accepts either a data matrix or a covariance matrix: a square symmetric matrix is treated as a covariance matrix, otherwise as a data matrix. Character arguments are matched on their first letter. The fat backend requires the data matrix; PC scores are computed only when a data matrix is supplied.
 
-Fitted models are returned as objects of class `spca`, holding both weights and percentage contributions, the nonzero indices and cardinality of each sPC, the VEXP and CVEXP and their proportions relative to the PCs, the sPC correlation matrix, and the squared correlations `r2` with the PCs. Scores are stored when computed. The package adds helper functions and `print()`, `summary()`, and `plot()` methods. Table-producing methods can return the underlying tables; plotting functions can return **ggplot2** objects for further editing.
+Fitted models are returned as objects of class `spca`, holding both weights and percentage contributions, the nonzero indices and cardinality of each sPC, the VEXP and CVEXP and their proportions relative to the PCs, the sPC correlation matrix, and the squared correlations `r2` with the PCs. Scores are stored when computed. The package adds helper functions and `print()`, `summary()`, and `plot()` methods. Table-producing methods can return the underlying tables; plotting functions can return *ggplot2* objects for further editing.
 
-Computations run in the **C++** backend, which uses referenced arrays to avoid deep copies. Fat matrices are handled with a reverse-SVD in the row space. The covariance matrix $S = X\trasp X$ and the product $SS$ are formed once, and deflations use rank-1 updates rather than recomputation, reducing the per-step cost from about $O(p^3)$ to $O(p^2)$. The leading eigen-pair can optionally be computed with the power method (`pm_weight = TRUE` for weights, `pm_varsel = TRUE` for selection), controlled by the `maxiter_pm...` and `eps_pm...` arguments.
+Computations run in the *C++* backend, which uses referenced arrays to avoid deep copies. Fat matrices are handled with a reverse-SVD in the row space. The covariance matrix $S = X\trasp X$ and the product $SS$ are formed once, and deflations use rank-1 updates rather than recomputation, reducing the per-step cost from about $O(p^3)$ to $O(p^2)$. The leading eigen-pair can optionally be computed with the power method (`pm_weight = TRUE` for weights, `pm_varsel = TRUE` for selection), controlled by the `maxiter_pm...` and `eps_pm...` arguments.
 
 ## Application
 
-We illustrate a standard workflow with the Holzinger–Swineford dataset from the package **psychTools** (Revelle 2025). We use a subset of $n = 145$ observations and $p = 12$ variables, as in other analyses (for example, Ferrara et al. 2019). The variables are centred and scaled to unit variance. The data ship in the package as `holzinger`, together with the factor `holzinger_scales` giving the scale of each variable.
+We illustrate a standard workflow with the Holzinger–Swineford dataset from the package *psychTools* (Revelle 2025). We use a subset of $n = 145$ observations and $p = 12$ variables, as in other analyses (for example, Ferrara et al. 2019). The variables are centred and scaled to unit variance. The data ship in the package as `holzinger`, together with the factor `holzinger_scales` giving the scale of each variable.
 
 We report percentage *contributions* (weights scaled to unit $l_1$ norm) rather than $l_2$-scaled weights, as they are easier to interpret. The `print()` and `plot()` methods use contributions by default; set `contributions = FALSE` for weights.
 
@@ -206,14 +206,15 @@ Cardinalities are well below the 12 variables, and every sPC explains over 95% o
 *Mutual correlation among the sPCs.*
 
 ```{r cor_comps}
-round(ho_spcadef$spc_cor, 2)
+show_correlations(ho_spcadef)
+#round(ho_spcadef$spc_cor, 2)
 ```
 
 Although cSPCA allows correlated sPCs, the correlations here are small; the fourth sPC is the most correlated, again signalling little signal.
 
 ### plot()
 
-`plot()` draws the contributions. Arguments under `controls` are **ggplot2** parameters; set `return_plot = TRUE` to edit the plot afterwards.
+`plot()` draws the contributions. Arguments under `controls` are *ggplot2* parameters; set `return_plot = TRUE` to edit the plot afterwards.
 
 ```r
 plot.spca = function (
@@ -324,7 +325,7 @@ plot(ho_spcadef, variable_groups = holzinger_scales, controls =
 
 ### Create an spca object
 
-`new_spca()` brings solutions from other analyses into the **spca** framework. It needs a set of weights and either the covariance or the data matrix.
+`new_spca()` brings solutions from other analyses into the *spca* framework. It needs a set of weights and either the covariance or the data matrix.
 ```{r new_spca}
 A = cbind(ho_spcadef$weights[, 1], ho_pspca$weights[, 2])
 ho_r = cor(holzinger)
@@ -414,9 +415,9 @@ As expected, `alpha = 0.98` gives parsimonious versions of the PCs.
 
 # Comparison with conventional SPCA
 
-We contrast LS-SPCA with conventional SPCA, computed by **elasticnet** 4.1-8 (Zou et al. 2006; Zou and Hastie 2020), the foundational and most-cited implementation. Conventional methods optimise the variance of the sPCs rather than the data approximation; for broader comparisons see Camacho et al. and references therein. We label the solutions `ls-spca` and `en-spca`.
+We contrast LS-SPCA with conventional SPCA, computed by *elasticnet* 4.1-8 (Zou et al. 2006; Zou and Hastie 2020), the foundational and most-cited implementation. Conventional methods optimise the variance of the sPCs rather than the data approximation; for broader comparisons see Camacho et al. and references therein. We label the solutions `ls-spca` and `en-spca`.
 
-Since **elasticnet** requires penalty tuning, we fixed the number of components and matched the cardinalities returned by the default `spca()`, setting `sparse = "varnum"` and leaving other arguments at their defaults. This isolates the difference between the two objectives.
+Since *elasticnet* requires penalty tuning, we fixed the number of components and matched the cardinalities returned by the default `spca()`, setting `sparse = "varnum"` and leaving other arguments at their defaults. This isolates the difference between the two objectives.
 
 ### Tall matrices
 
@@ -444,7 +445,7 @@ As expected, the conventional solutions load on fewer scales than LS-SPCA.
 
 ### Fat matrices
 
-For fat matrices ($n < p$), conventional SPCA can return weights with cardinality above the rank $(n - 1)$, even though any combination of the variables can be written with at most $(n-1)$ of them (e.g., Merola and Chen 2019). We illustrate with the `gasoline` dataset (402 near-infrared readings on 60 samples) from **pls** (Liland et al. 2026). The table below compares an `ls-spca` fit (`alpha = 0.999`) with **elasticnet** and **abess** `abesspca()` solutions, both fixed at cardinality 100.
+For fat matrices ($n < p$), conventional SPCA can return weights with cardinality above the rank $(n - 1)$, even though any combination of the variables can be written with at most $(n-1)$ of them (e.g., Merola and Chen 2019). We illustrate with the `gasoline` dataset (402 near-infrared readings on 60 samples) from *pls* (Liland et al. 2026). The table below compares an `ls-spca` fit (`alpha = 0.999`) with *elasticnet* and *abess* `abesspca()` solutions, both fixed at cardinality 100.
 
 *Summary statistics comparing the cspca alpha = 0.999 solution with two conventional SPCA solutions, computed with elasticnet spca() (en) and abess abesspca() (ab), both fixed at cardinality 100.*
 
@@ -458,28 +459,27 @@ compare_spca(list(gas_lsspca, gas_enspca_obj, gas_abspca_obj),
 
 The maximum meaningful cardinality is 59, yet both `en-spca` and `ab-spca` return weights of cardinality 100, while `ls-spca` reaches 0.999 CVEXP with cardinalities of 6 and 8. Both `ls-spca` and `en-spca` recover the first two PCs almost exactly (RCVEXP 100%, correlation 1). The `ab-spca` solution is less accurate (second sPC at 95.8% RCVEXP, correlation 0.51) and its two sPCs remain correlated at 0.84, whereas the ls-spca and en-spca components are effectively uncorrelated.
 
-
 # References
 
 Camacho J, Smilde AK, Saccenti E, Westerhuis JA (2020). "All sparse PCA models are wrong, but some are useful. Part I: Computation of scores, residuals and explained variance." *Chemometrics and Intelligent Laboratory Systems*, **196**, 103907. doi:10.1016/j.chemolab.2019.103907.
 
-Ferrara C, Martella F, Vichi M (2019). "Probabilistic Disjoint Principal Component Analysis." *Multivariate Behavioral Research*, **54**(1), 47–61.
+Ferrara C., Martella F, Vichi M (2019). "Probabilistic Disjoint Principal Component Analysis." *Multivariate Behavioral Research*, **54**(1), 47–61.
 
-Merola GM (2015). "Least Squares Sparse Principal Component Analysis: a Backward Elimination approach to attain large loadings." *Australia & New Zealand Journal of Statistics*, **57**, 391–429. doi:10.1111/anzs.12128.
+Merola G.M. (2015). "Least Squares Sparse Principal Component Analysis: a Backward Elimination approach to attain large loadings." *Australia & New Zealand Journal of Statistics*, **57**, 391–429. doi:10.1111/anzs.12128.
 
-Merola GM, Chen G (2019). "Projection sparse principal component analysis: An efficient least squares method." *Journal of Multivariate Analysis*, **173**, 366–382. doi:10.1016/j.jmva.2019.04.001.
+Merola G.M., Chen G (2019). "Projection sparse principal component analysis: An efficient least squares method." *Journal of Multivariate Analysis*, **173**, 366–382. doi:10.1016/j.jmva.2019.04.001.
 
-Revelle W (2025). *psychTools: Tools to Accompany the 'psych' Package for Psychological Research*. R package version 2.5.7. Northwestern University, Evanston, Illinois. <https://CRAN.R-project.org/package=psychTools>.
+Revelle W. (2025). *psychTools: Tools to Accompany the 'psych' Package for Psychological Research*. R package version 2.5.7. Northwestern University, Evanston, Illinois. <https://CRAN.R-project.org/package=psychTools>.
 
-Wachter KW (1976). "Probability plotting points for principal components." In *Ninth Interface Symposium Computer Science and Statistics*, 299–308. Prindle, Weber and Schmidt, Boston.
+Wachter K.W. (1976). "Probability plotting points for principal components." In *Ninth Interface Symposium Computer Science and Statistics*, 299–308. Prindle, Weber and Schmidt, Boston.
 
-Winkler AM (2021). "How many principal components?" *Brainder*, blog post, 5 April 2021. <https://brainder.org/tag/wachter-test/>.
+Winkler A.M. (2021). "How many principal components?" *Brainder*, blog post, 5 April 2021. <https://brainder.org/tag/wachter-test/>.
 
-Zou H, Hastie T, Tibshirani R (2006). "Sparse Principal Component Analysis." *Journal of Computational and Graphical Statistics*, **15**(2), 265–286.
+Zou H., Hastie T., Tibshirani R. (2006). "Sparse Principal Component Analysis." *Journal of Computational and Graphical Statistics*, **15**(2), 265–286.
 
 Zou H, Hastie T (2020). *elasticnet: Elastic-Net for Sparse Estimation and Sparse PCA*. R package version 1.3. <https://CRAN.R-project.org/package=elasticnet>.
 
-Liland KH, Mevik B-H, Wehrens R (2026). *pls: Partial Least Squares and Principal Component Regression*. R package version 2.9-0. <https://CRAN.R-project.org/package=pls>.
+Liland K.H., Mevik B-H., Wehrens R. (2026). *pls: Partial Least Squares and Principal Component Regression*. R package version 2.9-0. <https://CRAN.R-project.org/package=pls>.
 
 ```{r cleanup, include = FALSE}
 options(old_opt)

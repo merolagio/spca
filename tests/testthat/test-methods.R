@@ -92,3 +92,66 @@ test_that("show_weights() returns a list on request", {
   expect_type(cont, "list")
   expect_equal(length(cont), fit$n_comps)
 })
+
+test_that("show_correlations() prints and returns both correlation matrices", {
+  fit = spca(make_tall_data(), n_comps = 3, fat_matrix = FALSE)
+  result = NULL
+  
+  expect_output(
+    {
+      result = show_correlations(fit, return_matrices = TRUE)
+    },
+    "sPC-PC"
+  )
+  
+  expect_type(result, "list")
+  expect_named(
+    result,
+    c("spc_correlations", "spc_pc_correlations")
+  )
+  expect_true(is.matrix(result$spc_correlations))
+  expect_true(is.numeric(result$spc_correlations))
+  expect_true(is.matrix(result$spc_pc_correlations))
+  expect_true(is.numeric(result$spc_pc_correlations))
+  expect_equal(result$spc_correlations, fit$spc_cor)
+  expect_equal(
+    as.numeric(result$spc_pc_correlations),
+    as.numeric(fit$cor_with_pc)
+  )
+  expect_identical(rownames(result$spc_pc_correlations), "sPC-PC")
+  expect_identical(
+    colnames(result$spc_pc_correlations),
+    paste0("PC", seq_len(fit$n_comps))
+  )
+})
+
+test_that("show_correlations() handles abbreviated types and missing fields", {
+  fit = spca(make_tall_data(), n_comps = 3, fat_matrix = FALSE)
+  
+  spc_result = show_correlations(
+    fit, type = "s", print_matrices = FALSE, return_matrices = TRUE
+  )
+  pc_result = show_correlations(
+    fit, type = "p", print_matrices = FALSE, return_matrices = TRUE
+  )
+  
+  expect_equal(spc_result, fit$spc_cor)
+  expect_equal(as.numeric(pc_result), as.numeric(fit$cor_with_pc))
+  
+  without_spc_cor = fit
+  without_spc_cor$spc_cor = NULL
+  reconstructed = show_correlations(
+    without_spc_cor, type = "s", print_matrices = FALSE,
+    return_matrices = TRUE
+  )
+  expect_equal(reconstructed, stats::cor(fit$scores))
+  
+  without_pc_cor = fit
+  without_pc_cor$cor_with_pc = NULL
+  expect_error(
+    show_correlations(
+      without_pc_cor, type = "p", print_matrices = FALSE
+    ),
+    "not available"
+  )
+})

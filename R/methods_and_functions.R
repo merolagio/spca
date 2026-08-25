@@ -1,3 +1,4 @@
+#FUNCTIONS----------------------------------
 # is.spca==============
 #' Test for SPCA Objects
 #'
@@ -67,7 +68,7 @@ is.spca = function(x) {
 #' @export 
 new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   
-  # validation   ==============P
+# validation   ==============P
   
   fun_inp = list(A = A, S = S, X = X, method_name = method_name)
   validate_no_na(arg_list = fun_inp)
@@ -188,6 +189,9 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   return(obj)
 }
 
+#METHODS-------------------------------
+#change_weights_sign================
+##deprecated-----------------------
 #' Change Component Signs in an SPCA Object (Deprecated Alias)
 #'
 #' `change_weights_sign_spca()` is retained for backward compatibility.
@@ -203,7 +207,7 @@ change_weights_sign_spca = function(spca_obj, index_to_change) {
   .Deprecated("change_sign")
   change_sign(spca_obj, index_to_change = index_to_change)
 }
-
+##deprecated=============
 #' Change Component Signs in an SPCA Object (Deprecated Alias)
 #'
 #' `change_loadings_sign_spca()` is retained for backward compatibility.
@@ -223,12 +227,12 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 
 
 # change_sign==================
+##active===============
 #' Change Component Signs
 #'
 #' Change the signs of selected components in a fitted object.
 #'
 #' @param spca_obj A fitted object.
-#' @param ... Arguments passed to a method.
 #' @return The modified object.
 #' @family spca
 #' @export
@@ -241,12 +245,12 @@ change_sign = function(spca_obj, ...) {
 #' @param spca_obj An object of class \code{spca}.
 #' @param index_to_change An integer vector of component indices whose signs
 #'   should be changed.
-#' @param ... Unused.
 #' @return The modified \code{spca} object.
 #' @rdname change_sign
 #' @method change_sign spca
 #' @export
-change_sign.spca = function(spca_obj, index_to_change, ...) {
+change_sign.spca = function(spca_obj, index_to_change) {
+  
   if (length(index_to_change) < 1L ||
       !is.numeric(index_to_change) ||
       anyNA(index_to_change) ||
@@ -297,7 +301,6 @@ change_sign.spca = function(spca_obj, index_to_change, ...) {
 #' Show selected nonzero component weights or their unit-L1 contributions.
 #'
 #' @param spca_obj A fitted object.
-#' @param ... Arguments passed to a method.
 #' @return The selected weights or contributions when requested; otherwise
 #'   \code{NULL} invisibly.
 #' @family spca
@@ -312,13 +315,13 @@ show_weights = function(spca_obj, ...) {
 #'   contributions; otherwise, show the original nonzero weights.
 #' @param print_list A logical value indicating whether to print the result.
 #' @param return_list A logical value indicating whether to return the result.
-#' @param ... Unused.
 #' @rdname show_weights
 #' @method show_weights spca
 #' @export
 show_weights.spca = function(
     spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
-    return_list = FALSE, ...) {
+    return_list = FALSE) {
+  
   if (!validate_spca(spca_obj))
     stop("show_weights requires an spca object as first argument",
          call. = FALSE)
@@ -351,6 +354,163 @@ show_weights.spca = function(
   invisible(NULL)
 }
 
+#show_correlations=============
+#' Show Correlations from an SPCA Object
+#'
+#' Print and optionally return the mutual correlations among sparse principal
+#' components and their correlations with the corresponding principal
+#' components.
+#'
+#' @param spca_obj An object of class \code{spca}.
+#' @param type A character value specifying which correlations to show. Values
+#'   beginning with \code{"s"}, \code{"p"}, or \code{"b"} select the mutual
+#'   sPC correlations, the correlations with the corresponding PCs, or both,
+#'   respectively. The default is \code{"both"}.
+#' @param digits A non-negative integer scalar (default \code{2}). Number of
+#'   decimal places used for printing. Returned matrices are not rounded.
+#' @param print_matrices A logical value (default \code{TRUE}). If \code{TRUE},
+#'   print the requested correlations.
+#' @param return_matrices A logical value (default \code{FALSE}). If
+#'   \code{TRUE}, return the requested unrounded numeric matrix or matrices.
+#'
+#' @return If \code{return_matrices = TRUE}, a numeric matrix when one type of
+#'   correlation is requested, or a named list of two numeric matrices when
+#'   \code{type = "both"}. Otherwise, returns \code{NULL} invisibly.
+#'
+#' @examples
+#' data(holzinger)
+#' ho_cspca = spca(holzinger, n_comps = 3)
+#' show_correlations(ho_cspca)
+#' show_correlations(ho_cspca, type = "s", return_matrices = TRUE)
+#'
+#' @family spca
+#' @export
+show_correlations = function(spca_obj, ...) {
+  UseMethod("show_correlations")
+}
+
+#' @rdname show_correlations
+#' @method show_correlations spca
+#' @export
+show_correlations.spca = function(
+    spca_obj, type = "both", digits = 2, print_matrices = TRUE,
+    return_matrices = FALSE) {
+  
+  if (!is.spca(spca_obj))
+    stop("`show_correlations()` requires an `spca` object as first argument.",
+         call. = FALSE)
+  
+  if (!is.character(type) || length(type) < 1L || is.na(type[1L]) ||
+      !nzchar(type[1L]))
+    stop("`type` must begin with 's', 'p', or 'b'.", call. = FALSE)
+  
+  type = substr(tolower(type[1L]), 1L, 1L)
+  if (!type %in% c("s", "p", "b"))
+    stop("`type` must begin with 's', 'p', or 'b'.", call. = FALSE)
+  
+  if (!is.numeric(digits) || length(digits) != 1L || is.na(digits) ||
+      !is.finite(digits) || digits < 0 || digits != as.integer(digits))
+    stop("`digits` must be a non-negative integer scalar.", call. = FALSE)
+  digits = as.integer(digits)
+  
+  if (!is.logical(print_matrices) || length(print_matrices) != 1L ||
+      is.na(print_matrices))
+    stop("`print_matrices` must be TRUE or FALSE.", call. = FALSE)
+  if (!is.logical(return_matrices) || length(return_matrices) != 1L ||
+      is.na(return_matrices))
+    stop("`return_matrices` must be TRUE or FALSE.", call. = FALSE)
+  
+  need_spc = type %in% c("s", "b")
+  need_pc = type %in% c("p", "b")
+  spc_correlations = NULL
+  spc_pc_correlations = NULL
+  
+  if (need_spc) {
+    spc_correlations = spca_obj[["spc_cor"]]
+    
+    if (is.null(spc_correlations)) {
+      scores = spca_obj[["scores"]]
+      if (is.matrix(scores) && is.numeric(scores))
+        spc_correlations = stats::cor(scores)
+    }
+    
+    if (!is.matrix(spc_correlations) || !is.numeric(spc_correlations) ||
+        nrow(spc_correlations) != ncol(spc_correlations) ||
+        anyNA(spc_correlations)) {
+      stop("Mutual correlations among the sPCs are not available in this object.",
+           call. = FALSE)
+    }
+    
+    spc_names = paste0("sPC", seq_len(nrow(spc_correlations)))
+    dimnames(spc_correlations) = list(spc_names, spc_names)
+  }
+  
+  if (need_pc) {
+    cor_with_pc = spca_obj[["cor_with_pc"]]
+    
+    if (!is.numeric(cor_with_pc) || length(cor_with_pc) < 1L ||
+        anyNA(cor_with_pc)) {
+      stop(paste(
+        "Correlations between sPCs and the corresponding PCs are not",
+        "available in this object."
+      ), call. = FALSE)
+    }
+    
+    spc_pc_correlations = matrix(
+      as.numeric(cor_with_pc), nrow = 1L,
+      dimnames = list("sPC-PC", paste0("PC", seq_along(cor_with_pc)))
+    )
+  }
+  
+  if (type == "b" &&
+      ncol(spc_correlations) != ncol(spc_pc_correlations)) {
+    stop(paste(
+      "The number of sPC correlations does not match the number of",
+      "correlations with the corresponding PCs."
+    ), call. = FALSE)
+  }
+  
+  if (print_matrices) {
+    if (type == "s") {
+      print(round(spc_correlations, digits = digits))
+    } else if (type == "p") {
+      print(round(spc_pc_correlations, digits = digits))
+    } else {
+      n_comps = ncol(spc_correlations)
+      spc_print = matrix(
+        formatC(spc_correlations, format = "f", digits = digits),
+        nrow = n_comps,
+        dimnames = dimnames(spc_correlations)
+      )
+      separator = matrix(
+        "-----", nrow = 1L, ncol = n_comps,
+        dimnames = list("", colnames(spc_print))
+      )
+      pc_print = matrix(
+        formatC(spc_pc_correlations, format = "f", digits = digits),
+        nrow = 1L,
+        dimnames = list("sPC-PC", colnames(spc_print))
+      )
+      print(rbind(spc_print, separator, pc_print),
+            quote = FALSE, right = TRUE)
+    }
+  }
+  
+  if (return_matrices) {
+    if (type == "s")
+      return(spc_correlations)
+    if (type == "p")
+      return(spc_pc_correlations)
+    return(list(
+      spc_correlations = spc_correlations,
+      spc_pc_correlations = spc_pc_correlations
+    ))
+  }
+  
+  invisible(NULL)
+}
+
+
 # aggregate_by_group==================
 #' Aggregate SPCA Weights or Contributions by Group
 #'
@@ -358,7 +518,6 @@ show_weights.spca = function(
 #' variable.
 #'
 #' @param spca_obj A fitted object.
-#' @param ... Arguments passed to a method.
 #' @return The aggregated matrix, visibly when \code{return_table = TRUE} and
 #'   invisibly otherwise.
 #' @family spca
@@ -377,14 +536,14 @@ aggregate_by_group = function(spca_obj, ...) {
 #' @param print_table A logical value indicating whether to print the table.
 #' @param return_table A logical value indicating whether to return the table
 #'   visibly.
-#' @param ... Unused.
 #' @rdname aggregate_by_group
 #' @method aggregate_by_group spca
 #' @export
 aggregate_by_group.spca = function(
     spca_obj, groups, only_nonzero = TRUE, contributions = TRUE,
     digits = ifelse(contributions, 1, 3), print_table = TRUE,
-    return_table = FALSE, ...) {
+    return_table = FALSE) {
+  
   if (!validate_spca(spca_obj))
     stop("aggregate_by_group requires an spca object as first argument",
          call. = FALSE)
@@ -429,5 +588,4 @@ aggregate_by_group.spca = function(
     return(out)
   invisible(out)
 }
-
 

@@ -79,8 +79,7 @@ summary(myspca, cor_with_pc = TRUE)
 plot(myspca, plot_type = "bar")
 
 #sPCs correlation
-round(myspca$spc_cor, 2)
-
+show_correlations(myspca)
 ```
 
 Other plot types are available.

@@ -14,14 +14,11 @@ aggregate_by_group(spca_obj, ...)
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
   print_table = TRUE,
-  return_table = FALSE,
-  ...
+  return_table = FALSE
 )
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
-
-\item{...}{Unused.}
 
 \item{groups}{A vector or factor with one group label per variable.}
 
@@ -56,6 +53,7 @@ Other spca:
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_correlations}()},
 \code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
