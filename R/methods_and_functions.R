@@ -233,6 +233,7 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 #' Change the signs of selected components in a fitted object.
 #'
 #' @param spca_obj A fitted object.
+#' @param ... Additional arguments reserved for S3 method compatibility.
 #' @return The modified object.
 #' @family spca
 #' @export
@@ -249,7 +250,7 @@ change_sign = function(spca_obj, ...) {
 #' @rdname change_sign
 #' @method change_sign spca
 #' @export
-change_sign.spca = function(spca_obj, index_to_change) {
+change_sign.spca = function(spca_obj, index_to_change, ...) {
   
   if (length(index_to_change) < 1L ||
       !is.numeric(index_to_change) ||
@@ -315,12 +316,13 @@ show_weights = function(spca_obj, ...) {
 #'   contributions; otherwise, show the original nonzero weights.
 #' @param print_list A logical value indicating whether to print the result.
 #' @param return_list A logical value indicating whether to return the result.
+#' @param ... Additional arguments reserved for S3 method compatibility.
 #' @rdname show_weights
 #' @method show_weights spca
 #' @export
 show_weights.spca = function(
     spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
-    return_list = FALSE) {
+    return_list = FALSE, ...) {
   
   if (!validate_spca(spca_obj))
     stop("show_weights requires an spca object as first argument",
@@ -372,6 +374,7 @@ show_weights.spca = function(
 #'   print the requested correlations.
 #' @param return_matrices A logical value (default \code{FALSE}). If
 #'   \code{TRUE}, return the requested unrounded numeric matrix or matrices.
+#' @param ... Additional arguments reserved for S3 method compatibility.
 #'
 #' @return If \code{return_matrices = TRUE}, a numeric matrix when one type of
 #'   correlation is requested, or a named list of two numeric matrices when
@@ -394,7 +397,7 @@ show_correlations = function(spca_obj, ...) {
 #' @export
 show_correlations.spca = function(
     spca_obj, type = "both", digits = 2, print_matrices = TRUE,
-    return_matrices = FALSE) {
+    return_matrices = FALSE, ...) {
   
   if (!is.spca(spca_obj))
     stop("`show_correlations()` requires an `spca` object as first argument.",
@@ -536,13 +539,14 @@ aggregate_by_group = function(spca_obj, ...) {
 #' @param print_table A logical value indicating whether to print the table.
 #' @param return_table A logical value indicating whether to return the table
 #'   visibly.
+#' @param ... Additional arguments reserved for S3 method compatibility.
 #' @rdname aggregate_by_group
 #' @method aggregate_by_group spca
 #' @export
 aggregate_by_group.spca = function(
     spca_obj, groups, only_nonzero = TRUE, contributions = TRUE,
     digits = ifelse(contributions, 1, 3), print_table = TRUE,
-    return_table = FALSE) {
+    return_table = FALSE, ...) {
   
   if (!validate_spca(spca_obj))
     stop("aggregate_by_group requires an spca object as first argument",
