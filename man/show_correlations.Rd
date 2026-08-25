@@ -12,11 +12,14 @@ show_correlations(spca_obj, ...)
   type = "both",
   digits = 2,
   print_matrices = TRUE,
-  return_matrices = FALSE
+  return_matrices = FALSE,
+  ...
 )
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
+
+\item{...}{Additional arguments reserved for S3 method compatibility.}
 
 \item{type}{A character value specifying which correlations to show. Values
 beginning with \code{"s"}, \code{"p"}, or \code{"b"} select the mutual

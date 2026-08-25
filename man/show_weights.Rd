@@ -12,11 +12,14 @@ show_weights(spca_obj, ...)
   cols = NULL,
   contribution = TRUE,
   print_list = TRUE,
-  return_list = FALSE
+  return_list = FALSE,
+  ...
 )
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
+
+\item{...}{Additional arguments reserved for S3 method compatibility.}
 
 \item{cols}{An integer vector or \code{NULL}. Components to show.}
 

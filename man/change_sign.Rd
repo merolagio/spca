@@ -7,10 +7,12 @@
 \usage{
 change_sign(spca_obj, ...)
 
-\method{change_sign}{spca}(spca_obj, index_to_change)
+\method{change_sign}{spca}(spca_obj, index_to_change, ...)
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
+
+\item{...}{Additional arguments reserved for S3 method compatibility.}
 
 \item{index_to_change}{An integer vector of component indices whose signs
 should be changed.}

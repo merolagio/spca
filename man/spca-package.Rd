@@ -19,7 +19,7 @@ the results reported therein.
 Computation relies on efficient C++ routines and includes multiple options
 for variable selection and sparse weight estimation.
 
-strong{Fitting functions}
+\strong{Fitting functions}
 \itemize{
 \item \code{\link[=spca]{spca()}} Computes LS-SPCA solutions from a data or covariance/correlation
 matrix. It returns a \link{spca_object} of class \code{spca}.

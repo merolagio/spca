@@ -14,11 +14,14 @@ aggregate_by_group(spca_obj, ...)
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
   print_table = TRUE,
-  return_table = FALSE
+  return_table = FALSE,
+  ...
 )
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}
+
+\item{...}{Additional arguments reserved for S3 method compatibility.}
 
 \item{groups}{A vector or factor with one group label per variable.}
 
