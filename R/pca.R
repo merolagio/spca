@@ -112,7 +112,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   if (is.null(fat_matrix)) {
     fat_matrix = (is_datamatrix_M && (n < p))
     if (fat_matrix)
-      warning("fat_matrix = NULL selected the fat backend because M is 
+      message("fat_matrix = NULL selected the fat backend because M is 
               a data matrix with n < p")
   }
   
@@ -139,7 +139,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     } else if (n < p) {
       use_fat_backend = TRUE
     } else {
-      warning("fat_matrix = TRUE ignored because the data matrix is not fat;
+      message("fat_matrix = TRUE ignored because the data matrix is not fat;
               using the tall backend")
       use_fat_backend = FALSE
     }
@@ -242,12 +242,12 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     
     if (screeplot == TRUE) {
       
-      pl = screeplot_spca(out, nplot = neigen_toplot, 
+      pl = screeplot_spca(out, n_plot = neigen_toplot, 
                           ylab = "eigenvalues")
     }
     if (qq_plot == TRUE) {
       pl = qqplot_spca(out, n_vars = p, n_obs = nrow_data, 
-                          common_var = common_var, nplot = neigen_toplot,
+                          common_var = common_var, n_plot = neigen_toplot,
                           n_fitline = NULL
       )
     }

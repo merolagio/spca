@@ -16,7 +16,7 @@
   return_plot = FALSE,
   show_plot = TRUE,
   controls = list(color_scale = c("ggplot", "cbb", "printsafe", "bw"), variable_names =
-    NULL, legend_position = c("none", "bottom", "right", "top", "left"), grid_type =
+    "none", legend_position = c("none", "bottom", "right", "top", "left"), grid_type =
     c("horizontal", "full", "none"), facet_labels = NULL, legend_title = NULL, x_axis_lab
     = "variables", adjust_labels_circ = NULL, flip_heatmap = FALSE, heatmap_color_range =
     c("values", "unit")),
@@ -95,7 +95,7 @@ with black, \code{"printsafe"} is colorblind- and printer-friendly,
 \code{"bw"} uses gray tones, and \code{"ggplot"} uses the default ggplot2
 scale.
 \item \code{variable_names}: a character vector or \code{NULL} (default
-\code{NULL}). If \code{NULL}, row names of the weight matrix are used, or
+\code{"none"}). If \code{NULL}, row names of the weight matrix are used, or
 \code{V1}, ..., \code{Vp} if row names are missing. If set to
 \code{"none"}, variable names are not shown. If a character vector of
 length \eqn{p} is supplied, it is used as the variable names.

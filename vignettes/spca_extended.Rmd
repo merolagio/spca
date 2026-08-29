@@ -219,7 +219,7 @@ Although cSPCA allows correlated sPCs, the correlations here are small; the four
 ```r
 plot.spca = function (
  x,
- nplot = NULL,
+ n_plot = NULL,
  plot_type = c("bars", "circular", "heatmap"),
  contributions = TRUE,
  only_nonzero = TRUE,

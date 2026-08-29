@@ -23,7 +23,7 @@
 #'   use points. Other values default to bars.
 #' @param methods_names An optional character vector (default \code{NULL}) with
 #'   one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
-#' @param x_axis_var_names A logical value (default \code{TRUE}). If
+#' @param x_axis_var_names A logical value (default \code{FALSE}). If
 #'   \code{TRUE}, show variable names on the x axis of the weights plot.
 #' @param col_grouplines A character scalar (default \code{"red"}). Color of the
 #'   vertical group lines.
@@ -35,7 +35,7 @@
 #'   as \code{C1.object_name}.
 #' @param print_tables A logical value (default \code{TRUE}). If \code{FALSE},
 #'   suppress table printing. Takes priority over \code{print_weights}.
-#' @param print_weights A logical value (default \code{TRUE}). If \code{TRUE},
+#' @param print_weights A logical value (default \code{FALSE}). If \code{TRUE},
 #'   print the weights or contributions table.
 #' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE}, show
 #'   the weights or contributions plot.
@@ -65,12 +65,12 @@ compare_spca = function(
     plot_weights = TRUE,
     plot_type = c("bars", "points"),
     methods_names = NULL,
-    x_axis_var_names = TRUE,
+    x_axis_var_names = FALSE,
     col_grouplines = "red",
     color_scale = c("ggplot", "cbb", "printsafe", "bw"), 
     col_short_names = TRUE,
     print_tables = TRUE,
-    print_weights = TRUE,
+    print_weights = FALSE,
     show_plot = TRUE,
     return_tables = FALSE,
     return_plot = FALSE) {

@@ -96,7 +96,7 @@ compare_spca(list(ho_spcadef, ho_pspca), plot_weights = TRUE,
              color_scale = "c",
              print_weights = FALSE,
              col_short_names = TRUE,
-             methods_names = c("cSPCA", "pSPCA")
+             methods_names = c("cSPCA", "pSPCA"), show_plot = FALSE
              )
 
 

@@ -5,10 +5,10 @@
 #   class(out) = c("spca_pca", "spca", "list")
 #
 # Call these methods after assigning the class:
-#   screeplot_spca(pca_fit = out, nplot = neigen_toplot,
+#   screeplot_spca(pca_fit = out, n_plot = neigen_toplot,
 #                  ylab = "eigenvalues")
 #   qqplot_spca(pca_fit = out, common_var = common_var,
-#               nplot = neigen_toplot, n_fitline = NULL)
+#               n_plot = neigen_toplot, n_fitline = NULL)
 
 #' Wachter QQ Plot for PCA Eigenvalues
 #'
@@ -25,7 +25,7 @@
 #' @param cor A logical scalar retained for compatibility.
 #' @param common_var A positive numeric scalar. Common variance used for the
 #'   Marchenko--Pastur quantiles.
-#' @param nplot An integer scalar or `NULL`. Number of leading eigenvalues.
+#' @param n_plot An integer scalar or `NULL`. Number of leading eigenvalues.
 #' @param n_fitline An integer scalar or `NULL`. If positive, fit a line using
 #'   the last `n_fitline` points. If negative, exclude the largest
 #'   `abs(n_fitline)` points.
@@ -39,7 +39,7 @@
 #' @export
 qqplot_spca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
-    common_var = 1, nplot = NULL, n_fitline = NULL, addtitle = TRUE,
+    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
   UseMethod("qqplot_spca")
 }
@@ -48,7 +48,7 @@ qqplot_spca = function(
 #' @export
 qqplot_spca.spca_pca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
-    common_var = 1, nplot = NULL, n_fitline = NULL, addtitle = TRUE,
+    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
   eigenvalues = pca_fit$eigenvalues
@@ -97,23 +97,23 @@ qqplot_spca.spca_pca = function(
     stop("`common_var` must be a positive numeric scalar.", call. = FALSE)
   }
 
-  if (is.null(nplot))
-    nplot = length(eigenvalues)
+  if (is.null(n_plot))
+    n_plot = length(eigenvalues)
 
-  if (length(nplot) != 1L || !is.numeric(nplot) || is.na(nplot) ||
-      nplot < 1L || nplot > length(eigenvalues)) {
-    stop("`nplot` must be between 1 and the number of eigenvalues.",
+  if (length(n_plot) != 1L || !is.numeric(n_plot) || is.na(n_plot) ||
+      n_plot < 1L || n_plot > length(eigenvalues)) {
+    stop("`n_plot` must be between 1 and the number of eigenvalues.",
          call. = FALSE)
   }
-  nplot = as.integer(nplot)
+  n_plot = as.integer(n_plot)
 
   probs = ((n_vars - seq_len(n_vars) + 1) - 0.5) / n_vars
   mp_quantiles = RMTstat::qmp(p = probs, svr = gamma, var = common_var)
   mp_quantiles = n_vars * mp_quantiles / sum(mp_quantiles)
 
   df = data.frame(
-    expected = mp_quantiles[seq_len(nplot)],
-    observed = eigenvalues[seq_len(nplot)]
+    expected = mp_quantiles[seq_len(n_plot)],
+    observed = eigenvalues[seq_len(n_plot)]
   )
 
   pl = ggplot2::ggplot(df, ggplot2::aes(x = expected, y = observed)) +
@@ -123,14 +123,14 @@ qqplot_spca.spca_pca = function(
   if (is.numeric(n_fitline) && length(n_fitline) == 1L &&
       !is.na(n_fitline) && n_fitline != 0) {
     if (n_fitline < 0)
-      n_fitline = nplot + n_fitline
+      n_fitline = n_plot + n_fitline
 
-    if (n_fitline < 2L || n_fitline > nplot) {
-      stop("`n_fitline` selects fewer than 2 or more than `nplot` points.",
+    if (n_fitline < 2L || n_fitline > n_plot) {
+      stop("`n_fitline` selects fewer than 2 or more than `n_plot` points.",
            call. = FALSE)
     }
 
-    fit_rows = seq.int(nplot - n_fitline + 1L, nplot)
+    fit_rows = seq.int(n_plot - n_fitline + 1L, n_plot)
     lmcoef = stats::coef(
       stats::lm(observed ~ expected, data = df[fit_rows, ])
     )
@@ -157,7 +157,7 @@ qqplot_spca.spca_pca = function(
 #' @export
 qqplot_spca.spca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
-    common_var = 1, nplot = NULL, n_fitline = NULL, addtitle = TRUE,
+    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
   stop("`qqplot_spca()` applies only to objects returned by `pca()`.",
        call. = FALSE)
@@ -168,7 +168,7 @@ qqplot_spca.spca = function(
 #' Plot the leading eigenvalues of a fitted PCA against component order.
 #'
 #' @param pca_fit An object returned by [pca()].
-#' @param nplot An integer scalar or `NULL`. Number of leading eigenvalues.
+#' @param n_plot An integer scalar or `NULL`. Number of leading eigenvalues.
 #' @param ylab A character scalar used as the y-axis label.
 #' @param addtitle A logical scalar indicating whether to add a title.
 #' @param show_plot A logical scalar indicating whether to print the plot.
@@ -179,7 +179,7 @@ qqplot_spca.spca = function(
 #' @family pca
 #' @export
 screeplot_spca = function(
-    pca_fit, nplot = NULL, ylab = "eigenvalues", addtitle = TRUE,
+    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
   UseMethod("screeplot_spca")
 }
@@ -187,7 +187,7 @@ screeplot_spca = function(
 #' @rdname screeplot_spca
 #' @export
 screeplot_spca.spca_pca = function(
-    pca_fit, nplot = NULL, ylab = "eigenvalues", addtitle = TRUE,
+    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
   eigenvalues = pca_fit$eigenvalues
@@ -198,19 +198,19 @@ screeplot_spca.spca_pca = function(
          call. = FALSE)
   }
 
-  if (is.null(nplot))
-    nplot = length(eigenvalues)
+  if (is.null(n_plot))
+    n_plot = length(eigenvalues)
 
-  if (length(nplot) != 1L || !is.numeric(nplot) || is.na(nplot) ||
-      nplot < 1L || nplot > length(eigenvalues)) {
-    stop("`nplot` must be between 1 and the number of eigenvalues.",
+  if (length(n_plot) != 1L || !is.numeric(n_plot) || is.na(n_plot) ||
+      n_plot < 1L || n_plot > length(eigenvalues)) {
+    stop("`n_plot` must be between 1 and the number of eigenvalues.",
          call. = FALSE)
   }
-  nplot = as.integer(nplot)
+  n_plot = as.integer(n_plot)
 
   df = data.frame(
-    order = seq_len(nplot),
-    eigenvalue = eigenvalues[seq_len(nplot)]
+    order = seq_len(n_plot),
+    eigenvalue = eigenvalues[seq_len(n_plot)]
   )
 
   scree_pl = ggplot2::ggplot(
@@ -238,7 +238,7 @@ screeplot_spca.spca_pca = function(
 #' @rdname screeplot_spca
 #' @export
 screeplot_spca.spca = function(
-    pca_fit, nplot = NULL, ylab = "eigenvalues", addtitle = TRUE,
+    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
   stop("`screeplot_spca()` applies only to objects returned by `pca()`.",
        call. = FALSE)
@@ -260,7 +260,7 @@ screeplot_spca.spca = function(
 #' @param cor A logical scalar retained for compatibility.
 #' @param common_var A positive numeric scalar. Common variance used for the
 #'   Marchenko--Pastur quantiles.
-#' @param nplot An integer scalar or `NULL`. Number of leading eigenvalues.
+#' @param n_plot An integer scalar or `NULL`. Number of leading eigenvalues.
 #' @param n_fitline An integer scalar or `NULL`. If positive, fit a line
 #'   using the last `n_fitline` points. If negative, exclude the largest
 #'   `abs(n_fitline)` points.
@@ -274,7 +274,7 @@ screeplot_spca.spca = function(
 #' @export
 wachter_qqplot = function(
     eigenvalues, p = NULL, n, gamma, cor = TRUE, common_var = 1,
-    nplot = NULL, n_fitline = NULL, addtitle = TRUE, show_plot = TRUE,
+    n_plot = NULL, n_fitline = NULL, addtitle = TRUE, show_plot = TRUE,
     return_plot = FALSE) {
   .Deprecated("qqplot_spca")
 
@@ -292,7 +292,7 @@ wachter_qqplot = function(
         gamma = gamma_value,
         cor = cor,
         common_var = common_var,
-        nplot = nplot,
+        n_plot = n_plot,
         n_fitline = n_fitline,
         addtitle = addtitle,
         show_plot = show_plot,
@@ -328,22 +328,22 @@ wachter_qqplot = function(
       is.na(common_var) || common_var <= 0)
     stop("common_var must be a positive numeric scalar", call. = FALSE)
 
-  if (is.null(nplot))
-    nplot = length(eigenvalues)
-  if (length(nplot) != 1L || !is.numeric(nplot) || is.na(nplot) ||
-      nplot < 1L || nplot > length(eigenvalues)) {
-    stop("nplot must be between 1 and the number of eigenvalues",
+  if (is.null(n_plot))
+    n_plot = length(eigenvalues)
+  if (length(n_plot) != 1L || !is.numeric(n_plot) || is.na(n_plot) ||
+      n_plot < 1L || n_plot > length(eigenvalues)) {
+    stop("n_plot must be between 1 and the number of eigenvalues",
          call. = FALSE)
   }
-  nplot = as.integer(nplot)
+  n_plot = as.integer(n_plot)
 
   probs = ((p - seq_len(p) + 1) - 0.5) / p
   mp_quantiles = RMTstat::qmp(p = probs, svr = gamma, var = common_var)
   mp_quantiles = p * mp_quantiles / sum(mp_quantiles)
 
   df = data.frame(
-    expected = mp_quantiles[seq_len(nplot)],
-    observed = eigenvalues[seq_len(nplot)]
+    expected = mp_quantiles[seq_len(n_plot)],
+    observed = eigenvalues[seq_len(n_plot)]
   )
   pl = ggplot2::ggplot(df, ggplot2::aes(x = expected, y = observed)) +
     ggplot2::geom_point(size = 2, na.rm = TRUE) +
@@ -352,12 +352,12 @@ wachter_qqplot = function(
   if (is.numeric(n_fitline) && length(n_fitline) == 1L &&
       !is.na(n_fitline) && n_fitline != 0) {
     if (n_fitline < 0)
-      n_fitline = nplot + n_fitline
-    if (n_fitline < 2L || n_fitline > nplot) {
-      stop("n_fitline selects fewer than 2 or more than nplot points",
+      n_fitline = n_plot + n_fitline
+    if (n_fitline < 2L || n_fitline > n_plot) {
+      stop("n_fitline selects fewer than 2 or more than n_plot points",
            call. = FALSE)
     }
-    fit_rows = seq.int(nplot - n_fitline + 1L, nplot)
+    fit_rows = seq.int(n_plot - n_fitline + 1L, n_plot)
     lmcoef = stats::coef(
       stats::lm(observed ~ expected, data = df[fit_rows, ])
     )
@@ -385,7 +385,7 @@ wachter_qqplot = function(
 #'
 #' @param eigenvalues A numeric vector of eigenvalues, or an object returned
 #'   by [pca()].
-#' @param nplot An integer scalar or `NULL`. Number of leading eigenvalues.
+#' @param n_plot An integer scalar or `NULL`. Number of leading eigenvalues.
 #' @param ylab A character scalar used as the y-axis label.
 #' @param addtitle A logical scalar indicating whether to add a title.
 #' @param show_plot A logical scalar indicating whether to print the plot.
@@ -396,7 +396,7 @@ wachter_qqplot = function(
 #' @family pca
 #' @export
 spca_screeplot = function(
-    eigenvalues, nplot = NULL, ylab = "eigenvalues", addtitle = TRUE,
+    eigenvalues, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
   .Deprecated("screeplot_spca")
 
@@ -404,7 +404,7 @@ spca_screeplot = function(
     return(
       screeplot_spca(
         pca_fit = eigenvalues,
-        nplot = nplot,
+        n_plot = n_plot,
         ylab = ylab,
         addtitle = addtitle,
         show_plot = show_plot,
@@ -419,18 +419,18 @@ spca_screeplot = function(
          call. = FALSE)
   }
 
-  if (is.null(nplot))
-    nplot = length(eigenvalues)
-  if (length(nplot) != 1L || !is.numeric(nplot) || is.na(nplot) ||
-      nplot < 1L || nplot > length(eigenvalues)) {
-    stop("nplot must be between 1 and the number of eigenvalues",
+  if (is.null(n_plot))
+    n_plot = length(eigenvalues)
+  if (length(n_plot) != 1L || !is.numeric(n_plot) || is.na(n_plot) ||
+      n_plot < 1L || n_plot > length(eigenvalues)) {
+    stop("n_plot must be between 1 and the number of eigenvalues",
          call. = FALSE)
   }
-  nplot = as.integer(nplot)
+  n_plot = as.integer(n_plot)
 
   df = data.frame(
-    order = seq_len(nplot),
-    eigenvalue = eigenvalues[seq_len(nplot)]
+    order = seq_len(n_plot),
+    eigenvalue = eigenvalues[seq_len(n_plot)]
   )
   scree_pl = ggplot2::ggplot(
     df,

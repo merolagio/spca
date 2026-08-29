@@ -10,7 +10,7 @@
   contributions = TRUE,
   variance_metrics = c("both", "cumulative_relative", "relative", "none"),
   min_weight = FALSE,
-  cor_with_pc = FALSE,
+  cor_with_pc = TRUE,
   return_table = FALSE,
   print_table = TRUE,
   thresh_card = 1e-08,

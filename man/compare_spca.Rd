@@ -13,12 +13,12 @@ compare_spca(
   plot_weights = TRUE,
   plot_type = c("bars", "points"),
   methods_names = NULL,
-  x_axis_var_names = TRUE,
+  x_axis_var_names = FALSE,
   col_grouplines = "red",
   color_scale = c("ggplot", "cbb", "printsafe", "bw"),
   col_short_names = TRUE,
   print_tables = TRUE,
-  print_weights = TRUE,
+  print_weights = FALSE,
   show_plot = TRUE,
   return_tables = FALSE,
   return_plot = FALSE
@@ -52,7 +52,7 @@ use points. Other values default to bars.}
 \item{methods_names}{An optional character vector (default \code{NULL}) with
 one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.}
 
-\item{x_axis_var_names}{A logical value (default \code{TRUE}). If
+\item{x_axis_var_names}{A logical value (default \code{FALSE}). If
 \code{TRUE}, show variable names on the x axis of the weights plot.}
 
 \item{col_grouplines}{A character scalar (default \code{"red"}). Color of the
@@ -69,7 +69,7 @@ as \code{C1.object_name}.}
 \item{print_tables}{A logical value (default \code{TRUE}). If \code{FALSE},
 suppress table printing. Takes priority over \code{print_weights}.}
 
-\item{print_weights}{A logical value (default \code{TRUE}). If \code{TRUE},
+\item{print_weights}{A logical value (default \code{FALSE}). If \code{TRUE},
 print the weights or contributions table.}
 
 \item{show_plot}{A logical value (default \code{TRUE}). If \code{TRUE}, show

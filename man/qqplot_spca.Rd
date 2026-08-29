@@ -13,7 +13,7 @@ qqplot_spca(
   gamma = NULL,
   cor = TRUE,
   common_var = 1,
-  nplot = NULL,
+  n_plot = NULL,
   n_fitline = NULL,
   addtitle = TRUE,
   show_plot = TRUE,
@@ -27,7 +27,7 @@ qqplot_spca(
   gamma = NULL,
   cor = TRUE,
   common_var = 1,
-  nplot = NULL,
+  n_plot = NULL,
   n_fitline = NULL,
   addtitle = TRUE,
   show_plot = TRUE,
@@ -41,7 +41,7 @@ qqplot_spca(
   gamma = NULL,
   cor = TRUE,
   common_var = 1,
-  nplot = NULL,
+  n_plot = NULL,
   n_fitline = NULL,
   addtitle = TRUE,
   show_plot = TRUE,
@@ -65,7 +65,7 @@ use \code{n_obs / n_vars}.}
 \item{common_var}{A positive numeric scalar. Common variance used for the
 Marchenko--Pastur quantiles.}
 
-\item{nplot}{An integer scalar or \code{NULL}. Number of leading eigenvalues.}
+\item{n_plot}{An integer scalar or \code{NULL}. Number of leading eigenvalues.}
 
 \item{n_fitline}{An integer scalar or \code{NULL}. If positive, fit a line using
 the last \code{n_fitline} points. If negative, exclude the largest

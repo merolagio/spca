@@ -2,7 +2,7 @@
 test_that("screeplot_spca() returns a ggplot object", {
   fit = pca(make_tall_data(), n_comps = 3, qq_plot = FALSE)
 
-  pl = screeplot_spca(fit, nplot = 4, show_plot = FALSE,
+  pl = screeplot_spca(fit, n_plot = 4, show_plot = FALSE,
                       return_plot = TRUE)
 
   expect_s3_class(pl, "ggplot")
@@ -29,7 +29,7 @@ test_that("qqplot_spca() returns a ggplot object", {
   fit = pca(make_tall_data(), n_comps = 3, qq_plot = FALSE)
 
   pl = qqplot_spca(fit, n_vars = nrow(fit$weights),
-                   n_obs = nrow(make_tall_data()), nplot = 4,
+                   n_obs = nrow(make_tall_data()), n_plot = 4,
                    show_plot = FALSE, return_plot = TRUE)
 
   expect_s3_class(pl, "ggplot")
@@ -69,7 +69,7 @@ test_that("spca_screeplot() preserves the eigenvalue-vector interface", {
     {
       pl = spca_screeplot(
         eigenvalues = c(4, 3, 2, 1),
-        nplot = 3,
+        n_plot = 3,
         show_plot = FALSE,
         return_plot = TRUE
       )
@@ -89,7 +89,7 @@ test_that("spca_screeplot() accepts pca objects", {
     {
       pl = spca_screeplot(
         fit,
-        nplot = 3,
+        n_plot = 3,
         show_plot = FALSE,
         return_plot = TRUE
       )
@@ -108,7 +108,7 @@ test_that("wachter_qqplot() preserves the eigenvalue-vector interface", {
         eigenvalues = c(4, 3, 2, 1),
         p = 4,
         n = 20,
-        nplot = 3,
+        n_plot = 3,
         show_plot = FALSE,
         return_plot = TRUE
       )
@@ -134,7 +134,7 @@ test_that("wachter_qqplot() accepts obsolete pca objects with loadings", {
       pl = wachter_qqplot(
         legacy,
         n = nrow(X),
-        nplot = 3,
+        n_plot = 3,
         show_plot = FALSE,
         return_plot = TRUE
       )

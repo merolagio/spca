@@ -64,7 +64,7 @@ summary.spca = function(
     variance_metrics = c("both", "cumulative_relative",
                          "relative", "none"),
     min_weight = FALSE, 
-    cor_with_pc = FALSE,
+    cor_with_pc = TRUE,
     return_table = FALSE, 
     print_table = TRUE, 
     thresh_card = 1e-8, 
@@ -138,8 +138,8 @@ summary.spca = function(
   if (cor_with_pc){
     if ((!is.null(object$cor_with_pc)))
       out = rbind(out, r = object$cor_with_pc)
-    else
-      warning("correlations with PCs are not available")
+    # else
+    #   warning("correlations with PCs are not available")
   }
   
   # Not all columns may be selected 

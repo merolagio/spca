@@ -8,7 +8,7 @@
 \usage{
 screeplot_spca(
   pca_fit,
-  nplot = NULL,
+  n_plot = NULL,
   ylab = "eigenvalues",
   addtitle = TRUE,
   show_plot = TRUE,
@@ -17,7 +17,7 @@ screeplot_spca(
 
 \method{screeplot_spca}{spca_pca}(
   pca_fit,
-  nplot = NULL,
+  n_plot = NULL,
   ylab = "eigenvalues",
   addtitle = TRUE,
   show_plot = TRUE,
@@ -26,7 +26,7 @@ screeplot_spca(
 
 \method{screeplot_spca}{spca}(
   pca_fit,
-  nplot = NULL,
+  n_plot = NULL,
   ylab = "eigenvalues",
   addtitle = TRUE,
   show_plot = TRUE,
@@ -36,7 +36,7 @@ screeplot_spca(
 \arguments{
 \item{pca_fit}{An object returned by \code{\link[=pca]{pca()}}.}
 
-\item{nplot}{An integer scalar or \code{NULL}. Number of leading eigenvalues.}
+\item{n_plot}{An integer scalar or \code{NULL}. Number of leading eigenvalues.}
 
 \item{ylab}{A character scalar used as the y-axis label.}
 

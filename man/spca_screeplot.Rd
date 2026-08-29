@@ -6,7 +6,7 @@
 \usage{
 spca_screeplot(
   eigenvalues,
-  nplot = NULL,
+  n_plot = NULL,
   ylab = "eigenvalues",
   addtitle = TRUE,
   show_plot = TRUE,
@@ -17,7 +17,7 @@ spca_screeplot(
 \item{eigenvalues}{A numeric vector of eigenvalues, or an object returned
 by \code{\link[=pca]{pca()}}.}
 
-\item{nplot}{An integer scalar or \code{NULL}. Number of leading eigenvalues.}
+\item{n_plot}{An integer scalar or \code{NULL}. Number of leading eigenvalues.}
 
 \item{ylab}{A character scalar used as the y-axis label.}
 
