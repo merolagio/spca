@@ -11,13 +11,15 @@
 - changed function `show_contributions_spca()` to method `show_weights()`
 - added  method `show_correlations()`
 - changed function `change_weights_sign_spca()` to method `change_sign()`
-- changed functions `spca_screeplot()` and `wachter_qqplot()` to methods `screeplot_spca()` and `qqplot_spca()`
-  - first argument changed from `eigenvalues` to `pca_obj`
-  - in `qqplot_spca()`, arguments `n` and `p` changed to `n_vars` and `n_obs`
-
+- changed functions `spca_screeplot()` and `wachter_qqplot()` to methods
+    screeplot_spca()` and `qqplot_spca()`
+   -- first argument changed from `eigenvalues` to `pca_obj`
+    in `qqplot_spca()`, arguments `n` and `p` changed to `n_vars` and `n_obs`
+- added the method show_correlations to visualize the correlations between sPCs
+    and their correlation with  the original PCs.
 - pca() output takes class pca_spca, spca, list
 
-Other cosmetic changes
+** Other cosmetic changes**
 
 # spca 1.1.2
 - fixed cor_with_pcs sign in change_loadings_sign_spca
