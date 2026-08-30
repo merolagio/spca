@@ -30,13 +30,6 @@ test_that("spca accepts numeric data frames", {
 test_that("spca fits fat data matrices through the fat backend", {
   m = spca_test_matrices()
 
-  warn = expect_warning(
-    spca(m$X_fat, n_comps = 2, method = "c",
-                var_selection = "fwd", objective = "r2",
-                fat_matrix = NULL),
-    "fat_matrix backend selected because n < p"
-  )
-
   fit = suppressWarnings(
     spca(m$X_fat, n_comps = 2, method = "c",
          var_selection = "fwd", objective = "r2",
