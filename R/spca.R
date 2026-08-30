@@ -422,18 +422,18 @@ spca = function(M,
   
   if (is.null(fat_matrix)) {
     fat_matrix = (is_datamatrix_M && (n < p))
-    if (fat_matrix)
-      warning("fat_matrix backend selected because n < p")
   }
   
   if (isTRUE(fat_matrix)) {
     if (!is_datamatrix_M) {
-      warning("fat_matrix = TRUE ignored because the input is a covariance/correlation matrix; using the tall backend")
+      warning("fat_matrix = TRUE ignored because the input is a 
+              covariance/correlation matrix; using the tall backend")
       use_fat_backend = FALSE
     } else if (n < p) {
-      use_fat_backend = TRUE
+        use_fat_backend = TRUE
     } else {
-      warning("fat_matrix = TRUE ignored because the data matrix is not fat; using the tall backend")
+        warning("fat_matrix = TRUE ignored because the data matrix is not fat;
+                using the tall backend")
       use_fat_backend = FALSE
     }
   } else {
