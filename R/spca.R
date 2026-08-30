@@ -490,7 +490,8 @@ spca = function(M,
     if((method_cpp == "u") && any(cardvec_in < seq_len(p)) )
       stop("for uspca components need cardinality not less than component order")
   if (use_fat_backend && (var_selection_cpp != 0)){
-    warning("Only forward variable selection for fat matrices is available. Switching to that ", call. = FALSE)
+    warning("Only forward variable selection for fat matrices is available.
+            Switching to that ", call. = FALSE)
     var_selection_cpp = 0
   }
   if (use_fat_backend && intensive){
