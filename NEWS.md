@@ -1,25 +1,25 @@
 
 # spca 1.1.3
-**renamed loadings to weights**
+**Renamed loadings to weights**
 - objects now return `weights`, as documented.
 - same changes in C++ code but no need of backcompatibility
 - preserved backward compatibility by retaining the old function names as deprecated wrappers for the new S3 methods
 - preserved compatibility with older spca objects containing loadings-named elements through internal accessors
 
-**converted functions to methods and added new ones**
+**Converted functions to methods and added new ones**
 - changed function `aggregate_by_group_spca()` to method `aggregate_by_group()`
 - changed function `show_contributions_spca()` to method `show_weights()`
 - added  method `show_correlations()`
 - changed function `change_weights_sign_spca()` to method `change_sign()`
 - changed functions `spca_screeplot()` and `wachter_qqplot()` to methods
-    screeplot_spca()` and `qqplot_spca()`
+    `screeplot_spca()` and `qqplot_spca()`
    -- first argument changed from `eigenvalues` to `pca_obj`
     in `qqplot_spca()`, arguments `n` and `p` changed to `n_vars` and `n_obs`
 - added the method show_correlations to visualize the correlations between sPCs
     and their correlation with  the original PCs.
-- pca() output takes class pca_spca, spca, list
+- pca() output takes class c("spca_pca", "spca", "list").
 
-** Other cosmetic changes**
+**Other cosmetic changes**
 
 # spca 1.1.2
 - fixed cor_with_pcs sign in change_loadings_sign_spca

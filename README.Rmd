@@ -25,28 +25,24 @@ devtools::load_all(".")
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
 <!-- badges: end -->
 
-This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details, references and full presentation can be found in the spca_extended vignette.
+This package contains functions to compute, visualize and compare Least Squares Sparse Principal Components Analysis (LS-SPCA). An efficient `C++` backend makes the fitting functions fast and memory efficient. Methodological details, references and full presentation can be found in the *spca_extended* vignette.
 
 ## Installation
-You can install the stable release version from CRAN
-
+The stable release version can be installed from CRAN
 ``` {r inst_cran,  eval = FALSE}
 install.packages("spca")
-#or
-https://github.com/merolagio/spca/releases/tag/CRAN_submission
 ```
 
-The current development version from GitHub
-
-``` {r inst_gib, , eval = FALSE}
+The current development version can be installed from GitHub with
+``` {r inst_gib, eval = FALSE}
 remotes::install_github("merolagio/spca")
 ```
 ## Usage
-The  main function *spca()* computes the sparse loadings and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining visually the eigenvalues of the covariance matrix. These can be computed and stored in a compatible object of class *spca*  with the function  *pca()*.
+The  main function *spca()* computes the sparse weights and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining visually the eigenvalues of the covariance matrix. These can be computed and stored in a compatible object of class *spca*  with the function  *pca()*.
 
 Different methods can be applied to class *spca* objects: additionally to standard *print()*, *summary()* and *plot()*, also *aggregate_by_group()* (to visualize the contribution by scale), *change_sign()* and *show_weights()*  are available.  
 
-Utilities available are *compare_spca()* (to compare two or more spca solutions) and *new.spca()* (to create an *spca* object from a set of loadings) are available.
+The function `compare_spca()` compares two or more `spca` solutions, `aggregate_by_group()` summarizes weights or contributions by group, and `new_spca()` creates an `spca` object from a set of weights. Additional methods include `show_weights()`, which displays nonzero weights or contributions; `show_correlations()`, which displays correlations among sPCs and between sPCs and the corresponding PCs; and `change_sign()`, which changes the signs of selected components and their associated quantities. The functions `qqplot_spca()` and `screeplot_spca()` produce diagnostic plots from an object returned by `pca()`.
 
 ## Example
 
@@ -67,7 +63,7 @@ summary(ho_pca,cols = 10)
 
 We can settle for 4 components
 
-### Compute the sparse loadings
+### Compute the sparse weights
 Important parameters in the *spca()* function are: *alpha* which controls for the minimum $R^2$ [default]) or the minimum proportion of cumulative variance explained (VEXP) by the sPCs realtive to that explained by the corresponding  PCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; *var_selection* ("forward" [default], "stepwise", or "backward"). See the **spca**` help for details on these parameters and more.
 
 The following command computes four sPCs with default settings: *alpha = 0.95*, *var_selection = forward*, *method = "c"* that selects the *cSPCA* method. Hence, we expect each sPC to yield at least 0.95% cumulative VEXP, allowing some very mild correlation between sPCs.
@@ -77,7 +73,7 @@ myspca = spca(holzinger, n_comps = 4)
 
 ### Inspect spca results
 Methods are *print*, *plot* (several options available) and *summary*.
-By defaut, plot and print show the percentage *contributions*, that is the loadings scaled to have sum of their absolute values equal to 1.
+By defaut, plot and print show the percentage *contributions*, that is the weights scaled to have sum of their absolute values equal to 1.
 ```{r methods, message = TRUE, warning = FALSE, out.width="50%"}
 myspca # print
 
@@ -103,7 +99,7 @@ plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is e
 ```
 
 ## Variable groups
-The variables in the `holzinger` dataset belong to four different scales, recorded in the factor `holzinger_scales`. These can be differenciated in the barplot
+The variables in the `holzinger` dataset belong to four different scales, recorded in the factor `holzinger_scales`. These can be differentiated in the barplot
 ```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
 plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
 
@@ -111,7 +107,7 @@ aggregate_by_group(myspca, groups = holzinger_scales)
 ```
 
 ## Comparison of two or more spca solutions
-Compare the *CSPCA* solutions with *alpha = 0.95* those with  *alpha = 0.90*.
+Compare the *cSPCA* solutions computed with *alpha = 0.95*  computed with those with  *alpha = 0.90*.
 ```{r spca90, message = FALSE, warning = FALSE}
 myspca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
 

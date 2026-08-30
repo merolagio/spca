@@ -51,7 +51,10 @@ $$
 \newcommand{\trasp}{^{\top}}
 \newcommand{\traspj}{_{j}^{\top}}
 $$
-
+<div style="display:flex; align-items:center; gap:15px;">
+<img src="figures/spca_logo_octagon.png" height="90" alt="spca logo"/>
+<h2>Package spca</h2>
+</div>  
 *This vignette shows how to use the **spca** package to compute least squares sparse principal component analysis (LS-SPCA). LS-SPCA replaces the principal components of a dataset with sparse components that maximise the explained variance and stay closely aligned with the principal components. The vignette is an instructional, condensed version of the submitted Journal of Statistical Software paper: it concentrates on the package and its workflow, illustrated with real datasets. Theory and proofs are in the references.*
 
 **Keywords:** SPCA, LS-SPCA, variance explained, projection, uncorrelated, R.
@@ -91,7 +94,7 @@ The *spca* package fits and compares sparse PCA solutions through a single inter
 
 Fitted models are returned as objects of class `spca`, holding both weights and percentage contributions, the nonzero indices and cardinality of each sPC, the VEXP and CVEXP and their proportions relative to the PCs, the sPC correlation matrix, and the squared correlations `r2` with the PCs. Scores are stored when computed. The package adds helper functions and `print()`, `summary()`, and `plot()` methods. Table-producing methods can return the underlying tables; plotting functions can return *ggplot2* objects for further editing.
 
-Computations run in the *C++* backend, which uses referenced arrays to avoid deep copies. Fat matrices are handled with a reverse-SVD in the row space. The covariance matrix $S = X\trasp X$ and the product $SS$ are formed once, and deflations use rank-1 updates rather than recomputation, reducing the per-step cost from about $O(p^3)$ to $O(p^2)$. The leading eigen-pair can optionally be computed with the power method (`pm_weight = TRUE` for weights, `pm_varsel = TRUE` for selection), controlled by the `maxiter_pm...` and `eps_pm...` arguments.
+Computations run in the *C++* backend, which uses referenced arrays to avoid deep copies. Fat matrices are handled with a reverse-SVD in the row space. The covariance matrix $S = X\trasp X$ and the product $SS$ are formed once, and deflations use rank-1 updates rather than recomputation, reducing the per-step cost from about $O(p^3)$ to $O(p^2)$. The leading eigen-pair can optionally be computed with the power method (`pm_weights = TRUE` for weights, `pm_varsel = TRUE` for selection), controlled by the `maxiter_pm...` and `eps_pm...` arguments.
 
 ## Application
 
@@ -119,14 +122,14 @@ pca(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
 
 `M` is a data or covariance matrix; scores are computed only from a data matrix. With `n_comps = NULL` all components are computed. With `pm = TRUE`, only `n_comps < p` PCs are computed by the power method, controlled by `eps_pm` and `maxiter_pm`.
 
-`pca()` can draw a screeplot and a Wachter qq-plot (Wachter 1976), which compares the eigenvalues with the Marchenko–Pastur quantiles (Winkler 2021). The qq-plot applies to covariance matrices of equal-variance variables; for correlation matrices set `common_var = 1`, and supply `nrow_data` when `M` is a covariance matrix. The standalone `screeplot()` and `wachter_qqplot()` functions customise these plots. The plots below show the screeplot and the qq-plot, the latter with a line fitted to the smallest $(n - 3)$ eigenvalues.
+`pca()` can draw a screeplot and a Wachter qq-plot (Wachter 1976), which compares the eigenvalues with the Marchenko–Pastur quantiles (Winkler 2021). The qq-plot applies to covariance matrices of equal-variance variables; for correlation matrices set `common_var = 1`, and supply `nrow_data` when `M` is a covariance matrix. The standalone `screeplot_spca()` and `qqplot_spca()` functions customise these plots. The plots below show the screeplot and the qq-plot, the latter with a line fitted to the smallest $(n - 3)$ eigenvalues.
 
 ```{r pca, fig.cap = "Screeplot."}
 ho_pca = pca(holzinger, screeplot = TRUE, qq_plot = FALSE)
 ```
 
 ```{r qqplot, fig.cap = "qq-plot with a fitted line."}
-qqplot_spca(ho_pca, n_var = ncol(holzinger),
+qqplot_spca(ho_pca, n_vars = ncol(holzinger),
                n_obs = nrow(holzinger), n_fitline = -3)
 ```
 
@@ -143,8 +146,8 @@ spca(M, alpha = 0.95, n_comps = NULL, ncomp_by_cvexp = NULL,
     objective = c("cvexp", "r2"), intensive = FALSE,
     fat_matrix = NULL, fixed_index_list = list(),
     center_data = FALSE, scale_data = FALSE,
-    pm_weight = FALSE, eps_pm_weight = 1e-05,
-    maxiter_pm_weight = 100, pm_varsel = FALSE,
+    pm_weights = FALSE, eps_pm_weights = 1e-05,
+    maxiter_pm_weights = 100, pm_varsel = FALSE,
     eps_pm_varsel = 1e-05, maxiter_pm_varsel = 200)
 ```
 
