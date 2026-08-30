@@ -415,9 +415,14 @@ spca = function(M,
   objective_cpp = switch(objective,
                          "r2" = 0,
                          "cvexp" = 1)
+  k = min(p, n, 5) 
+  is_symM = isTRUE(all.equal(
+    M[seq_len(k), seq_len(k), drop = FALSE],
+    t(M[seq_len(k), seq_len(k), drop = FALSE]),
+    check.attributes = FALSE))
   
   is_datamatrix_M = TRUE
-  if ((n == p))
+  if ((n == p) && is_symM)
     is_datamatrix_M = FALSE
   
   if (is.null(fat_matrix)) {
@@ -458,7 +463,7 @@ spca = function(M,
   
   if (is.null(n_comps)){
     if (is.null(ncomp_by_cvexp))
-      stop("one of n_comps and ncomps_by_cvexp must have anumeric value")
+      stop("one of n_comps and ncomp_by_cvexp must have a numeric value")
     if (ncomp_by_cvexp < 1) {
       n_comps = 0L
       ncomps_cpp = max_n_comps
