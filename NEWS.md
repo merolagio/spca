@@ -1,3 +1,6 @@
+# spca 1.1.4
+- spca's parameter `fixed_index_list` now accepts same index in different components
+  it also allows to require that only some components have fixed indices.
 
 # spca 1.1.3
 **Renamed loadings to weights**
@@ -20,6 +23,9 @@
 - pca() output takes class c("spca_pca", "spca", "list").
 
 **Other cosmetic changes**
+- summary now returns cor_Pcs by default
+- removed ggplot warnings aboout missing data
+
 
 # spca 1.1.2
 - fixed cor_with_pcs sign in change_loadings_sign_spca
