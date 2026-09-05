@@ -118,7 +118,8 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 //   "p" for cSPCA, uSPCA, and pSPCA.
 // indvec_in: Optional 0-based fixed variable indices, concatenated across
 //   components.
-// cardvec_in: Optional cardinalities for fixed variable indices.
+// cardvec_in: Optional cardinalities for fixed variable indices. A zero or a
+//   missing trailing entry requests variable selection for that component.
 // PMPC: Use the power method for PC eigenvectors.
 // PMS: Use the power method for sparse-weight eigenvectors in variable
 //   selection and weight computation.
@@ -182,18 +183,56 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
    else
      ncompbycvexp = 1;
 
-   bool fixedind = false;
    int startind = 0;
    VectorXi indvec(0), cardvec(0);
+   VectorXi fixed_indices = VectorXi::Zero(ncomps);
 
    // fixed indices
-   if (indvec_in.isNotNull() && cardvec_in.isNotNull()) {
+   if (indvec_in.isNotNull() != cardvec_in.isNotNull())
+     Rcpp::stop("indvec_in and cardvec_in must be supplied together");
+
+   if (indvec_in.isNotNull()) {
      indvec = Rcpp::as<VectorXi>(indvec_in.get());
      cardvec = Rcpp::as<VectorXi>(cardvec_in.get());
-     fixedind = true;
 
+     if (cardvec.size() > ncomps)
+       Rcpp::stop("cardvec_in cannot contain more entries than ncomps");
+     if ((cardvec.array() < 0).any())
+       Rcpp::stop("cardvec_in cannot contain negative cardinalities");
      if (indvec.size() != cardvec.sum())
        Rcpp::stop("length of indvec_in must be equal to sum cardvec_in");
+
+     VectorXi clean_indvec(indvec.size());
+     int input_offset = 0;
+     int clean_offset = 0;
+     bool removed_duplicates = false;
+     for (int j = 0; j < cardvec.size(); j++) {
+       const int input_cardj = cardvec(j);
+       int clean_cardj = 0;
+       for (int k = 0; k < input_cardj; k++) {
+         const int index = indvec(input_offset + k);
+         if (index < 0 || index >= p)
+           Rcpp::stop("indvec_in contains an index outside [0, p - 1]");
+         bool duplicate = false;
+         for (int h = 0; h < clean_cardj; h++) {
+           if (clean_indvec(clean_offset + h) == index) {
+             duplicate = true;
+             break;
+           }
+         }
+         if (duplicate)
+           removed_duplicates = true;
+         else
+           clean_indvec(clean_offset + clean_cardj++) = index;
+       }
+       cardvec(j) = clean_cardj;
+       fixed_indices(j) = (clean_cardj > 0);
+       input_offset += input_cardj;
+       clean_offset += clean_cardj;
+     }
+     if (removed_duplicates)
+       Rcpp::warning("duplicate indices removed within fixed-index components");
+     indvec = clean_indvec.head(clean_offset);
    }
 
    // expand method vector to length ncomps
@@ -216,7 +255,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        Rcpp::stop("method entries must be one of 'u', 'c', or 'p'");
      if (Rcpp::as<std::string>(method[i]) == "u") {
        mincard_vec(i) = i + 1;
-       if (fixedind && cardvec(i) > 0 && cardvec(i) < i + 1)
+       if (fixed_indices(i) && cardvec(i) < i + 1)
          Rcpp::stop("the fixed indices have a problem: for uncorrelated components the cardinality cannot be smaller than the component's order");
      } else {
        mincard_vec(i) = 1;
@@ -348,7 +387,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
        //==============================================
 
        // fixedind NO VARIABLE SELECTION==
-       if (fixedind == true && cardvec(j) > 0){
+       if (fixed_indices(j)){
          indj = indvec.segment(startind, cardvec(j));
          cardt = cardvec(j);
          startind = startind + cardvec(j);

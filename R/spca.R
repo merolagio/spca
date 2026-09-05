@@ -24,8 +24,9 @@
 #' @param intensive A logical scalar or \code{NULL}.
 #' @param fat_matrix A logical scalar or \code{NULL}.
 #' @param fixed_index_list A list of numeric or integer vectors, a factor, or
-#'   \code{NULL}. If supplied, it must define a mutually exclusive and
-#'   exhaustive partition of the variables with at least two groups.
+#'   \code{NULL}. Each list element gives the fixed variable indices for the
+#'   corresponding component. A \code{NULL} or empty element requests variable
+#'   selection for that component. Indices are 1-based.
 #' @param center_data A logical scalar or \code{NULL}.
 #' @param scale_data A logical scalar or \code{NULL}.
 #' @param pm_weights A logical scalar or \code{NULL}.
@@ -165,10 +166,7 @@ validate_spca_inputs =
   if (!is.null(intensive) && !is_boolean(intensive))
     stop("intensive must be NULL, TRUE, or FALSE", call. = FALSE)
   
-  #fixed indices  
-  if (!is.null(fixed_index_list) && (length(fixed_index_list) < 2))
-    stop("fixed_index_list can be either NULL or contain at least 2 elements")
-  
+  #fixed indices
   if (!is.null(fixed_index_list)) {
     
     if (!(is.list(fixed_index_list) || is.factor(fixed_index_list))) {
@@ -177,24 +175,30 @@ validate_spca_inputs =
            call. = FALSE)
     }
     
-    noexh = FALSE
-    
     if (is.list(fixed_index_list)) {
-      noexh = (length(unlist(fixed_index_list)) != ncol(M))
-      
-      if (!noexh)
-        noexh = !isTRUE(all.equal(sort(unlist(fixed_index_list)),
-                                  seq_len(ncol(M))))
+      fixed_index_list_check = fixed_index_list
+      if (!is.null(n_comps) && n_comps > 0L &&
+          length(fixed_index_list_check) > n_comps)
+        fixed_index_list_check = fixed_index_list_check[seq_len(n_comps)]
+
+      for (j in seq_along(fixed_index_list_check)) {
+        ind_j = fixed_index_list_check[[j]]
+        if (is.null(ind_j) || length(ind_j) == 0L)
+          next
+        if (!is.numeric(ind_j) || !is.atomic(ind_j))
+          stop("each nonempty element of fixed_index_list must be a numeric or integer vector",
+               call. = FALSE)
+        if (any(!is.finite(ind_j)) || any(ind_j != floor(ind_j)))
+          stop("fixed_index_list must contain finite integer-valued indices",
+               call. = FALSE)
+        if (any(ind_j < 1L) || any(ind_j > p))
+          stop("fixed_index_list indices must be between 1 and the number of variables",
+               call. = FALSE)
+      }
     } else {
-      if ((length(fixed_index_list) != ncol(M)) ||
-          (nlevels(fixed_index_list) < 2))
-        noexh = TRUE
-    }
-    
-    if (noexh) {
-      stop("fixed_index_list must be a mutually exclusive and exhaustive
-       partition of the variables of length > 1",
-           call. = FALSE)
+      if (length(fixed_index_list) != p)
+        stop("a factor supplied as fixed_index_list must have one entry per variable",
+             call. = FALSE)
     }
   }
   
@@ -275,9 +279,16 @@ validate_spca_inputs =
 #'   and all other inputs use the tall backend. If \code{TRUE}, the fat backend
 #'   is requested. If \code{FALSE}, the tall backend is used.
 #' @param fixed_index_list A list of integer-valued vectors, a factor, or
-#'   \code{NULL} (default \code{NULL}). If supplied, it must define a mutually
-#'   exclusive and exhaustive partition of the variables with at least two
-#'   groups. List indices are 1-based.
+#'   \code{NULL} (default \code{NULL}). Each list element gives the fixed
+#'   variable indices for the corresponding component. A \code{NULL} or empty
+#'   element requests variable selection for that component. A list of length
+#'   one fixes only the first component; to fix a later component, include
+#'   \code{NULL} or empty placeholders for the preceding components. Index sets
+#'   may overlap and need not include every variable. Indices are 1-based. A
+#'   factor remains available as a shorthand for assigning variables to
+#'   component-specific groups. Duplicate indices within a component are
+#'   removed with a warning. If the list is longer than the number of components,
+#'   extra elements are ignored with a warning.
 #' @param center_data A logical value (default \code{FALSE}). If \code{TRUE},
 #'   center data-matrix columns before fitting. Ignored when \code{M} is treated
 #'   as a covariance/correlation matrix.
@@ -326,6 +337,10 @@ validate_spca_inputs =
 #' selection only: \code{var_selection = "f"} and \code{intensive = FALSE}.
 #' Other combinations generate an error.
 #'
+#' If both \code{n_comps} and \code{ncomp_by_cvexp} are supplied,
+#' \code{n_comps} takes precedence and automatic stopping by cumulative
+#' variance explained is disabled.
+#'
 #' The returned object is documented in [spca_object].
 #' @return An object of class \code{spca}.
 #' 
@@ -336,6 +351,9 @@ validate_spca_inputs =
 #' #uncorrelated components and subsets determined using CVEXP as stopping rule
 #' ho_uspca = spca(holzinger, n_comps = 4, method = "uspca", 
 #'                 objective = "cvexp")
+#' #fix indices for components 1 and 3 and select them for component 2
+#' ho_fixed = spca(holzinger, n_comps = 3,
+#'                 fixed_index_list = list(c(1, 2), NULL, c(2, 4, 6)))
 #' 
 #' @family spca
 #' @export
@@ -481,19 +499,36 @@ spca = function(M,
   indvec_in = NULL
   cardvec_in = NULL
   
-  if (is.factor(fixed_index_list) && (nlevels(fixed_index_list) > 1)) {
-    indvec_in = as.integer(fac2index(fixed_index_list)) - 1L #C++ takes 0 based indices
-    cardvec_in = table(fixed_index_list)
-  }
-  else {
-    if(length(fixed_index_list) > 1){
-      indvec_in = as.integer(unlist(fixed_index_list)) - 1L #C++ takes 0 based indices
-      cardvec_in = sapply(fixed_index_list, length)
-    }  
-  }
-  if (!is.null(cardvec_in)) 
-    if((method_cpp == "u") && any(cardvec_in < seq_len(p)) )
+  if (is.factor(fixed_index_list))
+    fixed_index_list = fac2list(fixed_index_list)
+
+  if (!is.null(fixed_index_list)) {
+    if (length(fixed_index_list) > ncomps_cpp) {
+      warning("fixed_index_list has more elements than the number of components; extra elements are ignored",
+              call. = FALSE)
+      fixed_index_list = fixed_index_list[seq_len(ncomps_cpp)]
+    }
+
+    for (j in seq_along(fixed_index_list)) {
+      ind_j = fixed_index_list[[j]]
+      if (is.null(ind_j) || length(ind_j) == 0L)
+        next
+      unique_ind_j = unique(ind_j)
+      if (length(unique_ind_j) < length(ind_j)) {
+        warning(paste0("duplicate indices removed from fixed_index_list component ", j),
+                call. = FALSE)
+        fixed_index_list[[j]] = unique_ind_j
+      }
+    }
+
+    indvec_in = as.integer(unlist(fixed_index_list, use.names = FALSE)) - 1L
+    cardvec_in = lengths(fixed_index_list)
+
+    fixed_components = which(cardvec_in > 0L)
+    if ((method_cpp == "u") &&
+        any(cardvec_in[fixed_components] < fixed_components))
       stop("for uspca components need cardinality not less than component order")
+  }
   if (use_fat_backend && (var_selection_cpp != 0)){
     warning("Only forward variable selection for fat matrices is available.
             Switching to that ", call. = FALSE)

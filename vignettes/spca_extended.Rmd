@@ -265,7 +265,7 @@ plot(ho_spcadef, pc_weights = ho_pca$contributions, plot_type = "h")
 
 ### Fixed indices
 
-`fixed_index_list` fixes the variable subset of each sPC. It must hold `n_comps` index vectors that partition the variables. The `holzinger` variables fall into four scales (`holzinger_scales`); we fit a four-component solution with each sPC weight on a single scale. Contributions and summaries are in the two tables below.
+`fixed_index_list` fixes the variable subset of selected sPCs. Its elements correspond to components in order; a `NULL` or empty element requests variable selection for that component. A list of length one fixes only the first component, whereas fixing a later component requires placeholders for the preceding components. Index sets may overlap and need not include every variable. If the list is longer than `n_comps`, the extra elements are ignored with a warning. The `holzinger` variables fall into four scales (`holzinger_scales`); we fit a four-component solution with each sPC weight on a single scale. Contributions and summaries are in the two tables below.
 
 ```{r fixed, eval = FALSE}
 ho_spcafixed = spca(holzinger, alpha = 0.95, n_comps = 4,

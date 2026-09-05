@@ -26,9 +26,21 @@ X[1,1] = NA
   expect_error(spca(m$X_tall, n_comps = 2, fat_matrix = NA))
 
   expect_error(spca(m$X_tall, n_comps = 2, fixed_index_list = 1),
-               "fixed_index_list can be either NULL or contain at least 2 elements")
+               "fixed_index_list must be NULL, a list indexing the variables")
   expect_error(spca(m$X_tall, n_comps = 2, fixed_index_list = list(c(1, NA))),
                "fixed_index_list must not contain missing values")
+  expect_error(spca(m$X_tall, n_comps = 2,
+                    fixed_index_list = list(c(1, 2.5))),
+               "finite integer-valued indices")
+  expect_error(spca(m$X_tall, n_comps = 2,
+                    fixed_index_list = list(c(0, 2))),
+               "indices must be between 1 and the number of variables")
+  expect_error(spca(m$X_tall, n_comps = 2,
+                    fixed_index_list = list(c(1, 5))),
+               "indices must be between 1 and the number of variables")
+  expect_error(spca(m$X_tall, n_comps = 2,
+                    fixed_index_list = list("x")),
+               "must be a numeric or integer vector")
 
   expect_error(spca(m$X_tall, n_comps = 2, eps_pm_weights = 0), "eps_pm_weights must be NULL or a positive numeric scalar")
   
