@@ -319,7 +319,8 @@ show_weights = function(spca_obj, ...) {
 #' @param ... Additional arguments reserved for S3 method compatibility.
 #' @rdname show_weights
 #' @method show_weights spca
-#' @export
+#' @exportS3Method
+#' @noRd
 show_weights.spca = function(
     spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
     return_list = FALSE, ...) {
@@ -394,7 +395,8 @@ show_correlations = function(spca_obj, ...) {
 
 #' @rdname show_correlations
 #' @method show_correlations spca
-#' @export
+#' @exportS3Method
+#' @noRd
 show_correlations.spca = function(
     spca_obj, type = "both", digits = 2, print_matrices = TRUE,
     return_matrices = FALSE, ...) {

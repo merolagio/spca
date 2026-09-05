@@ -2,19 +2,9 @@
 % Please edit documentation in R/methods_and_functions.R
 \name{show_correlations}
 \alias{show_correlations}
-\alias{show_correlations.spca}
 \title{Show Correlations from an SPCA Object}
 \usage{
 show_correlations(spca_obj, ...)
-
-\method{show_correlations}{spca}(
-  spca_obj,
-  type = "both",
-  digits = 2,
-  print_matrices = TRUE,
-  return_matrices = FALSE,
-  ...
-)
 }
 \arguments{
 \item{spca_obj}{An object of class \code{spca}.}

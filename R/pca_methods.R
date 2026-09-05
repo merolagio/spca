@@ -44,8 +44,8 @@ qqplot_spca = function(
   UseMethod("qqplot_spca")
 }
 
-#' @rdname qqplot_spca
-#' @export
+#' @exportS3Method
+#' @noRd
 qqplot_spca.spca_pca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
@@ -153,8 +153,8 @@ qqplot_spca.spca_pca = function(
   invisible(NULL)
 }
 
-#' @rdname qqplot_spca
-#' @export
+#' @exportS3Method
+#' @noRd
 qqplot_spca.spca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
@@ -184,8 +184,8 @@ screeplot_spca = function(
   UseMethod("screeplot_spca")
 }
 
-#' @rdname screeplot_spca
-#' @export
+#' @exportS3Method
+#' @noRd
 screeplot_spca.spca_pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
@@ -235,8 +235,8 @@ screeplot_spca.spca_pca = function(
   invisible(NULL)
 }
 
-#' @rdname screeplot_spca
-#' @export
+#' @exportS3Method
+#' @noRd
 screeplot_spca.spca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {

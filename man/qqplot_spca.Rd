@@ -2,39 +2,9 @@
 % Please edit documentation in R/pca_methods.R
 \name{qqplot_spca}
 \alias{qqplot_spca}
-\alias{qqplot_spca.spca_pca}
-\alias{qqplot_spca.spca}
 \title{Wachter QQ Plot for PCA Eigenvalues}
 \usage{
 qqplot_spca(
-  pca_fit,
-  n_vars = NULL,
-  n_obs = NULL,
-  gamma = NULL,
-  cor = TRUE,
-  common_var = 1,
-  n_plot = NULL,
-  n_fitline = NULL,
-  addtitle = TRUE,
-  show_plot = TRUE,
-  return_plot = FALSE
-)
-
-\method{qqplot_spca}{spca_pca}(
-  pca_fit,
-  n_vars = NULL,
-  n_obs = NULL,
-  gamma = NULL,
-  cor = TRUE,
-  common_var = 1,
-  n_plot = NULL,
-  n_fitline = NULL,
-  addtitle = TRUE,
-  show_plot = TRUE,
-  return_plot = FALSE
-)
-
-\method{qqplot_spca}{spca}(
   pca_fit,
   n_vars = NULL,
   n_obs = NULL,

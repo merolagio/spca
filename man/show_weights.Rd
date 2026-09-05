@@ -2,33 +2,12 @@
 % Please edit documentation in R/methods_and_functions.R
 \name{show_weights}
 \alias{show_weights}
-\alias{show_weights.spca}
 \title{Show SPCA Weights or Contributions}
 \usage{
 show_weights(spca_obj, ...)
-
-\method{show_weights}{spca}(
-  spca_obj,
-  cols = NULL,
-  contribution = TRUE,
-  print_list = TRUE,
-  return_list = FALSE,
-  ...
-)
 }
 \arguments{
-\item{spca_obj}{An object of class \code{spca}.}
-
-\item{...}{Additional arguments reserved for S3 method compatibility.}
-
-\item{cols}{An integer vector or \code{NULL}. Components to show.}
-
-\item{contribution}{A logical value. If \code{TRUE}, show unit-L1
-contributions; otherwise, show the original nonzero weights.}
-
-\item{print_list}{A logical value indicating whether to print the result.}
-
-\item{return_list}{A logical value indicating whether to return the result.}
+\item{spca_obj}{A fitted object.}
 }
 \value{
 The selected weights or contributions when requested; otherwise

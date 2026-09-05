@@ -2,29 +2,9 @@
 % Please edit documentation in R/pca_methods.R
 \name{screeplot_spca}
 \alias{screeplot_spca}
-\alias{screeplot_spca.spca_pca}
-\alias{screeplot_spca.spca}
 \title{Plot PCA Eigenvalues in a Screeplot}
 \usage{
 screeplot_spca(
-  pca_fit,
-  n_plot = NULL,
-  ylab = "eigenvalues",
-  addtitle = TRUE,
-  show_plot = TRUE,
-  return_plot = FALSE
-)
-
-\method{screeplot_spca}{spca_pca}(
-  pca_fit,
-  n_plot = NULL,
-  ylab = "eigenvalues",
-  addtitle = TRUE,
-  show_plot = TRUE,
-  return_plot = FALSE
-)
-
-\method{screeplot_spca}{spca}(
   pca_fit,
   n_plot = NULL,
   ylab = "eigenvalues",
