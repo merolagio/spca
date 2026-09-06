@@ -302,23 +302,22 @@ change_sign.spca = function(spca_obj, index_to_change, ...) {
 #' Show selected nonzero component weights or their unit-L1 contributions.
 #'
 #' @param spca_obj A fitted object.
-#' @return The selected weights or contributions when requested; otherwise
-#'   \code{NULL} invisibly.
-#' @family spca
-#' @export
-show_weights = function(spca_obj, ...) {
-  UseMethod("show_weights")
-}
-
-#' @param spca_obj An object of class \code{spca}.
 #' @param cols An integer vector or \code{NULL}. Components to show.
 #' @param contribution A logical value. If \code{TRUE}, show unit-L1
 #'   contributions; otherwise, show the original nonzero weights.
 #' @param print_list A logical value indicating whether to print the result.
 #' @param return_list A logical value indicating whether to return the result.
 #' @param ... Additional arguments reserved for S3 method compatibility.
-#' @rdname show_weights
-#' @method show_weights spca
+#' @return The selected weights or contributions when requested; otherwise
+#'   \code{NULL} invisibly.
+#' @family spca
+#' @export
+show_weights = function(
+    spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
+    return_list = FALSE, ...) {
+  UseMethod("show_weights")
+}
+
 #' @exportS3Method
 #' @noRd
 show_weights.spca = function(
@@ -389,12 +388,12 @@ show_weights.spca = function(
 #'
 #' @family spca
 #' @export
-show_correlations = function(spca_obj, ...) {
+show_correlations = function(
+    spca_obj, type = "both", digits = 2, print_matrices = TRUE,
+    return_matrices = FALSE, ...) {
   UseMethod("show_correlations")
 }
 
-#' @rdname show_correlations
-#' @method show_correlations spca
 #' @exportS3Method
 #' @noRd
 show_correlations.spca = function(
