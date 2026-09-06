@@ -44,18 +44,18 @@ test_that("fixed_index_list can fix selected components only", {
 test_that("extra and duplicate fixed indices are handled with warnings", {
   m = spca_test_matrices()
 
-  extra = expect_warning(
-    spca(m$S_diag, n_comps = 2, method = "c",
-         fixed_index_list = list(c(1, 2), c(2, 3), c(3, 4))),
-    "extra elements are ignored"
+  expect_warning(
+    extra <- spca(m$S_diag, n_comps = 2, method = "c",
+                 fixed_index_list = list(c(1, 2), c(2, 3), c(3, 4))),
+    "fixed_index_list has more elements than the number of components; extra elements are ignored"
   )
   expect_equal(extra$indices[[1]], c(1L, 2L))
   expect_equal(extra$indices[[2]], c(2L, 3L))
 
-  duplicate = expect_warning(
-    spca(m$S_diag, n_comps = 2, method = "c",
-         fixed_index_list = list(c(1, 1, 2), c(3, 4))),
-    "duplicate indices removed"
+  expect_warning(
+    duplicate <- spca(m$S_diag, n_comps = 2, method = "c",
+                     fixed_index_list = list(c(1, 1, 2), c(3, 4))),
+    "duplicate indices removed from fixed_index_list component 1"
   )
   expect_equal(duplicate$indices[[1]], c(1L, 2L))
 })
