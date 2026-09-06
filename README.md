@@ -8,6 +8,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/spca)](https://CRAN.R-project.org/package=spca)
 [![License](https://img.shields.io/badge/license-AGPL--3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
@@ -15,22 +17,27 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lif
 Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
 <!-- badges: end -->
 
-This package contains functions to compute, print and plot Least Squares
-Sparse Principal Components Analysis (LS-SPCA). Methodological details,
-references and full presentation can be found in the spca_extended
-vignette.
+This package contains functions to compute, visualize and compare Least
+Squares Sparse Principal Components Analysis (LS-SPCA). Differently from
+other *conventional* SPCA methods, LS-SPCA provides a close
+approximation to the PCs, thus something like PCA with sparse weights.
+
+An efficient `C++` backend makes the fitting functions fast and memory
+efficient. Careful input validation and error handling prevents crashes
+and provides useful error and warning messages.
+
+Methodological details, references and full presentation can be found in
+the *spca_extended* vignette.
 
 ## Installation
 
-You can install the stable release version from CRAN
+The stable release version can be installed from CRAN
 
 ``` r
 install.packages("spca")
-#or
-https://github.com/merolagio/spca/releases/tag/CRAN_submission
 ```
 
-The current development version from GitHub
+The current development version can be installed from GitHub with
 
 ``` r
 remotes::install_github("merolagio/spca")
@@ -38,7 +45,7 @@ remotes::install_github("merolagio/spca")
 
 ## Usage
 
-The main function *spca()* computes the sparse loadings and various
+The main function *spca()* computes the sparse weights and various
 statistics, such as the variance explained by each sparse component
 (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is
 chosen by examining visually the eigenvalues of the covariance matrix.
@@ -50,9 +57,15 @@ to standard *print()*, *summary()* and *plot()*, also
 *aggregate_by_group()* (to visualize the contribution by scale),
 *change_sign()* and *show_weights()* are available.
 
-Utilities available are *compare_spca()* (to compare two or more spca
-solutions) and *new.spca()* (to create an *spca* object from a set of
-loadings) are available.
+The function `compare_spca()` compares two or more `spca` solutions,
+`aggregate_by_group()` summarizes weights or contributions by group, and
+`new_spca()` creates an `spca` object from a set of weights. Additional
+methods include `show_weights()`, which displays nonzero weights or
+contributions; `show_correlations()`, which displays correlations among
+sPCs and between sPCs and the corresponding PCs; and `change_sign()`,
+which changes the signs of selected components and their associated
+quantities. The functions `qqplot_spca()` and `screeplot_spca()` produce
+diagnostic plots from an object returned by `pca()`.
 
 ## Example
 
@@ -82,13 +95,14 @@ summary(ho_pca,cols = 10)
 #> Rvexp  100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0%
 #> Rcvexp 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0%
 #> Card       12     12     12     12     12     12     12     12     12     12
+#> r       1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000
 ```
 
 <img src="man/figures/README-pca_checks-1.png" width="47%" /><img src="man/figures/README-pca_checks-2.png" width="47%" />
 
 We can settle for 4 components
 
-### Compute the sparse loadings
+### Compute the sparse weights
 
 Important parameters in the *spca()* function are: *alpha* which
 controls for the minimum $`R^2`$ \[default\]) or the minimum proportion
@@ -111,8 +125,8 @@ myspca = spca(holzinger, n_comps = 4)
 ### Inspect spca results
 
 Methods are *print*, *plot* (several options available) and *summary*.
-By defaut, plot and print show the percentage *contributions*, that is
-the loadings scaled to have sum of their absolute values equal to 1.
+By default, plot and print show the percentage *contributions*, that is
+the weights scaled to have sum of their absolute values equal to 1.
 
 ``` r
 myspca # print
@@ -142,11 +156,16 @@ summary(myspca, cor_with_pc = TRUE)
 #> Rcvexp  96.0%  96.3%  96.7%  97.0%
 #> Card        7      5      6      6
 #> r       0.978  0.973  0.979 -0.876
+```
 
+The sPCs explain over 96% of the variance explained by the corresponding
+full-cardinality PC whith which they are highly correlated.
+
+``` r
 plot(myspca, plot_type = "bar")
 ```
 
-<img src="man/figures/README-methods-1.png" width="50%" />
+<img src="man/figures/README-plots-1.png" width="50%" />
 
 ``` r
 
@@ -161,6 +180,8 @@ show_correlations(myspca)
 #> sPC-PC  0.98  0.97  0.98 -0.88
 #round(myspca$spc_cor, 2)
 ```
+
+The sPCs are virtually uncorrelated.
 
 Other plot types are available.
 
@@ -184,7 +205,7 @@ plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is e
 
 The variables in the `holzinger` dataset belong to four different
 scales, recorded in the factor `holzinger_scales`. These can be
-differenciated in the barplot
+differentiated in the barplot
 
 ``` r
 plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
@@ -204,8 +225,8 @@ aggregate_by_group(myspca, groups = holzinger_scales)
 
 ## Comparison of two or more spca solutions
 
-Compare the *CSPCA* solutions with *alpha = 0.95* those with *alpha =
-0.90*.
+Compare the *cSPCA* solutions computed with *alpha = 0.95* computed with
+those with *alpha = 0.90*.
 
 ``` r
 myspca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
@@ -216,20 +237,6 @@ compare_spca(obj_list = list(myspca, myspca90),
 
 ![](man/figures/README-spca90-1.png)<!-- -->
 
-    #>           C1.M1 C1.M2 C2.M1 C2.M2 C3.M1 C3.M2 C4.M1 C4.M2
-    #> visual     11.9                    13.2  13.3 -24.2      
-    #> cubes                              22.1  23.4  20.8  21.5
-    #> flags      14.2  16.6                17  16.2         -10
-    #> paragraph             -22.6       -11.9               6.2
-    #> sentence   19.6  23.7       -18.8 -17.2 -27.9            
-    #> wordm                 -21.9 -20.1                     6.2
-    #> addition   12.2        21.2  22.7 -18.5 -19.1   9.6  13.6
-    #> counting               20.3  24.8                        
-    #> straight   12.3  21.1    14  13.5             -18.6 -19.2
-    #> deduct     13.7  16.6                           9.3      
-    #> numeric                                        17.5  12.9
-    #> series     16.1  21.9                               -10.4
-    #>  
     #>        C1.M1  C1.M2  C2.M1  C2.M2  C3.M1  C3.M2  C4.M1  C4.M2 
     #> Vexp    38.6%  37.3%  13.3%  13.2%  10.4%  10.1%   6.4%   6.6%
     #> Cvexp   38.6%  37.3%  51.9%  50.5%  62.3%  60.6%  68.8%  67.2%

@@ -20,12 +20,17 @@ devtools::load_all(".")
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/spca)](https://CRAN.R-project.org/package=spca)
 [![License](https://img.shields.io/badge/license-AGPL--3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Project Status: Active](https://img.shields.io/badge/status-active-success.svg)](https://github.com/merolagio/spca)
 <!-- badges: end -->
 
-This package contains functions to compute, visualize and compare Least Squares Sparse Principal Components Analysis (LS-SPCA). An efficient `C++` backend makes the fitting functions fast and memory efficient. Methodological details, references and full presentation can be found in the *spca_extended* vignette.
+This package contains functions to compute, visualize and compare Least Squares Sparse Principal Components Analysis (LS-SPCA). Differently from other *conventional* SPCA methods, LS-SPCA provides a close approximation to the PCs, thus something like PCA with sparse weights. 
+
+An efficient `C++` backend makes the fitting functions fast and memory efficient. Careful input validation and error handling prevents crashes and provides useful error and warning messages.
+
+Methodological details, references and full presentation can be found in the *spca_extended* vignette.
 
 ## Installation
 The stable release version can be installed from CRAN
@@ -73,18 +78,22 @@ myspca = spca(holzinger, n_comps = 4)
 
 ### Inspect spca results
 Methods are *print*, *plot* (several options available) and *summary*.
-By defaut, plot and print show the percentage *contributions*, that is the weights scaled to have sum of their absolute values equal to 1.
+By default, plot and print show the percentage *contributions*, that is the weights scaled to have sum of their absolute values equal to 1.
 ```{r methods, message = TRUE, warning = FALSE, out.width="50%"}
 myspca # print
 
 summary(myspca, cor_with_pc = TRUE)
+```
+The sPCs explain over 96% of the variance explained by the corresponding  full-cardinality PC whith which they are highly correlated.
 
+```{r plots, message = TRUE, warning = FALSE, out.width="50%"}
 plot(myspca, plot_type = "bar")
 
 #sPCs correlation
 show_correlations(myspca)
 #round(myspca$spc_cor, 2)
 ```
+The sPCs are virtually uncorrelated.
 
 Other plot types are available.
 
