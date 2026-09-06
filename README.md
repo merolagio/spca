@@ -1,6 +1,4 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <img src = "man/figures/spca_logo_octagon.png" align = "left" height = "80" alt = "spca logo" />
 
 # Package spca
@@ -8,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/merolagio/spca/actions/workflows/R-CMD-check.yaml)
+[![GitHub
+version](https://img.shields.io/github/r-package/v/merolagio/spca/main)](https://github.com/merolagio/spca)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/spca)](https://CRAN.R-project.org/package=spca)
 [![License](https://img.shields.io/badge/license-AGPL--3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
