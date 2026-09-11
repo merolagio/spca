@@ -129,8 +129,8 @@ ho_pca = pca(holzinger, screeplot = TRUE, qq_plot = FALSE)
 ```
 
 ```{r qqplot, fig.cap = "qq-plot with a fitted line."}
-qqplot_spca(ho_pca, n_vars = ncol(holzinger),
-               n_obs = nrow(holzinger), n_fitline = -3)
+mp_qqplot(ho_pca, n_vars = ncol(holzinger),
+               n_fitline = -3)
 ```
 
 The screeplot suggests four components, the qq-plot three. We keep four, noting that the fourth may explain mostly noise.
