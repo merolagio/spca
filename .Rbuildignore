@@ -9,6 +9,7 @@
 ^R\Remove$
 Document_output.txt$
 Compile_output.txt$
+CLAUDE.md$
 change_log.txt$
 test_res.txt$
 ext_chunks.R$

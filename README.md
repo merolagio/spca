@@ -64,7 +64,7 @@ methods include `show_weights()`, which displays nonzero weights or
 contributions; `show_correlations()`, which displays correlations among
 sPCs and between sPCs and the corresponding PCs; and `change_sign()`,
 which changes the signs of selected components and their associated
-quantities. The functions `qqplot_spca()` and `screeplot_spca()` produce
+quantities. The functions `mp_qqplot()` and `screeplot_pca()` produce
 diagnostic plots from an object returned by `pca()`.
 
 ## Example
@@ -100,7 +100,8 @@ summary(ho_pca,cols = 10)
 
 <img src="man/figures/README-pca_checks-1.png" width="47%" /><img src="man/figures/README-pca_checks-2.png" width="47%" />
 
-We can settle for 4 components
+The screeplot would call for four components while the qqplot indicates
+three. We can settle for 4 components.
 
 ### Compute the sparse weights
 

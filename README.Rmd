@@ -46,7 +46,7 @@ The  main function *spca()* computes the sparse weights and various statistics, 
 
 Different methods can be applied to class *spca* objects: additionally to standard *print()*, *summary()* and *plot()*, also *aggregate_by_group()* (to visualize the contribution by scale), *change_sign()* and *show_weights()*  are available.  
 
-The function `compare_spca()` compares two or more `spca` solutions, `aggregate_by_group()` summarizes weights or contributions by group, and `new_spca()` creates an `spca` object from a set of weights. Additional methods include `show_weights()`, which displays nonzero weights or contributions; `show_correlations()`, which displays correlations among sPCs and between sPCs and the corresponding PCs; and `change_sign()`, which changes the signs of selected components and their associated quantities. The functions `qqplot_spca()` and `screeplot_spca()` produce diagnostic plots from an object returned by `pca()`.
+The function `compare_spca()` compares two or more `spca` solutions, `aggregate_by_group()` summarizes weights or contributions by group, and `new_spca()` creates an `spca` object from a set of weights. Additional methods include `show_weights()`, which displays nonzero weights or contributions; `show_correlations()`, which displays correlations among sPCs and between sPCs and the corresponding PCs; and `change_sign()`, which changes the signs of selected components and their associated quantities. The functions `mp_qqplot()` and `screeplot_pca()` produce diagnostic plots from an object returned by `pca()`.
 
 ## Example
 
@@ -65,7 +65,7 @@ ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
 summary(ho_pca,cols = 10)
 ```
 
-We can settle for 4 components
+The screeplot would call for four components while the qqplot indicates three. We can settle for 4 components.
 
 ### Compute the sparse weights
 Important parameters in the *spca()* function are: *alpha* which controls for the minimum $R^2$ [default]) or the minimum proportion of cumulative variance explained (VEXP) by the sPCs realtive to that explained by the corresponding  PCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; *var_selection* ("forward" [default], "stepwise", or "backward"). See the **spca**` help for details on these parameters and more.
