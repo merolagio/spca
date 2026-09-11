@@ -33,13 +33,14 @@ invisibly.
 }
 \description{
 \code{spca_screeplot()} is retained for backward compatibility. Use
-\code{\link[=screeplot_spca]{screeplot_spca()}} with objects returned by \code{\link[=pca]{pca()}} in new code.
+\code{\link[=screeplot_pca]{screeplot_pca()}} with objects returned by \code{\link[=pca]{pca()}} in new code.
 }
 \seealso{
 Other pca: 
+\code{\link{mp_qqplot}()},
 \code{\link{pca}()},
-\code{\link{qqplot_spca}()},
-\code{\link{screeplot_spca}()},
+\code{\link{screeplot_pca}()},
 \code{\link{wachter_qqplot}()}
 }
 \concept{pca}
+\keyword{internal}

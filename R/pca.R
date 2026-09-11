@@ -20,7 +20,7 @@
 #' @param screeplot A logical value (default \code{FALSE}). If \code{TRUE},
 #'   produce a scree plot.
 #' @param qq_plot A logical value (default \code{TRUE}). If \code{TRUE},
-#'   produce a Wachter QQ plot with \code{\link{qqplot_spca}}.
+#'   produce a Wachter QQ plot with \code{\link{mp_qqplot}}.
 #' @param nrow_data An integer scalar or \code{NULL} (default \code{NULL}).
 #'   Number of rows in the original data set. Required when
 #'   \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
@@ -43,7 +43,7 @@
 #'
 #' @return An \code{\link{spca_object}} with an additional
 #'   \code{eigenvalues} vector containing the eigenvalues up to the rank used by
-#'   the selected backend and \code{n_obs} stores the number of observations,  
+#'   the selected backend and \code{n_obs} stores the number of observations,
 #'   if a data matrix is passed, or NULL.
 #'
 #' @details \code{n_comps} controls how many components are retained in the
@@ -60,62 +60,62 @@
 #' @export
 pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                fat_matrix = NULL, screeplot = FALSE, qq_plot = TRUE,
-               nrow_data = NULL, neigen_toplot = NULL, cor = TRUE, 
+               nrow_data = NULL, neigen_toplot = NULL, cor = TRUE,
                common_var = 1, pm = FALSE, eps_pm = 1e-4, maxiter_pm = 1000) {
-  
+
   # validation ==========
-  
+
   vbool = validate_booleans(center_data = center_data,
                             scale_data = scale_data,
                             screeplot = screeplot,
                             qq_plot = qq_plot,
                             pm = pm)
-  
+
   if (!vbool) {
     stop("wrong input for boolean argument")
   }
-  
+
   if (!is.null(fat_matrix) &&
       (!is.logical(fat_matrix) || length(fat_matrix) != 1 || is.na(fat_matrix)))
     stop("fat_matrix must be TRUE, FALSE, or NULL")
-  
-  if (!is.numeric(eps_pm) || length(eps_pm) != 1 || 
+
+  if (!is.numeric(eps_pm) || length(eps_pm) != 1 ||
       is.na(eps_pm) || eps_pm <= 0)
     stop("eps_pm must be a positive scalar")
-  if (!is.numeric(maxiter_pm) || length(maxiter_pm) != 1 || 
+  if (!is.numeric(maxiter_pm) || length(maxiter_pm) != 1 ||
       is.na(maxiter_pm) || maxiter_pm < 1)
     stop("maxiter_pm must be a positive scalar")
-  
+
   if (any(is.na(M)))
     stop("The data matrix cannot contain missing values")
-  
+
   if (is.data.frame(M))
     M = as.matrix(M)
   if (!is.matrix(M))
     stop("M must be a matrix")
-  
+
   n = nrow(M)
   p = ncol(M)
-  
+
   is_datamatrix_M = FALSE
   if ((nrow(M) != p) || !isSymmetric(M)) {
     is_datamatrix_M = TRUE
     nrow_data = nrow(M)
   }
-  
+
   # maximum data rank
   if (is_datamatrix_M)
     rank_M = min((nrow(M) - 1), ncol(M))
   else
     rank_M = nrow(M)
-  
+
   if (is.null(fat_matrix)) {
     fat_matrix = (is_datamatrix_M && (n < p))
     if (fat_matrix)
-      message("fat_matrix = NULL selected the fat backend because M is 
+      message("fat_matrix = NULL selected the fat backend because M is
               a data matrix with n < p")
   }
-  
+
   if (is_datamatrix_M) {
     if (!is.null(colnames(M)))
       var_names = colnames(M)
@@ -130,7 +130,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
       else
         var_names = paste0("V", seq_len(ncol(M)))
   }
-  
+
   if (fat_matrix) {
     if (!is_datamatrix_M) {
       warning("fat_matrix = TRUE ignored because the input is a covariance/
@@ -149,7 +149,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
       warning("fat_matrix = FALSE forces the tall backend on a fat data matrix;
               X'X may be singular")
   }
-  
+
   max_comps = if (use_fat_backend) n else p
   if (is.null(n_comps))
     n_comps = max_comps
@@ -157,12 +157,12 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     warning(paste("incorrect value for n_comps in pca, set to", max_comps))
     n_comps = max_comps
   }
-  
+
   if (!is.numeric(nrow_data) && qq_plot) {
     warning("qq-plot cannot be produced because nrow_data is not available")
     qq_plot = FALSE
   }
-  
+
   if (is_datamatrix_M) {
     # data matrix must be column mean centered
     if (any(abs(colMeans(M)) > 1e-6))
@@ -171,9 +171,9 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
       M = standardize_data(M, center_data, scale_data)
     }
   }
-  
+
   # computation========
-  
+
   pcout = pcaC(M = M,
                ncomps = as.integer(n_comps),
                data_matrix = is_datamatrix_M,
@@ -181,22 +181,22 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                PM = pm,
                epsPM = eps_pm,
                maxiterPM = as.integer(maxiter_pm))
-  
+
   # output   ====
   weights = pcout$weights
   rownames(weights) = var_names
   colnames(weights) = paste0("PC", seq_len(ncol(weights)))
-  
+
   contributions = scale_columns(weights[, 1:n_comps, drop = FALSE],
                                 1, rep(1, n_comps))
   rownames(contributions) = var_names
   colnames(contributions) = paste0("PC", seq_len(ncol(contributions)))
-  
+
   weights_list = lapply(1:n_comps, function(i, x) x[, i],
                          x = weights[, 1:n_comps, drop = FALSE])
-  
+
   vexp = pcout$vexpPC
-  
+
   out = list(weights = weights[, 1:n_comps, drop = FALSE],
              contributions = contributions,
              n_comps = n_comps,
@@ -219,13 +219,13 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     colnames(out$scores) = paste0("Comp", 1:n_comps)
   }
   out$spc_cor = diag(out$n_comps)
-  
-  class(out) = c("spca_pca", "spca", "list")
-  
+
+  class(out) = c("pca", "spca", "list")
+
   # plots =============
-  
+
   if (screeplot || qq_plot) {
-    
+
     if (is.null(neigen_toplot))
       neigen_toplot = length(out$eigenvalues)
     if (neigen_toplot < 2) {
@@ -239,14 +239,14 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                     length(out$eigenvalues)))
       neigen_toplot = length(out$eigenvalues)
     }
-    
+
     if (screeplot == TRUE) {
-      
-      pl = screeplot_spca(out, n_plot = neigen_toplot, 
+
+      pl = screeplot_pca(out, n_plot = neigen_toplot,
                           ylab = "eigenvalues")
     }
     if (qq_plot == TRUE) {
-      pl = qqplot_spca(out, n_vars = p, n_obs = nrow_data, 
+      pl = mp_qqplot(out, n_vars = p, n_obs = nrow_data,
                           common_var = common_var, n_plot = neigen_toplot,
                           n_fitline = NULL
       )
@@ -276,4 +276,3 @@ theme_pca = function(base_size = 12, base_family = "") {
       panel.background = element_rect(colour = "black")
     )
 }
-

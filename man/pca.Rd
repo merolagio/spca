@@ -45,7 +45,7 @@ backend. Covariance and correlation matrices always use the tall backend.}
 produce a scree plot.}
 
 \item{qq_plot}{A logical value (default \code{TRUE}). If \code{TRUE},
-produce a Wachter QQ plot with \code{\link{qqplot_spca}}.}
+produce a Wachter QQ plot with \code{\link{mp_qqplot}}.}
 
 \item{nrow_data}{An integer scalar or \code{NULL} (default \code{NULL}).
 Number of rows in the original data set. Required when
@@ -97,8 +97,8 @@ summary(ho_pca)
 }
 \seealso{
 Other pca: 
-\code{\link{qqplot_spca}()},
-\code{\link{screeplot_spca}()},
+\code{\link{mp_qqplot}()},
+\code{\link{screeplot_pca}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }

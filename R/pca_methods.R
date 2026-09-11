@@ -2,20 +2,29 @@
 #
 # Required changes in pca():
 #   out$n_obs = nrow_data
-#   class(out) = c("spca_pca", "spca", "list")
+#   class(out) = c("pca", "spca", "list")
 #
 # Call these methods after assigning the class:
-#   screeplot_spca(pca_fit = out, n_plot = neigen_toplot,
-#                  ylab = "eigenvalues")
-#   qqplot_spca(pca_fit = out, common_var = common_var,
-#               n_plot = neigen_toplot, n_fitline = NULL)
+#   screeplot_pca(pca_fit = out, n_plot = neigen_toplot,
+#                 ylab = "eigenvalues")
+#   mp_qqplot(pca_fit = out, common_var = common_var,
+#             n_plot = neigen_toplot, n_fitline = NULL)
 
 #' Wachter QQ Plot for PCA Eigenvalues
 #'
 #' Produce a QQ plot comparing the eigenvalues of a fitted PCA with
 #' Marchenko--Pastur (Wachter) theoretical quantiles.
 #'
-#' @param pca_fit An object returned by [pca()].
+#' This diagnostic relies on Marchenko--Pastur theory for the null
+#' eigenvalue distribution of a (possibly high-dimensional) sample
+#' covariance matrix, and is therefore only meaningful for objects of
+#' class `"pca"` (i.e. objects returned by [pca()]). It does not apply
+#' to sparse fits returned by [spca()] (class `"spca"`), for which the
+#' reference distribution does not hold; no method is defined for that
+#' class, so calling it on such an object raises the standard
+#' "no applicable method" error rather than producing a plot.
+#'
+#' @param pca_fit An object of class `"pca"`, as returned by [pca()].
 #' @param n_vars An integer scalar or `NULL`. Number of variables. If `NULL`,
 #'   obtain it from the number of rows of `pca_fit$weights`.
 #' @param n_obs An integer scalar or `NULL`. Number of observations. If `NULL`,
@@ -37,16 +46,16 @@
 #'   invisibly.
 #' @family pca
 #' @export
-qqplot_spca = function(
+mp_qqplot = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("qqplot_spca")
+  UseMethod("mp_qqplot")
 }
 
 #' @exportS3Method
 #' @noRd
-qqplot_spca.spca_pca = function(
+mp_qqplot.pca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
@@ -153,21 +162,17 @@ qqplot_spca.spca_pca = function(
   invisible(NULL)
 }
 
-#' @exportS3Method
-#' @noRd
-qqplot_spca.spca = function(
-    pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
-    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
-    show_plot = TRUE, return_plot = FALSE) {
-  stop("`qqplot_spca()` applies only to objects returned by `pca()`.",
-       call. = FALSE)
-}
-
 #' Plot PCA Eigenvalues in a Screeplot
 #'
 #' Plot the leading eigenvalues of a fitted PCA against component order.
 #'
-#' @param pca_fit An object returned by [pca()].
+#' This diagnostic applies only to objects of class `"pca"` (i.e. objects
+#' returned by [pca()]). It does not apply to sparse fits returned by
+#' [spca()] (class `"spca"`); no method is defined for that class, so
+#' calling it on such an object raises the standard "no applicable
+#' method" error rather than producing a plot.
+#'
+#' @param pca_fit An object of class `"pca"`, as returned by [pca()].
 #' @param n_plot An integer scalar or `NULL`. Number of leading eigenvalues.
 #' @param ylab A character scalar used as the y-axis label.
 #' @param addtitle A logical scalar indicating whether to add a title.
@@ -178,15 +183,15 @@ qqplot_spca.spca = function(
 #'   invisibly.
 #' @family pca
 #' @export
-screeplot_spca = function(
+screeplot_pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("screeplot_spca")
+  UseMethod("screeplot_pca")
 }
 
 #' @exportS3Method
 #' @noRd
-screeplot_spca.spca_pca = function(
+screeplot_pca.pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
@@ -235,21 +240,12 @@ screeplot_spca.spca_pca = function(
   invisible(NULL)
 }
 
-#' @exportS3Method
-#' @noRd
-screeplot_spca.spca = function(
-    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
-    show_plot = TRUE, return_plot = FALSE) {
-  stop("`screeplot_spca()` applies only to objects returned by `pca()`.",
-       call. = FALSE)
-}
-
 # Obsolete function interfaces retained for backward compatibility ============
 
 #' Wachter QQ Plot for Eigenvalues (Deprecated)
 #'
 #' `wachter_qqplot()` is retained for backward compatibility. Use
-#' [qqplot_spca()] with objects returned by [pca()] in new code.
+#' [mp_qqplot()] with objects returned by [pca()] in new code.
 #'
 #' @param eigenvalues A numeric vector of eigenvalues in decreasing order, or
 #'   an object returned by [pca()].
@@ -271,21 +267,22 @@ screeplot_spca.spca = function(
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
 #' @family pca
+#' @keywords internal
 #' @export
 wachter_qqplot = function(
     eigenvalues, p = NULL, n, gamma, cor = TRUE, common_var = 1,
     n_plot = NULL, n_fitline = NULL, addtitle = TRUE, show_plot = TRUE,
     return_plot = FALSE) {
-  .Deprecated("qqplot_spca")
+  .Deprecated("mp_qqplot")
 
-  if (inherits(eigenvalues, "spca_pca")) {
+  if (inherits(eigenvalues, "pca")) {
     if (is.null(p))
       p = nrow(.get_spca_weights(eigenvalues))
     n_value = if (missing(n)) NULL else n
     gamma_value = if (missing(gamma)) NULL else gamma
 
     return(
-      qqplot_spca(
+      mp_qqplot(
         pca_fit = eigenvalues,
         n_vars = p,
         n_obs = n_value,
@@ -381,7 +378,7 @@ wachter_qqplot = function(
 #' Plot Eigenvalues in a Scree Plot (Deprecated)
 #'
 #' `spca_screeplot()` is retained for backward compatibility. Use
-#' [screeplot_spca()] with objects returned by [pca()] in new code.
+#' [screeplot_pca()] with objects returned by [pca()] in new code.
 #'
 #' @param eigenvalues A numeric vector of eigenvalues, or an object returned
 #'   by [pca()].
@@ -394,15 +391,16 @@ wachter_qqplot = function(
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
 #' @family pca
+#' @keywords internal
 #' @export
 spca_screeplot = function(
     eigenvalues, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
-  .Deprecated("screeplot_spca")
+  .Deprecated("screeplot_pca")
 
-  if (inherits(eigenvalues, "spca_pca")) {
+  if (inherits(eigenvalues, "pca")) {
     return(
-      screeplot_spca(
+      screeplot_pca(
         pca_fit = eigenvalues,
         n_plot = n_plot,
         ylab = ylab,

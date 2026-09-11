@@ -52,13 +52,14 @@ invisibly.
 }
 \description{
 \code{wachter_qqplot()} is retained for backward compatibility. Use
-\code{\link[=qqplot_spca]{qqplot_spca()}} with objects returned by \code{\link[=pca]{pca()}} in new code.
+\code{\link[=mp_qqplot]{mp_qqplot()}} with objects returned by \code{\link[=pca]{pca()}} in new code.
 }
 \seealso{
 Other pca: 
+\code{\link{mp_qqplot}()},
 \code{\link{pca}()},
-\code{\link{qqplot_spca}()},
-\code{\link{screeplot_spca}()},
+\code{\link{screeplot_pca}()},
 \code{\link{spca_screeplot}()}
 }
 \concept{pca}
+\keyword{internal}
