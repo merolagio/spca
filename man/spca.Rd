@@ -170,6 +170,7 @@ Other spca:
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_contributions_spca}()},
 \code{\link{show_correlations}()},
 \code{\link{show_weights}()},
 \code{\link{spca_object}},

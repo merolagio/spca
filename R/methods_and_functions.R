@@ -203,6 +203,7 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
 #' @return The modified `spca_obj`.
 #' @family spca
 #' @export
+#' @keywords internal
 change_weights_sign_spca = function(spca_obj, index_to_change) {
   .Deprecated("change_sign")
   change_sign(spca_obj, index_to_change = index_to_change)
@@ -219,6 +220,7 @@ change_weights_sign_spca = function(spca_obj, index_to_change) {
 #' @return The modified `spca_obj`.
 #' @family spca
 #' @export
+#' @keywords internal
 change_loadings_sign_spca = function(spca_obj, index_to_change) {
   .Deprecated("change_sign")
   change_sign(spca_obj, index_to_change = index_to_change)
@@ -250,6 +252,7 @@ change_sign = function(spca_obj, ...) {
 #' @rdname change_sign
 #' @method change_sign spca
 #' @export
+#' @noRd
 change_sign.spca = function(spca_obj, index_to_change, ...) {
   
   if (length(index_to_change) < 1L ||
@@ -354,6 +357,43 @@ show_weights.spca = function(
   if (return_list)
     return(values)
   invisible(NULL)
+}
+
+## show_contributions_spca ==================
+#' Shows the non-zero contributions separately for each component (Deprecated).
+#' Use \code{show_weights()} instead.. 
+#' It just turns an spca object loadings_list into a list of loadings 
+#' 
+#' @param spca_obj An spca object
+#' 
+#' @param cols A vector containing the indices of the loadings to be shown.  Can
+#'  be a single value. if missing all loadings are shown: If an integer is
+#'  passed, only that dimension will be returned.
+#' @details
+#'  Deprecated, will not work for spca version > 1.1.1. Use \code{show_weights()}.
+#' @param return_list Logical: if `TRUE` the list is returned
+#' @family spca
+#' @keywords internal
+#' @export 
+show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
+{
+  test = validate_spca(spca_obj)
+  if (!test)
+    stop("show_loadings requires an spca object as first argument")
+  
+  if(is.null(cols)){
+    cols = seq_along(spca_obj$vexp)
+  }
+  
+  contributions = lapply(spca_obj$loadings_list, function(x) x/ sum(abs(x)))
+  
+  message("Percentage Contributions")
+  print(contributions)
+  
+  if (return_list == TRUE)
+    return(contributions)
+  
+  invisible()
 }
 
 #show_correlations=============
@@ -544,6 +584,7 @@ aggregate_by_group = function(spca_obj, ...) {
 #' @rdname aggregate_by_group
 #' @method aggregate_by_group spca
 #' @export
+#' @noRd
 aggregate_by_group.spca = function(
     spca_obj, groups, only_nonzero = TRUE, contributions = TRUE,
     digits = ifelse(contributions, 1, 3), print_table = TRUE,

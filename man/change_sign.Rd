@@ -2,25 +2,17 @@
 % Please edit documentation in R/methods_and_functions.R
 \name{change_sign}
 \alias{change_sign}
-\alias{change_sign.spca}
 \title{Change Component Signs}
 \usage{
 change_sign(spca_obj, ...)
-
-\method{change_sign}{spca}(spca_obj, index_to_change, ...)
 }
 \arguments{
-\item{spca_obj}{An object of class \code{spca}.}
+\item{spca_obj}{A fitted object.}
 
 \item{...}{Additional arguments reserved for S3 method compatibility.}
-
-\item{index_to_change}{An integer vector of component indices whose signs
-should be changed.}
 }
 \value{
 The modified object.
-
-The modified \code{spca} object.
 }
 \description{
 Change the signs of selected components in a fitted object.
@@ -35,6 +27,7 @@ Other spca:
 \code{\link{new_spca}()},
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
+\code{\link{show_contributions_spca}()},
 \code{\link{show_correlations}()},
 \code{\link{show_weights}()},
 \code{\link{spca}()},
