@@ -29,11 +29,12 @@
 #'   selected components.
 #' * [aggregate_by_group()] aggregates weights or contributions according to a
 #'   grouping vector.
-#' * [screeplot_spca()] and [qqplot_spca()] provide diagnostic plots for objects
+#' * [screeplot_pca()] and [mp_qqplot()] provide diagnostic plots for objects
 #'   returned by [pca()].
 #' 
 #' \strong{Utilities}
-#' * [is.spca()] Verifies whether an object is an `spca` object.
+#' * [is.spca()] Verifies whether an object is a proper `spca` object.
+#' * [is.pca()] Verifies whether an object is a proper `pca` object.
 #' * [compare_spca()] Compares two or more LS-SPCA solutions numerically 
 #'   and visually.
 #' * [new_spca()] Creates an `spca` object from a set of weights.

@@ -103,9 +103,9 @@ mp_qqplot.pca = function(
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
-  if (!is.pca(pca_fit))
-    stop("`mp_qqplot()` requires a `pca` object as first argument.",
-         call. = FALSE)
+  # if (!is.pca(pca_fit))
+  #   stop("`mp_qqplot()` requires a `pca` object as first argument.",
+  #        call. = FALSE)
   
   eigenvalues = pca_fit$eigenvalues
 
@@ -242,9 +242,9 @@ screeplot_pca.pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
-  if (!is.pca(pca_fit))
-    stop("`screeplot_pca()` requires a `pca` object as first argument.",
-         call. = FALSE)
+  # if (!is.pca(pca_fit))
+  #   stop("`screeplot_pca()` requires a `pca` object as first argument.",
+  #        call. = FALSE)
   
   eigenvalues = pca_fit$eigenvalues
 

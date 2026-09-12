@@ -29,8 +29,7 @@ test_that("screeplot_pca() rejects spca() fits", {
 
   expect_error(
     screeplot_pca(fit, show_plot = FALSE),
-    "no applicable method"
-  )
+    "no applicable method")
 })
 
 
@@ -54,9 +53,7 @@ test_that("mp_qqplot() accepts pca objects", {
       fit,
       n_vars = ncol(X),
       n_obs = nrow(X),
-      show_plot = FALSE
-    )
-  )
+      show_plot = FALSE))
 })
 
 test_that("mp_qqplot() rejects unsupported objects", {
@@ -65,8 +62,7 @@ test_that("mp_qqplot() rejects unsupported objects", {
       list(values = 1:3),
       n_vars = 3,
       n_obs = 10,
-      show_plot = FALSE
-    ),
+      show_plot = FALSE),
     "no applicable method"
   )
 })
@@ -159,7 +155,7 @@ test_that("wachter_qqplot() accepts obsolete pca objects with loadings", {
         return_plot = TRUE
       )
     },
-    "mp_qqplot"
+    "'wachter_qqplot'"
   )
 
   expect_s3_class(pl, "ggplot")
