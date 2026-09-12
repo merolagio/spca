@@ -2,24 +2,35 @@
 % Please edit documentation in R/methods_and_functions.R
 \name{change_sign}
 \alias{change_sign}
-\title{Change Component Signs}
+\title{Change Weight Signs}
 \usage{
-change_sign(spca_obj, ...)
+change_sign(spca_obj, index_to_change)
 }
 \arguments{
-\item{spca_obj}{A fitted object.}
+\item{spca_obj}{An object of class \code{spca}.}
 
-\item{...}{Additional arguments reserved for S3 method compatibility.}
+\item{index_to_change}{An integer vector of component indices whose signs
+should be changed.}
 }
 \value{
-The modified object.
+The modified \code{spca} object.
 }
 \description{
-Change the signs of selected components in a fitted object.
+Change the signs of selected Weights in a fitted object.
+}
+\examples{
+data(holzinger)
+ho_cspca = spca(holzinger, n_comps = 4)
+show_correlations(ho_cspca) 
+# In applications we would change only the fourth set of weights
+ho_changed = change_sign(ho_cspca, index_to_change = c(2, 4))
+is.spca(ho_changed)
+show_weights(ho_cspca, cols = 2)
+show_weights(ho_changed, cols = 2)
+show_correlations(ho_changed) 
 }
 \seealso{
 Other spca: 
-\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
 \code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},

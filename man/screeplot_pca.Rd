@@ -42,6 +42,7 @@ method" error rather than producing a plot.
 }
 \seealso{
 Other pca: 
+\code{\link{is.pca}()},
 \code{\link{mp_qqplot}()},
 \code{\link{pca}()},
 \code{\link{spca_screeplot}()},

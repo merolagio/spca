@@ -1,3 +1,46 @@
+
+#' Test for PCA Objects
+#'
+#' Check whether an object has class \code{pca} and contains the core
+#' elements produced by \code{pca()}.
+#'
+#' @param x An object to test.
+#'
+#' @details Performs a lightweight check of the class and the presence of
+#' core elements. It does not validate their values or dimensions.
+#' Scores and the number of observations are not required because they
+#' may be unavailable for covariance-matrix input.
+#'
+#' @return A logical value: \code{TRUE} if the required class and core
+#' elements are present, and \code{FALSE} otherwise.
+#'
+#' @examples
+#' data(holzinger)
+#' ho_pca = pca(holzinger, n_comps = 2, screeplot = FALSE, qq_plot = FALSE)
+#' is.pca(ho_pca)
+#'
+#' @family pca
+#' @export
+is.pca = function(x) {
+  inherits(x, "pca") &&
+    is.list(x) &&
+    !is.null(x$weights) &&
+    !is.null(x$contributions) &&
+    !is.null(x$vexp) &&
+    !is.null(x$vexp_pc) &&
+    !is.null(x$cvexp) &&
+    !is.null(x$rvexp) &&
+    !is.null(x$rcvexp) &&
+    !is.null(x$n_comps) &&
+    !is.null(x$cardinality) &&
+    !is.null(x$weights_list) &&
+    !is.null(x$indices) &&
+    !is.null(x$eigenvalues) &&
+    !is.null(x$cor_with_pc) &&
+    !is.null(x$tot_var) &&
+    !is.null(x$spc_cor)
+}
+
 # S3 methods for PCA diagnostic plots
 #
 # Required changes in pca():
@@ -60,6 +103,10 @@ mp_qqplot.pca = function(
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
+  if (!is.pca(pca_fit))
+    stop("`mp_qqplot()` requires a `pca` object as first argument.",
+         call. = FALSE)
+  
   eigenvalues = pca_fit$eigenvalues
 
   if (!is.numeric(eigenvalues) || !is.null(dim(eigenvalues)) ||
@@ -195,6 +242,10 @@ screeplot_pca.pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
+  if (!is.pca(pca_fit))
+    stop("`screeplot_pca()` requires a `pca` object as first argument.",
+         call. = FALSE)
+  
   eigenvalues = pca_fit$eigenvalues
 
   if (!is.numeric(eigenvalues) || !is.null(dim(eigenvalues)) ||

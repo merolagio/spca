@@ -67,6 +67,7 @@ class, so calling it on such an object raises the standard
 }
 \seealso{
 Other pca: 
+\code{\link{is.pca}()},
 \code{\link{pca}()},
 \code{\link{screeplot_pca}()},
 \code{\link{spca_screeplot}()},

@@ -4,34 +4,35 @@
 \alias{aggregate_by_group}
 \title{Aggregate SPCA Weights or Contributions by Group}
 \usage{
-aggregate_by_group(spca_obj, ...)
+aggregate_by_group(
+  spca_obj,
+  groups,
+  only_nonzero = TRUE,
+  contributions = TRUE,
+  digits = ifelse(contributions, 1, 3),
+  print_table = TRUE,
+  return_table = FALSE
+)
 }
 \arguments{
-\item{spca_obj}{A fitted object.}
-}
-\value{
-The aggregated matrix, visibly when \code{return_table = TRUE} and
-invisibly otherwise.
+\item{spca_obj}{An object of class \code{spca}.}
+
+\item{groups}{A vector or factor with one group label per variable.}
+
+\item{only_nonzero}{A logical value indicating whether to omit groups whose
+values are zero in every selected component.}
+
+\item{contributions}{A logical value. If \code{TRUE}, aggregate percentage
+contributions; otherwise, aggregate weights.}
+
+\item{digits}{Number of digits used in printed output.}
+
+\item{print_table}{A logical value indicating whether to print the table.}
+
+\item{return_table}{A logical value indicating whether to return the table
+visibly.}
 }
 \description{
 Aggregate component weights or contributions according to a grouping
 variable.
 }
-\seealso{
-Other spca: 
-\code{\link{change_loadings_sign_spca}()},
-\code{\link{change_sign}()},
-\code{\link{change_weights_sign_spca}()},
-\code{\link{compare_spca}()},
-\code{\link{is.spca}()},
-\code{\link{new_spca}()},
-\code{\link{plot.spca}()},
-\code{\link{print.spca}()},
-\code{\link{show_contributions_spca}()},
-\code{\link{show_correlations}()},
-\code{\link{show_weights}()},
-\code{\link{spca}()},
-\code{\link{spca_object}},
-\code{\link{summary.spca}()}
-}
-\concept{spca}

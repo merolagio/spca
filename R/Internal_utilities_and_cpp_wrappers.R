@@ -332,7 +332,7 @@ var2cor = function(S) {
   if (anyNA(S))
     stop("S must not contain NA values")
   
-  if (!isSymmetric(S))
+  if (!is_symmetric_fast(S))
     stop("S must be symmetric")
   
   if (any(diag(S) <= 1e-4))
@@ -384,7 +384,7 @@ make_spc_cor_S = function(A, S) {
   if (nrow(A) != nrow(S))
     stop("A must have the same number of rows as S")
   
-  if (!isSymmetric(S)) {
+  if (!is_symmetric_fast(S)) {
     warning("S must be symmetric")
     return(NULL)
   }
@@ -421,7 +421,7 @@ make_vexp =  function (A, S) {
   if ((!is.matrix(A)) || (!is.matrix(S)))
     stop("A and S must be matrices")
   
-  if((!isSymmetric(S)))
+  if((!is_symmetric_fast(S)))
     stop("S must be a covariance or correlation matrix")
   
   if (nrow(A) != nrow(S))
@@ -493,6 +493,56 @@ cor_nocopy = function(X, center = TRUE, scale = TRUE){
     X = as.matrix(X)
   corC(X)
 }
+
+#' Check Matrix Symmetry Using Rcpp
+#'
+#' @param M A numeric matrix.
+#' @param ind1,ind2 Non-empty vectors of one-based integer indices.
+#' @param tol Finite, non-negative tolerance.
+#' @details
+#' Wraps a C++ functions passing M by reference and stopping at first failure.
+#' 
+#' @return TRUE if all selected comparisons pass; FALSE for a
+#'   non-square matrix or a mismatch. Invalid input raises an error.
+#' @noRd
+is_symmetric_fast = function(
+    M, ind1 = seq_len(nrow(M)), ind2 = ind1, tol = 1e-12) {
+  tryCatch({
+  validate_datamatrix(M)
+  
+  if (nrow(M) != ncol(M))
+    return(FALSE)
+  
+  p = nrow(M)
+  
+  for (nm in c("ind1", "ind2")) {
+    ind = get(nm)
+    
+    if (!(is.integer(ind) || is.double(ind)) ||
+        length(ind) == 0L ||
+        any(!is.finite(ind)) ||
+        any(ind < 1 | ind > p | ind != floor(ind))) {
+      stop(
+        nm, " must contain integer indices between 1 and ", p, ".",
+        call. = FALSE
+      )
+    }
+  }
+  
+  if (!(is.integer(tol) || is.double(tol)) ||
+      length(tol) != 1L ||
+      !is.finite(tol) ||
+      tol < 0) {
+    stop("tol must be a finite, non-negative number.", call. = FALSE)
+  }
+  
+  isSymmetricC(M, as.integer(ind1), as.integer(ind2), tol)
+  }, error = function(e) {
+    stop(e)
+  }
+  )
+}
+
 
 #data manipulation ======
 #' Convert a Vector to a List

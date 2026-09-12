@@ -10,7 +10,7 @@
 #'
 #' @return A ggplot2 theme object.
 #' @noRd
-spca_bar_theme = function(legend_position = "bottom", 
+spca_bar_theme = function(legend_position = "bottom",
                           grid_type = "horizontal") {
   th = ggplot2::theme_light() +
     ggplot2::theme(
@@ -19,14 +19,14 @@ spca_bar_theme = function(legend_position = "bottom",
       panel.border = ggplot2::element_rect(colour = "black",
                                            linewidth = 1) ,
       strip.text = element_text(size = 14, color = "black"),
-      strip.background = 
-        element_rect(fill = "white", color = "black", 
-                     linetype = 1, linewidth = ggplot2::rel(1))        
+      strip.background =
+        element_rect(fill = "white", color = "black",
+                     linetype = 1, linewidth = ggplot2::rel(1))
     )
   if (grid_type[1] == "none") {
     th = th + ggplot2::theme(panel.grid = ggplot2::element_blank())
-  } 
-  else 
+  }
+  else
     if (grid_type[1] == "horizontal") {
       th = th + ggplot2::theme(
         panel.grid.major.x = ggplot2::element_blank(),
@@ -36,7 +36,7 @@ spca_bar_theme = function(legend_position = "bottom",
       )
     }
   th
-} 
+}
 
 
 #' Theme for SPCA Circular Bar Plots
@@ -51,7 +51,7 @@ spca_bar_theme = function(legend_position = "bottom",
 #'
 #' @return A ggplot2 theme object.
 #' @noRd
-spca_circular_theme = function(legend_position, 
+spca_circular_theme = function(legend_position,
                                grid_type = "horizontal") {
   th = ggplot2::theme_light() +
     ggplot2::theme(
@@ -64,11 +64,11 @@ spca_circular_theme = function(legend_position,
   if (grid_type == "full") {
     warning(paste("vertical grid lines are not supported for circular",
                   "bar plots, setting full grid to only horizontal"))
-    grid_type = "horizontal" 
+    grid_type = "horizontal"
   }
   if (grid_type == "horizontal")
-    th = th + theme(panel.grid.major.y = 
-                      ggplot2::element_line(linewidth = 0.8, 
+    th = th + theme(panel.grid.major.y =
+                      ggplot2::element_line(linewidth = 0.8,
                                             color = "grey90")
     )
   th
@@ -86,9 +86,9 @@ spca_circular_theme = function(legend_position,
 #' @return A character scalar giving the matched color scale.
 #' @noRd
 spca_color_scale = function(color_scale) {
-  
+
   color_scale = color_scale[1]
-  
+
   if (grepl("^c", color_scale))
     return("cbb")
   if (grepl("^p", color_scale))
@@ -97,7 +97,7 @@ spca_color_scale = function(color_scale) {
     return("bw")
   if ((length(color_scale) == 1) && grepl("^g", color_scale))
     return("ggplot")
-  
+
   warning(paste("color_scale must be one of (ggplot, cbb, printsafe,",
                 "bw) setting it to ggplot"))
   return("ggplot")
@@ -141,23 +141,22 @@ spca_fill_palette = function(color_scale, pc_weights = NULL) {
       pal = pal[c(1, 7)]
     return(pal)
   }
-  
+
   if (color_scale[1] == "printsafe") {
-    if (!is.null(pc_weights))
-      pal = pal[c(1, 4)]
-    else{
     pal = rev(c(
       "#FFF7EC", "#FEE8C8", "#FDD49E", "#FDBB84", "#FC8D59",
       "#EF6548", "#D7301F", "#B30000", "#7F0000"
     ))
-    #}
-  }
+    
+    if (!is.null(pc_weights))
+      pal = pal[c(1, 4)]
+    
     return(pal)
-  }
+  }    
   
   if ((color_scale[1] == "bw") || (color_scale[1] == "ggplot"))
     return(NULL)
-  
+
   color_scale
 }
 
@@ -180,13 +179,13 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
                                variable_groups = NULL, pc_weights = NULL) {
   if (color_scale[1] == "ggplot")
     return(pl)
-  
+
   if (color_scale[1] == "bw")
     return(pl + ggplot2::scale_fill_grey())
-  
-  pal = spca_fill_palette(color_scale = color_scale, 
+
+  pal = spca_fill_palette(color_scale = color_scale,
                           pc_weights = pc_weights)
-  
+
   if (!is.null(variable_groups)) {
     nfill = nlevels(data_df$variable_groups)
     pal = rep_len(pal, nfill)
@@ -197,14 +196,14 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
       )
     )
   }
-  
+
   if (!is.null(pc_weights)) {
     nfill = nlevels(data_df$method)
   } else {
     nfill = nlevels(data_df$component)
   }
   pal = rep_len(pal, nfill)
-  
+
   pl + ggplot2::scale_fill_manual(values = pal)
 }
 
@@ -229,38 +228,38 @@ spca_add_fill_scale = function(pl, color_scale, data_df,
 #'
 #' @return A data frame used for plotting.
 #' @noRd
-create_data = function(x, n_plot, contributions, only_nonzero,  
+create_data = function(x, n_plot, contributions, only_nonzero,
                        variable_groups, pc_weights, lbl, facet_labels){
   weights = .get_spca_weights(x)
   p = nrow(weights)
-  
+
   # common part, PCweights binded later if needed
-  
-  
-  
+
+
+
   if(!is.null(pc_weights))
     facet_labels = paste("Comp", 1:n_plot)
-  
+
   data_df = data.frame(
     variable = factor(rep(1:p, n_plot), labels = lbl),
-    component = factor(rep(1:n_plot, each = p), 
+    component = factor(rep(1:n_plot, each = p),
                        labels = facet_labels
                        )
     )
-  if (contributions) 
+  if (contributions)
     data_df$value = c(x$contributions[, 1:n_plot])
   else
     data_df$value = c(weights[, 1:n_plot])
   if (!is.null(variable_groups))
     data_df$variable_groups = rep(variable_groups, n_plot)
-  
+
   if (!is.null(pc_weights)){
     df = data_df
-    if (contributions) 
+    if (contributions)
       df$value = c(make_contributions(pc_weights[, 1:n_plot]))
     else
       df$value = c(pc_weights[, 1:n_plot])
-    
+
     data_df = rbind(data_df, df)
     data_df$method = factor(c(rep(1:2, each = p * n_plot)),
                             labels = c("SPCA", "PCA")
@@ -272,7 +271,7 @@ create_data = function(x, n_plot, contributions, only_nonzero,
       data_df = droplevels(data_df[ind_nonzero, ])
     }
   }
-  
+
   data_df
 }
 
@@ -297,66 +296,66 @@ create_data = function(x, n_plot, contributions, only_nonzero,
 #' @return A ggplot object.
 #' @noRd
 plot_spca_circular = function(
-    data_df, n_plot, plotlab, lbl, 
-    legend_position, grid_type, 
+    data_df, n_plot, plotlab, lbl,
+    legend_position, grid_type,
     legend_title, variable_groups, color_scale,
     adjust_labels_circ) {
   # Set a number of 'empty bar' to add at the end of each component
   empty_bar = 4
-  to_add = 
+  to_add =
     data.frame(matrix(
       NA, empty_bar * nlevels(data_df$component), ncol(data_df)))
   colnames(to_add) = colnames(data_df)
-  to_add$component = 
+  to_add$component =
     rep(levels(data_df$component), each = empty_bar)
   data_df = rbind(data_df, to_add)
   data_df = data_df[order(data_df$component), ]
   data_df$id = seq(1, nrow(data_df))
-  
+
   # Get the name and the y position of each label
   label_data = data_df
   number_of_bar = nrow(label_data)
   angle = 90 - 360 * (label_data$id - 0.5) / number_of_bar
   label_data$hjust = ifelse(angle < -90, 1, 0)
   label_data$angle = ifelse(angle < -90, angle + 180, angle)
-  
+
   mval = max(stats::na.omit(data_df$value))
   label_data$pos = data_df$value
   label_data$pos[data_df$value == 0] = mval * 0.66
   label_data$pos[data_df$value < 0] = 0.05
-  
+
   # Make the plot
   if (!is.null(variable_groups)) {
-    pl = ggplot2::ggplot(data_df, 
-                         ggplot2::aes(x = as.factor(id), y = value, 
+    pl = ggplot2::ggplot(data_df,
+                         ggplot2::aes(x = as.factor(id), y = value,
                                       fill = variable_groups))
   } else {
-    pl = ggplot2::ggplot(data_df, 
-                         ggplot2::aes(x = as.factor(id), y = value, 
+    pl = ggplot2::ggplot(data_df,
+                         ggplot2::aes(x = as.factor(id), y = value,
                                       fill = component))
   }
-  pl = pl + 
-    ggplot2::geom_col(position = "dodge", 
+  pl = pl +
+    ggplot2::geom_col(position = "dodge",
                       alpha = 0.80,
-                      color = ifelse(color_scale[1] == "printsafe", 
+                      color = ifelse(color_scale[1] == "printsafe",
                                      "black", NA), na.rm = TRUE) +
     ggplot2::ylim(-0.5 - stats::median(abs(stats::na.omit(
       data_df$value))), mval + 0.2) +
-    spca_circular_theme(legend_position = legend_position, 
-                        grid_type = grid_type) + 
+    spca_circular_theme(legend_position = legend_position,
+                        grid_type = grid_type) +
     ggplot2::labs(fill = legend_title) +
     ggplot2::geom_abline(slope = 0, intercept = 0, na.rm = TRUE)
-  
+
   indg = (!is.na(data_df$variable))
-  min_weights = tapply(X = as.numeric(data_df$id[indg]), 
+  min_weights = tapply(X = as.numeric(data_df$id[indg]),
                        INDEX = data_df$component[indg], min)
-  median_weights = tapply(data_df$id[indg], 
+  median_weights = tapply(data_df$id[indg],
                           INDEX = data_df$component[indg], stats::median)
   lia = min(data_df$value[indg]) - 0.05
-  
+
   medangle = 360 * median_weights / number_of_bar
   anglela = 180 - medangle
-  anglela[((anglela > 90) | (anglela < -90))] = 
+  anglela[((anglela > 90) | (anglela < -90))] =
     anglela[((anglela > 90) | (anglela < -90))] + 180
   if (!is.null(adjust_labels_circ)) {
     if (length(adjust_labels_circ) == n_plot)
@@ -365,7 +364,7 @@ plot_spca_circular = function(
       warning(paste("need to pass as many values to adjustLabelCirc",
                     "as n_plot"))
   }
-  
+
   pl = pl +
     ggplot2::annotate(
       "text", x = median_weights, y = rep(lia, nlevels(data_df$component)),
@@ -373,18 +372,18 @@ plot_spca_circular = function(
       angle = anglela, fontface = "bold"
     ) +
     ggplot2::coord_polar()
-  
-  
+
+
   if (isTRUE(plotlab)) {
     pl = pl + ggplot2::geom_text(
       data = label_data,
-      ggplot2::aes(x = id, y = pos + 0.05, label = variable, 
+      ggplot2::aes(x = id, y = pos + 0.05, label = variable,
                    hjust = hjust),
       color = "black", fontface = "bold", alpha = 0.85,
       size = 3.5, angle = label_data$angle, inherit.aes = FALSE, na.rm = TRUE
     )
   }
-  
+
   pl
 }
 
@@ -410,67 +409,67 @@ plot_spca_circular = function(
 #'
 #' @return A ggplot object.
 #' @noRd
-plot_spca_bars = function(data_df, 
-                          n_plot, 
+plot_spca_bars = function(data_df,
+                          n_plot,
                           contributions,
                           variable_groups,
-                          has_pc_weights, 
-                          plotlab, 
-                          lbl, 
-                          color_scale, 
-                          legend_position, 
-                          grid_type, 
+                          has_pc_weights,
+                          plotlab,
+                          lbl,
+                          color_scale,
+                          legend_position,
+                          grid_type,
                           x_axis_lab) {
-  
+
   # Create plot (same code for both cases)
   nrows = ceiling(n_plot / 3)
   ncols = ceiling(n_plot / nrows)
-  
+
   #variable groups
   if (!is.null(variable_groups) && (!has_pc_weights))
-    pl = ggplot2::ggplot(data_df, 
-                         ggplot2::aes(x = variable, y = value, 
+    pl = ggplot2::ggplot(data_df,
+                         ggplot2::aes(x = variable, y = value,
                                       fill = variable_groups))
-  else 
+  else
     if (has_pc_weights){
-    pl = ggplot2::ggplot(data_df, 
-                         ggplot2::aes(x = variable, y = value, 
+    pl = ggplot2::ggplot(data_df,
+                         ggplot2::aes(x = variable, y = value,
                                       fill = method))
     }
   else
-    pl = ggplot2::ggplot(data_df, 
-                         ggplot2::aes(x = variable, y = value, 
+    pl = ggplot2::ggplot(data_df,
+                         ggplot2::aes(x = variable, y = value,
                                       fill = component))
-  
+
   pl = pl +
-    ggplot2::geom_col(position = "dodge", 
+    ggplot2::geom_col(position = "dodge",
                       alpha = ifelse((!has_pc_weights), 1, 0.75),
-                      color = ifelse(color_scale[1] == "printsafe", 
+                      color = ifelse(color_scale[1] == "printsafe",
                                      "black", NA), na.rm = TRUE) +
-    ggplot2::facet_wrap(facets = ggplot2::vars(component), 
+    ggplot2::facet_wrap(facets = ggplot2::vars(component),
                         ncol = ncols, nrow = nrows) +
     ggplot2::geom_abline(slope = 0, intercept = 0, na.rm = TRUE) +
-    spca_bar_theme(legend_position = legend_position, 
+    spca_bar_theme(legend_position = legend_position,
                    grid_type = grid_type) +
     ggplot2::xlab(x_axis_lab) +
-    ggplot2::ylab(ifelse(contributions == TRUE, 
+    ggplot2::ylab(ifelse(contributions == TRUE,
                          "contributions", "weights"))
-  
+
   if (isTRUE(plotlab))
-    pl = pl + ggplot2::theme(axis.text.x = 
-                               ggplot2::element_text(angle = 90, 
-                                                     vjust = 0.5, 
+    pl = pl + ggplot2::theme(axis.text.x =
+                               ggplot2::element_text(angle = 90,
+                                                     vjust = 0.5,
                                                      size = 8))
   else
-    pl = pl + ggplot2::theme(axis.ticks = ggplot2::element_blank(), 
+    pl = pl + ggplot2::theme(axis.ticks = ggplot2::element_blank(),
                              axis.text.x = ggplot2::element_blank())
-  
+
   if (contributions)
     pl = pl + ggplot2::scale_y_continuous(labels = scales::percent)
-  
+
   if (!is.null(variable_groups) && (!has_pc_weights))
     pl = pl + ggplot2::theme(legend.position = legend_position)
-  
+
   pl
 }
 
@@ -497,18 +496,18 @@ plot_spca_bars = function(data_df,
 plot_spca_heatmap = function(
     data_df,
     n_plot,
-    contributions, 
+    contributions,
     has_pc_weights,
     indices,
-    lbl, 
-    legend_position, 
-    flip_heatmap, 
+    lbl,
+    legend_position,
+    flip_heatmap,
     heatmap_color_range) {
-  
+
       tile_pal = spca_tile_palette()
-      
-    
-    
+
+
+
     if (heatmap_color_range == "values"){
     col_lims = range(data_df$value)
     maxlim =   ceiling( (max(abs(col_lims)*10)))/10
@@ -518,8 +517,8 @@ plot_spca_heatmap = function(
     # col_lims[2] = ceiling(col_lims*10)/10
     } else
       col_lims = c(-1, 1)
-      
-    
+
+
     pl = ggplot2::ggplot(data_df, ggplot2::aes(variable, component)) +
       ggplot2::geom_tile(ggplot2::aes(fill = value),  colour = "gray75") +
       ggplot2::theme_bw() +
@@ -528,42 +527,42 @@ plot_spca_heatmap = function(
         name = ifelse(contributions, "Contributions", "Weights")
       ) +
       ggplot2::theme(legend.position = legend_position)
- 
+
     pl = pl +
-      ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0, 
+      ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0,
                            colour = "grey75", na.rm = TRUE) +
-      ggplot2::geom_vline(xintercept = 
-                            (seq_along(unique(data_df$variable))) + 0.5, 
+      ggplot2::geom_vline(xintercept =
+                            (seq_along(unique(data_df$variable))) + 0.5,
                           colour = "grey75", na.rm = TRUE) +
       ggplot2::theme(
         panel.grid.minor = ggplot2::element_blank(),
         panel.grid.major = ggplot2::element_blank(),
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, 
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5,
                                             size = 8)
       )
-    
+
     # pl
 
     if(has_pc_weights){
-      
-      
+
+
       data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
-      data_df$compNum = c(rep(1:n_plot, each = length(lbl)), 
+      data_df$compNum = c(rep(1:n_plot, each = length(lbl)),
                           rep(1:n_plot, each = length(lbl)) + 0.5)
-      
-      lab_y = factor(1:(2 * n_plot), 
-                     labels = paste0(c("sPC", "PC"), 
+
+      lab_y = factor(1:(2 * n_plot),
+                     labels = paste0(c("sPC", "PC"),
                                     rep(1:n_plot, each = 2)))
-      
+
       pl = ggplot2::ggplot(
         data_df,
         ggplot2::aes(xmin = varNum, xmax = varNum + 1,
-                     ymin = compNum, ymax = compNum + 0.5, 
+                     ymin = compNum, ymax = compNum + 0.5,
                      fill = value)
       ) +
         ggplot2::geom_rect() +
         ggplot2::theme_bw() +
-        ggplot2::scale_fill_gradientn(colours = tile_pal, 
+        ggplot2::scale_fill_gradientn(colours = tile_pal,
                                       limits = col_lims) +
         ggplot2::scale_x_continuous(
           breaks = seq(1.5, length(lbl) + 0.5, 1),
@@ -573,26 +572,26 @@ plot_spca_heatmap = function(
           breaks = seq(1.25, (length(lab_y) / 2) + 1, 0.5),
           labels = lab_y, expand = c(0, 0)
         ) +
-        ggplot2::geom_abline(intercept = (1:n_plot) + 1, slope = 0, 
+        ggplot2::geom_abline(intercept = (1:n_plot) + 1, slope = 0,
                              colour = "black", linewidth = 1.5, na.rm = TRUE) +
-        ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0, 
+        ggplot2::geom_abline(intercept = (1:n_plot) + 0.5, slope = 0,
                              colour = "gray75", linewidth = 1, na.rm = TRUE) +
-        ggplot2::geom_vline(xintercept = (seq_along(lbl)) + 1, 
+        ggplot2::geom_vline(xintercept = (seq_along(lbl)) + 1,
                             colour = "grey75", na.rm = TRUE) +
         ggplot2::theme(
           panel.grid.major.x = ggplot2::element_blank(),
           panel.grid.major.y = ggplot2::element_blank(),
           panel.ontop = TRUE,
-          panel.background = 
+          panel.background =
             ggplot2::element_rect(fill = "transparent"),
-          axis.text.x = 
+          axis.text.x =
             ggplot2::element_text(angle = 90, vjust = 0.5, size = 8)
         )
     }
     if (flip_heatmap == TRUE)
       pl = pl + ggplot2::coord_flip()
-    
-  
+
+
   pl
 }
 #Validate inputs=================
@@ -611,39 +610,39 @@ validate_plot_inputs = function(inputs, controls, fun_formals) {
   crl_defaults = eval(fun_formals$controls, envir = parent.frame())
   inp_defaults = fun_formals[names(fun_formals) != "controls"]
 
-  
+
   inputs = lapply(inputs, eval)
-  
-  validate_no_na(arg_list = inputs)  
-  
+
+  validate_no_na(arg_list = inputs)
+
 
   inputs$plot_type = match.arg(inputs$plot_type,
                                choices = eval(inp_defaults$plot_type))
-  
-  
+
+
   validate_booleans(contributions = inputs$contributions,
                     only_nonzero = inputs$only_nonzero,
                     return_plot = inputs$return_plot,
                     show_plot = inputs$show_plot
                     )
-  
-  if (!is.null(inputs$pc_weights)) 
-     if ((!is.matrix(inputs$pc_weights)) && 
+
+  if (!is.null(inputs$pc_weights))
+     if ((!is.matrix(inputs$pc_weights)) &&
         (!is.data.frame(inputs$pc_weights)))
        stop("pc_weights must be a matrix or a data.frame, or NULL")
-  
+
   if (!is.null(inputs$variable_groups))
     if ((!is.vector(inputs$variable_groups)) &&
        (!is.factor(inputs$variable_groups)))
       stop("variable_groups must be a vector or a factor, or NULL")
-  
+
   if (!is.null(inputs$plot_title))
     if (!is.character(inputs$plot_title))
     stop("plot_title must be a character string, or NULL")
-  
-  
-  
-##validate controls================  
+
+
+
+##validate controls================
 if (is.null(controls)) {
   controls = crl_defaults
 } else {
@@ -653,27 +652,27 @@ if (is.null(controls)) {
   }
   controls = modifyList(crl_defaults, controls, keep.null = FALSE)
 }
-  
-  validate_no_na(arg_list = controls)  
-  
+
+  validate_no_na(arg_list = controls)
+
   controls$color_scale = match.arg(controls$color_scale[1],
                                    choices = crl_defaults$color_scale)
-  controls$legend_position = 
-    match.arg(controls$legend_position[1], 
+  controls$legend_position =
+    match.arg(controls$legend_position[1],
               choices = crl_defaults$legend_position)
-  
+
   controls$grid_type = match.arg(controls$grid_type[1],
                                  choices = crl_defaults$grid_type)
-  
-  
-  controls$heatmap_color_range = 
+
+
+  controls$heatmap_color_range =
     match.arg(controls$heatmap_color_range[1],
               choices = crl_defaults$heatmap_color_range)
-  
+
 
   validate_booleans(flip_heatmap = controls$flip_heatmap)
 
-  
+
   list(inputs = inputs, controls = controls)
 }
 
@@ -734,10 +733,13 @@ if (is.null(controls)) {
 #'   \code{"bw"} uses gray tones, and \code{"ggplot"} uses the default ggplot2
 #'   scale.
 #' \item \code{variable_names}: a character vector or \code{NULL} (default
-#'   \code{"none"}). If \code{NULL}, row names of the weight matrix are used, or
-#'   \code{V1}, ..., \code{Vp} if row names are missing. If set to
-#'   \code{"none"}, variable names are not shown. If a character vector of
-#'   length \eqn{p} is supplied, it is used as the variable names.
+#'   \code{"none"}). If \code{"auto"}, row names of the weight matrix are used
+#'   as variable names; if row names are missing, no variable names are
+#'   printed. \code{NULL} is a deprecated alias for \code{"auto"} retained for
+#'   backward compatibility; using it emits a warning to use \code{"auto"}
+#'   instead. If set to \code{"none"}, variable names are not shown. If a
+#'   character vector of length \eqn{p} is supplied, it is used as the
+#'   variable names.
 #' \item \code{legend_position}: a character vector (default first element
 #'   \code{"none"}). Accepted values are \code{"none"}, \code{"bottom"},
 #'   \code{"right"}, \code{"top"}, and \code{"left"}.
@@ -803,9 +805,9 @@ plot.spca = function(
       adjust_labels_circ = NULL,
       flip_heatmap = FALSE,
       heatmap_color_range = c("values", "unit")
-    ), 
+    ),
     ...) {
-  
+
   # Validation=============
   #needed to prevent wrong inputs to go unnoticed
   dots = list(...)
@@ -815,23 +817,23 @@ plot.spca = function(
 
   if(!is.spca(x))
     stop("plot.spca requires an spca object as first argument")
-  
+
   test = validate_spca(x)
   if (!test)
     stop("plot.spca requires an spca object as first argument")
-  
+
   weights = .get_spca_weights(x)
   p = nrow(weights)
-  
-  
-  ## validate character inputs by initial characters   
-  # 
+
+
+  ## validate character inputs by initial characters
+  #
   fun_formals = formals(sys.function())
   fun_inp = as.list(match.call(expand.dots = FALSE))[-1]
-  
+
   inputs = fun_formals
   inputs[names(fun_inp)] = fun_inp
-  
+
   inputs$x = NULL
   inputs$controls = NULL
   inputs$... = NULL
@@ -861,7 +863,7 @@ plot.spca = function(
   x_axis_lab = validated$controls$x_axis_lab
   adjust_labels_circ = validated$controls$adjust_labels_circ
   flip_heatmap = validated$controls$flip_heatmap
-  heatmap_color_range = validated$controls$heatmap_color_range  
+  heatmap_color_range = validated$controls$heatmap_color_range
 
   # plots take a matrix
   if ((!is.null(pc_weights)) && (is.vector(pc_weights))) {
@@ -872,10 +874,10 @@ plot.spca = function(
   if (contributions && is.null(x$contributions)) {
     x$contributions = make_contributions(weights[, 1:n_plot])
   }
-  
+
   if (!is.null(variable_groups)){
     if (length(variable_groups) != p) {
-      warning(paste("variable_groups must have length equal to the 
+      warning(paste("variable_groups must have length equal to the
                     number of", "variables. Ignored."))
       variable_groups = NULL
     }  else {
@@ -890,10 +892,10 @@ plot.spca = function(
     }
     if (is.null(legend_position) || (legend_position == "none")){
       legend_position = "bottom"
-    } 
+    }
   }
-  
-# Legend for circular plots must be on the right or plot breaks  
+
+# Legend for circular plots must be on the right or plot breaks
   if (plot_type == "circular") {
           legend_position = ifelse(legend_position == "none", "none",
                                    "right")
@@ -908,29 +910,37 @@ plot.spca = function(
   #legend is need to distinguish sPCs from PCs
   if(!is.null(pc_weights))
     legend_position = "bottom"
-  
+
   color_scale = spca_color_scale(color_scale)
-  
-  # needed to pass to plot 
+
+  # needed to pass to plot
   plotlab = TRUE
-  if (length(variable_names) > 2) {
-    if (length(variable_names) == p)
-      lbl = variable_names
-    else{
-      warning("variable_names must have the same length of the 
-              number of variables. Switched to generic names")
-      variable_names = NULL
-    }
-  }  
+  if (is.null(variable_names)) {
+    warning('variable_names = NULL is deprecated; use "auto" instead.')
+    variable_names = "auto"
+  }
   
-  if (is.null(variable_names[1])) {
-    if (is.null(rownames(weights))) {
-      lbl = paste0("V", 1:p)
-    } else 
-      lbl = rownames(weights)
+  if (!is.character(variable_names))
+    stop("variable_names must be a character vector.")
+  
+  if (!identical(variable_names, "auto") &&
+      !identical(variable_names, "none") &&
+      length(variable_names) != p) {
+    warning("variable_names must contain one name per variable. Using auto.")
+    variable_names = "auto"
+  }
+  
+  if (identical(variable_names, "none")) {
+    lbl = paste0("V", seq_len(p))
+    plotlab = FALSE
+  } else if (identical(variable_names, "auto")) {
+    lbl = rownames(weights)
+    if (is.null(lbl)) {
+      lbl = paste0("V", seq_len(p))
+      plotlab = FALSE
+    }
   } else {
-    lbl = paste0("V", 1:p) 
-    plotlab = NULL
+    lbl = variable_names
   }
   
   if (is.null(facet_labels)) {
@@ -942,7 +952,7 @@ plot.spca = function(
       facet_labels = paste0("sPC", 1:n_plot)
     }
   }
-  
+
   #Also zero PC weights needed for comparison
   if(!is.null(pc_weights))
     only_nonzero = FALSE
@@ -952,7 +962,7 @@ plot.spca = function(
 #circular plot ==============
   if (plot_type == "circular") {
     # Circular barplot (SPCA only - prepare data here)
-    
+
     pl = plot_spca_circular(
       data_df = data_df,
       n_plot = n_plot,
@@ -967,7 +977,7 @@ plot.spca = function(
     )
     # barplot ================
   } else if (plot_type == "bars") {
-    
+
     pl = plot_spca_bars(
       data_df,
       n_plot = n_plot,
@@ -981,10 +991,10 @@ plot.spca = function(
       grid_type = grid_type,
       x_axis_lab = x_axis_lab
     )
-  ##heatmap ======================  
+  ##heatmap ======================
   } else if (plot_type == "heatmap") {
     idx = unlist(x$indices)
-    if(legend_position == "none") 
+    if(legend_position == "none")
       legend_position = "bottom"
     pl = plot_spca_heatmap(
     data_df,
@@ -998,7 +1008,7 @@ plot.spca = function(
     heatmap_color_range = heatmap_color_range
     )
   }
-  
+
   ## Add discrete fill scale (only for non-heatmap plots)
   if (plot_type != "heatmap") {
     pl = spca_add_fill_scale(
@@ -1012,10 +1022,10 @@ plot.spca = function(
   ## Plot title==========================
   if (!is.null(plot_title))
     pl = pl + ggplot2::labs(title = plot_title)
-  
+
   if (show_plot == TRUE)
     print(pl)
-  
+
   if (return_plot == TRUE)
     return(pl)
   else

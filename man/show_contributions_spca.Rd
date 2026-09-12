@@ -27,7 +27,6 @@ Deprecated, will not work for spca version > 1.1.1. Use \code{show_weights()}.
 }
 \seealso{
 Other spca: 
-\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
 \code{\link{change_sign}()},
 \code{\link{change_weights_sign_spca}()},

@@ -106,7 +106,7 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
       stop("diag(S) is not compatible with X", call. = FALSE)
   }
   
-  if(!isSymmetric(S))
+  if(!is_symmetric_fast(S))
     stop("S must be a symmetric covariance or correlation matrix")
   
   if (any((colSums(A^2) - 1) > 1e-5)){
@@ -226,34 +226,38 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
   change_sign(spca_obj, index_to_change = index_to_change)
 }
 
-
-
 # change_sign==================
 ##active===============
-#' Change Component Signs
+#' Change Weight Signs
 #'
-#' Change the signs of selected components in a fitted object.
-#'
-#' @param spca_obj A fitted object.
-#' @param ... Additional arguments reserved for S3 method compatibility.
-#' @return The modified object.
-#' @family spca
-#' @export
-change_sign = function(spca_obj, ...) {
-  UseMethod("change_sign")
-}
-
-#' Change Signs in an SPCA Object
+#' Change the signs of selected Weights in a fitted object.
 #'
 #' @param spca_obj An object of class \code{spca}.
 #' @param index_to_change An integer vector of component indices whose signs
 #'   should be changed.
 #' @return The modified \code{spca} object.
-#' @rdname change_sign
-#' @method change_sign spca
+#' @examples
+#' data(holzinger)
+#' ho_cspca = spca(holzinger, n_comps = 4)
+#' show_correlations(ho_cspca) 
+#' # In applications we would change only the fourth set of weights
+#' ho_changed = change_sign(ho_cspca, index_to_change = c(2, 4))
+#' is.spca(ho_changed)
+#' show_weights(ho_cspca, cols = 2)
+#' show_weights(ho_changed, cols = 2)
+#' show_correlations(ho_changed) 
+#' @family spca
 #' @export
+change_sign = function(spca_obj, index_to_change) {
+  UseMethod("change_sign")
+}
+
+#' Change Signs in an SPCA Object
+#'
+#' @method change_sign spca
+#' @exportS3Method
 #' @noRd
-change_sign.spca = function(spca_obj, index_to_change, ...) {
+change_sign.spca = function(spca_obj, index_to_change) {
   
   if (length(index_to_change) < 1L ||
       !is.numeric(index_to_change) ||
@@ -414,7 +418,6 @@ show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
 #'   print the requested correlations.
 #' @param return_matrices A logical value (default \code{FALSE}). If
 #'   \code{TRUE}, return the requested unrounded numeric matrix or matrices.
-#' @param ... Additional arguments reserved for S3 method compatibility.
 #'
 #' @return If \code{return_matrices = TRUE}, a numeric matrix when one type of
 #'   correlation is requested, or a named list of two numeric matrices when
@@ -429,16 +432,16 @@ show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
 #' @family spca
 #' @export
 show_correlations = function(
-    spca_obj, type = "both", digits = 2, print_matrices = TRUE,
-    return_matrices = FALSE, ...) {
+    spca_obj, type = c("both", "spcs", "pcs"), digits = 2, 
+    print_matrices = TRUE, return_matrices = FALSE) {
   UseMethod("show_correlations")
 }
 
 #' @exportS3Method
 #' @noRd
 show_correlations.spca = function(
-    spca_obj, type = "both", digits = 2, print_matrices = TRUE,
-    return_matrices = FALSE, ...) {
+    spca_obj, type = c("both", "spcs", "pcs"), digits = 2, 
+    print_matrices = TRUE, return_matrices = FALSE) {
   
   if (!is.spca(spca_obj))
     stop("`show_correlations()` requires an `spca` object as first argument.",
@@ -560,16 +563,6 @@ show_correlations.spca = function(
 #'
 #' Aggregate component weights or contributions according to a grouping
 #' variable.
-#'
-#' @param spca_obj A fitted object.
-#' @return The aggregated matrix, visibly when \code{return_table = TRUE} and
-#'   invisibly otherwise.
-#' @family spca
-#' @export
-aggregate_by_group = function(spca_obj, ...) {
-  UseMethod("aggregate_by_group")
-}
-
 #' @param spca_obj An object of class \code{spca}.
 #' @param groups A vector or factor with one group label per variable.
 #' @param only_nonzero A logical value indicating whether to omit groups whose
@@ -580,15 +573,28 @@ aggregate_by_group = function(spca_obj, ...) {
 #' @param print_table A logical value indicating whether to print the table.
 #' @param return_table A logical value indicating whether to return the table
 #'   visibly.
-#' @param ... Additional arguments reserved for S3 method compatibility.
-#' @rdname aggregate_by_group
-#' @method aggregate_by_group spca
+
 #' @export
+aggregate_by_group = function(spca_obj, 
+                              groups, 
+                              only_nonzero = TRUE,
+                              contributions = TRUE,
+                              digits = ifelse(contributions, 1, 3), 
+                              print_table = TRUE,
+                              return_table = FALSE) {
+  UseMethod("aggregate_by_group")
+}
+
+#' @param spca_obj A fitted object.
+#' @return The aggregated matrix, visibly when \code{return_table = TRUE} and
+#'   invisibly otherwise.
+#' @family spca
+#' @exportS3Method
 #' @noRd
 aggregate_by_group.spca = function(
     spca_obj, groups, only_nonzero = TRUE, contributions = TRUE,
     digits = ifelse(contributions, 1, 3), print_table = TRUE,
-    return_table = FALSE, ...) {
+    return_table = FALSE) {
   
   if (!validate_spca(spca_obj))
     stop("aggregate_by_group requires an spca object as first argument",

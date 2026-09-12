@@ -318,5 +318,57 @@ Eigen::MatrixXd makeCorScoresC(const Eigen::Map<Eigen::MatrixXd>& T,
 }
 
 
+// //' Check selected matrix entries for symmetry
+// //'
+// //' Compares M[i, j] with M[j, i] for every combination of indices
+// //' in ind1 and ind2, stopping at the first mismatch.
+// //'
+// //' @param M A numeric matrix containing finite values.
+// //' @param ind1,ind2 Integer vectors of one-based indices.
+// //' @param tol Non-negative tolerance. Each comparison uses
+// //'   tol * max(1, abs(M[i, j]), abs(M[j, i])).
+// //' @return FALSE for a non-square matrix or a detected mismatch;
+// //'   otherwise TRUE. Invalid indices raise an error.
+// //' @details The R wrapper validates matrix values and tolerance.
+// //'   TRUE establishes symmetry only for the entries checked.
+// [[Rcpp::export]]
+bool isSymmetricC(
+    const Rcpp::NumericMatrix& M,
+    const Rcpp::IntegerVector& ind1,
+    const Rcpp::IntegerVector& ind2,
+    double tol = 1e-12) {
+  
+  const int p = M.nrow();
+  
+  for (int i : ind1) {
+    if (i == NA_INTEGER || i < 1 || i > p)
+      throw std::out_of_range("ind1 contains an invalid index.");
+  }
+  
+  for (int j : ind2) {
+    if (j == NA_INTEGER || j < 1 || j > p)
+      throw std::out_of_range("ind2 contains an invalid index.");
+  }
+  
+  if (M.ncol() != p)
+    return false;
+  
+  for (int j : ind2) {
+    for (int i : ind1) {
+      if (i == j)
+        continue;
+      
+      const double a = M(i - 1, j - 1);
+      const double b = M(j - 1, i - 1);
+      const double scale =
+        std::max(1.0, std::max(std::abs(a), std::abs(b)));
+      
+      if (std::abs(a - b) > tol * scale)
+        return false;
+    }
+  }
+  
+  return true;
+}
 
 

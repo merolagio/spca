@@ -406,6 +406,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// isSymmetricC
+bool isSymmetricC(const Rcpp::NumericMatrix& M, const Rcpp::IntegerVector& ind1, const Rcpp::IntegerVector& ind2, double tol);
+RcppExport SEXP _spca_isSymmetricC(SEXP MSEXP, SEXP ind1SEXP, SEXP ind2SEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type ind1(ind1SEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerVector& >::type ind2(ind2SEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(isSymmetricC(M, ind1, ind2, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_spca_aatC", (DL_FUNC) &_spca_aatC, 1},
@@ -438,6 +452,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_spca_make_scoresC", (DL_FUNC) &_spca_make_scoresC, 2},
     {"_spca_makeCorCompC", (DL_FUNC) &_spca_makeCorCompC, 3},
     {"_spca_makeCorScoresC", (DL_FUNC) &_spca_makeCorScoresC, 2},
+    {"_spca_isSymmetricC", (DL_FUNC) &_spca_isSymmetricC, 4},
     {NULL, NULL, 0}
 };
 

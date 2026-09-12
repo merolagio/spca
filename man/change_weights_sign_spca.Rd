@@ -21,7 +21,6 @@ Use \code{\link[=change_sign]{change_sign()}} in new code.
 }
 \seealso{
 Other spca: 
-\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
 \code{\link{change_sign}()},
 \code{\link{compare_spca}()},

@@ -121,3 +121,7 @@ makeCorScoresC <- function(T, ncomps = 0L) {
     .Call(`_spca_makeCorScoresC`, T, ncomps)
 }
 
+isSymmetricC <- function(M, ind1, ind2, tol = 1e-12) {
+    .Call(`_spca_isSymmetricC`, M, ind1, ind2, tol)
+}
+

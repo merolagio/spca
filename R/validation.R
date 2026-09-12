@@ -485,6 +485,28 @@ validate_spca = function(x, quiet = FALSE, tol = 1e-4) {
   success
 }
 
+#more validation functions===================
+#' Validate a Data Matrix
+#'
+#' @param M A non-empty integer or double matrix with finite values.
+#' @return TRUE invisibly. Invalid input raises an error.
+#' @noRd
+validate_datamatrix = function(M) {
+  if (is.null(M))
+    stop("M must not be NULL.", call. = FALSE)
+  
+  if (!is.matrix(M) || !(is.integer(M) || is.double(M)))
+    stop("M must be an integer or double matrix.", call. = FALSE)
+  
+  if (any(dim(M) == 0L))
+    stop("M must have at least one row and one column.", call. = FALSE)
+  
+  if (any(!is.finite(M)))
+    stop("M must not contain NA, NaN or infinite values.", call. = FALSE)
+  
+  invisible(TRUE)
+}
+
 #' Test Whether an Object Contains Only Integers
 #'
 #' Check whether an object, including a list, contains only finite, non-missing

@@ -6,11 +6,10 @@
 \usage{
 show_correlations(
   spca_obj,
-  type = "both",
+  type = c("both", "spcs", "pcs"),
   digits = 2,
   print_matrices = TRUE,
-  return_matrices = FALSE,
-  ...
+  return_matrices = FALSE
 )
 }
 \arguments{
@@ -29,8 +28,6 @@ print the requested correlations.}
 
 \item{return_matrices}{A logical value (default \code{FALSE}). If
 \code{TRUE}, return the requested unrounded numeric matrix or matrices.}
-
-\item{...}{Additional arguments reserved for S3 method compatibility.}
 }
 \value{
 If \code{return_matrices = TRUE}, a numeric matrix when one type of
@@ -51,7 +48,6 @@ show_correlations(ho_cspca, type = "s", return_matrices = TRUE)
 }
 \seealso{
 Other spca: 
-\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
 \code{\link{change_sign}()},
 \code{\link{change_weights_sign_spca}()},

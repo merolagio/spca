@@ -434,10 +434,7 @@ spca = function(M,
                          "r2" = 0,
                          "cvexp" = 1)
   k = min(p, n, 5) 
-  is_symM = isTRUE(all.equal(
-    M[seq_len(k), seq_len(k), drop = FALSE],
-    t(M[seq_len(k), seq_len(k), drop = FALSE]),
-    check.attributes = FALSE))
+  is_symM = is_symmetric_fast(M)
   
   is_datamatrix_M = TRUE
   if ((n == p) && is_symM)

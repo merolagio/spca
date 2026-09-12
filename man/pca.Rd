@@ -10,8 +10,8 @@ pca(
   center_data = FALSE,
   scale_data = FALSE,
   fat_matrix = NULL,
-  screeplot = FALSE,
-  qq_plot = TRUE,
+  screeplot = TRUE,
+  qq_plot = FALSE,
   nrow_data = NULL,
   neigen_toplot = NULL,
   cor = TRUE,
@@ -41,16 +41,16 @@ scale variables.}
 If \code{TRUE}, request the fat backend. If \code{FALSE}, use the tall
 backend. Covariance and correlation matrices always use the tall backend.}
 
-\item{screeplot}{A logical value (default \code{FALSE}). If \code{TRUE},
+\item{screeplot}{A logical value (default \code{TRUE}). If \code{TRUE},
 produce a scree plot.}
 
-\item{qq_plot}{A logical value (default \code{TRUE}). If \code{TRUE},
-produce a Wachter QQ plot with \code{\link{mp_qqplot}}.}
+\item{qq_plot}{A logical value (default \code{FALSE}). If \code{TRUE},
+produce a Wachter qq-plot with \code{\link{mp_qqplot}}.}
 
 \item{nrow_data}{An integer scalar or \code{NULL} (default \code{NULL}).
 Number of rows in the original data set. Required when
 \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
-matrix. If not available, the Wachter QQ-plot cannot be produced.}
+matrix. If not available, the Wachter qq-plot cannot be produced.}
 
 \item{neigen_toplot}{An integer scalar or \code{NULL} (default
 \code{NULL}). Number of eigenvalues to show in diagnostic plots. If
@@ -61,7 +61,7 @@ compatibility; the diagnostic plot uses \code{common_var} for the
 Marchenko--Pastur quantiles.}
 
 \item{common_var}{A numeric scalar (default \code{1}). Common variance of
-the variables used for the Marchenko--Pastur quantiles in the Wachter QQ
+the variables used for the Marchenko--Pastur quantiles in the Wachter qq
 plot.}
 
 \item{pm}{A logical value (default \code{FALSE}). If \code{TRUE}, compute
@@ -97,6 +97,7 @@ summary(ho_pca)
 }
 \seealso{
 Other pca: 
+\code{\link{is.pca}()},
 \code{\link{mp_qqplot}()},
 \code{\link{screeplot_pca}()},
 \code{\link{spca_screeplot}()},

@@ -37,6 +37,7 @@ invisibly.
 }
 \seealso{
 Other pca: 
+\code{\link{is.pca}()},
 \code{\link{mp_qqplot}()},
 \code{\link{pca}()},
 \code{\link{screeplot_pca}()},

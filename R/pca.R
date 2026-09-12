@@ -17,14 +17,14 @@
 #'   \eqn{n < p} use the fat backend and all other inputs use the tall backend.
 #'   If \code{TRUE}, request the fat backend. If \code{FALSE}, use the tall
 #'   backend. Covariance and correlation matrices always use the tall backend.
-#' @param screeplot A logical value (default \code{FALSE}). If \code{TRUE},
+#' @param screeplot A logical value (default \code{TRUE}). If \code{TRUE},
 #'   produce a scree plot.
-#' @param qq_plot A logical value (default \code{TRUE}). If \code{TRUE},
-#'   produce a Wachter QQ plot with \code{\link{mp_qqplot}}.
+#' @param qq_plot A logical value (default \code{FALSE}). If \code{TRUE},
+#'   produce a Wachter qq-plot with \code{\link{mp_qqplot}}.
 #' @param nrow_data An integer scalar or \code{NULL} (default \code{NULL}).
 #'   Number of rows in the original data set. Required when
 #'   \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
-#'   matrix. If not available, the Wachter QQ-plot cannot be produced.
+#'   matrix. If not available, the Wachter qq-plot cannot be produced.
 #' @param neigen_toplot An integer scalar or \code{NULL} (default
 #'   \code{NULL}). Number of eigenvalues to show in diagnostic plots. If
 #'   \code{NULL}, all available eigenvalues are shown.
@@ -32,7 +32,7 @@
 #'   compatibility; the diagnostic plot uses \code{common_var} for the
 #'   Marchenko--Pastur quantiles.
 #' @param common_var A numeric scalar (default \code{1}). Common variance of
-#'   the variables used for the Marchenko--Pastur quantiles in the Wachter QQ
+#'   the variables used for the Marchenko--Pastur quantiles in the Wachter qq
 #'   plot.
 #' @param pm A logical value (default \code{FALSE}). If \code{TRUE}, compute
 #'   the requested eigenpairs by power method and rank-one deflation.
@@ -59,7 +59,7 @@
 #' @family pca
 #' @export
 pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
-               fat_matrix = NULL, screeplot = FALSE, qq_plot = TRUE,
+               fat_matrix = NULL, screeplot = TRUE, qq_plot = FALSE,
                nrow_data = NULL, neigen_toplot = NULL, cor = TRUE,
                common_var = 1, pm = FALSE, eps_pm = 1e-4, maxiter_pm = 1000) {
 
@@ -98,7 +98,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   p = ncol(M)
 
   is_datamatrix_M = FALSE
-  if ((nrow(M) != p) || !isSymmetric(M)) {
+  if ((nrow(M) != p) || !is_symmetric_fast(M)) {
     is_datamatrix_M = TRUE
     nrow_data = nrow(M)
   }
