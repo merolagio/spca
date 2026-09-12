@@ -53,10 +53,10 @@ is.pca = function(x) {
 #   mp_qqplot(pca_fit = out, common_var = common_var,
 #             n_plot = neigen_toplot, n_fitline = NULL)
 
-#' Wachter QQ Plot for PCA Eigenvalues
+#' Wachter qq-plot for PCA Eigenvalues
 #'
-#' Produce a QQ plot comparing the eigenvalues of a fitted PCA with
-#' Marchenko--Pastur (Wachter) theoretical quantiles.
+#' Produce a qq-plot comparing the eigenvalues of a fitted PCA with
+#' Marchenko--Pastur theoretical quantiles.
 #'
 #' This diagnostic relies on Marchenko--Pastur theory for the null
 #' eigenvalue distribution of a (possibly high-dimensional) sample
@@ -84,7 +84,13 @@ is.pca = function(x) {
 #' @param addtitle A logical scalar indicating whether to add a title.
 #' @param show_plot A logical scalar indicating whether to print the plot.
 #' @param return_plot A logical scalar indicating whether to return the plot.
-#'
+#' @details
+#' The Marchenko-Pastur distribution depends on the data aspect ratio $p/n$.
+#'  Therefore both `n_vars` and `n_obs` must be available to produce the plot.
+#'  The distribution is applicable to the eigenvalues of the sample covariance 
+#'  matrix of a set of variables with equal variance. For sample correlation
+#'  matrix, the quantiles are scaled to have sum equal to `p`.
+#' 
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
 #' @family pca
@@ -130,7 +136,7 @@ mp_qqplot.pca = function(
   if (is.null(n_obs)) {
     stop(
       paste0("The number of observations is unavailable in `pca_fit`. ",
-             "Supply `n_obs` to produce a Wachter QQ plot."),
+             "Supply `n_obs` to produce a Wachter qq-plot."),
       call. = FALSE
     )
   }

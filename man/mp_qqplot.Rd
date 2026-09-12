@@ -2,7 +2,7 @@
 % Please edit documentation in R/pca_methods.R
 \name{mp_qqplot}
 \alias{mp_qqplot}
-\title{Wachter QQ Plot for PCA Eigenvalues}
+\title{Wachter qq-plot for PCA Eigenvalues}
 \usage{
 mp_qqplot(
   pca_fit,
@@ -52,8 +52,8 @@ If \code{return_plot = TRUE}, a \code{ggplot} object; otherwise \code{NULL}
 invisibly.
 }
 \description{
-Produce a QQ plot comparing the eigenvalues of a fitted PCA with
-Marchenko--Pastur (Wachter) theoretical quantiles.
+Produce a qq-plot comparing the eigenvalues of a fitted PCA with
+Marchenko--Pastur theoretical quantiles.
 }
 \details{
 This diagnostic relies on Marchenko--Pastur theory for the null
@@ -64,6 +64,12 @@ to sparse fits returned by \code{\link[=spca]{spca()}} (class \code{"spca"}), fo
 reference distribution does not hold; no method is defined for that
 class, so calling it on such an object raises the standard
 "no applicable method" error rather than producing a plot.
+
+The Marchenko-Pastur distribution depends on the data aspect ratio $p/n$.
+Therefore both \code{n_vars} and \code{n_obs} must be available to produce the plot.
+The distribution is applicable to the eigenvalues of the sample covariance
+matrix of a set of variables with equal variance. For sample correlation
+matrix, the quantiles are scaled to have sum equal to \code{p}.
 }
 \seealso{
 Other pca: 

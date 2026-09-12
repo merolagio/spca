@@ -37,13 +37,14 @@ object elements.
 selected components.
 \item \code{\link[=aggregate_by_group]{aggregate_by_group()}} aggregates weights or contributions according to a
 grouping vector.
-\item \code{\link[=screeplot_spca]{screeplot_spca()}} and \code{\link[=qqplot_spca]{qqplot_spca()}} provide diagnostic plots for objects
+\item \code{\link[=screeplot_pca]{screeplot_pca()}} and \code{\link[=mp_qqplot]{mp_qqplot()}} provide diagnostic plots for objects
 returned by \code{\link[=pca]{pca()}}.
 }
 
 \strong{Utilities}
 \itemize{
-\item \code{\link[=is.spca]{is.spca()}} Verifies whether an object is an \code{spca} object.
+\item \code{\link[=is.spca]{is.spca()}} Verifies whether an object is a proper \code{spca} object.
+\item \code{\link[=is.pca]{is.pca()}} Verifies whether an object is a proper \code{pca} object.
 \item \code{\link[=compare_spca]{compare_spca()}} Compares two or more LS-SPCA solutions numerically
 and visually.
 \item \code{\link[=new_spca]{new_spca()}} Creates an \code{spca} object from a set of weights.
