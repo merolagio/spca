@@ -16,10 +16,10 @@
   return_plot = FALSE,
   show_plot = TRUE,
   controls = list(color_scale = c("ggplot", "cbb", "printsafe", "bw"), variable_names =
-    "none", legend_position = c("none", "bottom", "right", "top", "left"), grid_type =
-    c("horizontal", "full", "none"), facet_labels = NULL, legend_title = NULL, x_axis_lab
-    = "variables", adjust_labels_circ = NULL, flip_heatmap = FALSE, heatmap_color_range =
-    c("values", "unit")),
+    c("none", "auto"), legend_position = c("none", "bottom", "right", "top", "left"),
+    grid_type = c("horizontal", "full", "none"), facet_labels = NULL, legend_title =
+    NULL, x_axis_lab = "variables", adjust_labels_circ = NULL, flip_heatmap = FALSE,
+    heatmap_color_range = c("values", "unit")),
   ...
 )
 }
@@ -94,14 +94,14 @@ The entries in \code{controls} are:
 with black, \code{"printsafe"} is colorblind- and printer-friendly,
 \code{"bw"} uses gray tones, and \code{"ggplot"} uses the default ggplot2
 scale.
-\item \code{variable_names}: a character vector or \code{NULL} (default
-\code{"none"}). If \code{"auto"}, row names of the weight matrix are used
-as variable names; if row names are missing, no variable names are
-printed. \code{NULL} is a deprecated alias for \code{"auto"} retained for
-backward compatibility; using it emits a warning to use \code{"auto"}
-instead. If set to \code{"none"}, variable names are not shown. If a
-character vector of length \eqn{p} is supplied, it is used as the
-variable names.
+\item \code{variable_names}: a character vector or \code{"auto"} or
+\code{"none"} (default \code{"none"}). If \code{"auto"}, row names of the
+weight matrix are used as variable names; if row names are missing, no
+variable names are printed. \code{NULL} is a deprecated alias for
+\code{"auto"} retained for backward compatibility; using it emits a warning
+to use \code{"auto"} instead. If set to \code{"none"}, variable names are
+not shown. If a character vector of length \eqn{p} is supplied, it is used
+as the variable names.
 \item \code{legend_position}: a character vector (default first element
 \code{"none"}). Accepted values are \code{"none"}, \code{"bottom"},
 \code{"right"}, \code{"top"}, and \code{"left"}.

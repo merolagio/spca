@@ -856,6 +856,8 @@ plot.spca = function(
   #acquire control input======
   color_scale = validated$controls$color_scale
   variable_names = validated$controls$variable_names
+  if (identical(variable_names, c("none", "auto")))
+    variable_names = "none"
   facet_labels = validated$controls$facet_labels
   legend_position = validated$controls$legend_position
   grid_type = validated$controls$grid_type
