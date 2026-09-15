@@ -227,8 +227,15 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 }
 
 # change_sign==================
-##active===============
-#' Change Weight Signs
+#' Change Weight Signs generic
+#'
+#' @export
+#' @noRd
+change_sign = function(spca_obj, index_to_change) {
+  UseMethod("change_sign")
+}
+
+#' Method That Changes Weight Signs in an SPCA Object
 #'
 #' Change the signs of selected Weights in a fitted object.
 #'
@@ -247,16 +254,8 @@ change_loadings_sign_spca = function(spca_obj, index_to_change) {
 #' show_weights(ho_changed, cols = 2)
 #' show_correlations(ho_changed) 
 #' @family spca
-#' @export
-change_sign = function(spca_obj, index_to_change) {
-  UseMethod("change_sign")
-}
-
-#' Change Signs in an SPCA Object
-#'
 #' @method change_sign spca
 #' @exportS3Method
-#' @noRd
 change_sign.spca = function(spca_obj, index_to_change) {
   
   if (length(index_to_change) < 1L ||
@@ -305,6 +304,16 @@ change_sign.spca = function(spca_obj, index_to_change) {
 
 # show_weights==================
 #' Show SPCA Weights or Contributions
+#' @export
+#' @noRd
+show_weights = function(
+    spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
+    return_list = FALSE, ...) {
+  UseMethod("show_weights")
+}
+
+# show_weights==================
+#' Method to Show SPCA Weights or Contributions
 #'
 #' Show selected nonzero component weights or their unit-L1 contributions.
 #'
@@ -318,15 +327,7 @@ change_sign.spca = function(spca_obj, index_to_change) {
 #' @return The selected weights or contributions when requested; otherwise
 #'   \code{NULL} invisibly.
 #' @family spca
-#' @export
-show_weights = function(
-    spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
-    return_list = FALSE, ...) {
-  UseMethod("show_weights")
-}
-
 #' @exportS3Method
-#' @noRd
 show_weights.spca = function(
     spca_obj, cols = NULL, contribution = TRUE, print_list = TRUE,
     return_list = FALSE, ...) {
@@ -400,8 +401,17 @@ show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
   invisible()
 }
 
-#show_correlations=============
-#' Show Correlations from an SPCA Object
+#' Generic show_correlations
+#'
+#' @export
+#' @noRd
+show_correlations = function(
+    spca_obj, type = c("both", "spcs", "pcs"), digits = 2, 
+    print_matrices = TRUE, return_matrices = FALSE) {
+  UseMethod("show_correlations")
+}
+#show_correlations===========
+#' Method to Show Correlations from an SPCA Object
 #'
 #' Print and optionally return the mutual correlations among sparse principal
 #' components and their correlations with the corresponding principal
@@ -430,15 +440,7 @@ show_contributions_spca = function(spca_obj, cols = NULL, return_list = FALSE)
 #' show_correlations(ho_cspca, type = "s", return_matrices = TRUE)
 #'
 #' @family spca
-#' @export
-show_correlations = function(
-    spca_obj, type = c("both", "spcs", "pcs"), digits = 2, 
-    print_matrices = TRUE, return_matrices = FALSE) {
-  UseMethod("show_correlations")
-}
-
 #' @exportS3Method
-#' @noRd
 show_correlations.spca = function(
     spca_obj, type = c("both", "spcs", "pcs"), digits = 2, 
     print_matrices = TRUE, return_matrices = FALSE) {
@@ -558,8 +560,21 @@ show_correlations.spca = function(
 }
 
 
+
+#' @export
+#' @noRd
+aggregate_by_group = function(spca_obj, 
+                              groups, 
+                              only_nonzero = TRUE,
+                              contributions = TRUE,
+                              digits = ifelse(contributions, 1, 3), 
+                              print_table = TRUE,
+                              return_table = FALSE) {
+  UseMethod("aggregate_by_group")
+}
+
 # aggregate_by_group==================
-#' Aggregate SPCA Weights or Contributions by Group
+#' Method to Aggregate SPCA Weights or Contributions by Group
 #'
 #' Aggregate component weights or contributions according to a grouping
 #' variable.
@@ -573,24 +588,8 @@ show_correlations.spca = function(
 #' @param print_table A logical value indicating whether to print the table.
 #' @param return_table A logical value indicating whether to return the table
 #'   visibly.
-
-#' @export
-aggregate_by_group = function(spca_obj, 
-                              groups, 
-                              only_nonzero = TRUE,
-                              contributions = TRUE,
-                              digits = ifelse(contributions, 1, 3), 
-                              print_table = TRUE,
-                              return_table = FALSE) {
-  UseMethod("aggregate_by_group")
-}
-
-#' @param spca_obj A fitted object.
-#' @return The aggregated matrix, visibly when \code{return_table = TRUE} and
-#'   invisibly otherwise.
 #' @family spca
 #' @exportS3Method
-#' @noRd
 aggregate_by_group.spca = function(
     spca_obj, groups, only_nonzero = TRUE, contributions = TRUE,
     digits = ifelse(contributions, 1, 3), print_table = TRUE,

@@ -41,19 +41,17 @@ is.pca = function(x) {
     !is.null(x$spc_cor)
 }
 
-# S3 methods for PCA diagnostic plots
-#
-# Required changes in pca():
-#   out$n_obs = nrow_data
-#   class(out) = c("pca", "spca", "list")
-#
-# Call these methods after assigning the class:
-#   scree_plot(pca_fit = out, n_plot = neigen_toplot,
-#                 ylab = "eigenvalues")
-#   mp_qqplot(pca_fit = out, common_var = common_var,
-#             n_plot = neigen_toplot, n_fitline = NULL)
+#' S3 Generic for PCA Diagnostic qqplot
+#' @export
+#' @noRd
+mp_qqplot = function(
+    pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
+    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
+    show_plot = TRUE, return_plot = FALSE) {
+  UseMethod("mp_qqplot")
+}
 
-#' Wachter qq-plot for PCA Eigenvalues
+#' S3 Method for PCA Diagnostic qqplot
 #'
 #' Produce a qq-plot comparing the eigenvalues of a fitted PCA with
 #' Marchenko--Pastur theoretical quantiles.
@@ -90,29 +88,27 @@ is.pca = function(x) {
 #'  The distribution is applicable to the eigenvalues of the sample covariance 
 #'  matrix of a set of variables with equal variance. For sample correlation
 #'  matrix, the quantiles are scaled to have sum equal to `p`.
+#' @examples
+#' data(holzinger)
+#' ho_pca = pca(holzinger)
+#' # from the screeplot we may choose to retain 4 components
+#' # produce a Wachter qqplot fitting a line to all but the largest 
+#' # 4 eigenvalues. 
+#' # Since pca was fitted using the data matrix, the fit carries the number 
+#' # of observations. Otherwise we would need to pass `n_obs` .
+#' mp_qqplot(ho_pca, n_fitline = -4)
+#' # The qq-plot indicates that the 4th eigenvalue is compatible 
+#' # with that of a random matrix. 
 #' 
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
 #' @family pca
-#' @export
-mp_qqplot = function(
-    pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
-    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
-    show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("mp_qqplot")
-}
-
 #' @exportS3Method
-#' @noRd
 mp_qqplot.pca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
     common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
-  # if (!is.pca(pca_fit))
-  #   stop("`mp_qqplot()` requires a `pca` object as first argument.",
-  #        call. = FALSE)
-  
   eigenvalues = pca_fit$eigenvalues
 
   if (!is.numeric(eigenvalues) || !is.null(dim(eigenvalues)) ||
@@ -215,7 +211,16 @@ mp_qqplot.pca = function(
   invisible(NULL)
 }
 
-#' Plot PCA Eigenvalues in a Screeplot
+#' S3 Generic for Plotting PCA Eigenvalues in a Screeplot
+#' @export
+#' @noRd
+scree_plot = function(
+    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
+    show_plot = TRUE, return_plot = FALSE) {
+  UseMethod("scree_plot")
+}
+
+#' S3 Method for Plotting PCA Eigenvalues in a Screeplot
 #'
 #' Plot the leading eigenvalues of a fitted PCA against component order.
 #'
@@ -232,31 +237,27 @@ mp_qqplot.pca = function(
 #' @param show_plot A logical scalar indicating whether to print the plot.
 #' @param return_plot A logical scalar indicating whether to return the plot.
 #'
+#' @examples
+#' data(holzinger)
+#' ho_pca = pca(holzinger, screeplot = FALSE)
+#' # the screeplot can be produced from `pca` directly.
+#' # It can be customized by saving it as a `ggplot` object 
+#' myscreeplot = scree_plot(ho_pca, return_plot = TRUE)
+#' myscreeplot  + ggplot2::geom_point(color = "red")
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
-#' @family pca
-#' @export
-scree_plot = function(
-    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
-    show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("scree_plot")
-}
-
+#' @family pca 
 #' @exportS3Method
-#' @noRd
 scree_plot.pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
-  # if (!is.pca(pca_fit))
-  #   stop("`scree_plot()` requires a `pca` object as first argument.",
-  #        call. = FALSE)
-  
   eigenvalues = pca_fit$eigenvalues
 
   if (!is.numeric(eigenvalues) || !is.null(dim(eigenvalues)) ||
       length(eigenvalues) < 1L || anyNA(eigenvalues)) {
-    stop("`pca_fit$eigenvalues` must be a numeric vector without missing values.",
+    stop("`pca_fit$eigenvalues` must be a numeric vector without missing 
+         values.",
          call. = FALSE)
   }
 
@@ -277,12 +278,18 @@ scree_plot.pca = function(
 
   scree_pl = ggplot2::ggplot(
     df,
-    ggplot2::aes(x = order, y = eigenvalue)
-  ) +
+    ggplot2::aes(x = order, y = eigenvalue)) +
     ggplot2::geom_point(size = 2, na.rm = TRUE) +
     ggplot2::geom_line(na.rm = TRUE) +
     ggplot2::labs(y = ylab) +
-    theme_pca()
+    theme_pca() +
+    scale_x_continuous(
+      breaks = function(limits) {
+        b <- scales::breaks_pretty(n = 6)(limits)
+        b[abs(b - round(b)) < 1e-8]
+      },
+      minor_breaks = NULL
+    )
 
   if (addtitle) {
     scree_pl = scree_pl + ggplot2::labs(title = "Screeplot") +

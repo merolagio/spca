@@ -57,9 +57,9 @@ invisibly.
 \seealso{
 Other pca: 
 \code{\link{is.pca}()},
-\code{\link{mp_qqplot}()},
+\code{\link{mp_qqplot.pca}()},
 \code{\link{pca}()},
-\code{\link{scree_plot}()},
+\code{\link{scree_plot.pca}()},
 \code{\link{spca_screeplot}()}
 }
 \concept{pca}

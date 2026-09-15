@@ -31,9 +31,9 @@ is.pca(ho_pca)
 }
 \seealso{
 Other pca: 
-\code{\link{mp_qqplot}()},
+\code{\link{mp_qqplot.pca}()},
 \code{\link{pca}()},
-\code{\link{scree_plot}()},
+\code{\link{scree_plot.pca}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }

@@ -21,7 +21,8 @@ Use \code{\link[=change_sign]{change_sign()}} in new code.
 }
 \seealso{
 Other spca: 
-\code{\link{change_sign}()},
+\code{\link{aggregate_by_group.spca}()},
+\code{\link{change_sign.spca}()},
 \code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},
 \code{\link{is.spca}()},
@@ -29,8 +30,8 @@ Other spca:
 \code{\link{plot.spca}()},
 \code{\link{print.spca}()},
 \code{\link{show_contributions_spca}()},
-\code{\link{show_correlations}()},
-\code{\link{show_weights}()},
+\code{\link{show_correlations.spca}()},
+\code{\link{show_weights.spca}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
 \code{\link{summary.spca}()}

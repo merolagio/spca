@@ -98,8 +98,8 @@ summary(ho_pca)
 \seealso{
 Other pca: 
 \code{\link{is.pca}()},
-\code{\link{mp_qqplot}()},
-\code{\link{scree_plot}()},
+\code{\link{mp_qqplot.pca}()},
+\code{\link{scree_plot.pca}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }
