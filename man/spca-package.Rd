@@ -37,7 +37,7 @@ object elements.
 selected components.
 \item \code{\link[=aggregate_by_group]{aggregate_by_group()}} aggregates weights or contributions according to a
 grouping vector.
-\item \code{\link[=screeplot_pca]{screeplot_pca()}} and \code{\link[=mp_qqplot]{mp_qqplot()}} provide diagnostic plots for objects
+\item \code{\link[=scree_plot]{scree_plot()}} and \code{\link[=mp_qqplot]{mp_qqplot()}} provide diagnostic plots for objects
 returned by \code{\link[=pca]{pca()}}.
 }
 

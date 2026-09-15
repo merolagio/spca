@@ -1,34 +1,34 @@
 #screeplot==========
-test_that("screeplot_pca() returns a ggplot object", {
+test_that("scree_plot() returns a ggplot object", {
   fit = pca(make_tall_data(), n_comps = 3, qq_plot = FALSE)
 
-  pl = screeplot_pca(fit, n_plot = 4, show_plot = FALSE,
+  pl = scree_plot(fit, n_plot = 4, show_plot = FALSE,
                       return_plot = TRUE)
 
   expect_s3_class(pl, "ggplot")
 })
 
-test_that("screeplot_pca() accepts pca objects", {
+test_that("scree_plot() accepts pca objects", {
   fit = pca(make_tall_data(), n_comps = 3, qq_plot = FALSE)
 
   expect_no_error(
-    screeplot_pca(fit, show_plot = FALSE)
+    scree_plot(fit, show_plot = FALSE)
   )
 })
 
-test_that("screeplot_pca() rejects unsupported objects", {
+test_that("scree_plot() rejects unsupported objects", {
   expect_error(
-    screeplot_pca(list(values = 1:3), show_plot = FALSE),
+    scree_plot(list(values = 1:3), show_plot = FALSE),
     "no applicable method"
   )
 })
 
-test_that("screeplot_pca() rejects spca() fits", {
+test_that("scree_plot() rejects spca() fits", {
   fit = spca(make_tall_data(), n_comps = 2, method = "cspca",
              var_selection = "fwd", objective = "cvexp", fat_matrix = FALSE)
 
   expect_error(
-    screeplot_pca(fit, show_plot = FALSE),
+    scree_plot(fit, show_plot = FALSE),
     "no applicable method")
 })
 
@@ -90,7 +90,7 @@ test_that("spca_screeplot() preserves the eigenvalue-vector interface", {
         return_plot = TRUE
       )
     },
-    "screeplot_pca"
+    "scree_plot"
   )
 
   expect_s3_class(pl, "ggplot")
@@ -110,7 +110,7 @@ test_that("spca_screeplot() accepts pca objects", {
         return_plot = TRUE
       )
     },
-    "screeplot_pca"
+    "scree_plot"
   )
 
   expect_s3_class(pl, "ggplot")

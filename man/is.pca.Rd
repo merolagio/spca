@@ -33,7 +33,7 @@ is.pca(ho_pca)
 Other pca: 
 \code{\link{mp_qqplot}()},
 \code{\link{pca}()},
-\code{\link{screeplot_pca}()},
+\code{\link{scree_plot}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }

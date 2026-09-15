@@ -242,7 +242,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
 
     if (screeplot == TRUE) {
 
-      pl = screeplot_pca(out, n_plot = neigen_toplot,
+      pl = scree_plot(out, n_plot = neigen_toplot,
                           ylab = "eigenvalues")
     }
     if (qq_plot == TRUE) {

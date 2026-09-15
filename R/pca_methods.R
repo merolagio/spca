@@ -48,7 +48,7 @@ is.pca = function(x) {
 #   class(out) = c("pca", "spca", "list")
 #
 # Call these methods after assigning the class:
-#   screeplot_pca(pca_fit = out, n_plot = neigen_toplot,
+#   scree_plot(pca_fit = out, n_plot = neigen_toplot,
 #                 ylab = "eigenvalues")
 #   mp_qqplot(pca_fit = out, common_var = common_var,
 #             n_plot = neigen_toplot, n_fitline = NULL)
@@ -236,20 +236,20 @@ mp_qqplot.pca = function(
 #'   invisibly.
 #' @family pca
 #' @export
-screeplot_pca = function(
+scree_plot = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("screeplot_pca")
+  UseMethod("scree_plot")
 }
 
 #' @exportS3Method
 #' @noRd
-screeplot_pca.pca = function(
+scree_plot.pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
 
   # if (!is.pca(pca_fit))
-  #   stop("`screeplot_pca()` requires a `pca` object as first argument.",
+  #   stop("`scree_plot()` requires a `pca` object as first argument.",
   #        call. = FALSE)
   
   eigenvalues = pca_fit$eigenvalues
@@ -435,7 +435,7 @@ wachter_qqplot = function(
 #' Plot Eigenvalues in a Scree Plot (Deprecated)
 #'
 #' `spca_screeplot()` is retained for backward compatibility. Use
-#' [screeplot_pca()] with objects returned by [pca()] in new code.
+#' [scree_plot()] with objects returned by [pca()] in new code.
 #'
 #' @param eigenvalues A numeric vector of eigenvalues, or an object returned
 #'   by [pca()].
@@ -453,11 +453,11 @@ wachter_qqplot = function(
 spca_screeplot = function(
     eigenvalues, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
     show_plot = TRUE, return_plot = FALSE) {
-  .Deprecated("screeplot_pca")
+  .Deprecated("scree_plot")
 
   if (inherits(eigenvalues, "pca")) {
     return(
-      screeplot_pca(
+      scree_plot(
         pca_fit = eigenvalues,
         n_plot = n_plot,
         ylab = ylab,

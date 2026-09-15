@@ -29,7 +29,7 @@
 #'   selected components.
 #' * [aggregate_by_group()] aggregates weights or contributions according to a
 #'   grouping vector.
-#' * [screeplot_pca()] and [mp_qqplot()] provide diagnostic plots for objects
+#' * [scree_plot()] and [mp_qqplot()] provide diagnostic plots for objects
 #'   returned by [pca()].
 #' 
 #' \strong{Utilities}

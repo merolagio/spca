@@ -64,7 +64,7 @@ methods include `show_weights()`, which displays nonzero weights or
 contributions; `show_correlations()`, which displays correlations among
 sPCs and between sPCs and the corresponding PCs; and `change_sign()`,
 which changes the signs of selected components and their associated
-quantities. The functions `mp_qqplot()` and `screeplot_pca()` produce
+quantities. The functions `mp_qqplot()` and `scree_plot()` produce
 diagnostic plots from an object returned by `pca()`.
 
 ## Example

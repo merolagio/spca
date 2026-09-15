@@ -75,7 +75,7 @@ matrix, the quantiles are scaled to have sum equal to \code{p}.
 Other pca: 
 \code{\link{is.pca}()},
 \code{\link{pca}()},
-\code{\link{screeplot_pca}()},
+\code{\link{scree_plot}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }

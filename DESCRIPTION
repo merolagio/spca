@@ -2,7 +2,7 @@ Package: spca
 Type: Package
 Title: Least Squares Sparse Principal Components Analysis
 Version: 1.1.4
-Date: 2026-09-12
+Date: 2026-09-15
 Authors@R: person(given = "Giovanni Maria", family = "Merola", email = "merolagio@gmail.com", role = c("aut", "cre"))
 Description: Implements least-squares sparse principal component analysis with cardinality constraints. The package has an efficient C++ backend and provides functions for fitting, summarizing, comparing, and visualizing sparse principal component models. The approach follows Merola (2015) <doi:10.1111/anzs.12128> and Merola and Chen (2019) <doi:10.1016/j.jmva.2019.04.001>. 
 Maintainer: Giovanni Maria Merola <merolagio@gmail.com>
@@ -13,8 +13,7 @@ Encoding: UTF-8
 Depends: R (>= 4.3)
 Imports: Rcpp (>= 1.0.14), ggplot2 (>= 4.0.0), RMTstat (>= 0.3.1),
         scales, rlang
-Suggests: testthat (>= 3.0.0), peakRAM (>= 1.0.2), knitr, rmarkdown,
-        R.rsp
+Suggests: testthat (>= 3.0.0), peakRAM (>= 1.0.2), knitr, rmarkdown
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 LinkingTo: Rcpp, RcppEigen

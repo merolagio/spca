@@ -122,7 +122,7 @@ pca(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
 
 `M` is a data or covariance matrix; scores are computed only from a data matrix. With `n_comps = NULL` all components are computed. With `pm = TRUE`, only `n_comps < p` PCs are computed by the power method, controlled by `eps_pm` and `maxiter_pm`.
 
-`pca()` can draw a screeplot and a Wachter qq-plot (Wachter 1976), which compares the eigenvalues with the Marchenko–Pastur quantiles (Winkler 2021). The qq-plot applies to covariance matrices of equal-variance variables; for correlation matrices set `common_var = 1`, and supply `nrow_data` when `M` is a covariance matrix. The standalone `screeplot_spca()` and `qqplot_spca()` functions customise these plots. The plots below show the screeplot and the qq-plot, the latter with a line fitted to the smallest $(n - 3)$ eigenvalues.
+`pca()` can draw a screeplot and a Wachter qq-plot (Wachter, 1976), which compares the eigenvalues with the Marchenko–Pastur quantiles (Winkler 2021). The qq-plot applies to covariance matrices of equal-variance variables; for correlation matrices set `common_var = 1`, and supply `nrow_data` when `M` is a covariance matrix. The standalone `scree_plot()` and `mp_qqplot()` functions customize these plots. The plots below show the screeplot and the qq-plot, the latter with a line fitted to the smallest $(n - 3)$ eigenvalues.
 
 ```{r pca, fig.cap = "Screeplot."}
 ho_pca = pca(holzinger, screeplot = TRUE, qq_plot = FALSE)

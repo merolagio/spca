@@ -1,10 +1,11 @@
 # spca 1.1.4
-- spca's parameter `fixed_index_list` now accepts same index in different components
-    it also allows to require that only some components have fixed indices.
+- spca's parameter `fixed_index_list` now accepts same index in different
+   components it also allows to require that only some components have fixed 
+   indices.
 - created new class `pca` for pca() output. and renamed pca plotting methods to 
-    screeplot_pca and mp_qqplot()
+    scree_plot and mp_qqplot()
 - eliminated help entris for deprecated functions
-- improved symmetry check for gramian input 
+- improved symmetry check for gramian input
 
 # spca 1.1.3
 **Renamed loadings to weights**
