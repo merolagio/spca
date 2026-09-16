@@ -1,4 +1,3 @@
-
 #' Test for PCA Objects
 #'
 #' Check whether an object has class \code{pca} and contains the core
@@ -18,7 +17,6 @@
 #' data(holzinger)
 #' ho_pca = pca(holzinger, n_comps = 2, screeplot = FALSE, qq_plot = FALSE)
 #' is.pca(ho_pca)
-#'
 #' @family pca
 #' @export
 is.pca = function(x) {
@@ -41,17 +39,55 @@ is.pca = function(x) {
     !is.null(x$spc_cor)
 }
 
-#' S3 Generic for PCA Diagnostic qqplot
-#' @export
-#' @noRd
-mp_qqplot = function(
-    pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
-    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
-    show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("mp_qqplot")
+#foreign generic====================
+#' @describeIn print.spca A \code{pca} object is printed identically to an
+#'   \code{spca} object.
+#' @exportS3Method
+print.pca = function(x, ...) {
+  print.spca(x, ...)
 }
 
-#' S3 Method for PCA Diagnostic qqplot
+#' @describeIn plot.spca A \code{pca} object is plotted identically to an
+#'   \code{spca} object.
+#' @exportS3Method
+plot.pca = function(x, ...) 
+{
+  plot.spca(x, ...)
+}
+
+#' @describeIn summary.spca A \code{pca} object is summarized identically to an
+#'   \code{spca} object.
+#' @exportS3Method
+summary.pca = function(
+    object, ...) {
+  summary.spca(object, ...)
+}
+
+# local generic============
+#' @describeIn aggregate_by_group A \code{pca} object is aggregated identically to an
+#'   \code{spca} object.
+#' @exportS3Method
+aggregate_by_group.pca = function(object, ...) {
+  aggregate_by_group.spca(object, ...)
+}
+
+#' @describeIn show_weights The weights or contributions of a \code{pca} object are shown 
+#'   identically those of an \code{spca} object.
+#' @exportS3Method
+show_weights.pca = function(object, ...) {
+  show_weights.spca(object, ...)
+}
+
+#' @describeIn change_sign The sign of the weights and related elements in a \code{pca} object are changed 
+#'   identically to those of an \code{spca} object.
+#' @exportS3Method
+change_sign.pca = function(object, ...) {
+  change_sign.spca(object, ...)
+}
+
+
+#specific to pca objects===============
+#' PCA Diagnostic qqplot
 #'
 #' Produce a qq-plot comparing the eigenvalues of a fitted PCA with
 #' Marchenko--Pastur theoretical quantiles.
@@ -103,6 +139,16 @@ mp_qqplot = function(
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
 #' @family pca
+#' @export
+mp_qqplot = function(
+    pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
+    common_var = 1, n_plot = NULL, n_fitline = NULL, addtitle = TRUE,
+    show_plot = TRUE, return_plot = FALSE) {
+  UseMethod("mp_qqplot")
+}
+
+
+#' @rdname mp_qqplot
 #' @exportS3Method
 mp_qqplot.pca = function(
     pca_fit, n_vars = NULL, n_obs = NULL, gamma = NULL, cor = TRUE,
@@ -211,15 +257,6 @@ mp_qqplot.pca = function(
   invisible(NULL)
 }
 
-#' S3 Generic for Plotting PCA Eigenvalues in a Screeplot
-#' @export
-#' @noRd
-scree_plot = function(
-    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
-    show_plot = TRUE, return_plot = FALSE) {
-  UseMethod("scree_plot")
-}
-
 #' S3 Method for Plotting PCA Eigenvalues in a Screeplot
 #'
 #' Plot the leading eigenvalues of a fitted PCA against component order.
@@ -244,9 +281,18 @@ scree_plot = function(
 #' # It can be customized by saving it as a `ggplot` object 
 #' myscreeplot = scree_plot(ho_pca, return_plot = TRUE)
 #' myscreeplot  + ggplot2::geom_point(color = "red")
+#' 
 #' @return If `return_plot = TRUE`, a `ggplot` object; otherwise `NULL`
 #'   invisibly.
-#' @family pca 
+#' @family pca
+#' @export
+scree_plot = function(
+    pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,
+    show_plot = TRUE, return_plot = FALSE) {
+  UseMethod("scree_plot")
+}
+
+#' @rdname scree_plot 
 #' @exportS3Method
 scree_plot.pca = function(
     pca_fit, n_plot = NULL, ylab = "eigenvalues", addtitle = TRUE,

@@ -41,15 +41,19 @@
 #' @param maxiter_pm A positive integer scalar (default \code{1000}). Maximum
 #'   number of power-method iterations.
 #'
-#' @return An \code{\link{spca_object}} with an additional
-#'   \code{eigenvalues} vector containing the eigenvalues up to the rank used by
-#'   the selected backend and \code{n_obs} stores the number of observations,
-#'   if a data matrix is passed, or NULL.
+#' @return An \code{pca_object} which is the same as an \code{\link{spca_object}} with an additional \code{eigenvalues} vector
+#'  containing the eigenvalues up to the rank used by the selected 
+#'  backend and \code{n_obs} stores the number of observations, if a data 
+#'  matrix is passed, or NULL.
 #'
 #' @details \code{n_comps} controls how many components are retained in the
-#' returned object. The tall backend computes PCA from the covariance or
-#' correlation matrix. The fat backend computes PCA in row space and converts
-#' the retained eigenvectors back to variable weights.
+#' returned object. 
+#' The tall backend computes PCA from the covariance or
+#'   correlation matrix, so passing this saves its computation from the data
+#'   matrix. If a covariance or correlation matrix is passed, the scores 
+#'   cannot be computed and are returned as \code{NULL}. 
+#' The fat backend computes PCA in row space and converts the retained
+#'  eigenvectors back to variable weights. 
 #'
 #' @examples
 #' data(holzinger)

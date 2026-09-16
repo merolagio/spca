@@ -27,13 +27,16 @@ may be unavailable for covariance-matrix input.
 data(holzinger)
 ho_pca = pca(holzinger, n_comps = 2, screeplot = FALSE, qq_plot = FALSE)
 is.pca(ho_pca)
-
 }
 \seealso{
 Other pca: 
-\code{\link{mp_qqplot.pca}()},
+\code{\link{aggregate_by_group}()},
+\code{\link{change_sign}()},
+\code{\link{mp_qqplot}()},
 \code{\link{pca}()},
-\code{\link{scree_plot.pca}()},
+\code{\link{scree_plot}()},
+\code{\link{show_correlations}()},
+\code{\link{show_weights}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }

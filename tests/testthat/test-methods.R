@@ -144,7 +144,7 @@ test_that("change_sign() changes the requested component sign", {
   old_weights = fit$weights[, 1]
 
   changed = change_sign(
-    spca_obj = fit,
+    object = fit,
     index_to_change = 1
   )
 
@@ -171,7 +171,7 @@ test_that("show_weights() returns a list on request", {
   fit = spca(make_tall_data(), n_comps = 2, fat_matrix = FALSE)
 
   cont = show_weights(
-    spca_obj = fit,
+    object = fit,
     print_list = FALSE,
     return_list = TRUE
   )

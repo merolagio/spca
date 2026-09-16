@@ -38,19 +38,19 @@ summary(spca_new)
 }
 \seealso{
 Other spca: 
-\code{\link{aggregate_by_group.spca}()},
+\code{\link{aggregate_by_group}()},
 \code{\link{change_loadings_sign_spca}()},
-\code{\link{change_sign.spca}()},
+\code{\link{change_sign}()},
 \code{\link{change_weights_sign_spca}()},
 \code{\link{compare_spca}()},
 \code{\link{is.spca}()},
-\code{\link{plot.spca}()},
-\code{\link{print.spca}()},
+\code{\link{plot.pca}()},
+\code{\link{print.pca}()},
 \code{\link{show_contributions_spca}()},
-\code{\link{show_correlations.spca}()},
-\code{\link{show_weights.spca}()},
+\code{\link{show_correlations}()},
+\code{\link{show_weights}()},
 \code{\link{spca}()},
 \code{\link{spca_object}},
-\code{\link{summary.spca}()}
+\code{\link{summary.pca}()}
 }
 \concept{spca}

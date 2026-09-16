@@ -37,10 +37,14 @@ invisibly.
 }
 \seealso{
 Other pca: 
+\code{\link{aggregate_by_group}()},
+\code{\link{change_sign}()},
 \code{\link{is.pca}()},
-\code{\link{mp_qqplot.pca}()},
+\code{\link{mp_qqplot}()},
 \code{\link{pca}()},
-\code{\link{scree_plot.pca}()},
+\code{\link{scree_plot}()},
+\code{\link{show_correlations}()},
+\code{\link{show_weights}()},
 \code{\link{wachter_qqplot}()}
 }
 \concept{pca}

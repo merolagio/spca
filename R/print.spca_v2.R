@@ -1,11 +1,11 @@
 # print.spca =======================
-#' Print an \code{spca} Object
+#' Print the Weights or Contributions of a \code{pca} or \code{spca} Object
 #'
-#' Print sparse weights, or the corresponding percentage contributions, from an
-#' \code{spca} object. By default, variables with only zero entries are omitted,
+#' Print sparse weights, or the corresponding percentage contributions, from a
+#' fitted object. By default, variables with only zero entries are omitted,
 #' and cumulative explained variance is shown at the bottom of the table.
 #'
-#' @param x An object of class \code{spca}.
+#' @param x An object of class \code{spca} or \code{pca}.
 #' @param cols An integer vector or \code{NULL} (default \code{NULL}).
 #'   Components to print. If \code{NULL}, all components are printed. If a
 #'   single integer is supplied, components \code{1:cols} are printed.
@@ -39,8 +39,7 @@
 #' print(ho_cspca, contributions = FALSE, digits = 4)
 #' 
 #' @family spca
-#' @export
-#' @method print spca
+#' @exportS3Method 
 print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE, digits = 3, thresh_card = 1e-07, return_table = FALSE, component_names = NULL, ...)
 {
   
@@ -50,9 +49,15 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
     stop("Unused arguments: ", paste(names(dots), collapse = ", "))
   }
   
-  fun_inp = as.list(match.call(expand.dots = FALSE))[-(1:2)]
-  fun_inp = lapply(fun_inp, eval, envir = environment())
-  validate_no_na(arg_list = eval(fun_inp))  
+  validate_no_na(arg_list = list(
+    cols = cols,
+    only_nonzero = only_nonzero,
+    contributions = contributions,
+    digits = digits,
+    thresh_card = thresh_card,
+    return_table = return_table,
+    component_names = component_names
+  ))
   
   test = validate_spca(x)
   if (!test)
@@ -74,26 +79,31 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
     if (length(cols) == 1L)
       cols = 1:cols
   
+  if (!all(cols %in% seq_len(ncol(A))))
+    stop("One of the indices provided in cols is too large or too small")
+    
   if (only_nonzero){
     rows = apply(A, 1, function(x) all(abs(x) < thresh_card))
     A  = A[!rows, , drop = FALSE]
   }  
   
-  A = A[, cols]
+  A = A[, cols, drop = FALSE]
   
   ## assigns names to weights
   if(is.null(component_names)){
     if(is.null(colnames(A)))
-      component_names = paste0("sPC", ncol(A))
+      component_names = paste0(ifelse(is.pca(x), "PC", "sPC"), cols)
     else
       component_names = colnames(A)
   }
   else
-    if ((length(component_names) < length(cols))){
-      message("Too few component_names, default names assigned")
-      component_names = paste0("sPC", ncol(A))
-    }
-  colnames(A) = component_names[cols]
+  if (length(component_names) != ncol(A)) {
+    message("Incorrect number of component_names, default names assigned")
+    component_names = paste0(ifelse(is.pca(x), "PC", "sPC"), cols)
+  }
+  
+  colnames(A) = component_names
+  
   # # -----  formatting -
   
   # needed because sprintf reduces to vector but preserves trailing zeroes
@@ -106,14 +116,14 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
                                round(A, digits)),drop0trailing = TRUE,
                        justify = "right"), ncol = length(cols))
   
-  colnames(fx) = paste0("sPC", cols)
+  colnames(fx) = component_names
   rownames(fx) = rownames(A)
   
   nc = nchar(fx[1L], type = "c")
   fx[abs(A) < thresh_card] = paste(rep(" ", nc), collapse = "")
   
   fx = format(fx, justify = "right" )
-  vexp = cumsum(x$vexp[cols])
+  vexp = cumsum(x$vexp)[cols]
   dashes = rep("-----", ifelse(is.null(ncol(fx)), 1, ncol(fx)))
   fx = rbind(fx, dashes, paste0(sprintf("%.1f", round(100*vexp,1)), "%"))
   rownames(fx)[nrow(fx) - 1] = ""     

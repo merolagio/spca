@@ -74,10 +74,10 @@ tolerance for the power method.}
 number of power-method iterations.}
 }
 \value{
-An \code{\link{spca_object}} with an additional
-\code{eigenvalues} vector containing the eigenvalues up to the rank used by
-the selected backend and \code{n_obs} stores the number of observations,
-if a data matrix is passed, or NULL.
+An \code{pca_object} which is the same as an \code{\link{spca_object}} with an additional \code{eigenvalues} vector
+containing the eigenvalues up to the rank used by the selected
+backend and \code{n_obs} stores the number of observations, if a data
+matrix is passed, or NULL.
 }
 \description{
 Compute a principal component analysis (PCA) and return the result as an
@@ -85,9 +85,13 @@ Compute a principal component analysis (PCA) and return the result as an
 }
 \details{
 \code{n_comps} controls how many components are retained in the
-returned object. The tall backend computes PCA from the covariance or
-correlation matrix. The fat backend computes PCA in row space and converts
-the retained eigenvectors back to variable weights.
+returned object.
+The tall backend computes PCA from the covariance or
+correlation matrix, so passing this saves its computation from the data
+matrix. If a covariance or correlation matrix is passed, the scores
+cannot be computed and are returned as \code{NULL}.
+The fat backend computes PCA in row space and converts the retained
+eigenvectors back to variable weights.
 }
 \examples{
 data(holzinger)
@@ -97,9 +101,13 @@ summary(ho_pca)
 }
 \seealso{
 Other pca: 
+\code{\link{aggregate_by_group}()},
+\code{\link{change_sign}()},
 \code{\link{is.pca}()},
-\code{\link{mp_qqplot.pca}()},
-\code{\link{scree_plot.pca}()},
+\code{\link{mp_qqplot}()},
+\code{\link{scree_plot}()},
+\code{\link{show_correlations}()},
+\code{\link{show_weights}()},
 \code{\link{spca_screeplot}()},
 \code{\link{wachter_qqplot}()}
 }

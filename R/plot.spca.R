@@ -267,11 +267,11 @@ create_data = function(x, n_plot, contributions, only_nonzero,
   } else{
     #only_nonzero disabled if pc_weights == TRUE
     if (only_nonzero == TRUE) {
-      ind_nonzero = apply(weights, 1, function(a) any(a != 0))
+      ind_nonzero = apply(weights[, seq_len(n_plot), drop = FALSE], 1, 
+                          function(a) any(a != 0))
       data_df = droplevels(data_df[ind_nonzero, ])
     }
   }
-
   data_df
 }
 
@@ -677,10 +677,10 @@ if (is.null(controls)) {
 }
 
 # plot.spca=====================
-#' Plot an \code{spca} Object
-#'
+#' Plot the Weights or Contributions of a \code{pca} or \code{spca} Object
+#' 
 #' Plot the sparse weights, or the corresponding percentage contributions, from
-#' an \code{spca} object. The plot can be shown as a bar plot, circular bar
+#' a fitted object. The plot can be shown as a bar plot, circular bar
 #' plot, or heatmap.
 #'
 #' If \code{pc_weights} is supplied, SPCA and PCA values are plotted side by
@@ -688,7 +688,7 @@ if (is.null(controls)) {
 #' comparison, so a standard bar plot is used instead. In this case all
 #' variables are plotted, regardless of \code{only_nonzero}.
 #'
-#' @param x An object of class \code{spca}.
+#' @param x An object of class \code{spca} or \code{pca}.
 #' @param n_plot An integer scalar or \code{NULL} (default \code{NULL}). Number
 #'   of components to plot. If \code{NULL}, all components in \code{x} are
 #'   plotted.
@@ -766,7 +766,6 @@ if (is.null(controls)) {
 #'
 #' @return If \code{return_plot = TRUE}, returns the ggplot2 object. Otherwise,
 #' returns \code{NULL} invisibly.
-#' @family spca
 #' @references
 #' The \code{printsafe} palette corresponds to \code{OrRd} from
 #' \url{https://colorbrewer2.org/}.
@@ -781,8 +780,9 @@ if (is.null(controls)) {
 #'   ncol = 4,
 #'   nrow = 1
 #' ) + ggplot2::theme(legend.position = "right")
-#' @export
-#' @method plot spca
+#' 
+#' @family spca
+#' @exportS3Method
 plot.spca = function(
     x,
     n_plot = NULL,
@@ -829,14 +829,18 @@ plot.spca = function(
   ## validate character inputs by initial characters
   #
   fun_formals = formals(sys.function())
-  fun_inp = as.list(match.call(expand.dots = FALSE))[-1]
-
-  inputs = fun_formals
-  inputs[names(fun_inp)] = fun_inp
-
-  inputs$x = NULL
-  inputs$controls = NULL
-  inputs$... = NULL
+  
+  inputs = list(
+    n_plot = n_plot,
+    plot_type = plot_type,
+    contributions = contributions,
+    only_nonzero = only_nonzero,
+    pc_weights = pc_weights,
+    variable_groups = variable_groups,
+    plot_title = plot_title,
+    return_plot = return_plot,
+    show_plot = show_plot
+  )
 
   validated = validate_plot_inputs(inputs, controls, fun_formals)
   names(validated)[1] = "inputs"
@@ -844,6 +848,9 @@ plot.spca = function(
   #acquire noncontrol input======
   if (is.null(n_plot))
     n_plot = ncol(weights)
+  if(!(n_plot %in% seq_len(ncol(weights))))
+    stop(paste0("n_plot must be integer between 1 and ", ncol(weights)),
+         call. = FALSE)
   plot_type = validated$inputs$plot_type
   contributions = validated$inputs$contributions
   only_nonzero = validated$inputs$only_nonzero
@@ -867,11 +874,22 @@ plot.spca = function(
   flip_heatmap = validated$controls$flip_heatmap
   heatmap_color_range = validated$controls$heatmap_color_range
 
+
+  #check pc_weights
   # plots take a matrix
   if ((!is.null(pc_weights)) && (is.vector(pc_weights))) {
-      pc_weights = matrix(pc_weights, ncol = 1)
-      }
-
+    pc_weights = matrix(pc_weights, ncol = 1)
+  }
+  if (!is.null(pc_weights)) {
+    if(is.data.frame(pc_weights))
+      pc_weights = as.matrix(pc_weights)
+    if (nrow(pc_weights) != nrow(weights))
+      stop("pc_weights must have the same number of rows as weights")
+    if (ncol(pc_weights) < n_plot)
+      stop("pc_weights must have at least n_plot columns")
+  }
+  
+  
   ## Contributions are not in minimal spca object
   if (contributions && is.null(x$contributions)) {
     x$contributions = make_contributions(weights[, 1:n_plot])
@@ -946,12 +964,11 @@ plot.spca = function(
   }
   
   if (is.null(facet_labels)) {
-    facet_labels = paste0("sPC", 1:n_plot)
+    facet_labels = paste0(ifelse(is.pca(x), "PC", "sPC"), 1:n_plot)
   } else {
-    if (length(facet_labels) < n_plot) {
-      warning(paste("length of stripname must be equal to the number",
-                    "of plots. Using default."))
-      facet_labels = paste0("sPC", 1:n_plot)
+    if (length(facet_labels) != n_plot) {
+      warning(paste("length of facet_labels must be equal to the number,                    of plots. Using default."))
+      facet_labels = paste0(ifelse(is.pca(x), "PC", "sPC"), 1:n_plot)
     }
   }
 
