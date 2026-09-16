@@ -310,12 +310,12 @@ Except for the first, the pSPCA weights have larger cardinality and explain more
 
 ### Variable groups
 
-Questionnaire variables often belong to scales; the 12 `holzinger` variables form four. `aggregate_by_group()` sums the weights or contributions of an `spca` object by the groups in `groups`.
+Questionnaire variables often belong to scales; the 12 `holzinger` variables form four. `aggregate_by_group()` sums the weights or contributions of an `spca` object by the groups in `varable_groups`.
 
 *Contributions aggregated by scale.*
 
 ```{r aggr}
-aggregate_by_group(ho_spcadef, groups = holzinger_scales)
+aggregate_by_group(ho_spcadef, varable_groups = holzinger_scales)
 ```
 
 Passing the groups to `variable_groups` colours the plot by scale.

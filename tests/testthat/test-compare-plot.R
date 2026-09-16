@@ -34,7 +34,7 @@ test_that("aggregate_by_group() returns a table", {
   fit = spca(make_tall_data(), n_comps = 2, fat_matrix = FALSE)
   groups = rep(c("A", "B"), length.out = nrow(fit$weights))
 
-  tab = aggregate_by_group(fit, groups = groups, print_table = FALSE,
+  tab = aggregate_by_group(fit, variable_groups = groups, print_table = FALSE,
                            return_table = TRUE)
 
   expect_true(is.matrix(tab) || is.data.frame(tab))

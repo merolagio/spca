@@ -2,7 +2,7 @@
 % Please edit documentation in R/pca_methods.R
 \name{wachter_qqplot}
 \alias{wachter_qqplot}
-\title{Wachter QQ Plot for Eigenvalues (Deprecated)}
+\title{Wachter qq Plot for Eigenvalues (Deprecated)}
 \usage{
 wachter_qqplot(
   eigenvalues,

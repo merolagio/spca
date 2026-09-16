@@ -245,7 +245,7 @@ mp_qqplot.pca = function(
   }
 
   if (addtitle) {
-    pl = pl + ggplot2::labs(title = "Wachter QQ-plot") +
+    pl = pl + ggplot2::labs(title = "Wachter qq-plot") +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   }
 
@@ -352,7 +352,7 @@ scree_plot.pca = function(
 
 # Obsolete function interfaces retained for backward compatibility ============
 
-#' Wachter QQ Plot for Eigenvalues (Deprecated)
+#' Wachter qq Plot for Eigenvalues (Deprecated)
 #'
 #' `wachter_qqplot()` is retained for backward compatibility. Use
 #' [mp_qqplot()] with objects returned by [pca()] in new code.
@@ -475,7 +475,7 @@ wachter_qqplot = function(
   }
 
   if (addtitle) {
-    pl = pl + ggplot2::labs(title = "Wachter QQ-plot") +
+    pl = pl + ggplot2::labs(title = "Wachter qq-plot") +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   }
   if (show_plot)

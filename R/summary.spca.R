@@ -112,6 +112,10 @@ summary.spca = function(
     Vexp = object$vexp,
     Cvexp = cumsum(object$vexp)
   )
+  if (is.pca(object)) {
+    variance_metrics = "none"
+    cor_with_pc = FALSE
+  }
   
   # Add variance comparison metrics based on user choice
   if (variance_metrics %in% c("cumulative_relative", "both")) {

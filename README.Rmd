@@ -111,7 +111,7 @@ The variables in the `holzinger` dataset belong to four different scales, record
 ```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
 plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
 
-aggregate_by_group(myspca, groups = holzinger_scales)
+aggregate_by_group(myspca, variable_groups = holzinger_scales)
 ```
 
 ## Comparison of two or more spca solutions

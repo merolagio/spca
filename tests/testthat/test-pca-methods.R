@@ -102,7 +102,7 @@ test_that("change_sign.pca updates weights and scores and preserves class", {
 test_that("aggregate_by_group.pca returns group sums", {
   fit = make_pca_method_fit()
   groups = rep(c("A", "B"), length.out = nrow(fit$weights))
-  tab = aggregate_by_group(fit, groups = groups, contributions = FALSE,
+  tab = aggregate_by_group(fit, variable_groups = groups, contributions = FALSE,
                            only_nonzero = FALSE, print_table = FALSE,
                            return_table = TRUE)
   expect_equal(tab, rowsum(fit$weights, groups, reorder = FALSE))
@@ -111,7 +111,7 @@ test_that("aggregate_by_group.pca returns group sums", {
 test_that("aggregate_by_group.pca accepts the documented object argument", {
   fit = make_pca_method_fit()
   groups = rep(c("A", "B"), length.out = nrow(fit$weights))
-  tab = aggregate_by_group(object = fit, groups = groups,
+  tab = aggregate_by_group(object = fit, variable_groups = groups,
                            only_nonzero = FALSE, print_table = FALSE,
                            return_table = TRUE)
   expect_equal(tab, rowsum(fit$contributions, groups, reorder = FALSE))

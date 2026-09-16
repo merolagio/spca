@@ -647,7 +647,6 @@ show_correlations.spca = function(
   invisible(NULL)
 }
 
-
 # aggregate_by_group==================
 #' Aggregate Weights or Contributions of a \code{pca} or \code{spca} Object by Group
 #'
@@ -657,8 +656,8 @@ show_correlations.spca = function(
 #' @param spca_obj Deprecated alias for \code{object} (default \code{NULL}).
 #'   Supply only one of \code{object} and \code{spca_obj}. Using the old
 #'   argument name issues a warning.
-#' @param groups A vector or factor with one group label per variable.
-#' @param only_nonzero A logical value indicating whether to omit groups whose
+#' @param variable_groups A vector or factor with one group label per variable.
+#' @param only_nonzero A logical value indicating whether to omit variable_groups whose
 #'   values are zero in every selected component.
 #' @param contributions A logical value. If \code{TRUE}, aggregate percentage
 #'   contributions; otherwise, aggregate weights.
@@ -670,7 +669,7 @@ show_correlations.spca = function(
 #' @family pca
 #' @export
 aggregate_by_group = function(object, 
-                              groups, 
+                              variable_groups, 
                               only_nonzero = TRUE,
                               contributions = TRUE,
                               digits = ifelse(contributions, 1, 3), 
@@ -686,7 +685,7 @@ aggregate_by_group = function(object,
             call. = FALSE)
     return(aggregate_by_group(
       object = spca_obj,
-      groups = groups,
+      variable_groups = variable_groups,
       only_nonzero = only_nonzero,
       contributions = contributions,
       digits = digits,
@@ -701,7 +700,7 @@ aggregate_by_group = function(object,
 #' @rdname aggregate_by_group
 #' @exportS3Method
 aggregate_by_group.spca = function(
-    object, groups, only_nonzero = TRUE, contributions = TRUE,
+    object, variable_groups, only_nonzero = TRUE, contributions = TRUE,
     digits = ifelse(contributions, 1, 3), print_table = TRUE,
     return_table = FALSE,
     spca_obj = NULL) {
@@ -725,18 +724,18 @@ aggregate_by_group.spca = function(
     print_table = print_table,
     return_table = return_table
   )
-  if ((!is.vector(groups) && !is.factor(groups)) || anyNA(groups))
-    stop("groups must be a vector or factor without missing values",
+  if ((!is.vector(variable_groups) && !is.factor(variable_groups)) || anyNA(variable_groups))
+    stop("variable_groups must be a vector or factor without missing values",
          call. = FALSE)
-  if (length(groups) != nrow(.get_spca_weights(object)))
-    stop("groups must have one element per variable", call. = FALSE)
+  if (length(variable_groups) != nrow(.get_spca_weights(object)))
+    stop("variable_groups must have one element per variable", call. = FALSE)
   
   if (contributions)
     values = object$contributions
   else
     values = .get_spca_weights(object)
   
-  out = rowsum(values, group = groups, reorder = FALSE)
+  out = rowsum(values, group = variable_groups, reorder = FALSE)
   if (only_nonzero)
     out = out[rowSums(abs(out)) > 1e-4, , drop = FALSE]
   

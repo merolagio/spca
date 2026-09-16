@@ -8,7 +8,7 @@
 \usage{
 aggregate_by_group(
   object,
-  groups,
+  variable_groups,
   only_nonzero = TRUE,
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
@@ -19,7 +19,7 @@ aggregate_by_group(
 
 \method{aggregate_by_group}{spca}(
   object,
-  groups,
+  variable_groups,
   only_nonzero = TRUE,
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
@@ -33,9 +33,9 @@ aggregate_by_group(
 \arguments{
 \item{object}{An object of class \code{pca} or \code{spca}.}
 
-\item{groups}{A vector or factor with one group label per variable.}
+\item{variable_groups}{A vector or factor with one group label per variable.}
 
-\item{only_nonzero}{A logical value indicating whether to omit groups whose
+\item{only_nonzero}{A logical value indicating whether to omit variable_groups whose
 values are zero in every selected component.}
 
 \item{contributions}{A logical value. If \code{TRUE}, aggregate percentage
