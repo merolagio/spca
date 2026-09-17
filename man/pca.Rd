@@ -12,10 +12,10 @@ pca(
   fat_matrix = NULL,
   screeplot = TRUE,
   qq_plot = FALSE,
-  nrow_data = NULL,
+  n_obs = NULL,
   neigen_toplot = NULL,
   cor = TRUE,
-  common_var = 1,
+  common_var = NULL,
   pm = FALSE,
   eps_pm = 1e-04,
   maxiter_pm = 1000
@@ -47,7 +47,7 @@ produce a scree plot.}
 \item{qq_plot}{A logical value (default \code{FALSE}). If \code{TRUE},
 produce a Wachter qq-plot with \code{\link{mp_qqplot}}.}
 
-\item{nrow_data}{An integer scalar or \code{NULL} (default \code{NULL}).
+\item{n_obs}{An integer scalar or \code{NULL} (default \code{NULL}).
 Number of rows in the original data set. Required when
 \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
 matrix. If not available, the Wachter qq-plot cannot be produced.}
@@ -60,9 +60,10 @@ matrix. If not available, the Wachter qq-plot cannot be produced.}
 compatibility; the diagnostic plot uses \code{common_var} for the
 Marchenko--Pastur quantiles.}
 
-\item{common_var}{A numeric scalar (default \code{1}). Common variance of
-the variables used for the Marchenko--Pastur quantiles in the Wachter qq
-plot.}
+\item{common_var}{A positive numeric scalar or \code{NULL} (default
+\code{NULL}). Common population variance assumed for the Wachter
+qq-plot. Required when \code{qq_plot = TRUE} and \code{cor = FALSE}.
+When \code{cor = TRUE}, the reference variance is set to 1.}
 
 \item{pm}{A logical value (default \code{FALSE}). If \code{TRUE}, compute
 the requested eigenpairs by power method and rank-one deflation.}
@@ -96,7 +97,7 @@ eigenvectors back to variable weights.
 \examples{
 data(holzinger)
 ho_pca = pca(holzinger, n_comps = 4, screeplot = TRUE,
-             nrow_data = 144, qq_plot = TRUE)
+             n_obs = 144, qq_plot = TRUE)
 summary(ho_pca)
 }
 \seealso{

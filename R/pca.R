@@ -21,19 +21,19 @@
 #'   produce a scree plot.
 #' @param qq_plot A logical value (default \code{FALSE}). If \code{TRUE},
 #'   produce a Wachter qq-plot with \code{\link{mp_qqplot}}.
-#' @param nrow_data An integer scalar or \code{NULL} (default \code{NULL}).
+#' @param n_obs An integer scalar or \code{NULL} (default \code{NULL}).
 #'   Number of rows in the original data set. Required when
 #'   \code{qq_plot = TRUE} and \code{M} is a covariance or correlation
 #'   matrix. If not available, the Wachter qq-plot cannot be produced.
 #' @param neigen_toplot An integer scalar or \code{NULL} (default
 #'   \code{NULL}). Number of eigenvalues to show in diagnostic plots. If
 #'   \code{NULL}, all available eigenvalues are shown.
-#' @param cor A logical value (default \code{TRUE}). Currently accepted for
-#'   compatibility; the diagnostic plot uses \code{common_var} for the
+#' @param cor A logical value (default \code{TRUE}); the diagnostic plot uses \code{common_var} for the
 #'   Marchenko--Pastur quantiles.
-#' @param common_var A numeric scalar (default \code{1}). Common variance of
-#'   the variables used for the Marchenko--Pastur quantiles in the Wachter qq
-#'   plot.
+#' @param common_var A positive numeric scalar or \code{NULL} (default
+#'   \code{NULL}). Common population variance assumed for the Wachter
+#'   qq-plot. Required when \code{qq_plot = TRUE} and \code{cor = FALSE}.
+#'   When \code{cor = TRUE}, the reference variance is set to 1.
 #' @param pm A logical value (default \code{FALSE}). If \code{TRUE}, compute
 #'   the requested eigenpairs by power method and rank-one deflation.
 #' @param eps_pm A positive numeric scalar (default \code{1e-4}). Convergence
@@ -58,14 +58,14 @@
 #' @examples
 #' data(holzinger)
 #' ho_pca = pca(holzinger, n_comps = 4, screeplot = TRUE,
-#'              nrow_data = 144, qq_plot = TRUE)
+#'              n_obs = 144, qq_plot = TRUE)
 #' summary(ho_pca)
 #' @family pca
 #' @export
 pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                fat_matrix = NULL, screeplot = TRUE, qq_plot = FALSE,
-               nrow_data = NULL, neigen_toplot = NULL, cor = TRUE,
-               common_var = 1, pm = FALSE, eps_pm = 1e-4, maxiter_pm = 1000) {
+               n_obs = NULL, neigen_toplot = NULL, cor = TRUE,
+               common_var = NULL, pm = FALSE, eps_pm = 1e-4, maxiter_pm = 1000) {
 
   # validation ==========
 
@@ -104,7 +104,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
   is_datamatrix_M = FALSE
   if ((nrow(M) != p) || !is_symmetric_fast(M)) {
     is_datamatrix_M = TRUE
-    nrow_data = nrow(M)
+    n_obs = nrow(M)
   }
 
   # maximum data rank
@@ -162,8 +162,8 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
     n_comps = max_comps
   }
 
-  if (!is.numeric(nrow_data) && qq_plot) {
-    warning("qq-plot cannot be produced because nrow_data is not available")
+  if (!is.numeric(n_obs) && qq_plot) {
+    warning("qq-plot cannot be produced because n_obs is not available")
     qq_plot = FALSE
   }
 
@@ -216,7 +216,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
              indices = as.list(rep(list(1:p), n_comps)),
              eigenvalues = pcout$eigenvalues[
                seq_len(min(rank_M, length(pcout$eigenvalues)))],
-             n_obs = if (is_datamatrix_M) nrow_data else NULL
+             n_obs = n_obs
   )
   if (is_datamatrix_M) {
     out$scores = pcout$scores
@@ -250,7 +250,7 @@ pca = function(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
                           ylab = "eigenvalues")
     }
     if (qq_plot == TRUE) {
-      pl = mp_qqplot(out, n_vars = p, n_obs = nrow_data,
+      pl = mp_qqplot(out, n_vars = p, n_obs = n_obs, cor = cor,
                           common_var = common_var, n_plot = neigen_toplot,
                           n_fitline = NULL
       )

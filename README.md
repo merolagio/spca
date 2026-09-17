@@ -89,13 +89,10 @@ holzinger_scales
 ``` r
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
 summary(ho_pca,cols = 10)
-#>          sPC1   sPC2   sPC3   sPC4   sPC5   sPC6   sPC7   sPC8   sPC9  sPC10
-#> Vexp    40.2%  13.7%  10.6%   6.4%   5.6%   5.1%   4.3%   3.9%   3.2%   2.6%
-#> Cvexp   40.2%  53.9%  64.5%  70.9%  76.5%  81.6%  85.9%  89.8%  93.0%  95.6%
-#> Rvexp  100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0%
-#> Rcvexp 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0% 100.0%
-#> Card       12     12     12     12     12     12     12     12     12     12
-#> r       1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000  1.000
+#>         PC1   PC2   PC3   PC4   PC5   PC6   PC7   PC8   PC9  PC10
+#> Vexp  40.2% 13.7% 10.6%  6.4%  5.6%  5.1%  4.3%  3.9%  3.2%  2.6%
+#> Cvexp 40.2% 53.9% 64.5% 70.9% 76.5% 81.6% 85.9% 89.8% 93.0% 95.6%
+#> Card     12    12    12    12    12    12    12    12    12    12
 ```
 
 <img src="man/figures/README-pca_checks-1.png" width="47%" /><img src="man/figures/README-pca_checks-2.png" width="47%" />
@@ -216,7 +213,7 @@ plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = 
 
 ``` r
 
-aggregate_by_group(myspca, groups = holzinger_scales)
+aggregate_by_group(myspca, variable_groups = holzinger_scales)
 #>      sPC1   sPC2   sPC3  sPC4
 #> SPL 26.0%         52.4% -3.5%
 #> VBL 19.6% -44.5% -29.1%      

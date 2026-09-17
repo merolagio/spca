@@ -39,6 +39,7 @@
 #' print(ho_cspca, contributions = FALSE, digits = 4)
 #' 
 #' @family spca
+#' @family pca
 #' @exportS3Method 
 print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE, digits = 3, thresh_card = 1e-07, return_table = FALSE, component_names = NULL, ...)
 {
@@ -83,7 +84,8 @@ print.spca = function(x, cols = NULL, only_nonzero = TRUE, contributions = TRUE,
     stop("One of the indices provided in cols is too large or too small")
     
   if (only_nonzero){
-    rows = apply(A, 1, function(x) all(abs(x) < thresh_card))
+    rows = apply(A[, cols, drop = FALSE], 1, 
+                 function(x) all(abs(x) < thresh_card))
     A  = A[!rows, , drop = FALSE]
   }  
   
