@@ -323,9 +323,20 @@ compare_spca = function(
   
   ## summary table ---------------
   ## sum_list is list of summaries for all objects
-
+  
+  which_pca = which(sapply(obj_list, function(x) inherits(x, "pca")))
+  
+  if (length(which_pca)> 0){
+    class(obj_list[[which_pca]]) = class(obj_list[[which_pca]])[-1]
+  }
+      
   sum_list = lapply(obj_list, summary, print_table = FALSE, return_table = TRUE,
                     cor_with_pc = TRUE) 
+  
+  if (length(which_pca)> 0){
+    class(obj_list[[which_pca]]) = c("pca", class(obj_list[[which_pca]]))
+  }
+  
   
   sum_matrix = matrix(0, nrow = nrow(sum_list[[1]]), ncol = n_objects *n_comps) 
   

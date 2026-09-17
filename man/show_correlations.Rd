@@ -84,6 +84,7 @@ Other pca:
 \code{\link{is.pca}()},
 \code{\link{mp_qqplot}()},
 \code{\link{pca}()},
+\code{\link{print.pca}()},
 \code{\link{scree_plot}()},
 \code{\link{show_weights}()},
 \code{\link{spca_screeplot}()},

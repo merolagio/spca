@@ -80,7 +80,7 @@ show_weights.pca = function(object, ...) {
 #' @describeIn change_sign Change component signs in a \code{pca} object.
 #' @param ... Additional arguments passed to \code{change_sign.spca}.
 #' @exportS3Method
-#' change_sign.pca = function(object, ...) {
+change_sign.pca = function(object, ...) {
   change_sign.spca(object, ...)
 }
 

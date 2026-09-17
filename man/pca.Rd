@@ -56,8 +56,7 @@ matrix. If not available, the Wachter qq-plot cannot be produced.}
 \code{NULL}). Number of eigenvalues to show in diagnostic plots. If
 \code{NULL}, all available eigenvalues are shown.}
 
-\item{cor}{A logical value (default \code{TRUE}). Currently accepted for
-compatibility; the diagnostic plot uses \code{common_var} for the
+\item{cor}{A logical value (default \code{TRUE}); the diagnostic plot uses \code{common_var} for the
 Marchenko--Pastur quantiles.}
 
 \item{common_var}{A positive numeric scalar or \code{NULL} (default
@@ -106,6 +105,7 @@ Other pca:
 \code{\link{change_sign}()},
 \code{\link{is.pca}()},
 \code{\link{mp_qqplot}()},
+\code{\link{print.pca}()},
 \code{\link{scree_plot}()},
 \code{\link{show_correlations}()},
 \code{\link{show_weights}()},
