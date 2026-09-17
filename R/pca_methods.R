@@ -63,8 +63,8 @@ summary.pca = function(
 }
 
 # local generic============
-#' @describeIn aggregate_by_group A \code{pca} object is aggregated identically to an
-#'   \code{spca} object.
+#' @describeIn aggregate_by_group Aggregate a \code{pca} object by group.
+#' @param ... Additional arguments passed to \code{aggregate_by_group.spca}.
 #' @exportS3Method
 aggregate_by_group.pca = function(object, ...) {
   aggregate_by_group.spca(object, ...)
@@ -77,10 +77,10 @@ show_weights.pca = function(object, ...) {
   show_weights.spca(object, ...)
 }
 
-#' @describeIn change_sign The sign of the weights and related elements in a \code{pca} object are changed 
-#'   identically to those of an \code{spca} object.
+#' @describeIn change_sign Change component signs in a \code{pca} object.
+#' @param ... Additional arguments passed to \code{change_sign.spca}.
 #' @exportS3Method
-change_sign.pca = function(object, ...) {
+#' change_sign.pca = function(object, ...) {
   change_sign.spca(object, ...)
 }
 

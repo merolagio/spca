@@ -8,7 +8,8 @@
 - scree_plot produces x-axis with integer tick-marks
 - eliminated help entries for deprecated functions
 - improved symmetry check for gramian input
-- fixed minor bugs in methods
+- fixed minor bugs in methods, reinforced checks for cor and n_obs in mp_qqplot
+    and pca
 
 # spca 1.1.3
 **Renamed loadings to weights**
