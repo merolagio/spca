@@ -337,7 +337,9 @@ change_sign.spca = function(object, index_to_change,
 #' @param spca_obj Deprecated alias for \code{object} (default \code{NULL}).
 #'   Supply only one of \code{object} and \code{spca_obj}. Using the old
 #'   argument name issues a warning.
-#' @param cols An integer vector or \code{NULL}. Components to show.
+#' @param cols An integer vector selecting components. If a single positive
+#'   integer is supplied, components \code{1:cols} are included.
+#'   If \code{NULL}, all components are included.
 #' @param contribution A logical value. If \code{TRUE}, show unit-L1
 #'   contributions; otherwise, show the original nonzero weights.
 #' @param print_list A logical value indicating whether to print the result.
@@ -406,7 +408,11 @@ show_weights.spca = function(
     stop("cols must contain valid component indices", call. = FALSE)
   }
   
+  if (length(cols) == 1L)
+    cols = seq_len(cols)
+  
   values = .get_spca_weights_list(object)[as.integer(cols)]
+  
   if (contribution)
     values = lapply(values, function(a) a / sum(abs(a)))
   if (length(values) == 1L)
@@ -657,7 +663,11 @@ show_correlations.spca = function(
 #'   Supply only one of \code{object} and \code{spca_obj}. Using the old
 #'   argument name issues a warning.
 #' @param variable_groups A vector or factor with one group label per variable.
-#' @param only_nonzero A logical value indicating whether to omit variable_groups whose
+#' @param cols An integer vector selecting components. If a single positive
+#'   integer is supplied, components \code{1:cols} are included.
+#'   If \code{NULL}, all components are included.
+#' @param only_nonzero A logical value indicating whether to omit
+#'  variable_groups whose
 #'   values are zero in every selected component.
 #' @param contributions A logical value. If \code{TRUE}, aggregate percentage
 #'   contributions; otherwise, aggregate weights.
@@ -669,7 +679,8 @@ show_correlations.spca = function(
 #' @family pca
 #' @export
 aggregate_by_group = function(object, 
-                              variable_groups, 
+                              variable_groups,
+                              cols = NULL,
                               only_nonzero = TRUE,
                               contributions = TRUE,
                               digits = ifelse(contributions, 1, 3), 
@@ -686,6 +697,7 @@ aggregate_by_group = function(object,
     return(aggregate_by_group(
       object = spca_obj,
       variable_groups = variable_groups,
+      cols = NULL, 
       only_nonzero = only_nonzero,
       contributions = contributions,
       digits = digits,
@@ -700,8 +712,12 @@ aggregate_by_group = function(object,
 #' @rdname aggregate_by_group
 #' @exportS3Method
 aggregate_by_group.spca = function(
-    object, variable_groups, only_nonzero = TRUE, contributions = TRUE,
-    digits = ifelse(contributions, 1, 3), print_table = TRUE,
+    object, variable_groups, 
+    cols = NULL, 
+    only_nonzero = TRUE, 
+    contributions = TRUE,
+    digits = ifelse(contributions, 1, 3), 
+    print_table = TRUE,
     return_table = FALSE,
     spca_obj = NULL) {
   if (!missing(spca_obj)) {
@@ -724,7 +740,8 @@ aggregate_by_group.spca = function(
     print_table = print_table,
     return_table = return_table
   )
-  if ((!is.vector(variable_groups) && !is.factor(variable_groups)) || anyNA(variable_groups))
+  if ((!is.vector(variable_groups) && !is.factor(variable_groups)) || 
+      anyNA(variable_groups))
     stop("variable_groups must be a vector or factor without missing values",
          call. = FALSE)
   if (length(variable_groups) != nrow(.get_spca_weights(object)))
@@ -734,6 +751,19 @@ aggregate_by_group.spca = function(
     values = object$contributions
   else
     values = .get_spca_weights(object)
+  
+  if (is.null(cols))
+    cols = seq_len(ncol(values))
+  
+  if (!is.numeric(cols) || length(cols) == 0L ||
+      any(!is.finite(cols)) || any(cols != floor(cols)) ||
+      any(cols < 1 | cols > ncol(values)))
+    stop("cols must contain valid component indices.", call. = FALSE)
+  
+  if (length(cols) == 1L)
+    cols = seq_len(cols)
+  
+  values = values[, cols, drop = FALSE]
   
   out = rowsum(values, group = variable_groups, reorder = FALSE)
   if (only_nonzero)

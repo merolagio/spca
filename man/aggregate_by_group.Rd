@@ -9,6 +9,7 @@
 aggregate_by_group(
   object,
   variable_groups,
+  cols = NULL,
   only_nonzero = TRUE,
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
@@ -20,6 +21,7 @@ aggregate_by_group(
 \method{aggregate_by_group}{spca}(
   object,
   variable_groups,
+  cols = NULL,
   only_nonzero = TRUE,
   contributions = TRUE,
   digits = ifelse(contributions, 1, 3),
@@ -35,7 +37,12 @@ aggregate_by_group(
 
 \item{variable_groups}{A vector or factor with one group label per variable.}
 
-\item{only_nonzero}{A logical value indicating whether to omit variable_groups whose
+\item{cols}{An integer vector selecting components. If a single positive
+integer is supplied, components \code{1:cols} are included.
+If \code{NULL}, all components are included.}
+
+\item{only_nonzero}{A logical value indicating whether to omit
+variable_groups whose
 values are zero in every selected component.}
 
 \item{contributions}{A logical value. If \code{TRUE}, aggregate percentage

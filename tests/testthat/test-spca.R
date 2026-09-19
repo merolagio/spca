@@ -74,3 +74,4 @@ test_that("spca() rejects invalid control combinations", {
   expect_error(spca(X, n_comps = 2, intensive = TRUE,
                     objective = "r2"))
 })
+

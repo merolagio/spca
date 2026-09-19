@@ -31,7 +31,9 @@ show_weights(
 \arguments{
 \item{object}{An object of class \code{pca} or \code{spca}.}
 
-\item{cols}{An integer vector or \code{NULL}. Components to show.}
+\item{cols}{An integer vector selecting components. If a single positive
+integer is supplied, components \code{1:cols} are included.
+If \code{NULL}, all components are included.}
 
 \item{contribution}{A logical value. If \code{TRUE}, show unit-L1
 contributions; otherwise, show the original nonzero weights.}
