@@ -59,7 +59,7 @@
 compare_spca = function(
     obj_list,
     n_comps = NULL,
-    contributions = TRUE, # change to contributions if safe 
+    contributions = TRUE, 
     only_nonzero = TRUE,
     variable_groups = NULL,
     plot_weights = TRUE,
@@ -429,12 +429,20 @@ format_weights = function(A, cols, digits = 3, rows, noprint = 1E-03,
     colnames(A) = paste("sPC", seq_len(ncol(A)), sep = "")
   }
   
-  if (contributions == TRUE)
-    weight_matrix_fmt = format(round(A * 100, max(digits - 2, 0)),
-                drop0trailing = TRUE, justify = "centre")
-  else
-    weight_matrix_fmt = format(round(A, digits),
-                drop0trailing = TRUE, justify = "centre")
+  if (contributions == TRUE) {
+    decimals = max(digits - 2, 0)
+    weight_matrix_fmt = format(
+      round(A * 100, decimals),
+      nsmall = decimals, drop0trailing = FALSE,
+      scientific = FALSE, justify = "centre"
+    )
+  } else {
+    weight_matrix_fmt = format(
+      round(A, digits),
+      nsmall = digits, drop0trailing = FALSE,
+      scientific = FALSE, justify = "centre"
+    )
+  }
   
   nc = nchar(weight_matrix_fmt[1L], type = "c")
   weight_matrix_fmt[abs(A) < noprint] = paste(rep(" ", nc), collapse = "")
