@@ -19,6 +19,7 @@ compare_spca(
   col_short_names = TRUE,
   print_tables = TRUE,
   print_weights = FALSE,
+  print_summary = TRUE,
   show_plot = TRUE,
   return_tables = FALSE,
   return_plot = FALSE
@@ -46,11 +47,12 @@ Used to draw vertical group-separating lines in the weights plot.}
 plot the weights or contributions.}
 
 \item{plot_type}{A character vector (default first element \code{"bars"}).
-Values starting with \code{"b"} use bars; values starting with \code{"p"}
-use points. Other values default to bars.}
+Values starting with \code{"b"} use bars; values starting with
+\code{"p"} use points. Other values default to bars.}
 
-\item{methods_names}{An optional character vector (default \code{NULL}) with
-one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.}
+\item{methods_names}{An optional character vector (default \code{NULL})
+with one label per object. If \code{NULL}, labels are
+\code{M1}, ..., \code{Mk}.}
 
 \item{x_axis_var_names}{A logical value (default \code{FALSE}). If
 \code{TRUE}, show variable names on the x axis of the weights plot.}
@@ -67,10 +69,14 @@ use short component names such as \code{C1.M1}; otherwise, use names such
 as \code{C1.object_name}.}
 
 \item{print_tables}{A logical value (default \code{TRUE}). If \code{FALSE},
-suppress table printing. Takes priority over \code{print_weights}.}
+suppress all table printing. Takes priority over \code{print_weights}
+and \code{print_summary}.}
 
 \item{print_weights}{A logical value (default \code{FALSE}). If \code{TRUE},
 print the weights or contributions table.}
+
+\item{print_summary}{A logical value (default \code{TRUE}). If \code{TRUE},
+print the summary statistics table when \code{print_tables = TRUE}.}
 
 \item{show_plot}{A logical value (default \code{TRUE}). If \code{TRUE}, show
 the weights or contributions plot.}

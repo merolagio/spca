@@ -19,10 +19,11 @@
 #' @param plot_weights A logical value (default \code{TRUE}). If \code{TRUE},
 #'   plot the weights or contributions.
 #' @param plot_type A character vector (default first element \code{"bars"}).
-#'   Values starting with \code{"b"} use bars; values starting with \code{"p"}
-#'   use points. Other values default to bars.
-#' @param methods_names An optional character vector (default \code{NULL}) with
-#'   one label per object. If \code{NULL}, labels are \code{M1}, ..., \code{Mk}.
+#'   Values starting with \code{"b"} use bars; values starting with
+#'    \code{"p"} use points. Other values default to bars.
+#' @param methods_names An optional character vector (default \code{NULL})
+#'  with one label per object. If \code{NULL}, labels are 
+#'  \code{M1}, ..., \code{Mk}.
 #' @param x_axis_var_names A logical value (default \code{FALSE}). If
 #'   \code{TRUE}, show variable names on the x axis of the weights plot.
 #' @param col_grouplines A character scalar (default \code{"red"}). Color of the
@@ -34,9 +35,12 @@
 #'   use short component names such as \code{C1.M1}; otherwise, use names such 
 #'   as \code{C1.object_name}.
 #' @param print_tables A logical value (default \code{TRUE}). If \code{FALSE},
-#'   suppress table printing. Takes priority over \code{print_weights}.
+#'   suppress all table printing. Takes priority over \code{print_weights}
+#'   and \code{print_summary}.
 #' @param print_weights A logical value (default \code{FALSE}). If \code{TRUE},
 #'   print the weights or contributions table.
+#' @param print_summary A logical value (default \code{TRUE}). If \code{TRUE},
+#'   print the summary statistics table when \code{print_tables = TRUE}.
 #' @param show_plot A logical value (default \code{TRUE}). If \code{TRUE}, show
 #'   the weights or contributions plot.
 #' @param return_tables A logical value (default \code{FALSE}). If \code{TRUE},
@@ -71,6 +75,7 @@ compare_spca = function(
     col_short_names = TRUE,
     print_tables = TRUE,
     print_weights = FALSE,
+    print_summary = TRUE,
     show_plot = TRUE,
     return_tables = FALSE,
     return_plot = FALSE) {
@@ -85,6 +90,7 @@ compare_spca = function(
     plot_weights = plot_weights,
     col_short_names = col_short_names,
     print_weights = print_weights,
+    print_summary = print_summary,
     return_tables = return_tables,
     print_tables = print_tables,
     return_plot = return_plot,
@@ -148,7 +154,8 @@ compare_spca = function(
   
   if (print_tables == FALSE){
     print_weights = FALSE
-  }
+    print_summary = FALSE
+    }
   
 ## A is list of weights of all objects--------------
   if(contributions)
@@ -376,8 +383,11 @@ compare_spca = function(
       writeLines(" ")
     }
     sum_matrix_fmt = format_summaries(sum_matrix, contributions)
-    message("Summary statistics")    
-    print(sum_matrix_fmt, quote = FALSE, justify = "right")
+    if (print_summary) {
+      sum_matrix_fmt = format_summaries(sum_matrix, contributions)
+      message("Summary statistics")
+      print(sum_matrix_fmt, quote = FALSE, justify = "right")
+    }
   }  
     ## out list------------------------  
     if(return_tables){
