@@ -2,11 +2,12 @@
 - spca's parameter `fixed_index_list` now accepts same index in different
    components it also allows to require that only some components have fixed 
    indices.
-- created new class `pca` for pca() output with its own methods. 
+- **created new class `pca` for pca() output with its own methods**. 
 - renamed pca plotting methods to 
-    scree_plot and mp_qqplot()
+    scree_plot and mp_qqplot(). Old functions kept as deprecated
 - scree_plot produces x-axis with integer tick-marks
-- eliminated help entries for deprecated functions
+- Heat map has low = red and high = blue
+- eliminated help entries in index for deprecated functions
 - improved symmetry check for gramian input
 - fixed minor bugs in methods, reinforced checks for cor and n_obs in mp_qqplot
     and pca

@@ -111,9 +111,11 @@ spca_color_scale = function(color_scale) {
 #' @return A character vector of colors.
 #' @noRd
 spca_tile_palette = function() {
-  c(
+  rev(
+    c(
     "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#F7F7F7",
     "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"
+    )
   )
 }
 
@@ -513,8 +515,6 @@ plot_spca_heatmap = function(
     maxlim =   ceiling( (max(abs(col_lims)*10)))/10
     col_lims[1] = -ceiling(maxlim*10)/10
     col_lims[2] = ceiling(maxlim*10)/10
-    # col_lims[1] = -ceiling(col_lims*10)/10
-    # col_lims[2] = ceiling(col_lims*10)/10
     } else
       col_lims = c(-1, 1)
 
@@ -544,8 +544,6 @@ plot_spca_heatmap = function(
     # pl
 
     if(has_pc_weights){
-
-
       data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
       data_df$compNum = c(rep(1:n_plot, each = length(lbl)),
                           rep(1:n_plot, each = length(lbl)) + 0.5)

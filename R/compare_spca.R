@@ -26,8 +26,8 @@
 #'  \code{M1}, ..., \code{Mk}.
 #' @param x_axis_var_names A logical value (default \code{FALSE}). If
 #'   \code{TRUE}, show variable names on the x axis of the weights plot.
-#' @param col_grouplines A character scalar (default \code{"red"}). Color of the
-#'   vertical group lines.
+#' @param col_grouplines A character scalar (default \code{"black"}). Color of
+#'  the vertical group lines.
 #' @param color_scale A character vector (default first element
 #'   \code{"ggplot"}). Color palette for bar plots. Accepted values are
 #'   \code{"ggplot"}, \code{"cbb"}, \code{"printsafe"}, and \code{"bw"}.
@@ -70,7 +70,7 @@ compare_spca = function(
     plot_type = c("bars", "points"),
     methods_names = NULL,
     x_axis_var_names = FALSE,
-    col_grouplines = "red",
+    col_grouplines = "black",
     color_scale = c("ggplot", "cbb", "printsafe", "bw"), 
     col_short_names = TRUE,
     print_tables = TRUE,
