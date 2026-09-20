@@ -111,11 +111,9 @@ spca_color_scale = function(color_scale) {
 #' @return A character vector of colors.
 #' @noRd
 spca_tile_palette = function() {
-  rev(
-    c(
+  c(
     "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#F7F7F7",
     "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"
-    )
   )
 }
 
@@ -269,11 +267,11 @@ create_data = function(x, n_plot, contributions, only_nonzero,
   } else{
     #only_nonzero disabled if pc_weights == TRUE
     if (only_nonzero == TRUE) {
-      ind_nonzero = apply(weights[, seq_len(n_plot), drop = FALSE], 1, 
-                          function(a) any(a != 0))
+      ind_nonzero = apply(weights, 1, function(a) any(a != 0))
       data_df = droplevels(data_df[ind_nonzero, ])
     }
   }
+
   data_df
 }
 
@@ -504,7 +502,8 @@ plot_spca_heatmap = function(
     lbl,
     legend_position,
     flip_heatmap,
-    heatmap_color_range) {
+    heatmap_color_range,
+    plotlab = TRUE) {
 
       tile_pal = spca_tile_palette()
 
@@ -515,6 +514,8 @@ plot_spca_heatmap = function(
     maxlim =   ceiling( (max(abs(col_lims)*10)))/10
     col_lims[1] = -ceiling(maxlim*10)/10
     col_lims[2] = ceiling(maxlim*10)/10
+    # col_lims[1] = -ceiling(col_lims*10)/10
+    # col_lims[2] = ceiling(col_lims*10)/10
     } else
       col_lims = c(-1, 1)
 
@@ -544,6 +545,8 @@ plot_spca_heatmap = function(
     # pl
 
     if(has_pc_weights){
+
+
       data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
       data_df$compNum = c(rep(1:n_plot, each = length(lbl)),
                           rep(1:n_plot, each = length(lbl)) + 0.5)
@@ -585,6 +588,19 @@ plot_spca_heatmap = function(
           axis.text.x =
             ggplot2::element_text(angle = 90, vjust = 0.5, size = 8)
         )
+    }
+    if (!plotlab) {
+      if (flip_heatmap) {
+        pl = pl + ggplot2::theme(
+          axis.text.y = ggplot2::element_blank(),
+          axis.ticks.y = ggplot2::element_blank()
+        )
+      } else {
+        pl = pl + ggplot2::theme(
+          axis.text.x = ggplot2::element_blank(),
+          axis.ticks.x = ggplot2::element_blank()
+        )
+      }
     }
     if (flip_heatmap == TRUE)
       pl = pl + ggplot2::coord_flip()
@@ -764,6 +780,7 @@ if (is.null(controls)) {
 #'
 #' @return If \code{return_plot = TRUE}, returns the ggplot2 object. Otherwise,
 #' returns \code{NULL} invisibly.
+#' @family spca
 #' @references
 #' The \code{printsafe} palette corresponds to \code{OrRd} from
 #' \url{https://colorbrewer2.org/}.
@@ -827,18 +844,14 @@ plot.spca = function(
   ## validate character inputs by initial characters
   #
   fun_formals = formals(sys.function())
-  
-  inputs = list(
-    n_plot = n_plot,
-    plot_type = plot_type,
-    contributions = contributions,
-    only_nonzero = only_nonzero,
-    pc_weights = pc_weights,
-    variable_groups = variable_groups,
-    plot_title = plot_title,
-    return_plot = return_plot,
-    show_plot = show_plot
-  )
+  fun_inp = as.list(match.call(expand.dots = FALSE))[-1]
+
+  inputs = fun_formals
+  inputs[names(fun_inp)] = fun_inp
+
+  inputs$x = NULL
+  inputs$controls = NULL
+  inputs$... = NULL
 
   validated = validate_plot_inputs(inputs, controls, fun_formals)
   names(validated)[1] = "inputs"
@@ -846,9 +859,6 @@ plot.spca = function(
   #acquire noncontrol input======
   if (is.null(n_plot))
     n_plot = ncol(weights)
-  if(!(n_plot %in% seq_len(ncol(weights))))
-    stop(paste0("n_plot must be integer between 1 and ", ncol(weights)),
-         call. = FALSE)
   plot_type = validated$inputs$plot_type
   contributions = validated$inputs$contributions
   only_nonzero = validated$inputs$only_nonzero
@@ -872,22 +882,11 @@ plot.spca = function(
   flip_heatmap = validated$controls$flip_heatmap
   heatmap_color_range = validated$controls$heatmap_color_range
 
-
-  #check pc_weights
   # plots take a matrix
   if ((!is.null(pc_weights)) && (is.vector(pc_weights))) {
-    pc_weights = matrix(pc_weights, ncol = 1)
-  }
-  if (!is.null(pc_weights)) {
-    if(is.data.frame(pc_weights))
-      pc_weights = as.matrix(pc_weights)
-    if (nrow(pc_weights) != nrow(weights))
-      stop("pc_weights must have the same number of rows as weights")
-    if (ncol(pc_weights) < n_plot)
-      stop("pc_weights must have at least n_plot columns")
-  }
-  
-  
+      pc_weights = matrix(pc_weights, ncol = 1)
+      }
+
   ## Contributions are not in minimal spca object
   if (contributions && is.null(x$contributions)) {
     x$contributions = make_contributions(weights[, 1:n_plot])
@@ -962,11 +961,12 @@ plot.spca = function(
   }
   
   if (is.null(facet_labels)) {
-    facet_labels = paste0(ifelse(is.pca(x), "PC", "sPC"), 1:n_plot)
+    facet_labels = paste0("sPC", 1:n_plot)
   } else {
-    if (length(facet_labels) != n_plot) {
-      warning(paste("length of facet_labels must be equal to the number,                    of plots. Using default."))
-      facet_labels = paste0(ifelse(is.pca(x), "PC", "sPC"), 1:n_plot)
+    if (length(facet_labels) < n_plot) {
+      warning(paste("length of stripname must be equal to the number",
+                    "of plots. Using default."))
+      facet_labels = paste0("sPC", 1:n_plot)
     }
   }
 
@@ -1022,7 +1022,8 @@ plot.spca = function(
     lbl = lbl,
     legend_position = legend_position,
     flip_heatmap = flip_heatmap,
-    heatmap_color_range = heatmap_color_range
+    heatmap_color_range = heatmap_color_range,
+    plotlab = plotlab
     )
   }
 

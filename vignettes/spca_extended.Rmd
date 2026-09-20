@@ -254,7 +254,7 @@ plot(ho_spcadef)
 `plot_type = "c"` gives a more compact circular plot; `color_scale = "printsafe"` keeps the tones distinct in grayscale.
 
 ```{r circplot, fig.cap = "Circular bar plots of the contributions of each sPC."}
-plot(ho_spcadef, n_plot = 3, plot_type = "c", controls = list(color_scale = "printsafe"))
+plot(ho_spcadef, n_plot = 3, plot_type = "c", controls = list(color_scale = "printsafe", variable_names = "auto"))
 ```
 
 `plot_type = "h"` gives a heat map. Here we add the PC contributions for comparison and keep `heatmap_color_range = "values"`, since the values span a narrow range.
