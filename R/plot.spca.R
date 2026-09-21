@@ -887,6 +887,8 @@ plot.spca = function(
   heatmap_color_range = validated$controls$heatmap_color_range
 
   # plots take a matrix
+  if (is.data.frame(pc_weights))
+    pc_weights = as.matrix(pc_weights)
   if ((!is.null(pc_weights)) && (is.vector(pc_weights))) {
       pc_weights = matrix(pc_weights, ncol = 1)
       }
