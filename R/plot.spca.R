@@ -546,7 +546,6 @@ plot_spca_heatmap = function(
 
     if(has_pc_weights){
 
-
       data_df$varNum = rep(rep(seq_along(lbl), n_plot), 2)
       data_df$compNum = c(rep(1:n_plot, each = length(lbl)),
                           rep(1:n_plot, each = length(lbl)) + 0.5)
@@ -965,14 +964,14 @@ plot.spca = function(
   } else {
     lbl = variable_names
   }
-  
+  lab = ifelse(inherits(x, "pca"), "PC", "sPC")
   if (is.null(facet_labels)) {
-    facet_labels = paste0("sPC", 1:n_plot)
+    facet_labels = paste0(lab, 1:n_plot)
   } else {
     if (length(facet_labels) < n_plot) {
       warning(paste("length of stripname must be equal to the number",
                     "of plots. Using default."))
-      facet_labels = paste0("sPC", 1:n_plot)
+      facet_labels = paste0(lab, 1:n_plot)
     }
   }
 
