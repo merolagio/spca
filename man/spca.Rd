@@ -11,7 +11,7 @@ spca(
   ncomp_by_cvexp = NULL,
   method = c("cspca", "uspca", "pspca"),
   var_selection = c("fwd", "bkw", "step"),
-  objective = c("r2", "cvexp"),
+  objective = c("cvexp", "r2"),
   intensive = FALSE,
   fat_matrix = NULL,
   fixed_index_list = NULL,
@@ -52,7 +52,8 @@ LS-SPCA variant. Accepted values are \code{"cspca"}, \code{"uspca"}, and
 backward elimination, and values starting with \code{"s"} use
 forward-stepwise selection.}
 
-\item{objective}{A character vector (default first element \code{"r2"}).
+\item{objective}{A character vector (default \code{"cvexp"} for all
+components).
 Stopping criterion for variable selection. Values starting with \code{"r"}
 use the squared-correlation criterion; values starting with \code{"c"} use
 cumulative variance explained.}
@@ -75,8 +76,8 @@ one fixes only the first component; to fix a later component, include
 may overlap and need not include every variable. Indices are 1-based. A
 factor remains available as a shorthand for assigning variables to
 component-specific groups. Duplicate indices within a component are
-removed with a warning. If the list is longer than the number of components,
-extra elements are ignored with a warning.}
+removed with a warning. If the list is longer than the number of
+components, extra elements are ignored with a warning.}
 
 \item{center_data}{A logical value (default \code{FALSE}). If \code{TRUE},
 center data-matrix columns before fitting. Ignored when \code{M} is treated

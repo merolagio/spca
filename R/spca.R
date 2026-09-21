@@ -267,7 +267,8 @@ validate_spca_inputs =
 #'   \code{"f"} use forward selection, values starting with \code{"b"} use
 #'   backward elimination, and values starting with \code{"s"} use
 #'   forward-stepwise selection.
-#' @param objective A character vector (default first element \code{"r2"}).
+#' @param objective A character vector (default \code{"cvexp"} for all
+#'   components).
 #'   Stopping criterion for variable selection. Values starting with \code{"r"}
 #'   use the squared-correlation criterion; values starting with \code{"c"} use
 #'   cumulative variance explained.
@@ -287,8 +288,8 @@ validate_spca_inputs =
 #'   may overlap and need not include every variable. Indices are 1-based. A
 #'   factor remains available as a shorthand for assigning variables to
 #'   component-specific groups. Duplicate indices within a component are
-#'   removed with a warning. If the list is longer than the number of components,
-#'   extra elements are ignored with a warning.
+#'   removed with a warning. If the list is longer than the number of 
+#'   components, extra elements are ignored with a warning.
 #' @param center_data A logical value (default \code{FALSE}). If \code{TRUE},
 #'   center data-matrix columns before fitting. Ignored when \code{M} is treated
 #'   as a covariance/correlation matrix.
@@ -363,7 +364,7 @@ spca = function(M,
                 ncomp_by_cvexp = NULL,
                 method =  c("cspca", "uspca", "pspca"),
                 var_selection = c("fwd", "bkw", "step"),
-                objective = c("r2", "cvexp"),
+                objective = c("cvexp", "r2"),
                 intensive = FALSE,
                 fat_matrix = NULL,
                 fixed_index_list = NULL,

@@ -111,10 +111,10 @@ spca_color_scale = function(color_scale) {
 #' @return A character vector of colors.
 #' @noRd
 spca_tile_palette = function() {
-  c(
+  rev(c(
     "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#F7F7F7",
     "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"
-  )
+  ))
 }
 
 
@@ -844,14 +844,18 @@ plot.spca = function(
   ## validate character inputs by initial characters
   #
   fun_formals = formals(sys.function())
-  fun_inp = as.list(match.call(expand.dots = FALSE))[-1]
-
-  inputs = fun_formals
-  inputs[names(fun_inp)] = fun_inp
-
-  inputs$x = NULL
-  inputs$controls = NULL
-  inputs$... = NULL
+  
+  inputs = list(
+    n_plot = n_plot,
+    plot_type = plot_type,
+    contributions = contributions,
+    only_nonzero = only_nonzero,
+    pc_weights = pc_weights,
+    variable_groups = variable_groups,
+    plot_title = plot_title,
+    return_plot = return_plot,
+    show_plot = show_plot
+  )
 
   validated = validate_plot_inputs(inputs, controls, fun_formals)
   names(validated)[1] = "inputs"

@@ -9,7 +9,7 @@
 
 \method{summary}{spca}(
   object,
-  cols,
+  cols = NULL,
   contributions = TRUE,
   variance_metrics = c("both", "cumulative_relative", "relative", "none"),
   min_weight = FALSE,
@@ -26,9 +26,9 @@
 \item{...}{Further arguments. These are currently unused and trigger an error
 if supplied.}
 
-\item{cols}{An integer vector of component indices. If missing, all
-available components are included. If a single integer is supplied,
-components \code{1:cols} are included.}
+\item{cols}{An integer vector of component indices or \code{NULL}.
+If \code{NULL} (the default), all available components are included.
+If a single integer is supplied, components \code{1:cols} are included.}
 
 \item{contributions}{A logical value (default \code{TRUE}). If \code{TRUE},
 minimum nonzero values are computed from percentage contributions;
