@@ -42,9 +42,9 @@ The current development version can be installed from GitHub with
 remotes::install_github("merolagio/spca")
 ```
 ## Usage
-The  main function *spca()* computes the sparse weights and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining visually the eigenvalues of the covariance matrix. These can be computed and stored in a compatible object of class *spca*  with the function  *pca()*.
+The  main function `spca()` computes the sparse weights and various statistics, such as the variance explained by each sparse component (sPC). In a typical LS-SPCA workflow, the number of sPCs to compute is chosen by examining visually the eigenvalues of the covariance/correlation matrix. These can be computed and stored in a compatible object of class `(pca, spca)`  with the function  `pca()`.
 
-Different methods can be applied to class *spca* objects: additionally to standard *print()*, *summary()* and *plot()*, also *aggregate_by_group()* (to visualize the contribution by scale), *change_sign()* and *show_weights()*  are available.  
+Different methods can be applied to class `spca` objects: additionally to standard `print()`, `summary()` and `plot()`, also `aggregate_by_group()` (to visualize the contribution by scale), `change_sign()` and `show_weights()`  and `show_correlations()` are available.  
 
 The function `compare_spca()` compares two or more `spca` solutions, `aggregate_by_group()` summarizes weights or contributions by group, and `new_spca()` creates an `spca` object from a set of weights. Additional methods include `show_weights()`, which displays nonzero weights or contributions; `show_correlations()`, which displays correlations among sPCs and between sPCs and the corresponding PCs; and `change_sign()`, which changes the signs of selected components and their associated quantities. The functions `mp_qqplot()` and `scree_plot()` produce diagnostic plots from an object returned by `pca()`.
 
@@ -56,69 +56,85 @@ The `holzinger` dataset is the small classic Holzinger-Swineford dataset with 14
 library(spca)
 data(holzinger)
 dim(holzinger)
+data(holzinger_scales)
 holzinger_scales
 ```
 
 ### Preliminary PCA
 ```{r pca_checks, message = FALSE, warning = FALSE, fig.show="hold", out.width="47%", fig.width=4, fig.height=4}
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
-summary(ho_pca,cols = 10)
+summary(ho_pca, cols = 10)
 ```
 
-The screeplot would call for four components while the qqplot indicates three. We can settle for 4 components.
+The screeplot would call for four components while the qqplot indicates three. We can settle for 4 components, ucknowledging that the fourth PC may be explaining mainly noise.
 
 ### Compute the sparse weights
-Important parameters in the *spca()* function are: *alpha* which controls for the minimum $R^2$ [default]) or the minimum proportion of cumulative variance explained (VEXP) by the sPCs realtive to that explained by the corresponding  PCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; *var_selection* ("forward" [default], "stepwise", or "backward"). See the **spca**` help for details on these parameters and more.
+Important parameters in the `spca()` function are: 
 
-The following command computes four sPCs with default settings: *alpha = 0.95*, *var_selection = forward*, *method = "c"* that selects the *cSPCA* method. Hence, we expect each sPC to yield at least 0.95% cumulative VEXP, allowing some very mild correlation between sPCs.
+- `alpha` which controls the minimum the minimum proportion of ;
+- `objective` sets which criterion is used to stop variable selection:
+cumulative variance explained (RCVEXP) by the sPCs, relative to that explained by the corresponding PCs [default], or $R^2$ with the current PC; 
+- `n_comps` the number of components to compute; 
+- `method` the LS-SPCA method to use: "u" (for uncorrelated), "c" (for correlated) [default]) or "p" (for projection); 
+- `var_selection` which variable selection to use "forward" [default], "stepwise", or "backward"). 
+
+
+See the `spca` help for details on these and more parameters.
+
+**The following command** computes four sPCs with default settings: `alpha = 0.95`, `var_selection = forward`, `method = "c"` that selects the `cSPCA` method. Hence, we expect each sPC to yield at least 95% cumulative VEXP, allowing some very mild correlation between sPCs.
 ```{r run_spca, message = FALSE, warning = FALSE}
-myspca = spca(holzinger, n_comps = 4)
+ho_spca = spca(holzinger, n_comps = 4)
 ```
 
 ### Inspect spca results
-Methods are *print*, *plot* (several options available) and *summary*.
-By default, plot and print show the percentage *contributions*, that is the weights scaled to have sum of their absolute values equal to 1.
-```{r methods, message = TRUE, warning = FALSE, out.width="50%"}
-myspca # print
+Methods are `print`, `plot` (several options available) and `summary`.
+By defaut, plot and print show the percentage `contributions`, that is the weights scaled to have sum of their absolute values equal to 1.
+```{r methods, message = TRUE, warning = FALSE, fig.height = 5, fig.width = 5}
+ho_spca # print
 
-summary(myspca, cor_with_pc = TRUE)
-```
-The sPCs explain over 96% of the variance explained by the corresponding  full-cardinality PC whith which they are highly correlated.
+summary(ho_spca, cor_with_pc = TRUE)
 
-```{r plots, message = TRUE, warning = FALSE, out.width="50%"}
-plot(myspca, plot_type = "bar")
+plot(ho_spca, plot_type = "bar")
 
 #sPCs correlation
-show_correlations(myspca)
-#round(myspca$spc_cor, 2)
+show_correlations(ho_spca)
 ```
-The sPCs are virtually uncorrelated.
 
-Other plot types are available.
+the sparse weights can be compared to the full PCA weights with `compare_spca`
+```{r spca_vs_pca, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
+compare_spca(list(ho_pca, ho_spca), variable_groups = holzinger_scales, 
+             x_axis_var_names = FALSE,  methods_names = c("PCA", "SPCA")
+             )
+```
+
+The `variable_groups = group_factor` adds lines separating variable groups. Adding  `print_weights = TRUE` would show the contributions side by side.
+
+**Other plot types are available:**
 
 Circular: 
 ```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(myspca, plot_type = "c") # "c" for "circular"
+plot(ho_spca, plot_type = "c") # "c" for "circular"
 ```
 
 Heatmap:
-```{r heatmap, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
+```{r heatmap, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 4}
+plot(ho_spca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
 ```
 
 ## Variable groups
 The variables in the `holzinger` dataset belong to four different scales, recorded in the factor `holzinger_scales`. These can be differentiated in the barplot
-```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
+```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 4}
+plot(ho_spca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
 
-aggregate_by_group(myspca, variable_groups = holzinger_scales)
+aggregate_by_group(ho_spca, variable_groups = holzinger_scales)
 ```
 
 ## Comparison of two or more spca solutions
-Compare the *cSPCA* solutions computed with *alpha = 0.95*  computed with those with  *alpha = 0.90*.
-```{r spca90, message = FALSE, warning = FALSE}
-myspca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
+Compare the *CSPCA* solutions with *alpha = 0.95* those with  *alpha = 0.90*.
+```{r spca90, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
+ho_spca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
 
-compare_spca(obj_list = list(myspca, myspca90), 
+compare_spca(obj_list = list(ho_spca, ho_spca90), 
              methods_names = c("alpha = 95", "alpha = 90"))
 ```
+
