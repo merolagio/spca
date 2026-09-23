@@ -265,3 +265,24 @@ compare_spca(obj_list = list(ho_spca, ho_spca90),
     #> Rcvexp 96.0% 92.8% 95.6% 90.0% 95.3% 90.6% 95.3% 91.2%
     #> Card       7     5     4     2     4     4     4     3
     #> abs_r   0.98  0.96  0.95  0.87  0.92  0.94  0.76  0.08
+
+## Practical recommendations
+
+The default settings provide a practical starting point for most
+analyses. Forward selection is recommended for routine use; stepwise and
+intensive selection are more suitable for smaller problems, while
+backward elimination can be expensive. The power method is mainly useful
+for large matrices.
+
+| Setting | Small | Medium | Large |
+|:---|:--:|:--:|:--:|
+| Stepwise selection | Consider | Consider | Avoid |
+| Intensive selection | Consider | Use cautiously | Avoid |
+| Backward elimination | Use cautiously | Avoid | Avoid |
+| `objective = "cvexp"` | Consider | Consider | Use cautiously |
+| Power method | Little expected gain | Little expected gain | Consider |
+
+Matrix size refers mainly to the number of variables for the tall-matrix
+engine and to both dimensions for the fat-matrix engine. The
+recommendations concern computational cost rather than guaranteed
+improvements in the solution. \`\`\`

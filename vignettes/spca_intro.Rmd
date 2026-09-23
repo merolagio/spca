@@ -1,10 +1,9 @@
 ---
 title: "Introduction to the spca package"
-author: "giovanni Maria Merola"
+author: "Giovanni Maria Merola"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette:  default
-  pdf_document: default
+  rmarkdown::html_vignette: 
 vignette: >
   %\VignetteIndexEntry{Introduction to the spca package}
   %\VignetteEngine{knitr::rmarkdown}
@@ -24,10 +23,14 @@ knitr::opts_chunk$set(
 <h2>Package spca</h2>
 </div>  
 
-This package contains functions to compute, print and plot Least Squares Sparse Principal Components Analysis (LS-SPCA). Methodological details, references and full presentation can be found in the `spca_extended` vignette.
+This package contains functions to compute, visualize and compare Least Squares Sparse Principal Components Analysis (LS-SPCA). Differently from other *conventional* SPCA methods, LS-SPCA provides a close approximation to the PCs, thus something like PCA with sparse weights. 
+
+An efficient `C++` backend makes the fitting functions fast and memory efficient. Careful input validation and error handling prevents crashes and provides useful error and warning messages.
+
+Methodological details, references and full presentation can be found in the *spca_extended* vignette.
 
 ## Installation
-You can install the release version from CRAN
+You can install the stable release from CRAN
 
 ``` {r inst_cran,  eval = FALSE}
 install.packages("spca")
@@ -37,6 +40,7 @@ or the development version from GitHub
 ``` {r inst_gib, , eval = FALSE}
 remotes::install_github("merolagio/spca")
 ```
+
 ## Usage
 The  main function *spca()* computes the sparse weights and various statistics, such as the variance explained by each sparse component (sPC). print, summary and plot methods are available. PCA solutions stored as an `*spca*` object can be obtained with the function  *pca()*.
 
@@ -55,57 +59,90 @@ holzinger_scales
 ### Preliminary PCA
 ```{r pca_checks, message = FALSE, warning = FALSE, fig.show = "hold", out.width = "47%", fig.width = 4, fig.height = 4}
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
-summary(ho_pca,cols = 10)
+summary(ho_pca, cols = 10)
 ```
-We settle for 4 components
+
+The screeplot would call for four components while the qqplot indicates three. We can settle for 4 components, acknowledging that the fourth PC may be explaining mainly noise.
 
 ### Compute the sparse weights
-Important parameters in the *spca()* function are: *alpha* which controls for the minimum $R^2$ [default]) or the minimum proportion of cumulative variance explained (VEXP) by the sPCs relative to that explained by the corresponding  PCs; *n_comps* the number of components to compute; *method* the LS-SPCA method to use ("u" for uncorrelated, "c" for correlated [default]) and "p" for projection; *var_selection* ("forward" [default], "stepwise", or "backward"). See the `**spca**` help for details on these parameters and more.
+Important parameters in the `spca()` function are: 
 
-The following command computes four sPCs with default settings: *alpha = 0.95*, *var_selection = forward*, *method = "c"* that selects the *cSPCA* method. Hence, we expect each sPC to yield at least 95% cumulative VEXP, allowing some very mild correlation between sPCs.
+- `alpha` which controls the minimum the minimum proportion of ;
+- `objective` sets which criterion is used to stop variable selection:
+cumulative variance explained (RCVEXP) by the sPCs, relative to that explained by the corresponding PCs [default], or $R^2$ with the current PC; 
+- `n_comps` the number of components to compute; 
+- `method` the LS-SPCA method to use: "u" (for uncorrelated), "c" (for correlated) [default]) or "p" (for projection); 
+- `var_selection` which variable selection to use "forward" [default], "stepwise", or "backward"). 
+
+See the `spca` help for details on these and more parameters.
+
+**The following command** computes four sPCs with default settings: `alpha = 0.95`, `var_selection = forward`, `method = "c"` that selects the `cSPCA` method. Hence, we expect each sPC to yield at least 95% cumulative VEXP, allowing some very mild correlation between sPCs.
 ```{r run_spca, message = FALSE, warning = FALSE}
-myspca = spca(holzinger, n_comps = 4)
+ho_spca = spca(holzinger, n_comps = 4)
 ```
 
 ### Inspect spca results
-Methods are *print*, *plot* (several options available) and *summary*.
-By defaut, plot and print show the percentage *contributions*, that is the weights scaled to have sum of their absolute values equal to 1.
-```{r methods, message = TRUE, warning = FALSE, fig.height=5, fig.width = 5}
-myspca # print
+Methods are `print`, `plot` (several options available) and `summary`.
+By defaut, plot and print show the percentage `contributions`, that is the weights scaled to have sum of their absolute values equal to 1.
+```{r methods, message = TRUE, warning = FALSE, fig.height = 5, fig.width = 5}
+ho_spca # print
 
-summary(myspca, cor_with_pc = TRUE)
+summary(ho_spca, cor_with_pc = TRUE)
 
-plot(myspca, plot_type = "bar")
+plot(ho_spca, plot_type = "bar")
 
 #sPCs correlation
-show_correlations(myspca)
+show_correlations(ho_spca)
 ```
 
-Other plot types are available.
+the sparse weights can be compared to the full PCA weights with `compare_spca`
+```{r spca_vs_pca, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
+compare_spca(list(ho_pca, ho_spca), variable_groups = holzinger_scales, 
+             x_axis_var_names = FALSE,  methods_names = c("PCA", "SPCA")
+             )
+```
+
+The `variable_groups = group_factor` adds lines separating variable groups. Adding  `print_weights = TRUE` would show the contributions side by side.
+
+**Other plot types are available:**
 
 Circular: 
 ```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(myspca, plot_type = "c") # "c" for "circular"
+plot(ho_spca, plot_type = "c") # "c" for "circular"
 ```
 
 Heatmap:
 ```{r heatmap, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 4}
-plot(myspca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
+plot(ho_spca, plot_type = "h", controls = list(legend_position = "b")) # "h" is enough to call "heatmap" type and "b" to indicate "bottom".
 ```
 
 ## Variable groups
 The variables in the `holzinger` dataset belong to four different scales, recorded in the factor `holzinger_scales`. These can be differentiated in the barplot
 ```{r groups, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 4}
-plot(myspca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
+plot(ho_spca, plot_type = "bars", variable_groups = holzinger_scales, controls = list(legend_position = "right")) 
 
-aggregate_by_group(myspca, variable_groups = holzinger_scales)
+aggregate_by_group(ho_spca, variable_groups = holzinger_scales)
 ```
 
 ## Comparison of two or more spca solutions
 Compare the *CSPCA* solutions with *alpha = 0.95* those with  *alpha = 0.90*.
 ```{r spca90, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
-myspca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
+ho_spca90 = spca(holzinger, n_comps = 4, alpha = 0.9)
 
-compare_spca(obj_list = list(myspca, myspca90), 
+compare_spca(obj_list = list(ho_spca, ho_spca90), 
              methods_names = c("alpha = 95", "alpha = 90"))
+```
+## Practical recommendations
+
+The default settings provide a practical starting point for most analyses. Forward selection is recommended for routine use; stepwise and intensive selection are more suitable for smaller problems, while backward elimination can be expensive. The power method may be inaccurate, especially for higher order components, and is mainly useful for large matrices.
+
+| Setting | Small | Medium | Large |
+|:--|:--:|:--:|:--:|
+| Stepwise selection | Consider | Consider | Avoid |
+| Intensive selection | Consider | Use cautiously | Avoid |
+| Backward elimination | Use cautiously | Avoid | Avoid |
+| `objective = "cvexp"` | Consider | Consider | Use cautiously |
+| Power method | Little expected gain | Little expected gain | Consider |
+
+Matrix size refers mainly to the number of variables for the tall-matrix engine and to both dimensions for the fat-matrix engine. The recommendations concern computational cost rather than guaranteed improvements in the solution.
 ```

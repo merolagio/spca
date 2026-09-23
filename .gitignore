@@ -28,3 +28,5 @@ Vignettes\spca_extended_vignette-concordance.tex
 *.d
 .lintr
 *.RData
+/doc/
+/Meta/

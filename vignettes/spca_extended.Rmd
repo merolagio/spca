@@ -1,5 +1,5 @@
 <!--
-Adapted from JSS artticle to an HTML vignette.
+Adapted from the JSS article to an HTML vignette.
   * R2latex() emits LaTeX, which does NOT render in HTML (it dumps raw LaTeX
     table source and shows no table). Each table is therefore shown by letting
     the object print its own spca/compare_spca output - no table is dropped.
@@ -8,15 +8,15 @@ Adapted from JSS artticle to an HTML vignette.
   * LaTeX markup (\pkg, \code, \section, \citep, thebibliography, ...) converted
     to Markdown; math kept for MathJax, with \trasp / \traspj defined below.
 Requires the Extended_vignette_material/ folder next to this file. The heavy
-fits are still loaded, not recomputed; only the cheap Holzinger plots run.
+fits are loaded rather than recomputed; figures are generated from those fits.
 -->
 ---
-title: "Computing Least Squares Sparse Principal Components with the spca Package"
+title: "spca Extended Vignette"
 author: "Giovanni Maria Merola"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Computing Least Squares Sparse Principal Components with spca}
+  %\VignetteIndexEntry{spca extended vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{spca}
@@ -44,7 +44,7 @@ source("Extended_vignette_material/spca_utilities_for_vignettes.R")
 ```
 
 ```{r load_all, include = FALSE}
-load("Extended_vignette_material/spca_JSS_article_results.rda")
+load("Extended_vignette_material/spca_vignette_results.rda")
 ```
 
 $$
@@ -96,247 +96,488 @@ Fitted models are returned as objects of class `spca`, holding both weights and 
 
 Computations run in the *C++* backend, which uses referenced arrays to avoid deep copies. Fat matrices are handled with a reverse-SVD in the row space. The covariance matrix $S = X\trasp X$ and the product $SS$ are formed once, and deflations use rank-1 updates rather than recomputation, reducing the per-step cost from about $O(p^3)$ to $O(p^2)$. The leading eigen-pair can optionally be computed with the power method (`pm_weights = TRUE` for weights, `pm_varsel = TRUE` for selection), controlled by the `maxiter_pm...` and `eps_pm...` arguments.
 
-## Application
+# A typical SPCA workflow using `spca`
 
-We illustrate a standard workflow with the Holzinger–Swineford dataset from the package *psychTools* (Revelle 2025). We use a subset of $n = 145$ observations and $p = 12$ variables, as in other analyses (for example, Ferrara et al. 2019). The variables are centred and scaled to unit variance. The data ship in the package as `holzinger`, together with the factor `holzinger_scales` giving the scale of each variable.
+To illustrate a standard SPCA workflow, we use the classic Holzinger--Swineford dataset, available from the **psychTools** package (Revelle 2025). To keep the results compact, we use a subset of $n = 145$ observations and $p = 12$ ability-test results, treated as variables in the analysis. The same subset is used in other analyses (for example, Ferrara et al. 2019, and references therein). The variables are centred and scaled to unit variance. The dataset is included in the package as `holzinger`; the accompanying factor `holzinger_scales` identifies which of the four scales each variable belongs to.
 
-We report percentage *contributions* (weights scaled to unit $l_1$ norm) rather than $l_2$-scaled weights, as they are easier to interpret. The `print()` and `plot()` methods use contributions by default; set `contributions = FALSE` for weights.
+When evaluating and comparing LS-SPCA solutions, we emphasize percentage contributions, which are weights scaled to unit $\ell_1$ norm (the sum of their absolute values), rather than conventional weights scaled to unit $\ell_2$ norm. Contributions are generally easier to interpret, and the **spca** methods print and plot them by default. Set `contributions = FALSE` to obtain conventional weights.
 
-Load the data:
+The aim is to obtain a compact representation of the relationships among the 12 variables while retaining most of the variation represented by ordinary PCA. We first use PCA to choose a candidate number of components. We then examine how sparsification affects variance explained, component interpretation, and agreement with the original PCs. Finally, we compare alternative solutions to assess whether additional sparsity or restrictions based on the test scales are appropriate.
 
-```{r load_ho}
+We assess how closely SPCA solutions approximate PCA using relative variance explained (RVEXP) and relative cumulative variance explained (RCVEXP), defined as the VEXP and CVEXP of the sPCs divided by the corresponding quantities for the PCs. We also consider the correlation between each sPC and its corresponding PC.
+
+Load the data as follows.
+
+```{r workflow_load_ho}
 data("holzinger")
 dim(holzinger)
 data("holzinger_scales")
 ```
 
-### pca()
+## PCA
 
-`pca()` runs the eigendecomposition of the covariance matrix and stores the result in an `spca` object. PCA is not required for LS-SPCA, but it helps decide how many components to retain. It takes:
+Although it is not required before fitting sparse components, examining the PCA solution helps identify the components to be approximated and choose how many to retain.
+
+The `pca()` function performs an eigendecomposition of the covariance matrix and stores the result in an object of classes `pca` and `spca`. It wraps a specialized C++ routine that uses a standard eigendecomposition for tall matrices and a truncated inverse singular value decomposition for fat matrices. Its arguments are:
 
 ```r
 pca(M, n_comps = NULL, center_data = FALSE, scale_data = FALSE,
-    fat_matrix = NULL, screeplot = FALSE, qq_plot = TRUE, n_obs = NULL,
-    neigen_toplot = NULL, pm = FALSE, eps_pm = 1e-05, maxiter_pm = 100)
+    fat_matrix = NULL, screeplot = TRUE, qq_plot = FALSE,
+    n_obs = NULL, neigen_toplot = NULL, cor = TRUE,
+    common_var = NULL, pm = FALSE, eps_pm = 1e-04,
+    maxiter_pm = 1000)
 ```
 
-`M` is a data or covariance matrix; scores are computed only from a data matrix. With `n_comps = NULL` all components are computed. With `pm = TRUE`, only `n_comps < p` PCs are computed by the power method, controlled by `eps_pm` and `maxiter_pm`.
+`M` can be either a data matrix or a covariance matrix. PC scores are not computed when a covariance matrix is supplied. The default `n_comps = NULL` computes all possible components. If `pm = TRUE`, only `n_comps` PCs are computed with the power method, controlled by the convergence tolerance `eps_pm` and maximum number of iterations `maxiter_pm`. Because the returned object also inherits from `spca`, the methods for that class apply to it.
 
-`pca()` can draw a screeplot and a Wachter qq-plot (Wachter, 1976), which compares the eigenvalues with the Marchenko–Pastur quantiles (Winkler 2021). The qq-plot applies to covariance matrices of equal-variance variables; for correlation matrices set `common_var = 1`, and supply `n_obs` when `M` is a covariance matrix. The standalone `scree_plot()` and `mp_qqplot()` functions customize these plots. The plots below show the screeplot and the qq-plot, the latter with a line fitted to the smallest $(n - 3)$ eigenvalues.
+`pca()` can generate a conventional screeplot and a Wachter qq-plot (Wachter 1976). The latter compares the observed eigenvalues with quantiles of the Marchenko--Pastur distribution, the limiting eigenvalue distribution for random covariance matrices of independent variables with a common variance (Winkler 2021). It therefore applies to covariance matrices whose variables have the same variance, specified through `common_var`, and to correlation matrices when `cor = TRUE`. For covariance or correlation matrix input, `n_obs` must be supplied to `pca()` or later to `mp_qqplot()` unless it is already stored in the fit. The methods `scree_plot()` and `mp_qqplot()` provide further customization.
 
-```{r pca, fig.cap = "Screeplot."}
+The following plots show the screeplot and qq-plot, with a line fitted to all but the three largest eigenvalues.
+
+```{r workflow_pca_scree, fig.cap = "Screeplot."}
 ho_pca = pca(holzinger, screeplot = TRUE, qq_plot = FALSE)
 ```
 
-```{r qqplot, fig.cap = "qq-plot with a fitted line."}
-mp_qqplot(ho_pca, n_vars = ncol(holzinger),
-               n_fitline = -3)
+```{r workflow_pca_qq}
+mp_qqplot(ho_pca, n_fitline = -4)
 ```
 
-The screeplot suggests four components, the qq-plot three. We keep four, noting that the fourth may explain mostly noise.
+The screeplot suggests retaining four components, whereas the qq-plot indicates that only three eigenvalues exceed those expected under a random correlation matrix. We nonetheless retain four components. Since components are extracted sequentially, the fourth does not affect the first three, and it illustrates how LS-SPCA behaves on a weak-signal component.
 
-### spca()
+The following bar plots show the variable contributions to the first four PCs, coloured by scale. The first PC is a weighted average of all variables, with similar weights. Disregarding small contributions, the second PC mainly contrasts verbal (VBL) and speed (SPD) abilities, with an additional contrast between two mathematics (MTH) tests. The third contrasts spatial (SPL) abilities with verbal and speed abilities. The fourth has no clearly interpretable pattern, possibly because it primarily captures noise.
 
-`spca()` is the main function. It computes LS-SPCA solutions and stores them in an `spca` object. Its arguments are:
+```{r workflow_pca_plot, fig.cap = "Contributions to the first four PCs."}
+plot(ho_pca, n_plot = 4, variable_groups = holzinger_scales)
+```
+
+## SPCA
+
+The main function, `spca()`, invokes the C++ engines that compute LS-SPCA solutions and stores the result in an `spca` object. Its arguments are:
 
 ```r
 spca(M, alpha = 0.95, n_comps = NULL, ncomp_by_cvexp = NULL,
-    method = c("cspca", "uspca", "pspca"),
-    var_selection = c("fwd", "bkw", "step"),
-    objective = c("cvexp", "r2"), intensive = FALSE,
-    fat_matrix = NULL, fixed_index_list = list(),
-    center_data = FALSE, scale_data = FALSE,
-    pm_weights = FALSE, eps_pm_weights = 1e-05,
-    maxiter_pm_weights = 100, pm_varsel = FALSE,
-    eps_pm_varsel = 1e-05, maxiter_pm_varsel = 200)
+     method = c("cspca", "uspca", "pspca"),
+     var_selection = c("fwd", "bkw", "step"),
+     objective = c("cvexp", "r2"), intensive = FALSE,
+     fat_matrix = NULL, fixed_index_list = list(),
+     center_data = FALSE, scale_data = FALSE,
+     pm_weights = FALSE, eps_pm_weights = 1e-05,
+     maxiter_pm_weights = 100, pm_varsel = FALSE,
+     eps_pm_varsel = 1e-05, maxiter_pm_varsel = 200)
 ```
 
-Character arguments are matched on the first letter of the first element.
+Character arguments may be abbreviated: only the first character of the first supplied value is used.
 
-Fit four components with the defaults:
+We fit four components using the defaults. The number of components can instead be left unspecified and computation stopped when `ncomp_by_cvexp` is reached. If both arguments are supplied, `n_comps` takes priority.
 
-```{r spcadef, eval = FALSE}
-  ho_spcadef = spca(M = holzinger,
-                  alpha = 0.95,          # 95% CVEXP
-                  n_comps = 4,           # 4 components
-                  method = "c",          # cSPCA
-                  var_selection = "f",   # forward
-                  objective = "cvexp",   # stop on CVEXP
-                  intensive = FALSE      # select by R-squared
-                )
+```{r workflow_spcadef, eval = FALSE}
+ho_spcadef = spca(
+  M = holzinger,
+  n_comps = 4,          # four components
+  alpha = 0.95,         # 95% CVEXP
+  method = "c",         # cSPCA
+  var_selection = "f", # forward selection
+  objective = "cvexp", # stop by CVEXP
+  intensive = FALSE     # select by R-squared
+)
 ```
 
-The same result follows from `ho_spcadef = spca(M = holzinger, n_comps = 4)`.
+The final four arguments are written explicitly for clarity. The same fit is obtained with `ho_spcadef = spca(holzinger, 4)`.
 
-### print()
+### `summary()`
 
-`print()` is the default method:
+The `summary()` method reports metrics for assessing an `spca` object relative to the PCs. With the default `cor_with_pc = TRUE`, it includes the correlations between the sPCs and their corresponding PCs. These correlations are omitted when the model was fitted from a covariance matrix.
+
+- `Vexp`: percentage variance explained.
+- `Cvexp`: percentage cumulative variance explained.
+- `Rvexp`: variance explained relative to the corresponding PC.
+- `Rcvexp`: cumulative variance explained relative to the corresponding PCs.
+- `Card`: number of nonzero weights.
+- `r`: correlation between each sPC and its corresponding PC.
+
+*Summary of the SPCA fit.*
+
+```{r workflow_summary}
+summary(ho_spcadef)
+```
+
+The weight cardinalities are substantially smaller than the 12 available variables, while all sPCs attain more than 95% RCVEXP. The first three sPCs are strongly correlated with their respective PCs. The fourth correlation is weaker, plausibly because that component contains less signal, as suggested by the qq-plot. The correlation matrix of the sPCs follows.
+
+```{r workflow_corcomps}
+show_correlations(ho_spcadef)
+```
+
+Although cSPCA permits correlated sPCs, their mutual correlations are small in this example. The larger correlations involving the fourth sPC provide further evidence that it conveys comparatively little signal.
+
+## Comparison of SPCA with PCA
+
+This comparison is not required in a standard SPCA analysis, but it clarifies the reduction achieved relative to PCA. `compare_spca()` produces tables and plots for two or more solutions. Here it displays the PCA and SPCA contributions side by side and plots them by scale.
+
+```{r workflow_comp_pca_call}
+compare_spca(
+  list(ho_pca, ho_spcadef),
+  variable_groups = holzinger_scales,
+  print_weights = TRUE,
+  print_summary = TRUE,
+  methods_names = c("PCA", "cSPCA")
+)
+```
+
+
+The cSPCA components preserve the main patterns in the PCs while involving fewer variables. The first sPC remains a positive weighted average spanning all four scales. The second more clearly contrasts verbal and speed abilities after eliminating the mathematics contributions. The third retains the contrast between spatial abilities and verbal and speed abilities. The fourth remains difficult to interpret at the scale level despite its sparser representation, because variables within the same scales receive contributions of opposite signs. Variable selection in LS-SPCA is not equivalent to removing the variables with the smallest absolute PCA weights: for example, the first sPC retains `addition` despite its small PCA weight.
+
+`aggregate_by_group()` sums contributions within each scale. These totals can aid interpretation at the scale level, although contributions with opposite signs within a scale cancel.
+
+*cSPCA contributions aggregated by scale.*
+
+```{r workflow_pca_aggr}
+aggregate_by_group(
+  ho_spcadef,
+  variable_groups = holzinger_scales,
+  only_nonzero = FALSE
+)
+```
+
+## Analysis of the sparse solutions
+
+### `print()`
+
+`print()` is the default method and accepts the following arguments:
 
 ```r
-print.spca = function (x, cols = NULL, only.nonzero = TRUE,
-                contributions = TRUE, digits = 3, thresh = 0.001,
-                return_table = FALSE, components = NULL, ...
-                )
+print.spca(x, cols = NULL, only_nonzero = TRUE,
+           contributions = TRUE, digits = 3,
+           thresh_card = 1e-07, return_table = FALSE,
+           component_names = NULL, ...)
 ```
 
-It shows percentage contributions. With `only_nonzero = TRUE`, variables that load on no sPC are dropped. `cols` selects the columns to print (an integer prints the first `cols` columns).
+It displays percentage contributions by default. With `only_nonzero = TRUE`, variables that do not load on any sPC are omitted. `cols` selects the columns to print; an integer selects the first `cols` columns.
 
-*Nonzero percentage contributions of the spca fit.*
+*Nonzero contributions to the cSPCA components.*
 
-```{r print_spca}
+```{r workflow_print_spca}
 ho_spcadef
 ```
 
-### summary()
+### `plot()`
 
-`summary()` reports metrics for assessing the fit against the PCs. With `cor_with_pc = TRUE` it also gives the sPC–PC correlations. The metrics are:
-
-- `Vexp` percentage variance explained;
-- `Cvexp` percentage cumulative variance explained;
-- `Rvexp` variance explained relative to the corresponding PC;
-- `Rcvexp` cumulative variance explained relative to the corresponding PCs;
-- `Card` number of nonzero weights;
-- `r` correlation between each sPC and its PC.
-
-*Summaries of the spca fit.*
-
-```{r summary}
-summary(ho_spcadef, cor_with_pc = TRUE)
-```
-
-Cardinalities are well below the 12 variables, and every sPC explains over 95% of the VEXP of its PC. The first three sPCs correlate strongly with their PCs; the fourth less so, consistent with the weak signal seen in the qq-plot above. The sPC correlation matrix follows.
-
-*Mutual correlation among the sPCs.*
-
-```{r cor_comps}
-show_correlations(ho_spcadef)
-#round(ho_spcadef$spc_cor, 2)
-```
-
-Although cSPCA allows correlated sPCs, the correlations here are small; the fourth sPC is the most correlated, again signalling little signal.
-
-### plot()
-
-`plot()` draws the contributions. Arguments under `controls` are *ggplot2* parameters; set `return_plot = TRUE` to edit the plot afterwards.
+The `plot()` method can be customized through the following arguments. Entries under `controls` are **ggplot2** parameters included for convenience. Set `return_plot = TRUE` to save and modify the resulting plot.
 
 ```r
-plot.spca = function (
- x,
- n_plot = NULL,
- plot_type = c("bars", "circular", "heatmap"),
- contributions = TRUE,
- only_nonzero = TRUE,
- pc_weights = NULL,
- variable_groups = NULL,
- plot_title = NULL,
- return_plot = FALSE,
- produce_plot = TRUE,
- controls = list(
- color_scale = c("ggplot", "cbb", "printsafe", "bw"),
- variable_names = NULL,
- legend_position = c("none", "bottom", "right", "top", "left"),
- grid_type = c("horizontal", "full", "none"),
- facet_labels = NULL,
- legend_title = NULL,
- x_axis_lab = "variables",
- adjust_labels_circ = NULL,
- flip_heatmap = FALSE,
- heatmap_color_range = c("values", "unit")),
- ...)
+plot.spca(
+  x,
+  n_plot = NULL,
+  plot_type = c("bars", "circular", "heatmap"),
+  contributions = TRUE,
+  only_nonzero = TRUE,
+  pc_weights = NULL,
+  variable_groups = NULL,
+  plot_title = NULL,
+  return_plot = FALSE,
+  show_plot = TRUE,
+  controls = list(
+    color_scale = c("ggplot", "cbb", "printsafe", "bw"),
+    variable_names = c("none", "auto"),
+    legend_position = c("none", "bottom", "right", "top", "left"),
+    grid_type = c("horizontal", "full", "none"),
+    facet_labels = NULL,
+    legend_title = NULL,
+    x_axis_lab = "variables",
+    adjust_labels_circ = NULL,
+    flip_heatmap = FALSE,
+    heatmap_color_range = c("values", "unit")
+  ),
+  ...
+)
 ```
 
-Passing PC weights to `pc_weights` overlays them for comparison (not for circular plots); a vector or factor in `variable_groups` colours the plot by group. The default is a bar plot.
+Supplying PC weights through `pc_weights` adds them to the plots for comparison, except for circular plots. Supplying a vector or factor through `variable_groups` identifies groups of variables, as in the PCA plot above. The default is a conventional bar plot.
 
-```{r barplot, fig.cap = "Bar plots of the contributions of each sPC."}
-plot(ho_spcadef)
+```{r workflow_bar_plot, fig.cap = "Contributions to each sPC."}
+plot(ho_spcadef, controls = list(variable_names = "auto"))
 ```
 
-`plot_type = "c"` gives a more compact circular plot; `color_scale = "printsafe"` keeps the tones distinct in grayscale.
+Set `plot_type = "c"` for a more compact circular plot. Here `color_scale = "printsafe"` keeps the tones distinguishable when printed in grayscale.
 
-```{r circplot, fig.cap = "Circular bar plots of the contributions of each sPC."}
-plot(ho_spcadef, n_plot = 3, plot_type = "c", controls = list(color_scale = "printsafe", variable_names = "auto"))
+```{r workflow_circplot, fig.cap = "Circular plots of the contributions to the first three sPCs."}
+plot(
+  ho_spcadef,
+  n_plot = 3,
+  plot_type = "c",
+  controls = list(
+    color_scale = "printsafe",
+    variable_names = "auto"
+  )
+)
 ```
 
-`plot_type = "h"` gives a heat map. Here we add the PC contributions for comparison and keep `heatmap_color_range = "values"`, since the values span a narrow range.
+The third option is a heat map. Adding the PC contributions permits a visual comparison. The default `heatmap_color_range = "values"` uses the observed range, which is more informative here than fixing the colour scale between -1 and 1.
 
-```{r heatmap, fig.cap = "Heat maps of the contributions of each sPC compared with the corresponding PC contributions."}
-plot(ho_spcadef, pc_weights = ho_pca$contributions, plot_type = "h")
+```{r workflow_heatmap, fig.cap = "Heat maps comparing cSPCA and PCA contributions."}
+plot(
+  ho_spcadef,
+  pc_weights = ho_pca$contributions,
+  plot_type = "h",
+  controls = list(variable_names = "none")
+)
+```
+
+## Comparison of two LS-SPCA solutions
+
+We now compare the default cSPCA fit with a fit that uses the forward intensive selection procedure. Both use the default `alpha = 0.95`.
+
+```{r workflow_ispca_fit, eval = FALSE}
+ho_cspcai = spca(
+  holzinger,
+  n_comps = 4,
+  alpha = 0.95,
+  method = "c",
+  objective = "cvexp",
+  intensive = TRUE
+)
+```
+
+The method names are used in the comparative plot legend. `col_short_names = TRUE` keeps the printed tables compact, while `color_scale = "cbb"` selects a colour-blind-friendly palette.
+
+*Comparative summaries for default cSPCA (M1) and cSPCA with intensive selection (M2).*
+
+```{r workflow_compispca_summary}
+compare_spca(
+  list(ho_spcadef, ho_cspcai),
+  plot_weights = FALSE,
+  variable_groups = holzinger_scales,
+  print_weights = FALSE,
+  print_summary = TRUE,
+  col_short_names = TRUE,
+  methods_names = c("cSPCA", "Intensive")
+)
+```
+
+*Contributions for default cSPCA (M1) and cSPCA with intensive selection (M2).*
+
+```{r workflow_compispca_weights}
+compare_spca(
+  list(ho_spcadef, ho_cspcai),
+  plot_weights = FALSE,
+  variable_groups = holzinger_scales,
+  print_weights = TRUE,
+  print_summary = FALSE,
+  col_short_names = TRUE,
+  methods_names = c("cSPCA", "Intensive")
+)
+```
+
+Both fits meet the 95% RCVEXP target for every component. With the same cardinalities for the first three sPCs (7, 4, and 4), intensive selection (M2) achieves slightly higher RCVEXP than default cSPCA (M1). For the fourth sPC, M2 selects three rather than four variables, with a modest decrease in RCVEXP from 95.3% to 95.2%. Intensive selection therefore gives a slightly closer approximation for the first three components and a sparser fourth component while still meeting the target.
+
+The contributions and plot show that the methods share five of the seven variables selected for the first sPC, despite selecting partially different sets. They select the same variables for the second and third sPCs, with slightly different contributions. For the fourth sPC, M2 retains a subset of the variables selected by M1, omitting `addition`. Assessing the relative interpretability of these weight sets requires subject-matter expertise.
+
+```{r workflow_compispca_plot, fig.cap = "Contributions from default cSPCA and cSPCA with intensive selection."}
+compare_spca(
+  list(ho_spcadef, ho_cspcai),
+  plot_weights = TRUE,
+  variable_groups = holzinger_scales,
+  col_grouplines = "firebrick2",
+  color_scale = "cbb",
+  print_weights = FALSE,
+  print_summary = FALSE,
+  col_short_names = TRUE,
+  methods_names = c("cSPCA", "Intensive")
+)
 ```
 
 ### Fixed indices
 
-`fixed_index_list` fixes the variable subset of selected sPCs. Its elements correspond to components in order; a `NULL` or empty element requests variable selection for that component. A list of length one fixes only the first component, whereas fixing a later component requires placeholders for the preceding components. Index sets may overlap and need not include every variable. If the list is longer than `n_comps`, the extra elements are ignored with a warning. The `holzinger` variables fall into four scales (`holzinger_scales`); we fit a four-component solution with each sPC weight on a single scale. Contributions and summaries are in the two tables below.
+The `fixed_index_list` argument allows a subset of variables to be specified for each sPC weight set. This is useful when the nonzero indices obtained by another method are available.
 
-```{r fixed, eval = FALSE}
-ho_spcafixed = spca(holzinger, alpha = 0.95, n_comps = 4,
-                 fixed_index_list = holzinger_scales)
-```
+To illustrate, we obtain four components in which each sPC loads only on the variables belonging to the corresponding scale. Constraining the weights in this way is not generally recommended because LS-SPCA aims to explain variation in the entire dataset rather than within separate subsets.
 
-*Contributions with each sPC weight on a single scale.*
-
-```{r fix_load}
-ho_spcafixed
-```
-
-*Summaries of the fits on distinct scales.*
-
-```{r fix_sum}
-summary(ho_spcafixed, cor_with_pc = TRUE)
-```
-
-### Compare solutions
-
-`compare_spca()` produces numerical and visual comparisons of several `spca` objects. Here we compare the cSPCA fit with a pSPCA fit using backward selection.
-
-```{r pspca, eval = FALSE}
-ho_pspca = spca(holzinger, n_comps = 4, alpha = 0.95,  method = "p",
-                objective = "r2", var_selection = "b")
-```
-
-Method names label the bar plot; `col_short_names = TRUE` keeps the comparative table compact, and `color_scale = "cbb"` uses colour-blind-friendly colours.
-
-*Comparative summaries and contributions of two different spca fits.*
-
-```{r compare, fig.cap = "Bar plots of the contributions of two different spca fits."}
-compare_spca(list(ho_spcadef, ho_pspca), plot_weights = TRUE,
-             color_scale = "c",
-             print_weights = FALSE,
-             col_short_names = TRUE,
-             methods_names = c("cSPCA", "pSPCA")
-             )
-```
-
-Except for the first, the pSPCA weights have larger cardinality and explain more variance, as VEXP cannot fall below the optimised $R^2$. The first three weight sets are broadly similar across methods, and those sPCs are highly correlated; the fourth differs, again reflecting mostly noise.
-
-### Variable groups
-
-Questionnaire variables often belong to scales; the 12 `holzinger` variables form four. `aggregate_by_group()` sums the weights or contributions of an `spca` object by the groups in `variable_groups`.
-
-*Contributions aggregated by scale.*
-
-```{r aggr}
-aggregate_by_group(ho_spcadef, variable_groups = holzinger_scales)
-```
-
-Passing the groups to `variable_groups` colours the plot by scale.
-
-```{r groupplot, fig.cap = "Bar plots of the contributions filled by groups."}
-plot(ho_spcadef, variable_groups = holzinger_scales, controls =
-       list( legend_position = "right")
+```{r workflow_fixed_fit, eval = FALSE}
+ho_spcafixed = spca(
+  holzinger,
+  alpha = 0.95,
+  n_comps = 4,
+  fixed_index_list = holzinger_scales
 )
 ```
 
-### Create an spca object
+*Contributions when each sPC loads on one scale.*
 
-`new_spca()` brings solutions from other analyses into the *spca* framework. It needs a set of weights and either the covariance or the data matrix.
-```{r new_spca}
-A = cbind(ho_spcadef$weights[, 1], ho_pspca$weights[, 2])
-ho_r = cor(holzinger)
-ho_spcahyb = new_spca(A, ho_r, method_name = "hybrid")
+```{r workflow_fixed_weights}
+ho_spcafixed
 ```
 
-```{r check_new_spca}
+*Summary of the fits on distinct scales.*
+
+```{r workflow_fixed_summary}
+summary(ho_spcafixed, cor_with_pc = TRUE)
+```
+
+These constrained approximations are parsimonious and easy to interpret, but they do not closely approximate the PCA solution. The second and third sPCs are negatively correlated with their PCs. This has no numerical significance because eigenvectors are defined only up to sign, but it can make comparisons confusing. `change_sign()` reverses selected components and updates all affected quantities. The following call then displays only the correlations with the corresponding PCs.
+
+```{r workflow_change_sign}
+ho_spcafixed = change_sign(ho_spcafixed, index_to_change = 2:3)
+show_correlations(ho_spcafixed, type = "pcs")
+```
+
+### Create an `spca` object
+
+`new_spca()` converts a set of weights, including weights computed by another SPCA method, into an `spca` object to which the package methods can be applied. It requires the weights and either a covariance matrix or the original data matrix.
+
+```{r workflow_new_spca, eval = FALSE}
+A = cbind(ho_spcadef$weights[, 1], ho_cspcai$weights[, 2])
+ho_spcahyb = new_spca(A, X = holzinger, method_name = "hybrid")
+```
+
+```{r workflow_check_new_spca}
 is.spca(ho_spcahyb)
+```
+
+## Practical recommendations
+
+The default settings are a practical starting point for a wide range of datasets. The default cSPCA method provides an intermediate choice between the exactly uncorrelated uSPCA components and the computationally simpler pSPCA solution. Unlike uSPCA, cSPCA does not impose a minimum weight cardinality and avoids uncorrelatedness constraints that can cause numerical difficulties for later components. pSPCA may offer a modest speed advantage over cSPCA, but it can yield more strongly correlated components and, in some cases, higher cardinalities.
+
+Forward selection is recommended for routine use. Stepwise selection and intensive search increase computational cost and are most appropriate for small to medium matrices. Intensive search can bring RCVEXP closer to the target and often produces more parsimonious solutions. Backward elimination is particularly expensive and should be used cautiously, mainly with small matrices. The default `objective = "cvexp"` directly controls cumulative variance explained relative to PCA. The alternative `objective = "r2"` may reduce computation time, although it controls a different approximation criterion.
+
+The power method can accelerate computation, particularly for larger matrices. Convergence may be slow when the two leading eigenvalues of the relevant eigenproblem are close, which can occur for later components. Users should check convergence warnings and revert to the default eigensolver when necessary. As a general rule, the power method is most useful for very large matrices.
+
+The following table summarizes these recommendations. Matrix size refers primarily to the number of variables $p$ for the tall-matrix backend, although $n$ also affects the initial covariance computation. Both $n$ and $p$ matter for the fat-matrix backend. The categories are qualitative because cost also depends on the number of components, their cardinalities, and the available hardware.
+
+| Setting | Small | Medium | Large |
+|:--|:--:|:--:|:--:|
+| Stepwise selection | Consider | Consider | Avoid |
+| Intensive selection | Consider | Use cautiously | Avoid |
+| Backward elimination | Use cautiously | Avoid | Avoid |
+| `objective = "cvexp"` | Consider | Consider | Use cautiously |
+| Power method | Little expected gain | Little expected gain | Consider |
+
+These recommendations concern computational cost and do not guarantee an improved solution.
+
+## Application to larger datasets
+
+We briefly apply LS-SPCA to three larger datasets to demonstrate how the method scales. The same workflow used for `holzinger` applies; the fitted objects below are loaded from the vignette's saved-results file so that the computationally intensive fits are not rerun during installation.
+
+### MSSCQ data
+
+The Multidimensional Sexual Self-Concept Questionnaire dataset (MSSCQ; Open-Source Psychometrics Project 2019) contains 16,985 responses to 100 items after observations with more than three zero values are excluded. The variables were centred and standardized to unit variance.
+
+We computed four cSPCA components with `alpha = 0.95` and `alpha = 0.90`.
+
+```{r workflow_mss_fit, eval = FALSE}
+mss_cspca95 = spca(mss, n_comps = 4)
+mss_cspca90 = spca(mss, n_comps = 4, alpha = 0.90)
+```
+
+*Summary statistics for the MSSCQ fits with `alpha = 0.95` and `alpha = 0.90`.*
+
+```{r workflow_mss_summary}
+compare_spca(
+  list(mss_cspca95, mss_cspca90),
+  methods_names = c("95%", "90%"),
+  col_short_names = FALSE,
+  plot_weights = FALSE
+)
+```
+
+At `alpha = 0.95`, the four sPCs have cardinalities 12, 17, 15, and 25, with RCVEXP of at least 95%. At `alpha = 0.90`, their cardinalities fall to 6, 8, 9, and 10 while RCVEXP remains above 90%.
+
+```{r workflow_mss_plot, fig.cap = "MSSCQ contributions computed with alpha equal to 0.95 and 0.90."}
+compare_spca(
+  list(mss_cspca95, mss_cspca90),
+  x_axis_var_names = FALSE,
+  methods_names = c("95%", "90%"),
+  col_short_names = FALSE,
+  print_tables = FALSE
+)
+```
+
+The resulting sPCs are virtually uncorrelated.
+
+```{r workflow_mss_correlations}
+mss_cors
+```
+
+### Isolet data
+
+The Isolet dataset (Cole and Fanty 1991) contains 618 spectral coefficients and phonetic measures from speakers pronouncing the 26 letters of the alphabet, for a total of 7,797 observations. The variables were standardized to unit variance before analysis.
+
+We computed four cSPCA components with `alpha = 0.95` and `alpha = 0.90`.
+
+```{r workflow_isolet_fit, eval = FALSE}
+is_cspca95 = spca(iss, n_comps = 4)
+is_cspca90 = spca(iss, n_comps = 4, alpha = 0.90)
+```
+
+*Summary statistics for the Isolet fits with `alpha = 0.95` and `alpha = 0.90`.*
+
+```{r workflow_isolet_summary}
+compare_spca(
+  list(is_cspca95, is_cspca90),
+  methods_names = c("95%", "90%"),
+  col_short_names = FALSE,
+  plot_weights = FALSE
+)
+```
+
+At `alpha = 0.95`, the four sPCs have cardinalities 5, 15, 13, and 22, with RCVEXP of at least 95%. At `alpha = 0.90`, their cardinalities fall to 3, 5, 6, and 9 while RCVEXP remains above 90%.
+
+```{r workflow_isolet_plot, fig.cap = "Isolet contributions computed with alpha equal to 0.95 and 0.90."}
+compare_spca(
+  list(is_cspca95, is_cspca90),
+  x_axis_var_names = FALSE,
+  methods_names = c("95%", "90%"),
+  col_short_names = FALSE,
+  print_tables = FALSE
+)
+```
+
+These sPCs are also virtually uncorrelated.
+
+```{r workflow_isolet_correlations}
+is_cors
+```
+
+### Colon data
+
+The `colon` dataset contains expression measurements for 2,000 genes from colon tissue samples collected from 62 patients, 40 of whom had tumours. It is available in the **plsgenomics** package (Boulesteix et al. 2015).
+
+We computed four cSPCA components with `alpha = 0.95` and `alpha = 0.90`.
+
+```{r workflow_colon_fit, eval = FALSE}
+cos_cspca95 = spca(cos, n_comps = 4)
+cos_cspca90 = spca(cos, n_comps = 4, alpha = 0.90)
+```
+
+*Summary statistics for the Colon fits with `alpha = 0.95` and `alpha = 0.90`.*
+
+```{r workflow_colon_summary}
+compare_spca(
+  list(cos_cspca95, cos_cspca90),
+  methods_names = c("95%", "90%"),
+  col_short_names = FALSE,
+  plot_weights = FALSE
+)
+```
+
+LS-SPCA substantially reduces cardinality in both cases. With `alpha = 0.95`, the four sPCs have 6, 12, 16, and 19 nonzero weights while maintaining RCVEXP of at least 95%. Lowering `alpha` to 0.90 reduces the cardinalities to 3, 3, 2, and 5 while maintaining RCVEXP above 90%. Correlations with the corresponding PCs are at least 0.95 for the first fit and fall to lower values for the second, so the reduction in cardinality is accompanied by weaker agreement with PCA.
+
+For a fat matrix, the rank of the centred data cannot exceed the number of observations minus one: 61 here. Cardinality reductions should therefore be judged against this rank, the largest cardinality that is not redundant. Any component whose support exceeds the rank, including an ordinary PC, can be expressed equally well by any set of variables whose columns form a basis for the same column space. Sparse components for such matrices are consequently subject to an inherent indeterminacy.
+
+The plot shows similar dominant contributions for the first sPC but larger changes in later components. The variables selected at 90% are subsets of those selected at 95% for the first two sPCs; the third pair shares no selected variables and the fourth shares only one.
+
+```{r workflow_colon_plot, fig.cap = "Colon-data contributions computed with alpha equal to 0.95 and 0.90."}
+compare_spca(
+  list(cos_cspca95, cos_cspca90),
+  x_axis_var_names = FALSE,
+  methods_names = c("95%", "90%"),
+  col_short_names = FALSE,
+  print_tables = FALSE
+)
+```
+
+The resulting sPCs are also virtually uncorrelated.
+
+```{r workflow_colon_correlations}
+cos_cors
 ```
 
 # Comparison of LS-SPCA variants
@@ -355,7 +596,7 @@ The data are the Multidimensional Sexual Self-Concept Questionnaire dataset (MSS
 
 Setting `method` to `uspca`, `cspca`, or `pspca` gives the three solutions below.
 
-```{r comp_methods, eval = FALSE}
+```{r comp_methods, echo = FALSE, eval = FALSE}
 met = c("uspca", "cspca", "pspca")
 mss_met_spca = vector("list", 3)
 
@@ -382,7 +623,6 @@ This varies the search direction (`var_selection`) and stopping rule (`objective
 
 *Comparative summaries for different variable selection methods.*
 
-
 ```{r comp_varsel, echo = FALSE}
 mss_varsel_table
 ```
@@ -393,28 +633,28 @@ The `r2` objective gives slightly higher cardinality and sPCs marginally more co
 
 `alpha` sets the target minimum CVEXP (or correlation with the residual PCs). Lower `alpha` moves sPCs further from the PCs but lowers cardinality. The summaries below use `alpha = c(0.90, 0.95, 0.98)`.
 
-```{r comp_alpha_create, eval = FALSE}
-alpha = c(0.90, 0.95, 0.98)
-
-mss_alpha_spca = vector("list", 3)
-
-for(i in 1:3){
-  mss_alpha_spca[[i]] = spca(mss, alpha = alpha[i], n_comps = 4)
-}
-
-mss_alpha_table = make_comparative_table(
-  L = mss_alpha_spca, pRAM = NULL,
-  par_name = "alpha", par_values = alpha
-)
-```
 
 *Comparative summaries of solutions obtained with increasing values of alpha.*
 
-```{r comp_alpha, echo = FALSE}
+```{r comp_alpha, echo = FALSE, echo = FALSE}
 mss_alpha_table
 ```
 
 As expected, `alpha = 0.98` gives parsimonious versions of the PCs.
+
+## Practical recommendations
+
+The default settings provide a practical starting point for most analyses. Forward selection is recommended for routine use; stepwise and intensive selection are more suitable for smaller problems, while backward elimination can be expensive. The power method is mainly useful for large matrices.
+
+| Setting | Small | Medium | Large |
+|:--|:--:|:--:|:--:|
+| Stepwise selection | Consider | Consider | Avoid |
+| Intensive selection | Consider | Use cautiously | Avoid |
+| Backward elimination | Use cautiously | Avoid | Avoid |
+| `objective = "cvexp"` | Consider | Consider | Use cautiously |
+| Power method | Little expected gain | Little expected gain | Consider |
+
+Matrix size refers mainly to the number of variables for the tall-matrix engine and to both dimensions for the fat-matrix engine. The recommendations concern computational cost rather than guaranteed improvements in the solution.
 
 # Comparison with conventional SPCA
 
@@ -471,6 +711,12 @@ Ferrara C., Martella F, Vichi M (2019). "Probabilistic Disjoint Principal Compon
 Merola G.M. (2015). "Least Squares Sparse Principal Component Analysis: a Backward Elimination approach to attain large loadings." *Australia & New Zealand Journal of Statistics*, **57**, 391–429. doi:10.1111/anzs.12128.
 
 Merola G.M., Chen G (2019). "Projection sparse principal component analysis: An efficient least squares method." *Journal of Multivariate Analysis*, **173**, 366–382. doi:10.1016/j.jmva.2019.04.001.
+
+Boulesteix A-L., Durif G., Lambert-Lacroix S., Peyre J., Strimmer K. (2024). *plsgenomics: PLS Analyses for Genomics*. R package version 1.5-3. <https://CRAN.R-project.org/package=plsgenomics>.
+
+Cole R., Fanty M. (1991). *ISOLET*. UCI Machine Learning Repository. doi:10.24432/C51G69. <https://archive.ics.uci.edu/dataset/54/isolet>.
+
+Open-Source Psychometrics Project (2019). *Raw data from online personality tests*. Updated 5 November 2019. <http://openpsychometrics.org/tests/MSSCQ.php>.
 
 Revelle W. (2025). *psychTools: Tools to Accompany the 'psych' Package for Psychological Research*. R package version 2.5.7. Northwestern University, Evanston, Illinois. <https://CRAN.R-project.org/package=psychTools>.
 

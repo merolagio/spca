@@ -21,3 +21,5 @@ ext_chunks.R$
 ^Vignettes\spca_extended_vignette.pdf$
 ^Vignettes\spca_extended_vignette.tex$
 ^Vignettes\spca_extended_vignette-concordance.tex$
+^doc$
+^Meta$
