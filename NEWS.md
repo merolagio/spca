@@ -11,6 +11,7 @@
 - improved symmetry check for gramian input
 - fixed minor bugs in methods, reinforced checks for cor and n_obs in mp_qqplot
     and pca
+- reviewed and harmonized vignettes with JSS article    
 
 # spca 1.1.3
 **Renamed loadings to weights**

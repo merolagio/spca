@@ -100,7 +100,7 @@ plot(ho_spca, plot_type = "bar")
 show_correlations(ho_spca)
 ```
 
-the sparse weights can be compared to the full PCA weights with `compare_spca`
+The sparse weights can be compared to the full PCA weights with `compare_spca`
 ```{r spca_vs_pca, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 5}
 compare_spca(list(ho_pca, ho_spca), variable_groups = holzinger_scales, 
              x_axis_var_names = FALSE,  methods_names = c("PCA", "SPCA")
@@ -113,7 +113,8 @@ The `variable_groups = group_factor` adds lines separating variable groups. Addi
 
 Circular: 
 ```{r circular, message = FALSE, warning = FALSE, fig.width = 5, fig.height = 3}
-plot(ho_spca, plot_type = "c") # "c" for "circular"
+plot(ho_spca, plot_type = "c",     # "c" for "circular"
+     controls = list(variable_names = "auto"))
 ```
 
 Heatmap:
