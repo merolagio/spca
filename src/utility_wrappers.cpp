@@ -29,7 +29,7 @@ Eigen::MatrixXd scaleC(const Eigen::Map<Eigen::MatrixXd>& A,
       C.array().rowwise() -= C.colwise().mean().array();
     
     if (scale) {
-      Eigen::VectorXd s = C.colwise().norm() * std::sqrt(A.rows() - 1);
+      Eigen::VectorXd s = C.colwise().norm() / std::sqrt(A.rows() - 1);
       
       if ((s.array() <= 0.0).any())
         Rcpp::stop("at least one column has zero norm");
