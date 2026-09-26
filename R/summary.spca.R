@@ -34,7 +34,7 @@
 #'   \code{"both"}, and \code{"none"}.
 #' @param min_weight A logical value (default \code{FALSE}). If \code{TRUE},
 #'   include the minimum nonzero weight or contribution.
-#' @param cor_with_pc A logical value (default \code{FALSE}). If \code{TRUE},
+#' @param cor_with_pc A logical value (default \code{TRUE}). If \code{TRUE},
 #'   include correlations between sPCs and the corresponding PCs when available.
 #' @param return_table A logical value (default \code{FALSE}). If \code{TRUE},
 #'   return the raw numeric summary matrix.
