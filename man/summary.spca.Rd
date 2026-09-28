@@ -42,7 +42,7 @@ Accepted values are \code{"relative"}, \code{"cumulative_relative"},
 \item{min_weight}{A logical value (default \code{FALSE}). If \code{TRUE},
 include the minimum nonzero weight or contribution.}
 
-\item{cor_with_pc}{A logical value (default \code{FALSE}). If \code{TRUE},
+\item{cor_with_pc}{A logical value (default \code{TRUE}). If \code{TRUE},
 include correlations between sPCs and the corresponding PCs when available.}
 
 \item{return_table}{A logical value (default \code{FALSE}). If \code{TRUE},
