@@ -87,7 +87,7 @@ holzinger_scales
 ```
 
 ### Preliminary PCA
-
+Running PCA is not a requirement, however for small datasets, it can be useful to inspect the dense solutions. 
 ``` r
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
 summary(ho_pca, cols = 10)
