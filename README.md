@@ -87,7 +87,10 @@ holzinger_scales
 ```
 
 ### Preliminary PCA
-Running PCA is not a requirement, however for small datasets, it can be useful to inspect the dense solutions. 
+
+Running PCA is not a requirement, however for small datasets, it can be
+useful to inspect the dense solutions.
+
 ``` r
 ho_pca = pca(holzinger, screeplot =  TRUE, qq_plot = TRUE)
 summary(ho_pca, cols = 10)
@@ -181,7 +184,7 @@ show_correlations(ho_spca)
 #> sPC-PC  0.98  0.95  0.92  0.76
 ```
 
-the sparse weights can be compared to the full PCA weights with
+The sparse weights can be compared to the full PCA weights with
 `compare_spca`
 
 ``` r
@@ -209,7 +212,8 @@ by side.
 Circular:
 
 ``` r
-plot(ho_spca, plot_type = "c") # "c" for "circular"
+plot(ho_spca, plot_type = "c",     # "c" for "circular"
+     controls = list(variable_names = "auto"))
 ```
 
 ![](man/figures/README-circular-1.png)<!-- -->
@@ -271,7 +275,8 @@ compare_spca(obj_list = list(ho_spca, ho_spca90),
 The default settings provide a practical starting point for most
 analyses. Forward selection is recommended for routine use; stepwise and
 intensive selection are more suitable for smaller problems, while
-backward elimination can be expensive. The power method is mainly useful
+backward elimination can be expensive. The power method may be
+inaccurate, especially for higher order components, and is mainly useful
 for large matrices.
 
 | Setting | Small | Medium | Large |
