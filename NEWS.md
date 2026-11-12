@@ -1,6 +1,7 @@
 
 # spca 1.1.6
 - The cpp and R wrapper return indices and weights lists in the selection order
+- more efficient new_spca. ita also takes pca() output.
 
 # spca 1.1.5
 - Aesthetic touchups

@@ -4,7 +4,14 @@
 \alias{new_spca}
 \title{Construct an SPCA Object from a Set of Weights}
 \usage{
-new_spca(A, S = NULL, X = NULL, method_name = NULL)
+new_spca(
+  A,
+  S = NULL,
+  X = NULL,
+  method_name = NULL,
+  fat_matrix = NULL,
+  pca_obj = NULL
+)
 }
 \arguments{
 \item{A}{A numeric matrix of weights.}
@@ -18,6 +25,17 @@ At least one of \code{S} or \code{X} must be provided.}
 
 \item{method_name}{A character scalar or \code{NULL} (default \code{NULL}).
 Name of the method used to compute the weights.}
+
+\item{fat_matrix}{A logical value or \code{NULL} (default \code{NULL}).
+If \code{NULL}, observation-space calculations are used when \code{S} is
+not supplied and \code{X} has more columns than rows. \code{TRUE} forces
+them (requires \code{X} and \code{S = NULL}); \code{FALSE} uses the
+covariance-matrix calculations.}
+
+\item{pca_obj}{An optional object of class \code{pca}, fitted to the same
+centered (and possibly scaled) variables. Its weights and variances are
+reused, so no eigendecomposition is computed. It must contain at least as
+many components as \code{A} has columns.}
 }
 \value{
 An \code{spca} object.
@@ -25,6 +43,17 @@ An \code{spca} object.
 \description{
 Build an object of class \code{spca} from a weights matrix and either a
 covariance or correlation matrix, a data matrix, or both.
+}
+\details{
+When \code{S} is not supplied and \code{X} has more columns than rows, no
+\eqn{p \times p} matrix is formed: all quantities are computed from the
+\eqn{n \times k} scores. With \code{pca_obj} and a data matrix, the
+covariance matrix is never formed either. In these cases the weight
+columns must give linearly independent scores, and the number of components
+cannot exceed the numerical rank of \code{X}.
+
+The sign of \code{cor_with_pc} follows the sign convention of the PCs
+(those of \code{pca_obj} when supplied).
 }
 \examples{
 set.seed(1)
@@ -34,6 +63,10 @@ data(holzinger)
 spca_new = new_spca(A, X = holzinger)
 is.spca(spca_new)
 summary(spca_new)
+
+# reusing a PCA avoids computing an eigendecomposition
+ho_pca = pca(holzinger, n_comps = 2, center_data = TRUE, screeplot = FALSE)
+spca_new2 = new_spca(A, X = holzinger, pca_obj = ho_pca)
 
 }
 \seealso{

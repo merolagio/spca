@@ -39,7 +39,7 @@ is.spca = function(x) {
     !is.null(x$indices) 
 }
 
-#new.spca==================
+#new_spca==================
 #' Construct an SPCA Object from a Set of Weights
 #'
 #' Build an object of class \code{spca} from a weights matrix and either a
@@ -53,8 +53,29 @@ is.spca = function(x) {
 #'   At least one of \code{S} or \code{X} must be provided.
 #' @param method_name A character scalar or \code{NULL} (default \code{NULL}).
 #'   Name of the method used to compute the weights.
+#' @param fat_matrix A logical value or \code{NULL} (default \code{NULL}).
+#'   If \code{NULL}, observation-space calculations are used when \code{S} is
+#'   not supplied and \code{X} has more columns than rows. \code{TRUE} forces
+#'   them (requires \code{X} and \code{S = NULL}); \code{FALSE} uses the
+#'   covariance-matrix calculations.
+#' @param pca_obj An optional object of class \code{pca}, fitted to the same
+#'   centered (and possibly scaled) variables. Its weights and variances are
+#'   reused, so no eigendecomposition is computed. It must contain at least as
+#'   many components as \code{A} has columns.
 #'
 #' @return An `spca` object.
+#'
+#' @details
+#' When \code{S} is not supplied and \code{X} has more columns than rows, no
+#' \eqn{p \times p} matrix is formed: all quantities are computed from the
+#' \eqn{n \times k} scores. With \code{pca_obj} and a data matrix, the
+#' covariance matrix is never formed either. In these cases the weight
+#' columns must give linearly independent scores, and the number of components
+#' cannot exceed the numerical rank of \code{X}.
+#'
+#' The sign of \code{cor_with_pc} follows the sign convention of the PCs
+#' (those of \code{pca_obj} when supplied).
+#'
 #' @examples
 #' set.seed(1)
 #' A = round(matrix(runif(24, -1, 1), 12))
@@ -63,27 +84,262 @@ is.spca = function(x) {
 #' spca_new = new_spca(A, X = holzinger)
 #' is.spca(spca_new)
 #' summary(spca_new)
-#' 
+#'
+#' # reusing a PCA avoids computing an eigendecomposition
+#' ho_pca = pca(holzinger, n_comps = 2, center_data = TRUE, screeplot = FALSE)
+#' spca_new2 = new_spca(A, X = holzinger, pca_obj = ho_pca)
+#'
 #' @family spca
-#' @export 
-new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
+#' @export
+new_spca = function(A, S = NULL, X = NULL, method_name = NULL,
+                    fat_matrix = NULL, pca_obj = NULL){
   
-# validation   ==============P
+  # validation   ==============
   
   fun_inp = list(A = A, S = S, X = X, method_name = method_name)
   validate_no_na(arg_list = fun_inp)
   
-  if(is.data.frame(A)) 
+  if (is.data.frame(A))
     A = as.matrix(A)
-  if (!is.matrix(A)){
+  if (!is.matrix(A))
     stop("A must be a matrix of weights")
+  if (is.data.frame(X))
+    X = as.matrix(X)
+  
+  if (!is.null(pca_obj) && !isTRUE(is.pca(pca_obj)))
+    stop("pca_obj must be a valid pca object", call. = FALSE)
+  if (!is.null(fat_matrix) &&
+      (!is.logical(fat_matrix) || length(fat_matrix) != 1L ||
+       is.na(fat_matrix)))
+    stop("fat_matrix must be NULL, TRUE, or FALSE", call. = FALSE)
+  if (isTRUE(fat_matrix) && (!is.null(S) || is.null(X)))
+    stop("fat_matrix = TRUE requires X and S = NULL", call. = FALSE)
+  if (is.null(fat_matrix))
+    fat_matrix = is.null(S) && is.matrix(X) && nrow(X) < ncol(X)
+  
+  # without a PCA object, tall matrices use the covariance-matrix route
+  if (!fat_matrix && is.null(pca_obj))
+    return(.new_spca_dense(A, S, X, method_name))
+  
+  # fast routes: fat matrices and/or a supplied pca object ================
+  
+  if (!is.numeric(A) || any(!is.finite(A)) || any(dim(A) == 0L))
+    stop("A must be a nonempty finite numeric matrix", call. = FALSE)
+  if (!is.null(X) && (!is.matrix(X) || !is.numeric(X) || any(!is.finite(X)) ||
+                      nrow(X) < 2L || ncol(X) != nrow(A)))
+    stop("X must be finite numeric data with at least two rows and ncol(X) = nrow(A)",
+         call. = FALSE)
+  if (!is.null(method_name) &&
+      (!is.character(method_name) || length(method_name) != 1L ||
+       is.na(method_name)))
+    stop("method_name must be NULL or a character scalar", call. = FALSE)
+  if (is.null(X) && is.null(S))
+    stop("S and X cannot be both NULL", call. = FALSE)
+  
+  norms = colSums(A^2)
+  if (any(!is.finite(norms)) || any(norms <= 0))
+    stop("Every weight column must have a finite positive norm", call. = FALSE)
+  if (any(abs(norms - 1) > 1e-5)) {
+    message("Scaling weights to unit L2 norm")
+    A = scale_columns(A, 2)
   }
+  k = ncol(A)
+  
+  if (!is.null(pca_obj)) {
+    V = pca_obj$weights
+    if (is.null(V)) V = pca_obj$loadings
+    if (!is.matrix(V) || !is.numeric(V) || any(!is.finite(V)) ||
+        nrow(V) != nrow(A) || ncol(V) < k)
+      stop("pca_obj must contain compatible weights for at least ncol(A) PCs",
+           call. = FALSE)
+    V = V[, seq_len(k), drop = FALSE]
+    pc_values = pca_obj$vexp_pc[seq_len(k)] * pca_obj$tot_var
+    if (length(pca_obj$tot_var) != 1L || !is.finite(pca_obj$tot_var) ||
+        pca_obj$tot_var <= 0 || length(pc_values) != k ||
+        any(!is.finite(pc_values)) || any(pc_values <= 0))
+      stop("pca_obj must contain positive finite PCA variances", call. = FALSE)
+    if (!is.null(X) && !is.null(colnames(X)) && !is.null(rownames(V)) &&
+        !identical(colnames(X), rownames(V)))
+      stop("X and pca_obj variable names/order differ", call. = FALSE)
+  }
+  
+  # Center only when needed (relative tolerance): scores, total variance and
+  # PCA references must agree, but an already centered X is not copied.
+  if (!is.null(X) && is.null(S)) {
+    if (any(abs(colMeans(X)) > 1e-8 * sqrt(colSums(X^2) / nrow(X))))
+      X = standardize_data(X, TRUE, FALSE)
+  }
+  active = which(rowSums(A != 0) > 0L)
+  Z = if (!is.null(X))
+    ab(X[, active, drop = FALSE], A[active, , drop = FALSE]) else NULL
+  
+  if (!fat_matrix) {
+    if (is.null(S)) {
+      # Data route: S = X'X/(n-1) is never formed. Only the n x k scores
+      # and the p x k product X'B are needed.
+      totv = sum(X^2) / (nrow(X) - 1)
+      if (!is.finite(totv) || totv <= 0)
+        stop("X must have positive finite total variance", call. = FALSE)
+      pc_values = pca_obj$vexp_pc[seq_len(k)] * totv
+      XV = ab(X, V)
+      if (!isTRUE(all.equal(unname(colSums(XV^2) / (nrow(X) - 1)),
+                            unname(pc_values), tolerance = 1e-6)))
+        stop("pca_obj variances are incompatible with X; check preprocessing",
+             call. = FALSE)
+      
+      # Normalize scores for better conditioning; their span is unchanged.
+      score_norms = colSums(Z^2)
+      if (any(!is.finite(score_norms)) || any(score_norms <= 0))
+        stop("Every component must have positive finite score variance",
+             call. = FALSE)
+      B = scale_columns(Z, 2)
+      G = ata(B)
+      if (rcond(G) <= max(dim(X)) * .Machine$double.eps)
+        stop("Score columns are numerically linearly dependent", call. = FALSE)
+      
+      # B'SB = W'W/(n-1), with W = X'B (p x k)
+      W = atb(X, B)
+      H = ata(W) / (nrow(X) - 1)
+      cv = .tall_cumulative_variance(G, H)
+      ve = diff(c(0, cv))
+      # correlation of X a_j with X v_j: cov / (sd_scores * sd_pc)
+      cor_pc = colSums(Z * XV) /
+        sqrt((nrow(X) - 1) * colSums(Z^2) * pc_values)
+      spc_cor = if (k == 1L) matrix(1, 1L, 1L) else cov2cor(G)
+    } else {
+      if (!is.matrix(S) || !is.numeric(S) || any(!is.finite(S)) ||
+          !identical(dim(S), c(nrow(A), nrow(A))) ||
+          !is_symmetric_fast(S))
+        stop("S must be a compatible finite symmetric matrix", call. = FALSE)
+      if (!is.null(X) && !isTRUE(all.equal(colSums(X^2) / (nrow(X) - 1),
+                                           diag(S), check.attributes = FALSE,
+                                           tolerance = 1e-6)))
+        stop("diag(S) is not compatible with X", call. = FALSE)
+      totv = trace_mat(S)
+      pc_values = pca_obj$vexp_pc[seq_len(k)] * totv
+      
+      # one product with S gives both SA and SV
+      SAV = ab(S, cbind(A, V))
+      SA = SAV[, seq_len(k), drop = FALSE]
+      SV = SAV[, k + seq_len(k), drop = FALSE]
+      if (!isTRUE(all.equal(unname(SV),
+                            unname(sweep(V, 2, pc_values, "*")),
+                            tolerance = 1e-6)))
+        stop("pca_obj eigenvectors/variances are incompatible with S",
+             call. = FALSE)
+      
+      # G = A'SA, H = A'S^2A = (SA)'(SA)
+      G = atb(A, SA)
+      if (any(diag(G) <= 0))
+        stop("Every component must have positive variance", call. = FALSE)
+      H = ata(SA)
+      cv = .tall_cumulative_variance(G, H)
+      ve = diff(c(0, cv))
+      cor_pc = colSums(A * SV) / sqrt(diag(G) * pc_values)
+      spc_cor = if (k == 1L) matrix(1, 1L, 1L) else cov2cor(G)
+    }
+  } else {
+    # fat matrix: work in observation space with K = XX'/(n-1) (n x n)
+    K = aat(X) / (nrow(X) - 1)
+    if (is.null(pca_obj)) {
+      ee = eigen_sym(K)
+      values = as.numeric(ee$values)
+      rank_tol = max(dim(X)) * .Machine$double.eps * max(abs(values))
+      if (k > sum(values > rank_tol))
+        stop("Number of components exceeds the numerical rank of X",
+             call. = FALSE)
+      pc_values = values[seq_len(k)]
+      pc_directions = ee$vectors[, seq_len(k), drop = FALSE]
+    } else {
+      pc_values = pca_obj$vexp_pc[seq_len(k)] * trace_mat(K)
+      pc_scores = ab(X, V)
+      if (!isTRUE(all.equal(unname(colSums(pc_scores^2) / (nrow(X) - 1)),
+                            unname(pc_values), tolerance = 1e-6)))
+        stop("pca_obj variances are incompatible with X; check preprocessing",
+             call. = FALSE)
+      pc_directions = scale_columns(pc_scores, 2)
+    }
+    totv = trace_mat(K)
+    if (!is.finite(totv) || totv <= 0)
+      stop("X must have positive finite total variance", call. = FALSE)
+    
+    # Normalize scores for better conditioning; their span is unchanged.
+    score_norms = colSums(Z^2)
+    if (any(!is.finite(score_norms)) || any(score_norms <= 0))
+      stop("Every component must have positive finite score variance",
+           call. = FALSE)
+    B = scale_columns(Z, 2)
+    G = ata(B)
+    if (rcond(G) <= max(dim(X)) * .Machine$double.eps)
+      stop("Score columns are numerically linearly dependent", call. = FALSE)
+    H = atb(B, ab(K, B))
+    cv = .tall_cumulative_variance(G, H)
+    ve = diff(c(0, cv))
+    cor_pc = diag(atb(B, pc_directions))
+    spc_cor = if (k == 1L) matrix(1, 1L, 1L) else makeCorScoresC(Z)
+  }
+  
+  if (!is.null(pca_obj)) {
+    # pca(data) stores sums of squares; pca(covariance) stores variances.
+    totals = as.numeric(pca_obj$tot_var)
+    n_ref = if (!is.null(X)) nrow(X) else pca_obj$n_obs
+    if (length(n_ref) == 1L && is.finite(n_ref) && n_ref > 1)
+      totals = c(totals, pca_obj$tot_var / (n_ref - 1))
+    if (!any(vapply(totals, function(t) isTRUE(all.equal(
+      as.numeric(totv), as.numeric(t), tolerance = 1e-6)), logical(1))))
+      stop("pca_obj total variance is incompatible with X or S", call. = FALSE)
+  }
+  
+  ind_list = lapply(seq_len(k), function(j) which(A[, j] != 0))
+  weights_list = lapply(seq_len(k), function(j) A[ind_list[[j]], j])
+  
+  # same structure and element order as the covariance-matrix route
+  obj = list()
+  obj$weights = A
+  obj$contributions = make_contributions(A)
+  dimnames(obj$contributions) = dimnames(A)
+  obj$n_comps = k
+  obj$cardinality = colSums(A != 0)
+  obj$vexp = ve / totv
+  obj$vexp_pc = pc_values / totv
+  obj$cvexp = cv / totv
+  obj$rvexp = ve / pc_values
+  obj$rcvexp = cv / cumsum(pc_values)
+  obj$cor_with_pc = pmax(-1, pmin(1, cor_pc))
+  obj$tot_var = totv
+  obj$indices = ind_list
+  obj$weights_list = weights_list
+  if (!is.null(Z))
+    obj$scores = Z
+  dimnames(spc_cor) = list(paste0("sPC", seq_len(k)),
+                           paste0("sPC", seq_len(k)))
+  obj$spc_cor = spc_cor
+  obj$method_name = method_name
+  class(obj) = c("spca", "list")
+  obj
+}
+
+# .tall_cumulative_variance ==================
+# Cumulative variances of the first j components, j = 1..k, from the
+# component Gram matrix G and H: cv_j = trace(solve(G_j) H_j), where G_j and
+# H_j are the leading j x j blocks. Raw units. Internal.
+.tall_cumulative_variance = function(G, H) {
+  k = ncol(G)
+  vapply(seq_len(k), function(j) {
+    ind = seq_len(j)
+    trace_mat(ab(solve_spd(G[ind, ind, drop = FALSE]),
+                 H[ind, ind, drop = FALSE]))
+  }, numeric(1))
+}
+
+# .new_spca_dense ==================
+# Covariance-matrix route of new_spca() (the former new_spca()). Internal.
+# A is a matrix, X a matrix or NULL; arguments are validated by new_spca().
+.new_spca_dense = function(A, S = NULL, X = NULL, method_name = NULL){
+  
   if (is.null(S)) {
     if (is.null(X))
       stop("S and X cannot be both NULL", call. = FALSE)
-    
-    if (is.data.frame(X))
-      X = as.matrix(X)
     
     if (any(abs(colMeans(X)) > 1e-4))
       X = standardize_data(X, TRUE, FALSE)
@@ -92,16 +348,13 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   }
   
   if (!is.null(X) && !is.null(S)) {
-    if (is.data.frame(X))
-      X = as.matrix(X)
-    
     if (ncol(X) != ncol(S))
       stop("X and S have incompatible dimensions", call. = FALSE)
     
     # avoids multiplication that could be expensive
     x_var = colSums(X^2) / (nrow(X) - 1)
     
-    if (!isTRUE(all.equal(x_var, diag(S), check.attributes = FALSE, 
+    if (!isTRUE(all.equal(x_var, diag(S), check.attributes = FALSE,
                           tolerance = 1e-6)))
       stop("diag(S) is not compatible with X", call. = FALSE)
   }
@@ -109,11 +362,11 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   if(!is_symmetric_fast(S))
     stop("S must be a symmetric covariance or correlation matrix")
   
-  if (any((colSums(A^2) - 1) > 1e-5)){
+  # (abs() added: columns with norm < 1 were previously not rescaled)
+  if (any(abs(colSums(A^2) - 1) > 1e-5)){
     message("Scaling weights to unit L2 norm")
     A = scale_columns(A, 2)
   }
-  
   
   n_comps = ncol(A)
   
@@ -121,7 +374,6 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
   vexp = make_vexpSC(A, S)
   
   s_ee = eigen_sym(S)
-  
   
   ind_list = apply(A, 2, function(x) which(x != 0))
   
@@ -134,23 +386,19 @@ new_spca = function(A, S = NULL, X = NULL, method_name = NULL){
     nonzero = (A[, j] != 0)
     weights_list[[j]] = A[nonzero, j]
     ind_list[[j]] = which(nonzero)
-    #cor_with_pc  
+    #cor_with_pc
     cor_with_pc[j] =
       sum(A[ind_list[[j]], j] *
             ab(S[ind_list[[j]], ,drop = FALSE],
                s_ee$vectors[, j, drop = FALSE])) /
       sqrt(
-        vtau(A[ind_list[[j]], j], 
+        vtau(A[ind_list[[j]], j],
              S[ind_list[[j]], ind_list[[j]], drop = FALSE],
              A[ind_list[[j]], j]) *  s_ee$values[j]
       )
-    
   }
   
-  
-  
   cor_with_pc = pmax(-1, pmin(1, cor_with_pc))
-  
   
   obj = list()
   obj$weights = A
