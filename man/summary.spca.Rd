@@ -3,7 +3,8 @@
 \name{summary.pca}
 \alias{summary.pca}
 \alias{summary.spca}
-\title{Summarize the Variance Explained and Sparsity of a \code{pca} or \code{spca} Object}
+\title{Summarize the Variance Explained and Sparsity of a \code{pca}
+or \code{spca} Object}
 \usage{
 \method{summary}{pca}(object, ...)
 

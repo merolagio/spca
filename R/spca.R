@@ -309,7 +309,9 @@ validate_spca_inputs =
 #' @param maxiter_pm_varsel A positive integer scalar (default \code{500}).
 #'   Maximum number of iterations for \code{pm_varsel}.
 #'
-#' @details Data matrices are routed to the tall or fat C++ backend. Square
+#' @details Lists indices and weights_list are paired in selection order (retained entry order for forward-stepwise selection). Backward elimination uses original variable order; fixed supports preserve the supplied order. The weights matrix always uses original variable order.
+#'
+#' Data matrices are routed to the tall or fat C++ backend. Square
 #' matrices are treated as covariance/correlation matrices and use the tall
 #' backend.
 #'
@@ -632,11 +634,11 @@ spca = function(M,
   dimnames(contributions) = dimnames(spout$weights)
   
   
-  # Convert the legacy backend field name at the R/C++ boundary.
+  # Preserve backend selection order and matching weights at the R/C++ boundary.
   weights_list = spout$weightlist
   if(is.null(weights_list)){
     weights_list = lapply(seq_len(spout$ncomps), function(i, A) {
-      A[A[, i] != 0, i]
+      A[spout$ind[[i]], i]
     }, A = spout$weights)
   }
   names(weights_list) = colnames(contributions)

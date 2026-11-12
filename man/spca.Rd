@@ -113,6 +113,8 @@ Compute least squares sparse principal components (LS-SPCA) from a data
 matrix or from a covariance/correlation matrix.
 }
 \details{
+Lists indices and weights_list are paired in selection order (retained entry order for forward-stepwise selection). Backward elimination uses original variable order; fixed supports preserve the supplied order. The weights matrix always uses original variable order.
+
 Data matrices are routed to the tall or fat C++ backend. Square
 matrices are treated as covariance/correlation matrices and use the tall
 backend.

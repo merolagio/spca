@@ -141,6 +141,7 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 // 3   0   Not allowed
 //
 // Returns
+// Lists ind and weightlist are paired in selection order (retained entry order for forward-stepwise selection). Backward elimination uses original variable order; fixed supports preserve the supplied order. The weights matrix always uses original variable order.
 // A list with weights, weightlist, ncomps, ind, card, vexp, cvexp, vexpPC, 
 // cor_comps sPCs correlation matrix, r,
 // totvar, method, varSelection, Time, Time_colnames, timevec, and timecomp.
@@ -502,9 +503,8 @@ static void validate_lsspca_inputs(const Eigen::Ref<const Eigen::MatrixXd>& S,
 
          // save weights in list
 
-         Eigen::VectorXi indt(indj);
-         std::sort(indt.data(),indt.data() + cardt);
-         indout[j] = indt.head(cardt).array() + 1;
+         // Preserve selection order and its pairing with a.
+         indout[j] = indj.head(cardt).array() + 1;
 
          weightlist[j] = a.head(cardt);
          indjm1.head(cardt) = indj.head(cardt);

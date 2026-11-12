@@ -597,7 +597,7 @@ bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
       (stop_rule == 1 && cur_cvexp >= alpha * maxcvexp && mincard <= 1)) {
     cvexp = cur_cvexp;
     r2 = (stop_rule == 0) ? cur_r2 : compute_r2_subset_T(X, u, indSorted, cardt);
-    std::sort(ind.data(), ind.data() + cardt);
+    // A single selected index is already in selection order.
     return false;
   }
   
@@ -724,6 +724,13 @@ bool fwd_selectT(const Eigen::Ref<const Eigen::MatrixXd>& X,
   else
     r2 = compute_r2_subset_T(X, u, indSorted, cardt);
   
-  std::sort(ind.data(), ind.data() + cardt);
+  // Keep ind in selection order. Match the returned weights to that order;
+  // all fits, scores and stopping calculations above retain their sorted basis.
+  const Eigen::VectorXd sorted_weights = a.head(cardt);
+  for (int i = 0; i < cardt; ++i) {
+    const int pos = static_cast<int>(std::lower_bound(
+      indSorted.data(), indSorted.data() + cardt, ind(i)) - indSorted.data());
+    a(i) = sorted_weights(pos);
+  }
   return (stop_rule == 0) ? (r2 < alpha) : (cur_cvexp < alpha * maxcvexp);
 }

@@ -116,6 +116,7 @@ static void validate_lsspcaT_inputs(const Eigen::Ref<const Eigen::MatrixXd>& X,
 // 1               Forward selection with CVEXP stopping
 //
 // Returns
+// Lists ind and weightlist are paired in selection order (retained entry order for forward-stepwise selection). Backward elimination uses original variable order; fixed supports preserve the supplied order. The weights matrix always uses original variable order.
 // A list with weights, weightlist, ncomps, ind, card, vexp, cvexp, vexpPC,
 // scores, cor_comps, r, totvar, method, varSelection, Time_wall, Time_cpu, Time_colnames,
 // setup_wall, setup_cpu, and time_unit_raw. The element r contains signed
@@ -352,7 +353,7 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
         indj.head(cardvec(j)) = indvec.segment(startind, cardvec(j));
         cardt = cardvec(j);
         startind += cardt;
-        std::sort(indj.data(), indj.data() + cardt);
+        // Preserve the supplied order; indt below is sorted for computation.
       } else {
         sel_fail = fwd_selectT(X, D, D_orig, totvexp, u,
                                prev_cvexp_j, target_cvexp_j, alpha,
@@ -413,8 +414,12 @@ List lsspcaTC(const Eigen::Map<Eigen::MatrixXd>& X,
       A.col(j).setZero();
       for (int i = 0; i < cardt; i++) A(indt(i), j) = a(i);
 
-      indout[j] = indt.array() + 1;
-      weightlist[j] = a.head(cardt);
+      // Output in selection order without changing the sorted computational basis.
+      indout[j] = indj.head(cardt).array() + 1;
+      VectorXd selected_weights(cardt);
+      for (int i = 0; i < cardt; ++i)
+        selected_weights(i) = A(indj(i), j);
+      weightlist[j] = selected_weights;
       card(j) = cardt;
       double den_r = scores.col(j).squaredNorm() * PCvexp(j);
       if (den_r > 0.0)

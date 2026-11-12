@@ -1,7 +1,8 @@
 
 
 #  summary.spca==============
-#' Summarize the Variance Explained and Sparsity of a \code{pca} or \code{spca} Object
+#' Summarize the Variance Explained and Sparsity of a \code{pca} 
+#' or \code{spca} Object
 #'
 #' Print and, optionally, return summary statistics for evaluating an
 #'  \code{spca} object and comparing it with the corresponding PCA 

@@ -47,10 +47,9 @@ source("Extended_vignette_material/spca_utilities_for_vignettes.R")
 load("Extended_vignette_material/spca_vignette_results.rda")
 ```
 
-$$
 \newcommand{\trasp}{^{\top}}
 \newcommand{\traspj}{_{j}^{\top}}
-$$
+
 <div style="display:flex; align-items:center; gap:15px;">
 <img src="figures/spca_logo_octagon.png" height="90" alt="spca logo"/>
 <h2>Package spca</h2>

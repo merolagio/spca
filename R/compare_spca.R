@@ -186,7 +186,7 @@ compare_spca = function(
      if(grepl("^b", plot_type[1]))
        plot_type = "bars"
      else{
-      warning(paste0("plot_type must be points or bars", plot_type, "was passed
+      warning(paste("plot_type must be points or bars", plot_type, "was passed
                      .\nset to bars"))
       plot_type = "bars"
    }

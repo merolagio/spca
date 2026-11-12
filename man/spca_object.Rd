@@ -28,10 +28,10 @@ the corresponding PCs.}
 \item{cor_with_pc}{Correlation between each sPC and the
 corresponding PC.}
 \item{tot_var}{Total variance of the data.}
-\item{weights_list}{List of nonzero weight vectors, one per sPC.}
+\item{weights_list}{List of selected weight vectors, paired with indices in selection order, one per sPC.}
 \item{spc_cor}{\eqn{n_comps \times n_comps} correlation matrix of the
 sPC scores.}
-\item{indices}{List of variable indices with nonzero weights, one per sPC.}
+\item{indices}{List of selected variable indices, one per sPC, in selection order (retained entry order for forward-stepwise selection). Backward elimination uses original variable order; fixed supports preserve the supplied order.}
 \item{scores}{Optional matrix of sPC scores, returned only when a data matrix
 is supplied.}
 \item{parameters}{List of parameters used to compute an \code{\link[=spca]{spca()}} fit.}

@@ -1,3 +1,10 @@
+
+# spca 1.1.6
+- The cpp and R wrapper return indices and weights lists in the selection order
+
+# spca 1.1.5
+- Aesthetic touchups
+
 # spca 1.1.4
 - spca's parameter `fixed_index_list` now accepts same index in different
    components it also allows to require that only some components have fixed 
